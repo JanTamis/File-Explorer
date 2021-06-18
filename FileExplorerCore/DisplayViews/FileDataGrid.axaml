@@ -1,0 +1,66 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+					xmlns:converters="using:FileExplorerCore.Converters"
+						 xmlns:models="clr-namespace:FileExplorerCore.Models"
+          mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+          x:Class="FileExplorerCore.DisplayViews.FileDataGrid">
+	<UserControl.Resources>
+		<converters:PathToImageConverter x:Key="imageConverter" />
+		<converters:EditedOnConverter x:Key="editedOnConverter" />
+		<converters:ExtensionConverter x:Key="extensionConverter" />
+		<converters:SizeConverter x:Key="sizeConverter" />
+		<converters:FileNameConverter x:Key="fileNameConverter" />
+	</UserControl.Resources>
+
+	<ScrollViewer>
+		<ItemsRepeater Items="{Binding Files}"
+									 Margin="0 0 0 5"
+									 x:Name="fileList">
+			<ItemsRepeater.Layout>
+				<StackLayout Orientation="Vertical" />
+			</ItemsRepeater.Layout>
+
+			<ItemsRepeater.ItemTemplate>
+				<DataTemplate DataType="models:FileModel">
+					<ListBoxItem Margin="0"
+											 Padding="2"
+											 HorizontalContentAlignment="Stretch"
+											 ToolTip.Tip="{Binding Name}"
+											 IsSelected="{Binding IsSelected}"
+											 Cursor="Hand">
+						<Grid ColumnDefinitions="Auto, *, 185, *, *">
+							<Viewbox Width="{Binding ImageSize}"
+											 Height="{Binding ImageSize}"
+											 RenderTransform="{Binding ImageTransform}">
+								<Image Source="{Binding Image}" />
+							</Viewbox>
+
+							<TextBlock Text="{Binding Name}"
+												 Grid.Column="1"
+												 TextTrimming="CharacterEllipsis"
+												 VerticalAlignment="Center"
+												 Margin="4 0"/>
+
+							<TextBlock Text="{Binding EditedOn}"
+												 Grid.Column="2"
+												 TextTrimming="CharacterEllipsis"
+												 VerticalAlignment="Center"
+												 Margin="4 0"/>
+
+							<TextBlock Text="{Binding, Converter={StaticResource extensionConverter}}"
+												 TextTrimming="CharacterEllipsis"
+												 Grid.Column="3"
+												 VerticalAlignment="Center" />
+
+							<TextBlock Text="{Binding, Converter={StaticResource sizeConverter}}"
+												 Grid.Column="4"
+												 VerticalAlignment="Center" />
+						</Grid>
+					</ListBoxItem>
+				</DataTemplate>
+			</ItemsRepeater.ItemTemplate>
+		</ItemsRepeater>
+	</ScrollViewer>
+</UserControl>

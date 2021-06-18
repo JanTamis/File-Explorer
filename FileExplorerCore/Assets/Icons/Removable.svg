@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<linearGradient x1="0.95470744" y1="0.045292407" x2="0.0088249445" y2="0.9912068" id="gradient_1">
+			<stop offset="0" stop-color="#75DAFF" />
+			<stop offset="1" stop-color="#1EA2E4" />
+		</linearGradient>
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+		<clipPath id="mask_1">
+			<use xlink:href="#path_1" />
+		</clipPath>
+	</defs>
+	<g id="icons8_usb_memory_stick_1">
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+		<g clip-path="url(#mask_1)">
+			<path d="M9.899 17.0457L0 7.14675L6.561 0.58575C7.342 -0.19525 8.608 -0.19525 9.389 0.58575L16.46 7.65675C17.241 8.43775 17.241 9.70375 16.46 10.4848L9.899 17.0457L9.899 17.0457Z" transform="translate(25.387999 5.5672507)" id="Shape" fill="#CCCCCC" fill-rule="evenodd" stroke="none" />
+			<path d="M1.56025 3.68125L0.14625 2.26725C-0.0487499 2.07225 -0.0487499 1.75525 0.14625 1.56025L1.56025 0.14625C1.75525 -0.0487499 2.07225 -0.0487499 2.26725 0.14625L3.68125 1.56025C3.87625 1.75525 3.87625 2.07225 3.68125 2.26725L2.26725 3.68125C2.07225 3.87725 1.75625 3.87725 1.56025 3.68125L1.56025 3.68125Z" transform="translate(30.708752 9.92775)" id="Shape" fill="#666666" fill-rule="evenodd" stroke="none" />
+			<path d="M1.56025 3.68125L0.146248 2.26725C-0.0487518 2.07225 -0.0487518 1.75525 0.146248 1.56025L1.56025 0.14625C1.75525 -0.0487499 2.07225 -0.0487499 2.26725 0.14625L3.68125 1.56025C3.87625 1.75525 3.87625 2.07225 3.68125 2.26725L2.26725 3.68125C2.07225 3.87625 1.75525 3.87625 1.56025 3.68125L1.56025 3.68125Z" transform="translate(34.24475 13.463751)" id="Shape" fill="#666666" fill-rule="evenodd" stroke="none" />
+			<path d="M2.92875 28.5445L2.92875 28.5445C-0.97625 24.6395 -0.97625 18.3075 2.92875 14.4025L17.0148 0.3165C17.4368 -0.1055 18.1198 -0.1055 18.5418 0.3165L31.1567 12.9315C31.5788 13.3535 31.5788 14.0365 31.1567 14.4585L17.0718 28.5445C13.1658 32.4495 6.83475 32.4495 2.92875 28.5445L2.92875 28.5445Z" transform="translate(5.56625 10.960501)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+		</g>
+	</g>
+</svg>

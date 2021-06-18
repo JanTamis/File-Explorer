@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient x1="0.5" y1="-0.008588791" x2="0.5" y2="0.23461723" id="gradient_1">
+      <stop offset="0" stop-color="#EBA600" />
+      <stop offset="1" stop-color="#C28200" />
+    </linearGradient>
+    <linearGradient x1="0.5" y1="-0.0048675537" x2="0.5" y2="0.9994316" id="gradient_2">
+      <stop offset="0" stop-color="#FFD869" />
+      <stop offset="1" stop-color="#FEC52B" />
+    </linearGradient>
+    <radialGradient gradientUnits="objectBoundingBox" cx="114.0092%" cy="80.42679%" fx="114.0092%" fy="80.42679%" r="64.65418%" gradientTransform="translate(1.140092,0.8042679),scale(0.89890003,1),scale(1,1.1887872),translate(-1.140092,-0.8042679)" id="gradient_3">
+      <stop offset="0%" stop-color="#BD8AF5" />
+      <stop offset="13.7%" stop-color="#B88BF5" />
+      <stop offset="30.899996%" stop-color="#A88FF3" />
+      <stop offset="49.9%" stop-color="#8F96F2" />
+      <stop offset="70.200005%" stop-color="#6B9EEF" />
+      <stop offset="91.299995%" stop-color="#3EAAEC" />
+      <stop offset="100%" stop-color="#29AFEA" />
+    </radialGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="icons8_movies_folder">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+    <g clip-path="url(#mask_1)">
+      <path d="M21.414 3.414L18.878 0.877999C18.316 0.316 17.553 0 16.757 0L2 0C0.895 0 0 0.895 0 2L0 32C0 33.105 0.895 34 2 34L40 34C41.105 34 42 33.105 42 32L42 6C42 4.895 41.105 4 40 4L22.828 4C22.298 4 21.789 3.789 21.414 3.414L21.414 3.414Z" transform="translate(3 7)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+      <path d="M18.586 3.414L21.854 0.146C21.947 0.0530005 22.074 0 22.207 0L40 0C41.105 0 42 0.895001 42 2L42 28C42 29.105 41.105 30 40 30L2 30C0.895 30 0 29.105 0 28L0 4.5C0 4.224 0.224 4 0.5 4L17.172 4C17.702 4 18.211 3.789 18.586 3.414L18.586 3.414Z" transform="translate(3 11)" id="Shape" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+      <path d="M19 17.978L1 17.978C0.448 17.978 0 17.53 0 16.978L0 1C0 0.450001 0.45 0 1 0L19 0C19.552 0 20 0.448 20 1L20 16.978C20 17.528 19.55 17.978 19 17.978L19 17.978Z" transform="translate(14 19.022)" id="Shape" fill="url(#gradient_3)" fill-rule="evenodd" stroke="none" />
+      <path d="M0 0L2 0L2 2L0 2L0 0Z" transform="translate(16 21)" id="Rectangle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+      <path d="M0 0L2 0L2 2L0 2L0 0Z" transform="translate(16 25)" id="Rectangle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+      <path d="M0 0L2 0L2 2L0 2L0 0Z" transform="translate(16 29)" id="Rectangle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+      <path d="M0 0L2 0L2 2L0 2L0 0Z" transform="translate(16 33)" id="Rectangle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+      <path d="M0 0L2 0L2 2L0 2L0 0Z" transform="translate(30 21)" id="Rectangle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+      <path d="M0 0L2 0L2 2L0 2L0 0Z" transform="translate(30 25)" id="Rectangle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+      <path d="M0 0L2 0L2 2L0 2L0 0Z" transform="translate(30 29)" id="Rectangle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+      <path d="M0 0L2 0L2 2L0 2L0 0Z" transform="translate(30 33)" id="Rectangle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+    </g>
+  </g>
+</svg>

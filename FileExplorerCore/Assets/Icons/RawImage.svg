@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="49px" viewBox="0 0 48 49" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient x1="0.048090935" y1="0.952" x2="0.5090909" y2="0.49090907" id="gradient_1">
+      <stop offset="0" stop-color="#3079D6" />
+      <stop offset="1" stop-color="#297CD2" />
+    </linearGradient>
+    <linearGradient x1="0.5" y1="0.015142858" x2="0.5" y2="1.0357143" id="gradient_2">
+      <stop offset="0.9" stop-color="#6D7882" />
+      <stop offset="0.91699994" stop-color="#45494D" />
+    </linearGradient>
+    <radialGradient gradientUnits="objectBoundingBox" cx="50%" cy="50%" fx="50%" fy="50%" r="50%" gradientTransform="translate(0.5,0.5),translate(-0.5,-0.5)" id="gradient_3">
+      <stop offset="0%" stop-color="#000000" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient gradientUnits="objectBoundingBox" cx="15.625%" cy="15.962505%" fx="15.625%" fy="15.962505%" r="103.23749%" gradientTransform="translate(0.15625,0.15962505),scale(1,0.9999999),translate(-0.15625,-0.15962505)" id="gradient_4">
+      <stop offset="0%" stop-color="#BD8AF5" />
+      <stop offset="13.7%" stop-color="#B88BF5" />
+      <stop offset="30.899996%" stop-color="#A88FF3" />
+      <stop offset="49.9%" stop-color="#8F96F2" />
+      <stop offset="70.200005%" stop-color="#6B9EEF" />
+      <stop offset="91.299995%" stop-color="#3EAAEC" />
+      <stop offset="100%" stop-color="#29AFEA" />
+    </radialGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <path d="M0 0L25 0L25 25L0 25L0 0Z" id="path_2" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+    <clipPath id="mask_2">
+      <use xlink:href="#path_2" />
+    </clipPath>
+  </defs>
+  <g id="icons8_file_2">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+    <g clip-path="url(#mask_1)">
+      <path d="M30 11L30 36C30 37.105 29.105 38 28 38L2 38C0.895001 38 0 37.105 0 36L0 2C0 0.895 0.895001 0 2 0L19 0L30 11L30 11Z" transform="translate(9 5)" id="Shape" fill="#50E6FF" fill-rule="evenodd" stroke="none" />
+      <path d="M0 0L0 9C0 10.105 0.895 11 2 11L11 11L0 0L0 0Z" transform="translate(28 5)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+    </g>
+  </g>
+  <g id="icons8_camera" transform="translate(11.517822 16.645477)">
+    <path d="M0 0L25 0L25 25L0 25L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+    <g clip-path="url(#mask_2)">
+      <path d="M20.8333 2.08333L15.7089 2.08333C15.3922 2.08333 15.0932 1.93958 14.8953 1.69219L13.8542 0.391146C13.6568 0.14375 13.3573 0 13.0411 0L8.83438 0C8.51771 0 8.21875 0.14375 8.02083 0.391146L6.97917 1.69219C6.78177 1.93958 6.48229 2.08333 6.16615 2.08333L1.04167 2.08333C0.466146 2.08333 0 2.54948 0 3.125L0 17.1875C0 17.763 0.466146 18.2292 1.04167 18.2292L20.8333 18.2292C21.4089 18.2292 21.875 17.763 21.875 17.1875L21.875 3.125C21.875 2.54948 21.4089 2.08333 20.8333 2.08333L20.8333 2.08333Z" transform="translate(1.5625 3.125)" id="Shape" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+      <path d="M0 7.03125C0 3.148 3.148 0 7.03125 0C10.9145 0 14.0625 3.148 14.0625 7.03125C14.0625 10.9145 10.9145 14.0625 7.03125 14.0625C3.148 14.0625 0 10.9145 0 7.03125Z" transform="translate(5.46875 6.25)" id="Circle" fill="url(#gradient_3)" fill-rule="evenodd" stroke="none" />
+      <path d="M0 5.72917C0 2.56504 2.56504 0 5.72917 0C8.8933 0 11.4583 2.56504 11.4583 5.72917C11.4583 8.8933 8.8933 11.4583 5.72917 11.4583C2.56504 11.4583 0 8.8933 0 5.72917Z" transform="translate(6.7708435 7.2916718)" id="Circle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+      <path d="M0 4.16667C0 1.86548 1.86548 0 4.16667 0C6.46785 0 8.33333 1.86548 8.33333 4.16667C8.33333 6.46785 6.46785 8.33333 4.16667 8.33333C1.86548 8.33333 0 6.46785 0 4.16667Z" transform="translate(8.3333435 8.854172)" id="Circle" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
+      <path d="M0 1.04167C0 0.46637 0.46637 0 1.04167 0C1.61696 0 2.08333 0.46637 2.08333 1.04167C2.08333 1.61696 1.61696 2.08333 1.04167 2.08333C0.46637 2.08333 0 1.61696 0 1.04167Z" transform="translate(19.270844 7.2916718)" id="Circle" fill="#EEF2F3" fill-rule="evenodd" stroke="none" />
+      <path d="M3.64583 1.04167L0 1.04167L0 0.520833C0 0.233333 0.233333 0 0.520833 0L3.125 0C3.4125 0 3.64583 0.233333 3.64583 0.520833L3.64583 1.04167L3.64583 1.04167Z" transform="translate(3.6458435 4.1666718)" id="Shape" fill="#0076D7" fill-rule="evenodd" stroke="none" />
+    </g>
+  </g>
+</svg>

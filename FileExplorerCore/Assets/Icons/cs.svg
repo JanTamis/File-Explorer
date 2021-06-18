@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="49px" viewBox="0 0 48 49" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient x1="0.048090935" y1="0.952" x2="0.5090909" y2="0.49090907" id="gradient_1">
+      <stop offset="0" stop-color="#3079D6" />
+      <stop offset="1" stop-color="#297CD2" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <path d="M0 0L25 0L25 25L0 25L0 0Z" id="path_2" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+    <clipPath id="mask_2">
+      <use xlink:href="#path_2" />
+    </clipPath>
+  </defs>
+  <g id="icons8_file_2">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+    <g clip-path="url(#mask_1)">
+      <path d="M30 11L30 36C30 37.105 29.105 38 28 38L2 38C0.895001 38 0 37.105 0 36L0 2C0 0.895 0.895001 0 2 0L19 0L30 11L30 11Z" transform="translate(9 5)" id="Shape" fill="#50E6FF" fill-rule="evenodd" stroke="none" />
+      <path d="M0 0L0 9C0 10.105 0.895 11 2 11L11 11L0 0L0 0Z" transform="translate(28 5)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+    </g>
+  </g>
+  <g id="icons8_c_sharp_logo_3" transform="translate(11.661682 16.645554)">
+    <path d="M0 0L25 0L25 25L0 25L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+    <g clip-path="url(#mask_2)">
+      <path d="M9.32448 0.148828C9.67813 -0.0496093 10.1135 -0.0496093 10.4667 0.148828C12.2141 1.12956 17.4724 4.08164 19.2203 5.06237C19.574 5.26029 19.7917 5.62695 19.7917 6.02383C19.7917 7.98529 19.7917 13.8889 19.7917 15.8504C19.7917 16.2473 19.574 16.6139 19.2203 16.8124C17.4729 17.7931 12.2146 20.7452 10.4667 21.7259C10.113 21.9243 9.6776 21.9243 9.32448 21.7259C7.57708 20.7452 2.31875 17.7931 0.570834 16.8124C0.217708 16.6139 0 16.2478 0 15.8509C0 13.8895 0 7.98581 0 6.02435C0 5.62747 0.217708 5.26081 0.571354 5.06237C2.31823 4.08164 7.5776 1.12956 9.32448 0.148828L9.32448 0.148828Z" transform="translate(2.604187 1.5626221)" id="Shape" fill="#6B1578" fill-rule="evenodd" stroke="none" />
+      <path d="M0.158333 16.3564C0.0197917 16.171 0 15.9949 0 15.758C0 13.808 0 7.93817 0 5.98765C0 5.59285 0.217187 5.22827 0.569792 5.0314C2.31094 4.0564 7.55156 1.1215 9.29271 0.14598C9.64531 -0.0514158 10.1229 -0.0472492 10.4755 0.150147C12.2167 1.12515 17.4396 4.03504 19.1807 5.01004C19.3214 5.08921 19.4286 5.18452 19.5245 5.31004L0.158333 16.3564L0.158333 16.3564Z" transform="translate(2.604187 1.5623627)" id="Shape" fill="#9A4A93" fill-rule="evenodd" stroke="none" />
+      <path d="M7.29167 0C11.3161 0 14.5833 3.26719 14.5833 7.29167C14.5833 11.3161 11.3161 14.5833 7.29167 14.5833C3.26719 14.5833 0 11.3161 0 7.29167C0 3.26719 3.26719 0 7.29167 0L7.29167 0ZM7.29166 3.64583C9.30364 3.64583 10.9375 5.27916 10.9375 7.29166C10.9375 9.30364 9.30364 10.9375 7.29166 10.9375C5.27968 10.9375 3.64583 9.30364 3.64583 7.29166C3.64583 5.27916 5.27916 3.64583 7.29166 3.64583L7.29166 3.64583Z" transform="translate(5.208313 5.2083282)" id="Shape" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+      <path d="M9.83958 0C10.1083 0.251562 10.1031 0.630729 10.1031 0.929167C10.1031 2.90573 10.0865 8.5276 10.1078 10.5042C10.1099 10.7104 10.0417 10.9276 9.93958 11.0911L0 5.6224L9.83958 0L9.83958 0Z" transform="translate(12.288025 6.8776093)" id="Shape" fill="#823084" fill-rule="evenodd" stroke="none" />
+      <path d="M0 0L0.520833 0L0.520833 4.16667L0 4.16667L0 0ZM1.5625 0L2.08333 0L2.08333 4.16667L1.5625 4.16667L1.5625 0Z" transform="translate(17.708313 10.4166565)" id="Shape" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+      <path d="M0 1.5625L4.16667 1.5625L4.16667 2.08333L0 2.08333L0 1.5625ZM0 0L4.16667 0L4.16667 0.520833L0 0.520833L0 0Z" transform="translate(16.666687 11.4583435)" id="Shape" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+    </g>
+  </g>
+</svg>

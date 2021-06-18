@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<linearGradient x1="0.048090935" y1="0.952" x2="0.5090909" y2="0.49090907" id="gradient_1">
+			<stop offset="0" stop-color="#3079D6" />
+			<stop offset="1" stop-color="#297CD2" />
+		</linearGradient>
+		<radialGradient gradientUnits="objectBoundingBox" cx="91.94524%" cy="78.84999%" fx="91.94524%" fy="78.84999%" r="91.44835%" gradientTransform="translate(0.91945237,0.7884999),scale(0.8095222,1),scale(1,0.80952215),translate(-0.91945237,-0.7884999)" id="gradient_2">
+			<stop offset="0%" stop-color="#BD8AF5" />
+			<stop offset="13.7%" stop-color="#B88BF5" />
+			<stop offset="30.899996%" stop-color="#A88FF3" />
+			<stop offset="49.9%" stop-color="#8F96F2" />
+			<stop offset="70.200005%" stop-color="#6B9EEF" />
+			<stop offset="91.299995%" stop-color="#3EAAEC" />
+			<stop offset="100%" stop-color="#29AFEA" />
+		</radialGradient>
+		<linearGradient x1="0.49999997" y1="-0.086241364" x2="0.49999997" y2="1.9801203" id="gradient_3">
+			<stop offset="0" stop-color="#124787" />
+			<stop offset="0.9229999" stop-color="#173B75" />
+			<stop offset="1" stop-color="#173A73" />
+		</linearGradient>
+		<path d="M0 0L48 0L48 48L0 48L0 0L0 0Z" id="path_1" />
+		<path d="M0 0L25 0L25 25L0 25L0 0L0 0Z" id="path_2" />
+		<clipPath id="mask_1">
+			<use xlink:href="#path_1" />
+		</clipPath>
+		<clipPath id="mask_2">
+			<use xlink:href="#path_2" />
+		</clipPath>
+	</defs>
+	<g id="svg">
+		<g id="icons8_file">
+			<path d="M0 0L48 0L48 48L0 48L0 0L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+			<g id="Mask-group">
+				<path d="M0 0L48 0L48 48L0 48L0 0L0 0Z" id="path_1" fill="none" fill-rule="evenodd" stroke="none" />
+				<g clip-path="url(#mask_1)">
+					<g id="Group" transform="translate(9 5)">
+						<path d="M30 11L30 36C30 37.105 29.105 38 28 38L2 38C0.895001 38 0 37.105 0 36L0 2C0 0.895 0.895001 0 2 0L19 0L30 11L30 11L30 11Z" id="Shape" fill="#50E6FF" fill-rule="evenodd" stroke="none" />
+						<path d="M0 0L0 9C0 10.105 0.895 11 2 11L11 11L0 0L0 0L0 0Z" transform="translate(19 0)" id="Shape#1" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+					</g>
+				</g>
+			</g>
+		</g>
+		<g id="icons8_wallpaper" transform="translate(12.252594 16.625885)">
+			<path d="M0 0L25 0L25 25L0 25L0 0L0 0Z" id="Background#1" fill="none" fill-rule="evenodd" stroke="none" />
+			<g id="Mask-group">
+				<path d="M0 0L25 0L25 25L0 25L0 0L0 0Z" id="path_2" fill="none" fill-rule="evenodd" stroke="none" />
+				<g clip-path="url(#mask_2)">
+					<g id="Group" transform="translate(0.5625 3.125)">
+						<path d="M20.8333 0L1.04167 0C0.466146 0 0 0.466146 0 1.04167L0 16.6667C0 17.2422 0.466146 17.7083 1.04167 17.7083L20.8333 17.7083C21.4089 17.7083 21.875 17.2422 21.875 16.6667L21.875 1.04167C21.875 0.466146 21.4089 0 20.8333 0L20.8333 0L20.8333 0Z" id="Shape#2" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+						<path d="M0 1.82292C0 0.816147 0.816149 0 1.82292 0C2.82969 0 3.64583 0.816147 3.64583 1.82292C3.64583 2.82969 2.82969 3.64583 1.82292 3.64583C0.816149 3.64583 0 2.82969 0 1.82292L0 1.82292Z" transform="translate(15.1041565 3.125)" id="Circle" fill="#FFF8DE" fill-rule="evenodd" stroke="none" />
+						<path d="M7.32552 0.457567C6.72708 -0.140871 5.76042 -0.153891 5.14583 0.427879L0 5.30288L0 9.79871L11.4583 9.79871C12.0339 9.79871 12.5 9.33257 12.5 8.75705L12.5 5.63205L7.32552 0.457567L7.32552 0.457567L7.32552 0.457567Z" transform="translate(9.375 8.951294)" id="Shape#3" fill="#436DCD" fill-rule="evenodd" stroke="none" />
+						<path d="M18.75 11.882L7.32552 0.457567C6.72708 -0.140871 5.76042 -0.153891 5.14583 0.427879L0 5.30288L0 10.8404C0 11.4159 0.466146 11.882 1.04167 11.882L18.75 11.882L18.75 11.882L18.75 11.882Z" transform="translate(0 6.8679504)" id="Shape#4" fill="url(#gradient_3)" fill-rule="evenodd" stroke="none" />
+					</g>
+				</g>
+			</g>
+		</g>
+	</g>
+</svg>

@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<linearGradient x1="0.8483479" y1="0.8483479" x2="0.14700001" y2="0.14700001" id="gradient_1">
+			<stop offset="0" stop-color="#FFFFFF" />
+			<stop offset="0.242" stop-color="#F2F2F2" />
+			<stop offset="1" stop-color="#CCCCCC" />
+		</linearGradient>
+		<linearGradient x1="0.032142997" y1="0.032142997" x2="0.85285723" y2="0.85285723" id="gradient_2">
+			<stop offset="0" stop-color="#0D61A9" />
+			<stop offset="0.36299998" stop-color="#0E5FA4" />
+			<stop offset="0.78" stop-color="#135796" />
+			<stop offset="1" stop-color="#16528C" />
+		</linearGradient>
+		<linearGradient x1="0.03315001" y1="0.012466535" x2="0.85205" y2="0.87213266" id="gradient_3">
+			<stop offset="0" stop-color="#889097" />
+			<stop offset="0.33099997" stop-color="#848C94" />
+			<stop offset="0.669" stop-color="#78828B" />
+			<stop offset="1" stop-color="#64717C" />
+		</linearGradient>
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+		<clipPath id="mask_1">
+			<use xlink:href="#path_1" />
+		</clipPath>
+	</defs>
+	<g id="icons8_settings">
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+		<g clip-path="url(#mask_1)">
+			<path d="M0 11.5C0 5.14873 5.14873 0 11.5 0C17.8513 0 23 5.14873 23 11.5C23 17.8513 17.8513 23 11.5 23C5.14873 23 0 17.8513 0 11.5Z" transform="translate(12.5 12.5)" id="Circle" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+			<path d="M0 7C0 3.13401 3.13401 0 7 0C10.866 0 14 3.13401 14 7C14 10.866 10.866 14 7 14C3.13401 14 0 10.866 0 7Z" transform="translate(17 17)" id="Circle" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+			<path d="M39.407 14.374C37.018 14.345 34.705 13.1 33.424 10.881C32.191 8.745 32.216 6.232 33.262 4.188C31.137 2.301 28.62 0.849 25.832 0C24.577 1.887 22.435 3.131 20 3.131C17.565 3.131 15.423 1.887 14.169 0C11.381 0.849 8.864 2.301 6.739 4.188C7.785 6.232 7.81 8.745 6.577 10.881C5.296 13.1 2.983 14.345 0.594001 14.374C0.22 15.901 0 17.489 0 19.131C0 20.415 0.133 21.666 0.364 22.883C2.833 22.832 5.255 24.091 6.577 26.381C7.945 28.751 7.764 31.585 6.357 33.726C8.439 35.673 10.93 37.182 13.697 38.101C14.827 35.755 17.221 34.131 20 34.131C22.779 34.131 25.173 35.755 26.303 38.102C29.07 37.183 31.561 35.674 33.643 33.727C32.236 31.586 32.055 28.752 33.423 26.382C34.745 24.092 37.166 22.833 39.636 22.884C39.867 21.666 40 20.415 40 19.131C40 17.489 39.78 15.901 39.407 14.374L39.407 14.374ZM20 29.631C14.201 29.631 9.5 24.93 9.5 19.131C9.5 13.332 14.201 8.631 20 8.631C25.799 8.631 30.5 13.332 30.5 19.131C30.5 24.93 25.799 29.631 20 29.631L20 29.631Z" transform="translate(4 4.869)" id="Shape" fill="url(#gradient_3)" fill-rule="evenodd" stroke="none" />
+		</g>
+	</g>
+</svg>

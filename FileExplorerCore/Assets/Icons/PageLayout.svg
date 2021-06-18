@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient x1="0.048090935" y1="0.952" x2="0.5090909" y2="0.49090907" id="gradient_1">
+      <stop offset="0" stop-color="#3079D6" />
+      <stop offset="1" stop-color="#297CD2" />
+    </linearGradient>
+    <linearGradient x1="0.7701998" y1="6.4232507" x2="-0.5194496" y2="-21.84725" id="gradient_2">
+      <stop offset="0" stop-color="#A3FFFF" />
+      <stop offset="0.223" stop-color="#9DFBFF" />
+      <stop offset="0.53" stop-color="#8BF1FF" />
+      <stop offset="0.885" stop-color="#6EE0FF" />
+      <stop offset="1" stop-color="#63DAFF" />
+    </linearGradient>
+    <linearGradient x1="0.62929976" y1="1.129778" x2="-0.66039956" y2="-5.1525555" id="gradient_3">
+      <stop offset="0" stop-color="#A3FFFF" />
+      <stop offset="0.223" stop-color="#9DFBFF" />
+      <stop offset="0.53" stop-color="#8BF1FF" />
+      <stop offset="0.885" stop-color="#6EE0FF" />
+      <stop offset="1" stop-color="#63DAFF" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <path d="M0 0L25 0L25 25L0 25L0 0Z" id="path_2" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+    <clipPath id="mask_2">
+      <use xlink:href="#path_2" />
+    </clipPath>
+  </defs>
+  <g id="icons8_file_2">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+    <g clip-path="url(#mask_1)">
+      <path d="M30 11L30 36C30 37.105 29.105 38 28 38L2 38C0.895001 38 0 37.105 0 36L0 2C0 0.895 0.895001 0 2 0L19 0L30 11L30 11Z" transform="translate(9 5)" id="Shape" fill="#50E6FF" fill-rule="evenodd" stroke="none" />
+      <path d="M0 0L0 9C0 10.105 0.895 11 2 11L11 11L0 0L0 0Z" transform="translate(28 5)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+    </g>
+  </g>
+  <g id="icons8_footer" transform="translate(11 16.645538)">
+    <path d="M0 0L25 0L25 25L0 25L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+    <g clip-path="url(#mask_2)">
+      <path d="M0 1.04167C0 0.466146 0.466146 0 1.04167 0L14.5833 0C15.1589 0 15.625 0.466146 15.625 1.04167L15.625 18.75C15.625 19.3255 15.1589 19.7917 14.5833 19.7917L1.04167 19.7917C0.466146 19.7917 0 19.3255 0 18.75L0 1.04167L0 1.04167Z" transform="translate(4.6875 2.6041565)" id="Shape" fill="#00B5D3" fill-rule="evenodd" stroke="none" />
+      <path d="M0.260417 0L10.1563 0C10.3 0 10.4167 0.116666 10.4167 0.260417L10.4167 1.82292C10.4167 1.96667 10.3 2.08333 10.1563 2.08333L0.260417 2.08333C0.116667 2.08333 0 1.96667 0 1.82292L0 0.260417C0 0.116666 0.116667 0 0.260417 0L0.260417 0Z" transform="translate(7.2916565 18.229156)" id="Shape" fill="#057093" fill-rule="evenodd" stroke="none" />
+      <path d="M0.260417 0L10.1563 0C10.3 0 10.4167 0.116667 10.4167 0.260417L10.4167 1.82292C10.4167 1.96667 10.3 2.08333 10.1563 2.08333L0.260417 2.08333C0.116667 2.08333 0 1.96667 0 1.82292L0 0.260417C0 0.116667 0.116667 0 0.260417 0L0.260417 0Z" transform="translate(7.2916565 4.6875)" id="Shape" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+      <path d="M0.260417 0L10.1563 0C10.3 0 10.4167 0.116667 10.4167 0.260417L10.4167 9.11458C10.4167 9.25833 10.3 9.375 10.1563 9.375L0.260417 9.375C0.116667 9.375 0 9.25833 0 9.11458L0 0.260417C0 0.116667 0.116667 0 0.260417 0L0.260417 0Z" transform="translate(7.2916565 7.8125)" id="Shape" fill="url(#gradient_3)" fill-rule="evenodd" stroke="none" />
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient x1="0.49997786" y1="1.0253439" x2="0.49997786" y2="0.41051322" id="gradient_1">
+      <stop offset="0.36499998" stop-color="#199AE0" />
+      <stop offset="0.699" stop-color="#1898DE" />
+      <stop offset="0.819" stop-color="#1691D8" />
+      <stop offset="0.905" stop-color="#1186CC" />
+      <stop offset="0.9739999" stop-color="#0A75BC" />
+      <stop offset="1" stop-color="#076CB3" />
+    </linearGradient>
+    <linearGradient x1="0.26335946" y1="1.3104341" x2="0.81906724" y2="0.22371474" id="gradient_2">
+      <stop offset="0" stop-color="#32BDEF" />
+      <stop offset="1" stop-color="#1EA2E4" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="icons8_left">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+    <g clip-path="url(#mask_1)">
+      <path d="M0.48375 6.16775L16.3328 22.0168C16.9778 22.6618 18.0228 22.6618 18.6677 22.0168L22.0167 18.6678C22.6618 18.0228 22.6618 16.9778 22.0167 16.3328L6.16775 0.483751C5.52275 -0.161249 4.47775 -0.161249 3.83275 0.483751L0.48375 3.83275C-0.16125 4.47675 -0.16125 5.52275 0.48375 6.16775L0.48375 6.16775Z" transform="translate(2.00025 19.000248)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+      <path d="M41.9997 12.5007L15.6837 12.5007L22.0168 6.16775C22.6618 5.52275 22.6618 4.47775 22.0168 3.83275L18.6677 0.48375C18.0227 -0.16125 16.9777 -0.16125 16.3328 0.48375L0.48375 16.3328C-0.16125 16.9778 -0.16125 18.0228 0.48375 18.6677L3.83275 22.0167C4.15475 22.3398 4.57675 22.5007 4.99975 22.5007L41.9997 22.5007C43.1048 22.5007 43.9997 21.6057 43.9997 20.5007L43.9997 14.5007C43.9997 13.3957 43.1048 12.5007 41.9997 12.5007L41.9997 12.5007Z" transform="translate(2.0002499 6.49925)" id="Shape" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+    </g>
+  </g>
+</svg>

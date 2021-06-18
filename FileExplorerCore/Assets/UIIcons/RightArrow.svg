@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient x1="0.49999726" y1="1.0253885" x2="0.49999726" y2="0.41055757" id="gradient_1">
+      <stop offset="0.36499998" stop-color="#199AE0" />
+      <stop offset="0.699" stop-color="#1898DE" />
+      <stop offset="0.819" stop-color="#1691D8" />
+      <stop offset="0.905" stop-color="#1186CC" />
+      <stop offset="0.9739999" stop-color="#0A75BC" />
+      <stop offset="1" stop-color="#076CB3" />
+    </linearGradient>
+    <linearGradient x1="0.7366405" y1="1.3104478" x2="0.18093276" y2="0.22368023" id="gradient_2">
+      <stop offset="0" stop-color="#32BDEF" />
+      <stop offset="1" stop-color="#1EA2E4" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="icons8_right">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+    <g clip-path="url(#mask_1)">
+      <path d="M22.0157 6.16875L6.16775 22.0167C5.52275 22.6617 4.47775 22.6617 3.83275 22.0167L0.483749 18.6677C-0.161251 18.0227 -0.161251 16.9777 0.483749 16.3327L16.3327 0.483749C16.9777 -0.161251 18.0227 -0.161251 18.6677 0.483749L22.0167 3.83275C22.6607 4.47775 22.6607 5.52375 22.0157 6.16875L22.0157 6.16875Z" transform="translate(23.500252 18.999252)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+      <path d="M43.516 16.3318L27.667 0.48375C27.022 -0.16125 25.977 -0.16125 25.332 0.48375L21.983 3.83275C21.338 4.47775 21.338 5.52275 21.983 6.16775L28.316 12.4998L2 12.4998C0.895 12.4998 0 13.3948 0 14.4997L0 20.4998C0 21.6047 0.895 22.4998 2 22.4998L39 22.4998C39.423 22.4998 39.845 22.3388 40.167 22.0158L43.516 18.6667C44.161 18.0228 44.161 16.9767 43.516 16.3318L43.516 16.3318Z" transform="translate(2 6.5002503)" id="Shape" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+    </g>
+  </g>
+</svg>

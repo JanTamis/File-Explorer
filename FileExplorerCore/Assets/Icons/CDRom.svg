@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<linearGradient x1="0.31135002" y1="-0.033424996" x2="0.6688" y2="0.97722507" id="gradient_1">
+			<stop offset="0" stop-color="#7DD8F3" />
+			<stop offset="1" stop-color="#45B0D0" />
+		</linearGradient>
+		<linearGradient x1="0.0021152496" y1="0.49961543" x2="0.9978844" y2="0.49961543" id="gradient_2">
+			<stop offset="0" stop-color="#3079D6" />
+			<stop offset="1" stop-color="#297CD2" />
+		</linearGradient>
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+		<clipPath id="mask_1">
+			<use xlink:href="#path_1" />
+		</clipPath>
+	</defs>
+	<g id="icons8_software_license">
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+		<g clip-path="url(#mask_1)">
+			<path d="M0 20C0 8.9543 8.9543 0 20 0C31.0457 0 40 8.9543 40 20C40 31.0457 31.0457 40 20 40C8.9543 40 0 31.0457 0 20Z" transform="translate(4 4)" id="Circle" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+			<path d="M0 7.8C0 3.49218 3.49218 0 7.8 0C12.1078 0 15.6 3.49218 15.6 7.8C15.6 12.1078 12.1078 15.6 7.8 15.6C3.49218 15.6 0 12.1078 0 7.8Z" transform="translate(16.199997 16.399994)" id="Circle" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+			<path d="M0 3.1C0 1.38792 1.38792 0 3.1 0C4.81208 0 6.2 1.38792 6.2 3.1C6.2 4.81208 4.81208 6.2 3.1 6.2C1.38792 6.2 0 4.81208 0 3.1Z" transform="translate(20.899994 21.100006)" id="Circle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+		</g>
+	</g>
+</svg>

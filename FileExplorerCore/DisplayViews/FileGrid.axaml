@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+						 xmlns:models="clr-namespace:FileExplorerCore.Models"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="FileExplorerCore.DisplayViews.FileGrid">
+	<ScrollViewer>
+		<ItemsRepeater Items="{Binding Files}"
+									 Margin="0 0 0 5"
+									 x:Name="fileList">
+			<ItemsRepeater.Layout>
+				<UniformGridLayout ItemsStretch="Uniform"
+													 ItemsJustification="Center"
+													 MinColumnSpacing="7.5"
+													 MinRowSpacing="5"/>
+			</ItemsRepeater.Layout>
+
+			<ItemsRepeater.ItemTemplate>
+				<DataTemplate DataType="models:FileModel">
+					<ListBoxItem Margin="0"
+											 ToolTip.Tip="{Binding Name}"
+											 IsSelected="{Binding IsSelected}"
+											 Cursor="Hand"
+											 VerticalContentAlignment="Center"
+											 HorizontalContentAlignment="Center"
+											 Height="140">
+						<StackPanel>
+							<Viewbox Width="{Binding ImageSize}"
+											 Height="{Binding ImageSize}"
+											 Margin="4" 
+											 RenderTransform="{Binding ImageTransform}">
+									<Image Source="{Binding Image}" />
+							</Viewbox>
+
+							<TextBlock Text="{Binding Name}"
+												 TextTrimming="CharacterEllipsis"
+												 HorizontalAlignment="Center"
+												 Margin="4 0"/>
+						</StackPanel>
+					</ListBoxItem>
+				</DataTemplate>
+			</ItemsRepeater.ItemTemplate>
+		</ItemsRepeater>
+	</ScrollViewer>
+</UserControl>

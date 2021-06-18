@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="icons8_up">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+    <g clip-path="url(#mask_1)">
+      <path d="M6.16775 0.48375L22.0168 16.3328C22.6618 16.9778 22.6618 18.0228 22.0168 18.6677L18.6678 22.0167C18.0228 22.6618 16.9778 22.6618 16.3328 22.0167L0.483751 6.16775C-0.161249 5.52275 -0.161249 4.47775 0.483751 3.83275L3.83275 0.48375C4.47675 -0.16125 5.52275 -0.16125 6.16775 0.48375L6.16775 0.48375Z" transform="translate(19.000248 2.00025)" id="Shape" fill="#1A9BA1" fill-rule="evenodd" stroke="none" />
+      <path d="M22.0168 6.16775L6.16775 22.0158C5.52275 22.6608 4.47775 22.6608 3.83275 22.0158L0.48375 18.6667C-0.16125 18.0217 -0.16125 16.9767 0.48375 16.3318L16.3337 0.48375C16.9788 -0.16125 18.0238 -0.16125 18.6687 0.48375L22.0177 3.83275C22.6617 4.47675 22.6617 5.52275 22.0168 6.16775L22.0168 6.16775Z" transform="translate(6.49925 2.0002499)" id="Shape" fill="#37C6D0" fill-rule="evenodd" stroke="none" />
+      <path d="M10 37L10 0L0 3L0 37C0 38.105 0.895 39 2 39L8 39C9.105 39 10 38.105 10 37L10 37Z" transform="translate(19 7)" id="Shape" fill="#37C6D0" fill-rule="evenodd" stroke="none" />
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="84px" height="84px" viewBox="0 0 84 84" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<radialGradient gradientUnits="objectBoundingBox" cx="-101.55341%" cy="-100.6443%" fx="-101.55341%" fy="-100.6443%" r="247.5877%" gradientTransform="translate(-1.0155342,-1.006443),translate(1.0155342,1.006443)" id="gradient_1">
+			<stop offset="69.3%" stop-color="#006185" />
+			<stop offset="92.09999%" stop-color="#35C1F1" />
+		</radialGradient>
+		<linearGradient x1="0.15346876" y1="0.15346861" x2="0.8543438" y2="0.8543439" id="gradient_2">
+			<stop offset="0" stop-color="#A3FFFF" />
+			<stop offset="0.223" stop-color="#9DFBFF" />
+			<stop offset="0.53" stop-color="#8BF1FF" />
+			<stop offset="0.885" stop-color="#6EE0FF" />
+			<stop offset="1" stop-color="#63DAFF" />
+		</linearGradient>
+		<path d="M0 0L84 0L84 84L0 84L0 0Z" id="path_1" />
+		<clipPath id="mask_1">
+			<use xlink:href="#path_1" />
+		</clipPath>
+	</defs>
+	<g id="icons8_nothing_found">
+		<path d="M0 0L84 0L84 84L0 84L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+		<g clip-path="url(#mask_1)">
+			<path d="M6.188 0L0 6.188L13.7725 19.9605C14.1138 20.3017 14.6685 20.3017 15.0098 19.9605L19.9588 15.0115C20.3 14.6702 20.3 14.1155 19.9588 13.7742L6.188 0L6.188 0Z" transform="translate(56.782288 56.783966)" id="Shape" fill="#199BE2" fill-rule="evenodd" stroke="none" />
+			<path d="M6.188 0L0 6.188L7.67025 13.8565L13.8565 7.67025L6.188 0Z" transform="translate(49.11377 49.113678)" id="Polygon" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+			<path d="M0 28C0 12.536 12.536 0 28 0C43.464 0 56 12.536 56 28C56 43.464 43.464 56 28 56C12.536 56 0 43.464 0 28Z" transform="translate(7.0000305 7.0000305)" id="Circle" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+			<path d="M2.625 21.4375C2.625 20.713 7.875 14.875 15.75 14.875C23.625 14.875 28.875 20.713 28.875 21.4375C28.875 22.162 28.287 22.75 27.5625 22.75C27.4453 22.75 21.5985 19.6875 15.75 19.6875C9.9085 19.6875 4.06525 22.75 3.9375 22.75C3.213 22.75 2.625 22.162 2.625 21.4375L2.625 21.4375ZM24.2515 7.2485C26.2535 9.2505 29.498 9.2505 31.5 7.2485L24.2515 0C22.2495 2.002 22.2495 5.2465 24.2515 7.2485L24.2515 7.2485ZM7.2485 7.2485C9.2505 5.2465 9.2505 2.002 7.2485 0L0 7.2485C2.002 9.2505 5.2465 9.2505 7.2485 7.2485L7.2485 7.2485Z" transform="translate(19.24997 25.37503)" id="Shape" fill="#1B9DE2" fill-rule="evenodd" stroke="none" />
+		</g>
+	</g>
+</svg>
