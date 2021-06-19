@@ -5,7 +5,6 @@ using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using ReactiveUI;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -50,7 +49,7 @@ namespace FileExplorerCore.ViewModels
 		private int foundItems;
 
 		public ReactiveCommand<Unit, Unit> RemoveTabCommand;
-		
+
 		private SortEnum _sort = SortEnum.None;
 
 		public SortEnum Sort

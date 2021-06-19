@@ -3,6 +3,7 @@ using Avalonia.Platform;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace FileExplorerCore.Helpers
 {
@@ -37,6 +38,7 @@ namespace FileExplorerCore.Helpers
 		[return: MarshalAs(UnmanagedType.Bool)]
 		internal static extern bool DeleteObject(IntPtr hObject);
 
+		[SupportedOSPlatform("Windows")]
 		public unsafe static Bitmap? GetThumbnail(string fileName, int width, int height, ThumbnailOptions options)
 		{
 			var hBitmap = GetHBitmap(fileName, width, height, options);

@@ -156,13 +156,13 @@ namespace FileExplorerCore.Models
 
 											if (img is not null)
 											{
-												Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1), DispatcherPriority.ApplicationIdle);
+												Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1), DispatcherPriority.MaxValue);
 											}
 										}
 
 										if (ImageSize <= 64)
 										{
-											Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1), DispatcherPriority.ApplicationIdle);
+											Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1), DispatcherPriority.MaxValue);
 										}
 
 										subject.Image = img;
