@@ -1,9 +1,9 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Generators;
 using Avalonia.Controls.Notifications;
-using Avalonia.Controls.Primitives;
+using Avalonia.Input;
 using Avalonia.Markup.Xaml;
-using Avalonia.Markup.Xaml.Templates;
 using FileExplorerCore.Models;
 using FileExplorerCore.ViewModels;
 using ReactiveUI;
@@ -36,7 +36,7 @@ namespace FileExplorerCore.Views
 			var grid = this.FindControl<ListBox>("fileGrid");
 			var tree = this.FindControl<TreeView>("FolderTree");
 			var pathFolders = this.FindControl<Menu>("pathFolders");
-			var searchBar = this.FindControl<TextBox>("searchBar");
+			var searchBar = this.FindControl<AutoCompleteBox>("searchBar");
 
 			if (grid is { })
 			{
@@ -58,15 +58,15 @@ namespace FileExplorerCore.Views
 			PointerPressed += MainWindow_PointerPressed;
 		}
 
-		private void SearchBar_KeyUp(object? sender, Avalonia.Input.KeyEventArgs e)
+		private void SearchBar_KeyUp(object? sender, KeyEventArgs e)
 		{
-			if (e.Key == Avalonia.Input.Key.Enter && DataContext is MainWindowViewModel model)
+			if (sender is AutoCompleteBox { IsDropDownOpen: false } && e.Key is Key.Enter && DataContext is MainWindowViewModel model)
 			{
 				model.StartSearch();
 			}
 		}
 
-		private void ItemContainerGenerator_Materialized1(object? sender, Avalonia.Controls.Generators.ItemContainerEventArgs e)
+		private void ItemContainerGenerator_Materialized1(object? sender, ItemContainerEventArgs e)
 		{
 			foreach (var info in e.Containers)
 			{
@@ -111,9 +111,9 @@ namespace FileExplorerCore.Views
 			}
 		}
 
-		private void MainWindow_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+		private void MainWindow_PointerPressed(object? sender, PointerPressedEventArgs e)
 		{
-			if (DataContext is MainWindowViewModel model && e.Pointer.Type is Avalonia.Input.PointerType.Mouse)
+			if (DataContext is MainWindowViewModel model && e.Pointer.Type is PointerType.Mouse)
 			{
 				var properties = e.GetCurrentPoint(this).Properties;
 
@@ -128,7 +128,7 @@ namespace FileExplorerCore.Views
 			}
 		}
 
-		private void CloseSettings(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+		private void CloseSettings(object? sender, PointerPressedEventArgs e)
 		{
 			if (DataContext is MainWindowViewModel model)
 			{

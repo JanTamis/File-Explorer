@@ -4,6 +4,7 @@ using Avalonia.Threading;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using Nessos.LinqOptimizer.CSharp;
+using NetFabric.Hyperlinq;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,7 @@ namespace FileExplorerCore.ViewModels
 		private bool isDarkMode;
 
 		private TabItemViewModel _currentTab;
+		private IEnumerable<string> searchHistory;
 
 		public static IEnumerable<SortEnum> SortValues => Enum.GetValues<SortEnum>();
 
@@ -79,7 +81,13 @@ namespace FileExplorerCore.ViewModels
 
 		public ObservableRangeCollection<FileModel> Files => CurrentTab.Files;
 
-		public ObservableRangeCollection<TabItemViewModel> Tabs { get; set; } = new ObservableRangeCollection<TabItemViewModel>();
+		public ObservableRangeCollection<TabItemViewModel> Tabs { get; set; } = new();
+
+		public IEnumerable<string> SearchHistory
+		{
+			get => searchHistory;
+			set => this.RaiseAndSetIfChanged(ref searchHistory, value);
+		}
 
 		public TabItemViewModel CurrentTab
 		{
@@ -118,7 +126,12 @@ namespace FileExplorerCore.ViewModels
 
 					isSearching = false;
 
-					CurrentTab.UpdateFiles(false, "*");
+					CurrentTab.UpdateFiles(false, "*").ContinueWith(x =>
+					{
+						var categories = Enum.GetValues<Categories>().Select(s => s.ToString() + ":");
+						SearchHistory = categories.Concat(CurrentTab.Files.Select(s => "*" + s.Extension).Distinct());
+					});
+
 				}
 			}
 		}

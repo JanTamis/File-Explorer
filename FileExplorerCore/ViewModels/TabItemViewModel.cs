@@ -214,11 +214,6 @@ namespace FileExplorerCore.ViewModels
 					foreach (var item in Files)
 					{
 						item.ImageSize = 32;
-
-						if (item.HasImage)
-						{
-							item.Image = null;
-						}
 					}
 
 					var list = new FileDataGrid
@@ -235,11 +230,6 @@ namespace FileExplorerCore.ViewModels
 					foreach (var item in Files)
 					{
 						item.ImageSize = 100;
-
-						if (item.HasImage)
-						{
-							item.Image = null;
-						}
 					}
 
 					var grid = new FileGrid

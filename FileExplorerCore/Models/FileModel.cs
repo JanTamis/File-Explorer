@@ -6,7 +6,9 @@ using FileExplorerCore.Helpers;
 using NetFabric.Hyperlinq;
 using ReactiveUI;
 using System;
+using System.Buffers;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
@@ -20,6 +22,7 @@ namespace FileExplorerCore.Models
 		static Task? imageLoadTask;
 
 		private bool _isSelected;
+		private bool needsNewImage = true;
 
 		private string _name;
 
@@ -29,8 +32,17 @@ namespace FileExplorerCore.Models
 
 		private Bitmap _image;
 		private Transform _imageTransform;
+		private int imageSize;
 
-		public int ImageSize { get; set; }
+		public int ImageSize
+		{
+			get => imageSize;
+			set
+			{
+				needsNewImage = true;
+				imageSize = value;
+			}
+		}
 
 		public string ExtensionName { get; set; }
 
@@ -131,8 +143,13 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				if (_image is null)
+				if (needsNewImage)
 				{
+					_image?.Dispose();
+					_image = null;
+
+					ImageTransform = null;
+
 					FileImageQueue.Push(this);
 
 					if (imageLoadTask is null || imageLoadTask is { IsCompleted: true })
@@ -141,32 +158,26 @@ namespace FileExplorerCore.Models
 						{
 							while (!FileImageQueue.IsEmpty)
 							{
-								Concurrent.While(new ParallelOptions()
+								Concurrent.ForEach(Concurrent.AsEnumerable(FileImageQueue), subject =>
 								{
-									MaxDegreeOfParallelism = Environment.ProcessorCount / 4
-								}, () => !FileImageQueue.IsEmpty, () =>
-								{
-									if (FileImageQueue.TryPop(out var subject))
+									var img = WindowsThumbnailProvider.GetThumbnail(subject.Path, subject.ImageSize, subject.ImageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk);
+
+									if (img is null)
 									{
-										var img = WindowsThumbnailProvider.GetThumbnail(subject.Path, subject.ImageSize, subject.ImageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk);
+										img = WindowsThumbnailProvider.GetThumbnail(subject.Path, subject.ImageSize, subject.ImageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
 
-										if (img is null)
-										{
-											img = WindowsThumbnailProvider.GetThumbnail(subject.Path, subject.ImageSize, subject.ImageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
-
-											if (img is not null)
-											{
-												Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1), DispatcherPriority.MaxValue);
-											}
-										}
-
-										if (ImageSize <= 64)
+										if (img is not null)
 										{
 											Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1), DispatcherPriority.MaxValue);
 										}
-
-										subject.Image = img;
 									}
+									else if (ImageSize <= 64)
+									{
+										Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1), DispatcherPriority.MaxValue);
+									}
+
+									subject.Image = img;
+									subject.needsNewImage = false;
 								});
 							}
 						});
@@ -192,9 +203,12 @@ namespace FileExplorerCore.Models
 			{
 				var span = path.AsSpan();
 
-				if (System.IO.Path.HasExtension(span))
+				if (File.Exists(path))
 				{
-					return System.IO.Path.GetExtension(span).ToString();
+					if (System.IO.Path.HasExtension(span))
+					{
+						return System.IO.Path.GetExtension(span).ToString();
+					}
 				}
 
 				return null;
