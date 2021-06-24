@@ -202,6 +202,11 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
+		public void Refresh()
+		{
+			OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs("IsSelected"));
+		}
+
 		static void ParallelQuickSort(List<T> array, int left, int right, IComparer<T> comparer)
 		{
 			var Threshold = 50;
@@ -228,8 +233,8 @@ namespace FileExplorerCore.Helpers
 			if (j - left > Threshold && right - i > Threshold)
 			{
 				Parallel.Invoke(
-						() => ParallelQuickSort(array, left, j, comparer),
-						() => ParallelQuickSort(array, i, right, comparer)
+					() => ParallelQuickSort(array, left, j, comparer),
+					() => ParallelQuickSort(array, i, right, comparer)
 				);
 			}
 			else

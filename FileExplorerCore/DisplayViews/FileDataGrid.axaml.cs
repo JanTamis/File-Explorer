@@ -51,6 +51,8 @@ namespace FileExplorerCore.DisplayViews
 				{
 					file.IsSelected = true;
 				}
+
+				Files.Refresh();
 			}
 		}
 
@@ -178,6 +180,8 @@ namespace FileExplorerCore.DisplayViews
 			{
 				anchorIndex = index;
 			}
+
+			files.Refresh();
 		}
 	}
 }

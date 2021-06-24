@@ -51,6 +51,8 @@ namespace FileExplorerCore.DisplayViews
 				{
 					file.IsSelected = true;
 				}
+
+				Files.Refresh();
 			}
 		}
 
@@ -67,13 +69,6 @@ namespace FileExplorerCore.DisplayViews
 		{
 			if (sender is ListBoxItem { DataContext: FileModel model } item)
 			{
-				//model.IsSelected = !model.IsSelected;
-
-				//foreach (var file in Files.AsValueEnumerable().Where(x => x.IsSelected && x != model))
-				//{
-				//	file.IsSelected = false;
-				//}
-
 				var point = e.GetCurrentPoint(item);
 
 				if (point.Properties.IsLeftButtonPressed || point.Properties.IsRightButtonPressed)
@@ -185,6 +180,8 @@ namespace FileExplorerCore.DisplayViews
 			{
 				anchorIndex = index;
 			}
+
+			files.Refresh();
 		}
 	}
 }

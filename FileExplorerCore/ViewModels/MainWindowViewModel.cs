@@ -282,6 +282,8 @@ namespace FileExplorerCore.ViewModels
 				{
 					file.IsSelected = true;
 				}
+
+				Files.Refresh();
 			}
 		}
 

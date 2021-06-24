@@ -28,7 +28,10 @@
 					<Setter Property="Background" Value="Transparent" />
 					<Setter Property="Template">
 						<ControlTemplate>
-							<Border CornerRadius="10" Name="PART_ContentPresenter">
+							<Border CornerRadius="10" 
+											Name="PART_ContentPresenter"
+											BoxShadow="0 0 15 -5 Black"
+											Margin="8 4">
 								<ContentPresenter 
 																	ClipToBounds="true"
 																Background="{TemplateBinding Background}"
@@ -47,6 +50,7 @@
 
 				<Style Selector="ListBoxItem /template/ Border#PART_ContentPresenter">
 					<Setter Property="TextBlock.FontWeight" Value="Normal" />
+					<Setter Property="Background" Value="{DynamicResource SystemChromeDisabledHighColor}" />
 					<Setter Property="TextBlock.FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
 				</Style>
 
@@ -57,7 +61,7 @@
 
 				<!--  PointerOver State  -->
 				<Style Selector="ListBoxItem:pointerover /template/ Border#PART_ContentPresenter">
-					<Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}" />
+					<Setter Property="Background" Value="{DynamicResource SystemListLowColor}" />
 				</Style>
 				<Style Selector="ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
 					<Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlHighlightAltBaseHighBrush}" />
@@ -106,8 +110,7 @@
 
 			<ItemsRepeater.ItemTemplate>
 				<DataTemplate DataType="models:FileModel">
-					<ListBoxItem Margin="2 1"
-											 Padding="2 1"
+					<ListBoxItem Padding="2 1"
 											 HorizontalContentAlignment="Stretch"
 											 ToolTip.Tip="{Binding Name}"
 											 IsSelected="{Binding IsSelected}"
@@ -115,7 +118,7 @@
 						<Grid ColumnDefinitions="Auto, *, 185, *">
 							<Viewbox Width="{Binding ImageSize}"
 											 Height="{Binding ImageSize}"
-											 Margin="0"
+											 Margin="2.5 0 0 0"
 											 RenderTransform="{Binding ImageTransform}">
 								<Image Source="{Binding Image}" />
 							</Viewbox>

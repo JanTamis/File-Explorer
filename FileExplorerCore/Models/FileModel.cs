@@ -55,7 +55,7 @@ namespace FileExplorerCore.Models
 		public bool IsSelected
 		{
 			get => _isSelected;
-			set => this.RaiseAndSetIfChanged(ref _isSelected, value);
+			set => _isSelected = value;
 		}
 
 		public bool HasImage => _image is not null;

@@ -515,12 +515,14 @@
 											</ItemsPanelTemplate>
 										</ListBox.ItemsPanel>
 										<ListBoxItem Cursor="Hand"
+																 Padding="7.5"
 																 IsSelected="{Binding IsGrid, Mode=TwoWay}" >
 												<Image Source="{SvgImage /Assets/UIIcons/Grid.svg}" 
 															 Width="25"/>
 										</ListBoxItem>
 
 										<ListBoxItem Cursor="Hand" 
+																 Padding="7.5"
 																 IsSelected="{Binding !IsGrid, Mode=TwoWay}">
 												<Image Source="{SvgImage /Assets/UIIcons/List.svg}" 
 															 Width="25" />
