@@ -6,6 +6,7 @@ using Avalonia.Markup.Xaml;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using NetFabric.Hyperlinq;
+using ReactiveUI;
 using System;
 
 namespace FileExplorerCore.DisplayViews
@@ -58,14 +59,15 @@ namespace FileExplorerCore.DisplayViews
 
 		private void Grid_ElementClearing(object? sender, ItemsRepeaterElementClearingEventArgs e)
 		{
-			if (e.Element is ListBoxItem item)
+			if (e.Element is ListBoxItem { DataContext: FileModel model } item)
 			{
 				item.DoubleTapped -= Item_DoubleTapped;
 				item.PointerPressed -= Item_PointerPressed;
+				model.SelectionChanged -= Model_SelectionChanged;
 			}
 		}
 
-		private void Item_PointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
+		private void Item_PointerPressed(object? sender, PointerPressedEventArgs e)
 		{
 			if (sender is ListBoxItem { DataContext: FileModel model } item)
 			{
@@ -79,18 +81,19 @@ namespace FileExplorerCore.DisplayViews
 												index,
 												true,
 												e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
-												e.KeyModifiers.HasAllFlags(KeyModifiers.Control),
-												point.Properties.IsRightButtonPressed);
+												e.KeyModifiers.HasAllFlags(KeyModifiers.Control));
 				}
 			}
 		}
 
 		private void Grid_ElementPrepared(object? sender, ItemsRepeaterElementPreparedEventArgs e)
 		{
-			if (e.Element is ListBoxItem item)
+			if (e.Element is ListBoxItem { DataContext: FileModel model } item)
 			{
 				item.DoubleTapped += Item_DoubleTapped;
 				item.PointerPressed += Item_PointerPressed;
+
+				model.SelectionChanged += Model_SelectionChanged;
 			}
 		}
 
@@ -100,6 +103,11 @@ namespace FileExplorerCore.DisplayViews
 			{
 				PathChanged(model.Path);
 			}
+		}
+
+		private void Model_SelectionChanged(FileModel obj)
+		{
+			obj.RaisePropertyChanged(nameof(obj.IsSelected));
 		}
 
 		/// <summary>
@@ -114,8 +122,7 @@ namespace FileExplorerCore.DisplayViews
 				int index,
 				bool select = true,
 				bool rangeModifier = false,
-				bool toggleModifier = false,
-				bool rightButton = false)
+				bool toggleModifier = false)
 		{
 			var files = Files;
 

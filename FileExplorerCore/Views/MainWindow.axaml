@@ -252,6 +252,7 @@
 																</TransformGroup>
 															</Image.RenderTransform>
 														</Image>
+														
 														<TextBlock Text="{Binding Path, Converter={StaticResource fileNameConverter}}"
 																			 TextTrimming="CharacterEllipsis"
 																			 VerticalAlignment="Center"
@@ -472,7 +473,7 @@
 										<Grid ColumnDefinitions="* Auto">
 											<AutoCompleteBox Background="{x:Null}"
 																			 BorderBrush="{x:Null}"
-																			 Text="{Binding Search}"
+																			 Text="{Binding CurrentTab.Search}"
 																			 x:Name="searchBar"
 																			 VerticalAlignment="Center"
 																			 Items="{Binding SearchHistory}"
@@ -505,7 +506,7 @@
 														Margin="0"
 														Background="Transparent"
 														VerticalAlignment="Stretch"
-														SelectedItem="{Binding Sort}"
+														SelectedItem="{Binding CurrentTab.Sort}"
 														Items="{Binding SortValues}" />
 
 									<ListBox HorizontalAlignment="Right">
@@ -516,26 +517,26 @@
 										</ListBox.ItemsPanel>
 										<ListBoxItem Cursor="Hand"
 																 Padding="7.5"
-																 IsSelected="{Binding IsGrid, Mode=TwoWay}" >
+																 IsSelected="{Binding CurrentTab.IsGrid, Mode=TwoWay}" >
 												<Image Source="{SvgImage /Assets/UIIcons/Grid.svg}" 
 															 Width="25"/>
 										</ListBoxItem>
 
 										<ListBoxItem Cursor="Hand" 
 																 Padding="7.5"
-																 IsSelected="{Binding !IsGrid, Mode=TwoWay}">
+																 IsSelected="{Binding !CurrentTab.IsGrid, Mode=TwoWay}">
 												<Image Source="{SvgImage /Assets/UIIcons/List.svg}" 
 															 Width="25" />
 										</ListBoxItem>
 									</ListBox>
 									
-								<ContentControl Content="{Binding DisplayControl}"
+								<ContentControl Content="{Binding CurrentTab.DisplayControl}"
 																Grid.Row="1" />
 
 									<!-- Failed Search -->
 									<Border VerticalAlignment="Center"
 												  HorizontalAlignment="Center"
-												  IsVisible="{Binding SearchFailed}"
+												  IsVisible="{Binding CurrentTab.SearchFailed}"
 												  Padding="10 5 10 10"
 												  Grid.Row="1">
 										<Viewbox MaxWidth="300"
@@ -557,12 +558,12 @@
 										<Grid ColumnDefinitions="Auto, *, Auto">
 
 											<StackPanel Orientation="Horizontal">
-												<Label Content="{Binding Count, StringFormat={}{0:N0} item(s)}"
+												<Label Content="{Binding CurrentTab.Count, StringFormat={}{0:N0} item(s)}"
 															 Margin="5" />
 												
 											</StackPanel>
 
-											<Label Content="{Binding LoadTime, StringFormat=Load Time: {0:mm\\:ss\\.fff}}"
+											<Label Content="{Binding CurrentTab.LoadTime, StringFormat=Load Time: {0:mm\\:ss\\.fff}}"
 														 Margin="5"
 														 Grid.Column="2" />
 										</Grid>
@@ -571,15 +572,15 @@
 									<!-- Search Progress -->
 									<Border VerticalAlignment="Center"
 													HorizontalAlignment="Center"
-													IsVisible="{Binding IsLoading}"
+													IsVisible="{Binding CurrentTab.IsLoading}"
 													Background="{DynamicResource NotificationCardBackgroundBrush}"
 													Padding="10 5 10 10"
 													Grid.Row="1"
 													CornerRadius="10"
-													BoxShadow="0 0 10 0 #333333" >
+													BoxShadow="0 0 30 -5 Black" >
 										<StackPanel>
 											<Grid ColumnDefinitions="*, Auto">
-												<TextBlock Text="{Binding SearchText}"
+												<TextBlock Text="{Binding CurrentTab.SearchText}"
 																	 HorizontalAlignment="Center"
 																	 VerticalAlignment="Center"
 																	 Margin="0 5 0 5" />
@@ -601,9 +602,9 @@
 											<Grid>
 												<ProgressBar VerticalAlignment="Center"
 																		 Height="15"
-																		 Value="{Binding Count}"
-																		 IsIndeterminate="{Binding IsIndeterminate}"
-																		 Maximum="{Binding FileCount}" />
+																		 Value="{Binding CurrentTab.Count}"
+																		 IsIndeterminate="{Binding CurrentTab.IsIndeterminate}"
+																		 Maximum="{Binding CurrentTab.FileCount}" />
 											</Grid>
 										</StackPanel>
 									</Border>
@@ -615,62 +616,47 @@
 			</Grid>
 		</Border>
 				
-		<Border Background="#55000000" 
-						IsVisible="{Binding #settingsPanel.IsVisible}"
-						PointerPressed="CloseSettings" />
+		<!--<Border Background="#55000000" 
+						IsVisible="{Binding PopupContent.HasShadow}"
+						PointerPressed="CloseSettings" />-->
 
 		<!-- Settings -->
 		<Border VerticalAlignment="Center"
 						HorizontalAlignment="Center"
 						Background="{DynamicResource NotificationCardBackgroundBrush}"
-						Padding="10 5 10 10"
+						Padding="0"
 						MinWidth="300"
 						CornerRadius="10"
-						IsVisible="{Binding SettingsVisible}"
+						IsVisible="{Binding CurrentTab.PopupVisible}"
 						x:Name="settingsPanel"
-						BoxShadow="0 0 10 0 #333333" >
+						BoxShadow="0 0 30 -5 Black" >
 				<Grid RowDefinitions="Auto, *">
 
-					<Panel>
-						<Label Content="Settings"
-									 FontSize="21"
-									 FontWeight="Bold"
-									 VerticalAlignment="Center"/>
-						
-						<Button Width="30"
-										Height="30"
-										Command="{Binding CloseSettings}"
-										VerticalAlignment="Top"
-										HorizontalAlignment="Right"
-										Background="Transparent"
-										Cursor="Hand"
-										Padding="0">
-							<Viewbox Margin="2.5" >
-								<Image Source="{SvgImage /Assets/UIIcons/Close.svg}" />
-							</Viewbox>
-						</Button>
-					</Panel>
-					
-					<TabControl Grid.Row="1">
-						<TabItem Header="Search">
-							<StackPanel>
-								<CheckBox Content="Search In Files" 
-													Cursor="Hand"/>
-							</StackPanel>
-						</TabItem>
-						<TabItem Header="View">
-							<StackPanel>
-								<ToggleSwitch OnContent="Default Icons"
-															OffContent="Windows Icons"
-															Cursor="Hand" />
+					<Border Background="{DynamicResource SystemChromeDisabledHighColor}"
+									CornerRadius="10 10 0 0" >
+						<Panel Margin="4">
+							<Label Content="{Binding CurrentTab.PopupContent.Title}"
+											FontSize="21"
+											FontWeight="Bold"
+											VerticalAlignment="Center"/>
 
-								<ToggleSwitch OnContent="Dark Mode"
-															OffContent="Light Mode"
-															IsChecked="{Binding IsDarkMode}"
-															Cursor="Hand" />
-							</StackPanel>
-						</TabItem>
-					</TabControl>
+							<Button Width="30"
+											Height="30"
+											Command="{Binding CurrentTab.PopupContent.Close}"
+											VerticalAlignment="Top"
+											HorizontalAlignment="Right"
+											Background="Transparent"
+											Cursor="Hand"
+											Padding="0">
+								<Viewbox Margin="2.5" >
+									<Image Source="{SvgImage /Assets/UIIcons/Close.svg}" />
+								</Viewbox>
+							</Button>
+						</Panel>
+					</Border>
+
+					<ContentControl Content="{Binding CurrentTab.PopupContent}"
+													Grid.Row="1" />
 				</Grid>
 		</Border>
 	</Panel>

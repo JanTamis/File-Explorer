@@ -17,9 +17,13 @@ namespace FileExplorerCore.Models
 		private Bitmap _image;
 		static Task imageLoadTask;
 
+		private bool _isSelected;
+
 		public readonly static ConcurrentStack<FolderModel> FileImageQueue = new();
 
 		IEnumerable<FolderModel> query = Enumerable.Empty<FolderModel>();
+
+		public event Action SelectionChanged = delegate { };
 
 		public static FolderModel Empty { get; } = new FolderModel();
 
@@ -90,7 +94,15 @@ namespace FileExplorerCore.Models
 			}
 		}
 
-		public bool IsSelected { get; set; }
+		public bool IsSelected
+		{
+			get => _isSelected;
+			set
+			{
+				_isSelected = value;
+				SelectionChanged();
+			}
+		}
 
 		public FolderModel(string path, string? name = null, IEnumerable<FolderModel>? subFolders = null)
 		{

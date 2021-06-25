@@ -34,6 +34,8 @@ namespace FileExplorerCore.Models
 		private Transform _imageTransform;
 		private int imageSize;
 
+		public event Action<FileModel> SelectionChanged = delegate { };
+
 		public int ImageSize
 		{
 			get => imageSize;
@@ -55,7 +57,11 @@ namespace FileExplorerCore.Models
 		public bool IsSelected
 		{
 			get => _isSelected;
-			set => _isSelected = value;
+			set
+			{
+				_isSelected = value;
+				SelectionChanged(this);
+			}
 		}
 
 		public bool HasImage => _image is not null;

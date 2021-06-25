@@ -19,9 +19,7 @@
 									 x:Name="fileList">
 			<ItemsRepeater.Layout>
 				<UniformGridLayout ItemsStretch="Uniform"
-													 ItemsJustification="Center"
-													 MinColumnSpacing="7.5"
-													 MinRowSpacing="5"/>
+													 ItemsJustification="Center"/>
 			</ItemsRepeater.Layout>
 
 			<ItemsRepeater.Styles>
@@ -32,7 +30,7 @@
 							<Border CornerRadius="10" 
 											Name="PART_ContentPresenter"
 											BoxShadow="0 0 20 -5 Black"
-											Margin="7.5">
+											Margin="10">
 								<ContentPresenter ClipToBounds="true"
 																	Background="{TemplateBinding Background}"
 																	BorderBrush="{TemplateBinding BorderBrush}"
@@ -46,65 +44,6 @@
 						</ControlTemplate>
 					</Setter>
 				</Style>
-
-				<Style Selector="ListBoxItem /template/ Border#PART_ContentPresenter">
-					<Setter Property="TextBlock.FontWeight" Value="Normal" />
-					<Setter Property="Background" Value="{DynamicResource SystemChromeDisabledHighColor}" />
-					<Setter Property="TextBlock.FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
-				</Style>
-
-				<!--  Disabled State  -->
-				<Style Selector="ListBoxItem:disabled /template/ Border#PART_ContentPresenter">
-					<Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlDisabledBaseMediumLowBrush}" />
-				</Style>
-
-				<!--  PointerOver State  -->
-				<Style Selector="ListBoxItem:pointerover /template/ Border#PART_ContentPresenter">
-					<Setter Property="Background" Value="{DynamicResource SystemListLowColor}" />
-				</Style>
-				<Style Selector="ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-					<Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlHighlightAltBaseHighBrush}" />
-				</Style>
-
-				<!--  Pressed State  -->
-				<Style Selector="ListBoxItem:pressed /template/ Border#PART_ContentPresenter">
-					<Setter Property="Background" Value="{DynamicResource SystemControlHighlightListMediumBrush}" />
-				</Style>
-				<Style Selector="ListBoxItem:pressed /template/ ContentPresenter">
-					<Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlHighlightAltBaseHighBrush}" />
-				</Style>
-
-				<!--  Selected State  -->
-				<Style Selector="ListBoxItem:selected /template/ Border#PART_ContentPresenter">
-					<Setter Property="Background" Value="{DynamicResource SystemControlHighlightListAccentLowBrush}" />
-				</Style>
-				<Style Selector="ListBoxItem:selected /template/ Border">
-					<Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlHighlightAltBaseHighBrush}" />
-				</Style>
-
-				<!--  Selected Unfocused State  -->
-				<Style Selector="ListBoxItem:selected:not(:focus) /template/ Border#PART_ContentPresenter">
-					<Setter Property="Background" Value="{DynamicResource SystemControlHighlightListAccentLowBrush}" />
-				</Style>
-				<Style Selector="ListBoxItem:selected:not(:focus) /template/ ContentPresenter#PART_ContentPresenter">
-					<Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlHighlightAltBaseHighBrush}" />
-				</Style>
-
-				<!--  Selected PointerOver State  -->
-				<Style Selector="ListBoxItem:selected:pointerover /template/ Border#PART_ContentPresenter">
-					<Setter Property="Background" Value="{DynamicResource SystemControlHighlightListAccentMediumBrush}" />
-				</Style>
-				<Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter">
-					<Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlHighlightAltBaseHighBrush}" />
-				</Style>
-
-				<!--  Selected Pressed State  -->
-				<Style Selector="ListBoxItem:selected:pressed /template/ Border#PART_ContentPresenter">
-					<Setter Property="Background" Value="{DynamicResource SystemControlHighlightListAccentHighBrush}" />
-				</Style>
-				<Style Selector="ListBoxItem:selected:pressed /template/ Border#PART_ContentPresenter">
-					<Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlHighlightAltBaseHighBrush}" />
-				</Style>
 			</ItemsRepeater.Styles>
 
 			<ItemsRepeater.ItemTemplate>
@@ -115,7 +54,7 @@
 											 Cursor="Hand"
 											 VerticalContentAlignment="Center"
 											 HorizontalContentAlignment="Center"
-											 Height="170">
+											 Height="175">
 						<StackPanel>
 							<Viewbox Width="{Binding ImageSize}"
 											 Height="{Binding ImageSize}"

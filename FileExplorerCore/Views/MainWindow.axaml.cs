@@ -94,6 +94,11 @@ namespace FileExplorerCore.Views
 			}
 		}
 
+		private void Item_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+		{
+			throw new NotImplementedException();
+		}
+
 		private void ItemContainerGenerator_Materialized(object? sender, Avalonia.Controls.Generators.ItemContainerEventArgs e)
 		{
 			for (int i = 0; i < e.Containers.Count; i++)
@@ -125,14 +130,6 @@ namespace FileExplorerCore.Views
 				{
 					model.Redo();
 				}
-			}
-		}
-
-		private void CloseSettings(object? sender, PointerPressedEventArgs e)
-		{
-			if (DataContext is MainWindowViewModel model)
-			{
-				model.CloseSettings();
 			}
 		}
 

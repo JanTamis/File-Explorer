@@ -2,6 +2,7 @@
 using Avalonia.Threading;
 using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
+using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
 using ReactiveUI;
 using System;
@@ -27,12 +28,15 @@ namespace FileExplorerCore.ViewModels
 
 		private bool _isLoading;
 		private bool isUserEntered = true;
+		private bool _isGrid;
 
 		private readonly Stack<string> undoStack = new();
 		private readonly Stack<string> redoStack = new();
 
 		private CancellationTokenSource tokenSource;
 		private Control _displayControl;
+
+		private IPopup _popupContent;
 
 		private readonly EnumerationOptions options = new()
 		{
@@ -200,14 +204,12 @@ namespace FileExplorerCore.ViewModels
 			set => this.RaiseAndSetIfChanged(ref _displayControl, value);
 		}
 
-		private bool isGrid;
-
 		public bool IsGrid
 		{
-			get => isGrid;
+			get => _isGrid;
 			set
 			{
-				this.RaiseAndSetIfChanged(ref isGrid, value);
+				this.RaiseAndSetIfChanged(ref _isGrid, value);
 
 				if (IsGrid is false)
 				{
@@ -243,6 +245,27 @@ namespace FileExplorerCore.ViewModels
 				}
 			}
 		}
+
+		public IPopup PopupContent
+		{
+			get => _popupContent;
+			set
+			{
+				this.RaiseAndSetIfChanged(ref _popupContent, value);
+
+				if (PopupContent is not null)
+				{
+					PopupContent.OnClose += delegate
+					{
+						PopupContent = null;
+					};
+				}
+
+				this.RaisePropertyChanged(nameof(PopupVisible));
+			}
+		}
+
+		public bool PopupVisible => PopupContent is not null;
 
 
 		public TabItemViewModel(ReactiveCommand<Unit, Unit> removeCommand)

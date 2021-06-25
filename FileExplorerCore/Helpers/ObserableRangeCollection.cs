@@ -204,7 +204,8 @@ namespace FileExplorerCore.Helpers
 
 		public void Refresh()
 		{
-			OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs("IsSelected"));
+			//OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs("IsSelected"));
+			//OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 		}
 
 		static void ParallelQuickSort(List<T> array, int left, int right, IComparer<T> comparer)
