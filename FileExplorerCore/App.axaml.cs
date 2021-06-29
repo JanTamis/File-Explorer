@@ -1,12 +1,9 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Notifications;
 using Avalonia.Markup.Xaml;
-using Avalonia.Themes.Fluent;
 using FileExplorerCore.ViewModels;
 using FileExplorerCore.Views;
-using Microsoft.Win32;
-using System;
-using System.Runtime.InteropServices;
 
 namespace FileExplorerCore
 {
@@ -21,23 +18,27 @@ namespace FileExplorerCore
 		{
 			if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 			{
-				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				{
-					var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
-					var value = key.GetValue("AppsUseLightTheme");
+				//if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+				//{
+				//	var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
+				//	var value = key.GetValue("AppsUseLightTheme");
 
-					if (value is 0)
-					{
-						var fluentTheme = new FluentTheme(new Uri(@"avares://FileExplorer"))
-						{
-							Mode = FluentThemeMode.Dark,
-						};
+				//	if (value is 0)
+				//	{
+				//		var fluentTheme = new FluentTheme(new Uri(@"avares://FileExplorer"))
+				//		{
+				//			Mode = FluentThemeMode.Dark,
+				//		};
 
-						App.Current.Styles[0] = fluentTheme;
-					}
-				}
+				//		App.Current.Styles[0] = fluentTheme;
+				//	}
+				//}
 
 				desktop.MainWindow = new MainWindow();
+				desktop.MainWindow.DataContext = new MainWindowViewModel(new WindowNotificationManager(desktop.MainWindow)
+				{
+					Position = NotificationPosition.BottomLeft,
+				});
 			}
 
 			base.OnFrameworkInitializationCompleted();

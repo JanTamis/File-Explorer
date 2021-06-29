@@ -14,6 +14,7 @@ namespace FileExplorerCore.DisplayViews
 	public partial class FileDataGrid : UserControl
 	{
 		private int anchorIndex;
+		private double elementHeight;
 
 		public event Action<string> PathChanged = delegate { };
 
@@ -42,18 +43,71 @@ namespace FileExplorerCore.DisplayViews
 			grid.ElementClearing += Grid_ElementClearing;
 
 			grid.KeyDown += Grid_KeyDown;
+
+			ListBoxItem.BoundsProperty.Changed.Subscribe(x =>
+			{
+				if (elementHeight < x.NewValue.Value.Height && x.Sender is ListBoxItem)
+				{
+					elementHeight = x.NewValue.Value.Height;
+				}
+			}, delegate { }, delegate { }, default);
 		}
 
-		private void Grid_KeyDown(object? sender, Avalonia.Input.KeyEventArgs e)
+		private void Grid_KeyDown(object? sender, KeyEventArgs e)
 		{
-			if (e.Key is Key.A && e.KeyModifiers is KeyModifiers.Control)
+			if (sender is ItemsRepeater { Parent: ScrollViewer viewer } repeater)
 			{
-				foreach (var file in Files.AsValueEnumerable().Where(x => !x.IsSelected))
+				if (e.Key is Key.A && e.KeyModifiers is KeyModifiers.Control)
 				{
-					file.IsSelected = true;
+					foreach (var file in Files.AsValueEnumerable().Where(x => !x.IsSelected))
+					{
+						file.IsSelected = true;
+					}
+				}
+				else if (e.Key is Key.Down)
+				{
+					anchorIndex = Math.Min(Files.Count - 1, anchorIndex + 1);
+
+					UpdateSelection(anchorIndex);
+
+					viewer.Offset = new Vector(0, anchorIndex * elementHeight - viewer.Bounds.Height / 2 + elementHeight / 2);
+				}
+				else if (e.Key is Key.Up)
+				{
+					anchorIndex = Math.Max(0, anchorIndex - 1);
+
+					UpdateSelection(anchorIndex);
+
+					viewer.Offset = new Vector(0, anchorIndex * elementHeight - viewer.Bounds.Height / 2 + elementHeight / 2);
+				}
+				else if (e.Key.ToString() is { Length: 1 } key)
+				{
+					var index = IndexOf(Char.ToUpper(key[0]));
+
+					if (index is not -1)
+					{
+						anchorIndex = index;
+
+						UpdateSelection(anchorIndex);
+
+						viewer.Offset = new Vector(0, anchorIndex * elementHeight - viewer.Bounds.Height / 2 + elementHeight / 2);
+					}
+				}
+			}
+
+			int IndexOf(char startChar)
+			{
+				var files = Files;
+
+				for (int i = 0; i < files.Count; i++)
+				{
+					if (Char.ToUpper(files[i].Name[0]) == startChar)
+					{
+						return i;
+					}
 				}
 
-				Files.Refresh();
+				return -1;
 			}
 		}
 
@@ -82,8 +136,7 @@ namespace FileExplorerCore.DisplayViews
 												index,
 												true,
 												e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
-												e.KeyModifiers.HasAllFlags(KeyModifiers.Control),
-												point.Properties.IsRightButtonPressed);
+												e.KeyModifiers.HasAllFlags(KeyModifiers.Control));
 				}
 			}
 		}
@@ -124,8 +177,7 @@ namespace FileExplorerCore.DisplayViews
 				int index,
 				bool select = true,
 				bool rangeModifier = false,
-				bool toggleModifier = false,
-				bool rightButton = false)
+				bool toggleModifier = false)
 		{
 			var files = Files;
 
@@ -167,14 +219,7 @@ namespace FileExplorerCore.DisplayViews
 			}
 			else if (multi && toggle)
 			{
-				if (files[index].IsSelected)
-				{
-					files[index].IsSelected = false;
-				}
-				else
-				{
-					files[index].IsSelected = true;
-				}
+				files[index].IsSelected ^= true;
 			}
 			else
 			{
@@ -190,8 +235,6 @@ namespace FileExplorerCore.DisplayViews
 			{
 				anchorIndex = index;
 			}
-
-			files.Refresh();
 		}
 	}
 }

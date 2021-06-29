@@ -1,9 +1,12 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Notifications;
+using Avalonia.Input;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using FileExplorerCore.Popup;
+using Microsoft.CodeAnalysis.CSharp;
 using Nessos.LinqOptimizer.CSharp;
 using NetFabric.Hyperlinq;
 using ReactiveUI;
@@ -13,6 +16,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Timers;
 
 namespace FileExplorerCore.ViewModels
@@ -20,7 +24,8 @@ namespace FileExplorerCore.ViewModels
 	public class MainWindowViewModel : ViewModelBase
 	{
 		private bool isSearching = false;
-		private bool isDarkMode;
+
+		WindowNotificationManager notificationManager;
 
 		private TabItemViewModel _currentTab;
 		private IEnumerable<string> searchHistory;
@@ -74,10 +79,10 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		
-
-		public MainWindowViewModel()
+		public MainWindowViewModel(WindowNotificationManager manager)
 		{
+			notificationManager = manager;
+
 			var drives = from drive in DriveInfo.GetDrives()
 									 where drive.IsReady
 									 select new FolderModel(drive.RootDirectory.FullName, $"{drive.VolumeLabel} ({drive.Name})");
@@ -186,8 +191,6 @@ namespace FileExplorerCore.ViewModels
 				{
 					file.IsSelected = true;
 				}
-
-				CurrentTab.Files.Refresh();
 			}
 		}
 
@@ -208,14 +211,52 @@ namespace FileExplorerCore.ViewModels
 			{
 				foreach (var file in CurrentTab.Files)
 				{
-					file.IsSelected = !file.IsSelected;
+					file.IsSelected ^= true;
 				}
 			}
 		}
 
 		public void ShowSettings()
 		{
-			CurrentTab.PopupContent = new Settings();
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+			{
+				CurrentTab.PopupContent = new Settings();
+			}
+		}
+
+		public void Rename()
+		{
+			var fileIndex = CurrentTab.Files.IndexOf(CurrentTab.Files.FirstOrDefault(x => x.IsSelected));
+
+			if (fileIndex is not -1 && CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+			{
+				var rename = new Rename
+				{
+					Files = CurrentTab.Files,
+					Index = fileIndex,
+				};
+
+				CurrentTab.PopupContent = rename;
+
+				rename.OnPropertyChanged(nameof(rename.File));
+			}
+		}
+
+		public async void CopyFiles()
+		{
+			var data = new DataObject();
+			data.Set(DataFormats.FileNames, CurrentTab.Files.Where(x => x.IsSelected).Select(s => s.Path).ToArray());
+
+			await App.Current.Clipboard.SetDataObjectAsync(data);
+
+			notificationManager.Show(new Notification("Copy Files", "Files has been copied"));
+		}
+
+		public async void CopyPath()
+		{
+			await App.Current.Clipboard.SetTextAsync(CurrentTab.Path);
+
+			notificationManager.Show(new Notification("Copy Path", "The path has been copied"));
 		}
 
 		public void RemoveTab()

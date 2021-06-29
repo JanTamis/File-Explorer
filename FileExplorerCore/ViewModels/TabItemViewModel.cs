@@ -267,7 +267,6 @@ namespace FileExplorerCore.ViewModels
 
 		public bool PopupVisible => PopupContent is not null;
 
-
 		public TabItemViewModel(ReactiveCommand<Unit, Unit> removeCommand)
 		{
 			Files.CountChanged += (count) =>

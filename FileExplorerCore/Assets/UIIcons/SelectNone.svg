@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="105px" height="105px" viewBox="0 0 105 105" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<linearGradient x1="0.7195455" y1="0.88027275" x2="0.28045452" y2="0.11972731" id="gradient_1">
+			<stop offset="0" stop-color="#777777" />
+			<stop offset="1" stop-color="#B9B9B9" />
+		</linearGradient>
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" transform="matrix(0.9999999 -1.4921397E-13 1.4921397E-13 0.9999999 0.00012207031 -0.00012207031)" id="path_1" />
+		<clipPath id="mask_1">
+			<use xlink:href="#path_1" />
+		</clipPath>
+	</defs>
+	<g id="icons8_rhombus-5" transform="matrix(0.7071071 0.7071063 -0.7071063 0.7071071 33.963867 0)">
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" transform="matrix(0.9999999 -1.4921397E-13 1.4921397E-13 0.9999999 0.00012207031 -0.00012207031)" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+		<g clip-path="url(#mask_1)">
+			<path d="M43.4 20.6L23.4 0.6C22.6 -0.2 21.4 -0.2 20.6 0.6L0.6 20.6C-0.2 21.4 -0.2 22.6 0.6 23.4L20.6 43.4C21.4 44.2 22.6 44.2 23.4 43.4L43.4 23.4C44.2 22.6 44.2 21.4 43.4 20.6L43.4 20.6Z" transform="matrix(0.9999999 -1.4921397E-13 1.4921397E-13 0.9999999 2.0002441 2)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+		</g>
+	</g>
+	<g id="icons8_rhombus-10" transform="matrix(0.7071071 0.7071063 -0.7071063 0.7071071 70.92383 36.98239)">
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" transform="matrix(0.9999999 -1.4921397E-13 1.4921397E-13 0.9999999 0.00012207031 -0.00012207031)" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+		<g clip-path="url(#mask_1)">
+			<path d="M43.4 20.6L23.4 0.6C22.6 -0.2 21.4 -0.2 20.6 0.6L0.6 20.6C-0.2 21.4 -0.2 22.6 0.6 23.4L20.6 43.4C21.4 44.2 22.6 44.2 23.4 43.4L43.4 23.4C44.2 22.6 44.2 21.4 43.4 20.6L43.4 20.6Z" transform="matrix(0.9999999 -1.4921397E-13 1.4921397E-13 0.9999999 2.0002441 2)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+		</g>
+	</g>
+	<g id="icons8_rhombus-11" transform="matrix(0.7071071 0.7071063 -0.7071063 0.7071071 70.94116 0.00018310547)">
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" transform="matrix(0.9999999 -1.4921397E-13 1.4921397E-13 0.9999999 0.00012207031 -0.00012207031)" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+		<g clip-path="url(#mask_1)">
+			<path d="M43.4 20.6L23.4 0.6C22.6 -0.2 21.4 -0.2 20.6 0.6L0.6 20.6C-0.2 21.4 -0.2 22.6 0.6 23.4L20.6 43.4C21.4 44.2 22.6 44.2 23.4 43.4L43.4 23.4C44.2 22.6 44.2 21.4 43.4 20.6L43.4 20.6Z" transform="matrix(0.9999999 -1.4921397E-13 1.4921397E-13 0.9999999 2.0003662 2)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+		</g>
+	</g>
+	<g id="icons8_rhombus-12" transform="matrix(0.7071071 0.7071063 -0.7071063 0.7071071 33.941162 36.98239)">
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" transform="matrix(0.9999999 -1.4921397E-13 1.4921397E-13 0.9999999 0.00012207031 -0.00012207031)" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+		<g clip-path="url(#mask_1)">
+			<path d="M43.4 20.6L23.4 0.6C22.6 -0.2 21.4 -0.2 20.6 0.6L0.6 20.6C-0.2 21.4 -0.2 22.6 0.6 23.4L20.6 43.4C21.4 44.2 22.6 44.2 23.4 43.4L43.4 23.4C44.2 22.6 44.2 21.4 43.4 20.6L43.4 20.6Z" transform="matrix(0.9999999 -1.4921397E-13 1.4921397E-13 0.9999999 2.0003662 2)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+		</g>
+	</g>
+</svg>

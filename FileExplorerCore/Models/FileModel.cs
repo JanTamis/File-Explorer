@@ -6,9 +6,7 @@ using FileExplorerCore.Helpers;
 using NetFabric.Hyperlinq;
 using ReactiveUI;
 using System;
-using System.Buffers;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
@@ -94,18 +92,32 @@ namespace FileExplorerCore.Models
 			}
 			set
 			{
-				if (File.Exists(Path))
+				try
 				{
-					var name = System.IO.Path.GetFileNameWithoutExtension(Path);
-					var extension = Extension;
-					var newPath = Path.Replace(name + extension, value + extension);
+					if (File.Exists(Path))
+					{
+						var name = System.IO.Path.GetFileNameWithoutExtension(Path);
+						var extension = Extension;
+						var newPath = Path.Replace(name + extension, value + extension);
 
-					File.Move(Path, newPath);
+						File.Move(Path, newPath);
 
-					Path = newPath;
+						Path = newPath;
+					}
+					else if (Directory.Exists(Path))
+					{
+						var name = System.IO.Path.GetFileNameWithoutExtension(Path);
+						var newPath = Path.Replace(name, value);
+
+						Directory.Move(Path, newPath);
+
+						Path = newPath;
+					}
+
+					this.RaiseAndSetIfChanged(ref _name, value);
 				}
+				catch (Exception) { }
 
-				this.RaiseAndSetIfChanged(ref _name, value);
 			}
 		}
 		public string Extension => _extension.Value;

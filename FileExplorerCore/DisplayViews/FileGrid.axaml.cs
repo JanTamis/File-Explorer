@@ -44,7 +44,7 @@ namespace FileExplorerCore.DisplayViews
 			grid.KeyDown += Grid_KeyDown;
 		}
 
-		private void Grid_KeyDown(object? sender, Avalonia.Input.KeyEventArgs e)
+		private void Grid_KeyDown(object? sender, KeyEventArgs e)
 		{
 			if (e.Key is Key.A && e.KeyModifiers is KeyModifiers.Control)
 			{
@@ -52,8 +52,6 @@ namespace FileExplorerCore.DisplayViews
 				{
 					file.IsSelected = true;
 				}
-
-				Files.Refresh();
 			}
 		}
 
@@ -187,8 +185,6 @@ namespace FileExplorerCore.DisplayViews
 			{
 				anchorIndex = index;
 			}
-
-			files.Refresh();
 		}
 	}
 }

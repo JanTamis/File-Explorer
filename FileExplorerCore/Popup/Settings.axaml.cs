@@ -17,6 +17,7 @@ namespace FileExplorerCore.Popup
 		private bool isDarkMode;
 
 		public bool HasShadow => true;
+		public bool HasToBeCanceled => false;
 
 		public string Title => "Settings";
 

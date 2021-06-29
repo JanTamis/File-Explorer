@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<linearGradient x1="0" y1="0.50000006" x2="1" y2="0.50000006" id="gradient_1">
+			<stop offset="0" stop-color="#50E6FF" />
+			<stop offset="0.55" stop-color="#50E6FF" />
+			<stop offset="0.58" stop-color="#4FE3FC" />
+			<stop offset="0.601" stop-color="#4EDAF4" />
+			<stop offset="0.62" stop-color="#4ACAE7" />
+			<stop offset="0.63699996" stop-color="#46B4D3" />
+			<stop offset="0.64" stop-color="#45B0D0" />
+			<stop offset="0.71" stop-color="#45B0D0" />
+			<stop offset="0.713" stop-color="#46B4D3" />
+			<stop offset="0.72999996" stop-color="#4ACAE7" />
+			<stop offset="0.749" stop-color="#4EDAF4" />
+			<stop offset="0.77" stop-color="#4FE3FC" />
+			<stop offset="0.79999995" stop-color="#50E6FF" />
+			<stop offset="1" stop-color="#50E6FF" />
+		</linearGradient>
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+		<clipPath id="mask_1">
+			<use xlink:href="#path_1" />
+		</clipPath>
+	</defs>
+	<g id="icons8_rename">
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+		<g clip-path="url(#mask_1)">
+			<path d="M0 2L0 18C0 19.105 0.895 20 2 20L38 20C39.105 20 40 19.105 40 18L40 2C40 0.895 39.105 0 38 0L2 0C0.895 0 0 0.895 0 2L0 2Z" transform="translate(4 14)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+			<path d="M9 40L8 40C3.582 40 0 36.418 0 32L0 8C0 3.582 3.582 0 8 0L9 0C9.552 0 10 0.448 10 1L10 3C10 3.552 9.552 4 9 4L8 4C5.791 4 4 5.791 4 8L4 32C4 34.209 5.791 36 8 36L9 36C9.552 36 10 36.448 10 37L10 39C10 39.552 9.552 40 9 40L9 40Z" transform="translate(29 4)" id="Shape" fill="#057093" fill-rule="evenodd" stroke="none" />
+			<path d="M1 40L2 40C6.418 40 10 36.418 10 32L10 8C10 3.582 6.418 0 2 0L1 0C0.448 0 0 0.448 0 1L0 3C0 3.552 0.448 4 1 4L2 4C4.209 4 6 5.791 6 8L6 32C6 34.209 4.209 36 2 36L1 36C0.448 36 0 36.448 0 37L0 39C0 39.552 0.448 40 1 40L1 40Z" transform="translate(23 4)" id="Shape" fill="#057093" fill-rule="evenodd" stroke="none" />
+		</g>
+	</g>
+</svg>

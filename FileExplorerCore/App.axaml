@@ -6,13 +6,21 @@
 		<local:ViewLocator/>
 	</Application.DataTemplates>
 
+	<Application.Resources>
+		<SolidColorBrush Color="#CCC" x:Key="Background" />
+		<SolidColorBrush Color="#EEE" x:Key="ContentBackground" />
+		<SolidColorBrush Color="#F8F8F8" x:Key="MenuBackground" />
+		<SolidColorBrush Color="#F5F5F5" x:Key="CardBackground" />
+		<SolidColorBrush Color="#DFDFDF" x:Key="CardPointerOverBackground" />
+	</Application.Resources>
+
 	<Application.Styles>
 		<FluentTheme Mode="Light" />
 		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
 
 		<Style Selector="ListBoxItem /template/ Border#PART_ContentPresenter">
 			<Setter Property="TextBlock.FontWeight" Value="Normal" />
-			<Setter Property="Background" Value="{DynamicResource SystemChromeDisabledHighColor}" />
+			<Setter Property="Background" Value="{DynamicResource CardBackground}" />
 			<Setter Property="TextBlock.FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
 		</Style>
 
@@ -23,7 +31,7 @@
 
 		<!--  PointerOver State  -->
 		<Style Selector="ListBoxItem:pointerover /template/ Border#PART_ContentPresenter">
-			<Setter Property="Background" Value="{DynamicResource NotificationCardBackgroundBrush}" />
+			<Setter Property="Background" Value="{DynamicResource CardPointerOverBackground}" />
 		</Style>
 		<Style Selector="ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
 			<Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlHighlightAltBaseHighBrush}" />
@@ -38,7 +46,7 @@
 		</Style>
 
 		<!--  Selected State  -->
-		<Style Selector="ListBoxItem:selected /template/ Border#PART_ContentPresenter">
+		<Style Selector="ListBoxItem:selected /template/ Border#PART_ContentPresenter">	
 			<Setter Property="Background" Value="{DynamicResource SystemControlHighlightListAccentLowBrush}" />
 		</Style>
 		<Style Selector="ListBoxItem:selected /template/ Border">
@@ -68,6 +76,5 @@
 		<Style Selector="ListBoxItem:selected:pressed /template/ Border#PART_ContentPresenter">
 			<Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlHighlightAltBaseHighBrush}" />
 		</Style>
-		
 	</Application.Styles>
 </Application>
