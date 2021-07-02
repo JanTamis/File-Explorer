@@ -189,8 +189,11 @@ namespace FileExplorerCore.ViewModels
 					}
 				}
 				this.RaiseAndSetIfChanged(ref _path, value);
+				this.RaisePropertyChanged(nameof(FolderName));
 			}
 		}
+
+		public string FolderName => System.IO.Path.GetFileName(Path);
 
 		public string? Search
 		{
@@ -429,7 +432,7 @@ namespace FileExplorerCore.ViewModels
 
 				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToSpecifiedFullPath(), x.IsDirectory, size), options)
 				{
-					ShouldIncludePredicate = (ref FileSystemEntry x) => regex.IsMatch(new String(x.FileName)) || FileSearcher.IsValid(x, query)
+					ShouldIncludePredicate = (ref FileSystemEntry x) => regex.IsMatch(new String(x.FileName)) || FileSearcher.IsValidAsync(x, query)
 				};
 			}
 		}
@@ -450,7 +453,7 @@ namespace FileExplorerCore.ViewModels
 
 				enumerable = new FileSystemEnumerable<byte>(path, (ref FileSystemEntry x) => 0, options)
 				{
-					ShouldIncludePredicate = (ref FileSystemEntry x) => regex.IsMatch(new String(x.FileName)) || FileSearcher.IsValid(x, query)
+					ShouldIncludePredicate = (ref FileSystemEntry x) => regex.IsMatch(new String(x.FileName)) || FileSearcher.IsValidAsync(x, query)
 				};
 			}
 

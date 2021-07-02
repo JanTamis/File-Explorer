@@ -224,6 +224,10 @@
     <PackageReference Include="Avalonia.Diagnostics" Version="0.10.6" />
     <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.6" />
     <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.6.1" />
+    <PackageReference Include="ErrorProne.NET.Structs" Version="0.4.0-beta.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="LinqOptimizer.CSharp" Version="0.7.0" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="6.0.0-preview.4.21253.7" />
     <PackageReference Include="NetFabric.Hyperlinq" Version="3.0.0-beta45" />

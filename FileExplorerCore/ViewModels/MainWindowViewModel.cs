@@ -1,22 +1,18 @@
-using Avalonia.Controls;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input;
-using Avalonia.Themes.Fluent;
-using Avalonia.Threading;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using FileExplorerCore.Popup;
-using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.VisualBasic.FileIO;
 using Nessos.LinqOptimizer.CSharp;
 using NetFabric.Hyperlinq;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace FileExplorerCore.ViewModels
@@ -24,8 +20,7 @@ namespace FileExplorerCore.ViewModels
 	public class MainWindowViewModel : ViewModelBase
 	{
 		private bool isSearching = false;
-
-		WindowNotificationManager notificationManager;
+		readonly WindowNotificationManager notificationManager;
 
 		private TabItemViewModel _currentTab;
 		private IEnumerable<string> searchHistory;
@@ -74,7 +69,6 @@ namespace FileExplorerCore.ViewModels
 						var categories = Enum.GetValues<Categories>().Select(s => s.ToString() + ":");
 						SearchHistory = categories.Concat(CurrentTab.Files.Select(s => "*" + s.Extension).Distinct());
 					});
-
 				}
 			}
 		}
@@ -226,7 +220,7 @@ namespace FileExplorerCore.ViewModels
 
 		public void Rename()
 		{
-			var fileIndex = CurrentTab.Files.IndexOf(CurrentTab.Files.FirstOrDefault(x => x.IsSelected));
+			var fileIndex = CurrentTab.Files.IndexOf(CurrentTab.Files.First(x => x.IsSelected));
 
 			if (fileIndex is not -1 && CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
 			{
@@ -245,7 +239,9 @@ namespace FileExplorerCore.ViewModels
 		public async void CopyFiles()
 		{
 			var data = new DataObject();
-			data.Set(DataFormats.FileNames, CurrentTab.Files.Where(x => x.IsSelected).Select(s => s.Path).ToArray());
+			data.Set(DataFormats.FileNames, CurrentTab.Files.Where(x => x.IsSelected)
+																											.Select(s => s.Path)
+																											.ToArray());
 
 			await App.Current.Clipboard.SetDataObjectAsync(data);
 
@@ -257,6 +253,50 @@ namespace FileExplorerCore.ViewModels
 			await App.Current.Clipboard.SetTextAsync(CurrentTab.Path);
 
 			notificationManager.Show(new Notification("Copy Path", "The path has been copied"));
+		}
+
+		public void DeleteFiles()
+		{
+			var selectedFiles = CurrentTab.Files.Where(x => x.IsSelected);
+			var SelectedFileCount = selectedFiles.Count();
+
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && SelectedFileCount > 0)
+			{
+				var choice = new Choice
+				{
+					CloseText = "Cancel",
+					SubmitText = "Delete",
+					Message = CultureInfo.CurrentCulture.TextInfo.ToTitleCase($"Are you sure you want to delete {SelectedFileCount} item{(SelectedFileCount > 1 ? "s" : String.Empty)}?"),
+				};
+
+				choice.OnClose += () => CurrentTab.PopupContent = null;
+				choice.OnSubmit += () =>
+				{
+					var deletedFiles = new List<FileModel>(SelectedFileCount);
+
+					foreach (var file in selectedFiles)
+					{
+						try
+						{
+							if (File.Exists(file.Path))
+							{
+								FileSystem.DeleteFile(file.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+							}
+							else if (Directory.Exists(file.Path))
+							{
+								FileSystem.DeleteDirectory(file.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+							}
+							deletedFiles.Add(file);
+						}
+						catch (Exception) { }
+					}
+
+					CurrentTab.Files.RemoveRange(deletedFiles);
+					CurrentTab.PopupContent = null;
+				};
+
+				CurrentTab.PopupContent = choice;
+			}
 		}
 
 		public void RemoveTab()

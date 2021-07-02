@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
+using System.Threading.Tasks;
 
 namespace FileExplorerCore.Helpers
 {
@@ -18,7 +19,7 @@ namespace FileExplorerCore.Helpers
 			{ "!", (x, y) => !x.Equals(y) },
 		};
 
-		public static bool IsValid(FileSystemEntry systemEntry, IEnumerable<(Categories, (Func<object, object, bool>, object))> query)
+		public static bool IsValidAsync(FileSystemEntry systemEntry, IEnumerable<(Categories, (Func<object, object, bool>, object))> query)
 		{
 			foreach (var item in query)
 			{
@@ -79,9 +80,9 @@ namespace FileExplorerCore.Helpers
 
 							using (var reader = File.OpenText(systemEntry.ToFullPath()))
 							{
-								while ((line = reader.ReadLine()) != null && line.Length >= searchText.Length)
+								while ((line = reader.ReadLine()) is not null && line.Length >= searchText.Length)
 								{
-									if (line!.Contains(searchText!, StringComparison.CurrentCultureIgnoreCase))
+									if (line.Contains(searchText!, StringComparison.CurrentCultureIgnoreCase))
 									{
 										return true;
 									}

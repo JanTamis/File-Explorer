@@ -397,7 +397,8 @@
 										<Grid RowDefinitions="* Auto">
 											<StackPanel Orientation="Horizontal">
 												<Button Cursor="Hand"
-														Background="Transparent">
+																Command="{Binding DeleteFiles}"
+																Background="Transparent">
 													<StackPanel Orientation="Vertical">
 														<Viewbox Height="30">
 															<Image Source="{SvgImage /Assets/UIIcons/Remove.svg}" />
@@ -626,7 +627,7 @@
 																			 IsTextCompletionEnabled="True"
 																			 MinimumPrefixLength="0"
 																			 MinWidth="100"
-																			 Watermark="Search" >
+																			 Watermark="Search}" >
 												<AutoCompleteBox.Styles>
 													<Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
 														<Setter Property="BorderBrush" Value="{x:Null}"/>

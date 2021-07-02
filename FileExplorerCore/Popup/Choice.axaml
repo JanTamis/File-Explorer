@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="FileExplorerCore.Popup.Choice">
+	<Grid ColumnDefinitions="*, *"
+				Margin="4">
+		<Button Content="{Binding CloseText}" 
+						Command="{Binding Close}"
+						Grid.Column="1"
+						Cursor="Hand"
+						Height="50"
+						FontSize="21"
+						HorizontalContentAlignment="Center"
+						VerticalContentAlignment="Center"
+						HorizontalAlignment="Stretch"/>
+	
+		<Button Content="{Binding SubmitText}"
+						Command="{Binding Confirm}"
+						Grid.Column="0" 
+						Cursor="Hand"
+						Height="50"
+						FontSize="21"
+						HorizontalContentAlignment="Center"
+						VerticalContentAlignment="Center"
+						HorizontalAlignment="Stretch"/>
+	</Grid>
+</UserControl>
