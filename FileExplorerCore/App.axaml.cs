@@ -38,6 +38,7 @@ namespace FileExplorerCore
 				desktop.MainWindow.DataContext = new MainWindowViewModel(new WindowNotificationManager(desktop.MainWindow)
 				{
 					Position = NotificationPosition.BottomLeft,
+					Margin = new Thickness(0, 10),
 				});
 			}
 

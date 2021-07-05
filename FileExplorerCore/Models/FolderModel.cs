@@ -72,27 +72,7 @@ namespace FileExplorerCore.Models
 		public string Name { get; }
 		public string Path { get; }
 
-		public Task<IEnumerable<FolderModel>> SubFolders
-		{
-			get
-			{
-				return Task.Run(() =>
-				{
-					if (query is FolderModel[] arr)
-					{
-						return query;
-					}
-					if (query.Any())
-					{
-						return query = query.ToArray();
-					}
-					else
-					{
-						return Enumerable.Empty<FolderModel>();
-					}
-				});
-			}
-		}
+		public Task<IEnumerable<FolderModel>> SubFolders => Task.Run(() => (IEnumerable<FolderModel>)query.ToArray());
 
 		public bool IsSelected
 		{

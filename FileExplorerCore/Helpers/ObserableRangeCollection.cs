@@ -1,7 +1,5 @@
 ﻿using Avalonia.Threading;
-using JetBrains.Annotations;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -91,7 +89,7 @@ namespace FileExplorerCore.Helpers
 				throw new ArgumentNullException(nameof(collection));
 
 			var buffer = new Queue<T>();
-			Task task = null;
+			Task? task = null;
 
 			if (Items is List<T> list)
 			{
@@ -216,11 +214,11 @@ namespace FileExplorerCore.Helpers
 
 				if (i <= j)
 				{
-					var t = array[i]; 
-					array[i] = array[j]; 
+					var t = array[i];
+					array[i] = array[j];
 					array[j] = t;
 
-					i++; 
+					i++;
 					j--;
 				}
 			}

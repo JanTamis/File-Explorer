@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<linearGradient x1="0.05727744" y1="0.9427244" x2="0.6899382" y2="0.31008112" id="gradient_1">
+			<stop offset="0.36499998" stop-color="#199AE0" />
+			<stop offset="0.699" stop-color="#1898DE" />
+			<stop offset="0.819" stop-color="#1691D8" />
+			<stop offset="0.905" stop-color="#1186CC" />
+			<stop offset="0.9739999" stop-color="#0A75BC" />
+			<stop offset="1" stop-color="#076CB3" />
+		</linearGradient>
+		<linearGradient x1="0.8992816" y1="0.8993065" x2="0.08464503" y2="0.08464736" id="gradient_2">
+			<stop offset="0" stop-color="#32BDEF" />
+			<stop offset="1" stop-color="#1EA2E4" />
+		</linearGradient>
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+		<clipPath id="mask_1">
+			<use xlink:href="#path_1" />
+		</clipPath>
+	</defs>
+	<g id="icons8_forward_1">
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+		<g clip-path="url(#mask_1)">
+			<path d="M26.4205 7.4015L7.4015 26.4205C6.6275 27.1945 5.3735 27.1945 4.5995 26.4205L0.580501 22.4015C-0.1935 21.6275 -0.1935 20.3735 0.580501 19.5995L19.5995 0.5805C20.3735 -0.193501 21.6275 -0.193501 22.4015 0.5805L26.4205 4.5995C27.1935 5.3735 27.1935 6.6275 26.4205 7.4015L26.4205 7.4015Z" transform="translate(11.999498 17.9995)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+			<path d="M19.5995 26.4205L0.5805 7.4015C-0.193501 6.6275 -0.193501 5.3735 0.5805 4.5995L4.5995 0.5805C5.3735 -0.1935 6.6275 -0.1935 7.4015 0.5805L26.4205 19.5995C27.1945 20.3735 27.1945 21.6275 26.4205 22.4015L22.4015 26.4205C21.6275 27.1935 20.3735 27.1935 19.5995 26.4205L19.5995 26.4205Z" transform="translate(11.9995 2.9995)" id="Shape" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+		</g>
+	</g>
+</svg>

@@ -27,6 +27,7 @@
 		<converters:ExtensionConverter x:Key="extensionConverter" />
 		<converters:SizeConverter x:Key="sizeConverter" />
 		<converters:FileNameConverter x:Key="fileNameConverter" />
+		<converters:MinSizeConverter x:Key="minSizeConverter" />
 
 		<converters:PathToFoldersConverter x:Key="pathToFoldersConverter" />
 	</Window.Resources>
@@ -119,9 +120,9 @@
 	</Window.Styles>
 
 	<Panel Margin="{Binding #MainWindow.OffScreenMargin}" >
-		
+
 		<Panel IsHitTestVisible="False"
-					 Background="{DynamicResource Background}" 
+					 Background="{DynamicResource Background}"
 					 Opacity="0.8" />
 
 		<Border IsHitTestVisible="True">
@@ -151,7 +152,7 @@
 						</StackPanel>
 
 					</Border>
-					
+
 					<ScrollViewer Grid.ColumnSpan="2"
 												Grid.Row="2"
 												ClipToBounds="True">
@@ -195,23 +196,25 @@
 
 				<Border CornerRadius="0 0 0 0"
 								Grid.Column="2">
-					<Grid RowDefinitions="Auto, *">
-
-						<Border Grid.Row="0"
-										HorizontalAlignment="Left"
-										Background="Transparent"
+					<Grid RowDefinitions="Auto, *"
+								Grid.Column="2">
+						
+							<Grid ColumnDefinitions="*, Auto"
 										IsHitTestVisible="True"
-										Height="30">
-							<StackPanel Orientation="Horizontal">
-								<Viewbox HorizontalAlignment="Left">
+										HorizontalAlignment="Left"
+										Margin="0 0 200 0">
 									<TabStrip Items="{Binding Tabs}"
-														IsHitTestVisible="True"
 														SelectedItem="{Binding CurrentTab}">
+										<TabStrip.ItemsPanel>
+											<ItemsPanelTemplate>
+												<UniformGrid Rows="1" />
+											</ItemsPanelTemplate>
+										</TabStrip.ItemsPanel>
 										<TabStrip.DataTemplates>
 											<DataTemplate DataType="{x:Type viewmodels:TabItemViewModel}">
 												<StackPanel>
-													<StackPanel Orientation="Horizontal"
-																		Margin="1">
+													<Grid ColumnDefinitions="Auto, *, Auto"
+																MaxWidth="350">
 														<Image Source="{Binding Path, Converter={StaticResource imageConverter}}"
 																	 Height="25"
 																	 Margin="0 0 4 0"
@@ -224,29 +227,36 @@
 															</Image.RenderTransform>
 														</Image>
 														
+
 														<TextBlock Text="{Binding Path, Converter={StaticResource fileNameConverter}}"
 																			 TextTrimming="CharacterEllipsis"
 																			 VerticalAlignment="Center"
-																			 MaxWidth="200"/>
-															<!--<Button Background="Transparent"
-																			Height="25"
-																			Margin="2 0 0 0"
-																			Padding="0"
-																			IsVisible="{Binding $parent[TabStripItem].IsPointerOver}"
-																			Command="{Binding RemoveTabCommand}">
-																<Viewbox>
-																	<Image Source="{SvgImage /Assets/UIIcons/Remove.svg}" />
-																</Viewbox>
-															</Button>-->
-													</StackPanel>
-													
-													<ProgressBar MinWidth="0"
+																			 Grid.Column="1" 
+																			 IsVisible="{Binding $self.DesiredSize.Width, Mode=TwoWay, Converter={StaticResource minSizeConverter}, ConverterParameter=100}"/>
+
+														<Button Background="Transparent"
+																		Height="25"
+																		Margin="0"
+																		Padding="3"
+																		HorizontalAlignment="Right"
+																		Grid.Column="2"
+																		Click="OnTabCloseClick"
+																		IsVisible="{Binding !!$parent[Window].Tabs.Count}" >
+															<Viewbox>
+																<Image Source="{SvgImage /Assets/UIIcons/Close.svg}" />
+															</Viewbox>
+														</Button>
+													</Grid>
+
+													<!--<ProgressBar MinWidth="0"
+																			 Grid.ColumnSpan="3"
+																			 VerticalAlignment="Top"
 																			 Value="{Binding Count}"
 																			 IsIndeterminate="{Binding IsIndeterminate}"
 																		   Maximum="{Binding FileCount}"
 																			 IsVisible="{Binding IsLoading}"
 																			 HorizontalAlignment="Stretch"
-																			 Orientation="Horizontal" />
+																			 Orientation="Horizontal" />-->
 												</StackPanel>
 											</DataTemplate>
 										</TabStrip.DataTemplates>
@@ -260,9 +270,9 @@
 											</Style>
 										</TabStrip.Styles>
 									</TabStrip>
-								</Viewbox>
 
 								<Viewbox Margin="5 0 0 0"
+												 Grid.Column="2"
 												 Padding="2">
 									<Button Cursor="Hand"
 													Padding="0"
@@ -274,9 +284,7 @@
 										</Viewbox>
 									</Button>
 								</Viewbox>
-							</StackPanel>
-
-						</Border>
+							</Grid>
 
 						<DockPanel ClipToBounds="True"
 											 Background="{DynamicResource MenuBackground}"
@@ -347,16 +355,16 @@
 													</Button>
 												</Grid>
 											</StackPanel>
-											
+
 											<TextBlock Text="Clipboard"
-																 Grid.Row="1" 
+																 Grid.Row="1"
 																 HorizontalAlignment="Center"
 																 Foreground="{DynamicResource SystemChromeDisabledLowColor}"
 																 FontSize="12"/>
 										</Grid>
-										
-										<Border Width="1" 
-														Background="{DynamicResource Background}" 
+
+										<Border Width="1"
+														Background="{DynamicResource Background}"
 														Margin="4"/>
 
 										<Grid RowDefinitions="* Auto">
@@ -372,7 +380,8 @@
 													</StackPanel>
 												</Button>
 												<Button Cursor="Hand"
-																Background="Transparent">
+																Background="Transparent"
+																Command="{Binding CopyTo}">
 													<StackPanel Orientation="Vertical">
 														<Viewbox Height="30">
 															<Image Source="{SvgImage /Assets/UIIcons/Paste.svg}" />
@@ -490,7 +499,7 @@
 																 FontSize="12"/>
 										</Grid>
 
-										
+
 									</StackPanel>
 
 									<StackPanel Grid.Column="2">
@@ -552,38 +561,130 @@
 
 											<ScrollViewer Margin="7.5 0 0 0"
 																		HorizontalScrollBarVisibility="Auto">
-												<Menu Items="{Binding Path, Converter={StaticResource pathToFoldersConverter}}"
-														Height="40"
-														x:Name="pathFolders">
-													<Menu.DataTemplates>
-														<DataTemplate DataType="{x:Type models:FolderModel}">
-															<TextBlock Text="{Binding Name}"
-																				 TextTrimming="CharacterEllipsis" />
-														</DataTemplate>
-													</Menu.DataTemplates>
-													<Menu.Styles>
-														<Style Selector="MenuItem">
-															<Setter Property="Cursor" Value="Hand" />
-															<Setter Property="ToolTip.Tip" Value="{Binding Name}" />
-															<Setter Property="ContextMenu">
-																<Setter.Value>
-																	<ContextMenu Items="{Binding SubFolders}" >
-																		<ContextMenu.Styles>
-																			<Style Selector="MenuItem">
-																				<Setter Property="Items" Value="{Binding SubFolders}" />
-																			</Style>
-																		</ContextMenu.Styles>
-																		<ContextMenu.ItemsPanel>
-																			<ItemsPanelTemplate>
-																				<VirtualizingStackPanel />
-																			</ItemsPanelTemplate>
-																		</ContextMenu.ItemsPanel>
-																	</ContextMenu>
-																</Setter.Value>
+												<ItemsRepeater Items="{Binding CurrentTab.Folders}">
+													<ItemsRepeater.Styles>
+														<Style Selector="ComboBox">
+															<Setter Property="Padding" Value="{DynamicResource ComboBoxPadding}" />
+															<Setter Property="FocusAdorner" Value="{x:Null}" />
+															<Setter Property="MaxDropDownHeight" Value="504" />
+															<Setter Property="Foreground" Value="{DynamicResource ComboBoxForeground}" />
+															<Setter Property="Background" Value="{DynamicResource ComboBoxBackground}" />
+															<Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrush}" />
+															<Setter Property="BorderThickness" Value="{DynamicResource ComboBoxBorderThemeThickness}" />
+															<Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+															<Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+															<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+															<Setter Property="VerticalContentAlignment" Value="Center" />
+															<Setter Property="HorizontalAlignment" Value="Left" />
+															<Setter Property="VerticalAlignment" Value="Top" />
+															<Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+															<Setter Property="PlaceholderForeground" Value="{DynamicResource ComboBoxPlaceHolderForeground}" />
+															<Setter Property="Template">
+																<ControlTemplate>
+																	<DataValidationErrors>
+																		<Grid RowDefinitions="Auto, *, Auto"
+																					ColumnDefinitions="*,Auto">
+																			<Border x:Name="Background"
+																							Grid.Row="1"
+																							Grid.Column="0"
+																							Grid.ColumnSpan="2"
+																							Background="{TemplateBinding Background}"
+																							BorderBrush="{TemplateBinding BorderBrush}"
+																							BorderThickness="{TemplateBinding BorderThickness}"
+																							MinWidth="{DynamicResource ComboBoxThemeMinWidth}" />
+
+																			<Border x:Name="HighlightBackground"
+																							Grid.Row="1"
+																							Grid.Column="0"
+																							Grid.ColumnSpan="2"
+																							Background="{DynamicResource ComboBoxBackgroundUnfocused}"
+																							BorderBrush="{DynamicResource ComboBoxBackgroundBorderBrushUnfocused}"
+																							BorderThickness="{TemplateBinding BorderThickness}" />
+
+																			<Border x:Name="DropDownOverlay"
+																							Grid.Row="1"
+																							Grid.Column="1"
+																							Background="Transparent"
+																							Margin="0,1,1,1"
+																							Width="30"
+																							IsVisible="False"
+																							HorizontalAlignment="Right" />
+
+																			<Viewbox Grid.Row="1"
+																							 Grid.Column="0"
+																							 Grid.ColumnSpan="2"
+																							 IsHitTestVisible="False"
+																							 HorizontalAlignment="Stretch"
+																							 VerticalAlignment="Stretch">
+																				<Panel>
+																					<Image Source="{SvgImage /Assets/UIIcons/DownSmallArrow.svg}"
+																								 IsVisible="{TemplateBinding IsDropDownOpen}" 
+																								 x:Name="OpenImage"/>
+																					
+																					<Image Source="{SvgImage /Assets/UIIcons/RightSmallArrow.svg}"
+																								 IsVisible="{Binding ElementName=OpenImage, Path=!IsVisible}" />
+																				</Panel>
+																			</Viewbox>
+																			<Popup Name="PART_Popup"
+																						 WindowManagerAddShadowHint="False"
+																						 IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+																						 MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
+																						 MaxHeight="{TemplateBinding MaxDropDownHeight}"
+																						 PlacementTarget="Background"
+																						 IsLightDismissEnabled="True">
+																				<Border x:Name="PopupBorder"
+																								Background="{DynamicResource ComboBoxDropDownBackground}"
+																								BorderBrush="{DynamicResource ComboBoxDropDownBorderBrush}"
+																								BorderThickness="{DynamicResource ComboBoxDropdownBorderThickness}"
+																								Margin="0,-1,0,-1"
+																								Padding="{DynamicResource ComboBoxDropdownBorderPadding}"
+																								HorizontalAlignment="Stretch"
+																								CornerRadius="{DynamicResource OverlayCornerRadius}">
+																					<Panel>
+																						<ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+																													VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
+																							<ItemsPresenter Name="PART_ItemsPresenter"
+																															Items="{TemplateBinding Items}"
+																															Margin="{DynamicResource ComboBoxDropdownContentMargin}"
+																															ItemsPanel="{TemplateBinding ItemsPanel}"
+																															ItemTemplate="{TemplateBinding ItemTemplate}"
+																															VirtualizationMode="{TemplateBinding VirtualizationMode}" />
+																						</ScrollViewer>
+																					</Panel>
+																				</Border>
+																			</Popup>
+																		</Grid>
+																	</DataValidationErrors>
+																</ControlTemplate>
 															</Setter>
 														</Style>
-													</Menu.Styles>
-												</Menu>
+													</ItemsRepeater.Styles>
+													<ItemsRepeater.Layout>
+														<StackLayout Orientation="Horizontal" />
+													</ItemsRepeater.Layout>
+
+													<ItemsRepeater.ItemTemplate>
+														<DataTemplate>
+															<StackPanel Orientation="Horizontal">
+																<!--<controls.DropdownButton />-->
+																<!--<Button Background="{DynamicResource ContentBackground}"
+																				Content="{Binding Name}"
+																				VerticalContentAlignment="Center"
+																				Cursor="Hand"
+																				VerticalAlignment="Stretch"
+																				Tapped="OnButtonClick" />
+
+																<ComboBox Items="{Binding SubFolders^}"
+																					VerticalAlignment="Stretch"
+																					BorderThickness="0"
+																					Width="20"
+																					SelectionChanged="OnComboBoxChanged"
+																					Background="{DynamicResource ContentBackground}"
+																					Cursor="Hand" />-->
+															</StackPanel>
+														</DataTemplate>
+													</ItemsRepeater.ItemTemplate>
+												</ItemsRepeater>
 											</ScrollViewer>
 
 											<!--<TextBox Background="{x:Null}"
@@ -627,7 +728,7 @@
 																			 IsTextCompletionEnabled="True"
 																			 MinimumPrefixLength="0"
 																			 MinWidth="100"
-																			 Watermark="Search}" >
+																			 Watermark="Search" >
 												<AutoCompleteBox.Styles>
 													<Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
 														<Setter Property="BorderBrush" Value="{x:Null}"/>
@@ -672,48 +773,15 @@
 							</StackPanel>
 
 							<Border Background="{DynamicResource ContentBackground}">
-								<Grid RowDefinitions="Auto, *, Auto">
-
-									<ComboBox BorderThickness="0"
-														Cursor="Hand"
-														Margin="0"
-														Background="Transparent"
-														VerticalAlignment="Stretch"
-														SelectedItem="{Binding CurrentTab.Sort}"
-														Items="{Binding SortValues}" />
-
-									<ListBox HorizontalAlignment="Right">
-										<ListBox.ItemsPanel>
-											<ItemsPanelTemplate>
-												<StackPanel Orientation="Horizontal" />
-											</ItemsPanelTemplate>
-										</ListBox.ItemsPanel>
-										<ListBoxItem Cursor="Hand"
-																 Padding="7.5"
-																 Background="{DynamicResource ContentBackground}"
-																 IsSelected="{Binding CurrentTab.IsGrid, Mode=TwoWay}" >
-												<Image Source="{SvgImage /Assets/UIIcons/Grid.svg}" 
-															 Width="25"/>
-										</ListBoxItem>
-
-										<ListBoxItem Cursor="Hand" 
-																 Padding="7.5"
-															 Background="{DynamicResource ContentBackground}"
-																 IsSelected="{Binding !CurrentTab.IsGrid, Mode=TwoWay}">
-												<Image Source="{SvgImage /Assets/UIIcons/List.svg}" 
-															 Width="25" />
-										</ListBoxItem>
-									</ListBox>
+								<Grid RowDefinitions="*, Auto">
 									
-								<ContentControl Content="{Binding CurrentTab.DisplayControl}"
-																Grid.Row="1" />
+									<ContentControl Content="{Binding CurrentTab.DisplayControl}" />
 
 									<!-- Failed Search -->
 									<Border VerticalAlignment="Center"
 												  HorizontalAlignment="Center"
 												  IsVisible="{Binding CurrentTab.SearchFailed}"
-												  Padding="10 5 10 10"
-												  Grid.Row="1">
+												  Padding="10 5 10 10">
 										<Viewbox MaxWidth="300"
 														 MaxHeight="300">
 											<StackPanel>
@@ -729,18 +797,67 @@
 									</Border>
 
 									<Border Background="{DynamicResource NotificationCardBackgroundBrush}"
-													Grid.Row="2">
+													Grid.Row="1">
 										<Grid ColumnDefinitions="Auto, *, Auto">
 
 											<StackPanel Orientation="Horizontal">
 												<Label Content="{Binding CurrentTab.Count, StringFormat={}{0:N0} item(s)}"
-															 Margin="5" />
-												
+															 Margin="5 0"
+															 FontSize="15"
+															 VerticalAlignment="Center"/>
+
 											</StackPanel>
 
-											<Label Content="{Binding CurrentTab.LoadTime, StringFormat=Load Time: {0:mm\\:ss\\.fff}}"
+											<StackPanel Grid.Column="2"
+																	Orientation="Horizontal">
+												<StackPanel Orientation="Horizontal">
+													<Viewbox Width="25"
+																	 Margin="2 0 0 0">
+														<Image Source="{SvgImage /Assets/UIIcons/Filter.svg}" />
+													</Viewbox>
+
+													<ComboBox BorderThickness="0"
+																		Cursor="Hand"
+																		Padding="0 1 2 1"
+																		Margin="0"
+																		Background="Transparent"
+																		VerticalAlignment="Stretch"
+																		SelectedItem="{Binding CurrentTab.Sort}"
+																		Items="{Binding SortValues}" />
+												</StackPanel>
+
+												<Border Width="1"
+																	Background="{DynamicResource Background}"
+																	Margin="4"/>
+
+												<ListBox HorizontalAlignment="Right"
+																 Background="Transparent">
+													<ListBox.ItemsPanel>
+														<ItemsPanelTemplate>
+															<StackPanel Orientation="Horizontal" />
+														</ItemsPanelTemplate>
+													</ListBox.ItemsPanel>
+													<ListBoxItem Cursor="Hand"
+																			 Padding="7.5"
+																			 Background="Transparent"
+																			 IsSelected="{Binding !CurrentTab.IsGrid, Mode=TwoWay}">
+														<Image Source="{SvgImage /Assets/UIIcons/List.svg}"
+																	 Width="25" />
+
+													</ListBoxItem>
+													<ListBoxItem Cursor="Hand"
+																			 Padding="7.5"
+																			 Background="Transparent"
+																			 IsSelected="{Binding CurrentTab.IsGrid, Mode=TwoWay}" >
+														<Image Source="{SvgImage /Assets/UIIcons/Grid.svg}"
+																	 Width="25"/>
+													</ListBoxItem>
+												</ListBox>
+											</StackPanel>
+
+											<!--<Label Content="{Binding CurrentTab.LoadTime, StringFormat=Load Time: {0:mm\\:ss\\.fff}}"
 														 Margin="5"
-														 Grid.Column="2" />
+														 Grid.Column="2" />-->
 										</Grid>
 									</Border>
 
@@ -790,7 +907,7 @@
 				</Border>
 			</Grid>
 		</Border>
-				
+
 		<!--<Border Background="#55000000" 
 						IsVisible="{Binding PopupContent.HasShadow}"
 						PointerPressed="CloseSettings" />-->
@@ -805,37 +922,39 @@
 						IsVisible="{Binding CurrentTab.PopupVisible}"
 						x:Name="settingsPanel"
 						BoxShadow="0 0 30 -5 Black" >
-				<Grid RowDefinitions="Auto, *">
+			<Grid RowDefinitions="Auto, *">
 
-					<Border Background="{DynamicResource ContentBackground}"
-									CornerRadius="10 10 0 0" >
-						<Grid Margin="4"
-									ColumnDefinitions="* Auto">
-							<Label Content="{Binding CurrentTab.PopupContent.Title}"
-											FontSize="21"
-											FontWeight="Bold"
-											VerticalAlignment="Center"/>
+				<Border Background="{DynamicResource ContentBackground}"
+								CornerRadius="10 10 0 0" >
+					<Grid Margin="4"
+								ColumnDefinitions="* Auto">
+						<Label Content="{Binding CurrentTab.PopupContent.Title}"
+									 FontSize="21"
+									 Margin="10 0"
+									 FontWeight="Bold"
+									 VerticalAlignment="Center"
+									 HorizontalAlignment="Center"/>
 
-							<Button Width="30"
-											Height="30"
-											Grid.Column="1"
-											IsDefault="True"
-											Command="{Binding CurrentTab.PopupContent.Close}"
-											VerticalAlignment="Top"
-											HorizontalAlignment="Right"
-											Background="Transparent"
-											Cursor="Hand"
-											Padding="0">
-								<Viewbox Margin="2.5" >
-									<Image Source="{SvgImage /Assets/UIIcons/Close.svg}" />
-								</Viewbox>
-							</Button>
-						</Grid>
-					</Border>
+						<Button Width="30"
+										Height="30"
+										Grid.Column="1"
+										IsDefault="True"
+										Command="{Binding CurrentTab.PopupContent.Close}"
+										VerticalAlignment="Top"
+										HorizontalAlignment="Right"
+										Background="Transparent"
+										Cursor="Hand"
+										Padding="0">
+							<Viewbox Margin="2.5" >
+								<Image Source="{SvgImage /Assets/UIIcons/Close.svg}" />
+							</Viewbox>
+						</Button>
+					</Grid>
+				</Border>
 
-					<ContentControl Content="{Binding CurrentTab.PopupContent}"
-													Grid.Row="1" />
-				</Grid>
+				<ContentControl Content="{Binding CurrentTab.PopupContent}"
+												Grid.Row="1" />
+			</Grid>
 		</Border>
 	</Panel>
 </FluentWindow>

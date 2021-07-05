@@ -7,6 +7,7 @@
 		<PublishTrimmed>false</PublishTrimmed>
     <StartupObject>FileExplorerCore.Program</StartupObject>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -160,7 +161,9 @@
     <None Remove="Assets\UIIcons\Copy.svg" />
     <None Remove="Assets\UIIcons\Cut.svg" />
     <None Remove="Assets\UIIcons\Details.svg" />
+    <None Remove="Assets\UIIcons\DownSmallArrow.svg" />
     <None Remove="Assets\UIIcons\FailedSearch.svg" />
+    <None Remove="Assets\UIIcons\Filter.svg" />
     <None Remove="Assets\UIIcons\Grid.svg" />
     <None Remove="Assets\UIIcons\LeftArrow.svg" />
     <None Remove="Assets\UIIcons\Length.svg" />
@@ -176,6 +179,7 @@
     <None Remove="Assets\UIIcons\Remove.svg" />
     <None Remove="Assets\UIIcons\Rename.svg" />
     <None Remove="Assets\UIIcons\RightArrow.svg" />
+    <None Remove="Assets\UIIcons\RightSmallArrow.svg" />
     <None Remove="Assets\UIIcons\Search.svg" />
     <None Remove="Assets\UIIcons\SelectAll.svg" />
     <None Remove="Assets\UIIcons\SelectInvert.svg" />

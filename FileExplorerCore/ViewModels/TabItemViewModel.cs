@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Controls.Shapes;
 using Avalonia.Threading;
 using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
@@ -77,6 +78,33 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
+		public IEnumerable<FolderModel> Folders
+		{
+			get
+			{
+				var path = Path.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
+
+				var names = path.Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+
+				for (int i = 0; i < names.Length; i++)
+				{
+					var folderPath = String.Join(System.IO.Path.DirectorySeparatorChar, new ArraySegment<string>(names, 0, i + 1));
+					var name = names[i];
+
+					if (!String.IsNullOrEmpty(folderPath))
+					{
+						if (i is 0)
+						{
+							folderPath += System.IO.Path.DirectorySeparatorChar;
+							name += System.IO.Path.DirectorySeparatorChar;
+						}
+
+						yield return new FolderModel(folderPath, name, from directory in Directory.EnumerateDirectories(folderPath, "*", new EnumerationOptions())
+																													 select new FolderModel(directory, System.IO.Path.GetFileName(directory)));
+					}
+				}
+			}
+		}
 		public int Count
 		{
 			get => _count;
@@ -187,9 +215,11 @@ namespace FileExplorerCore.ViewModels
 						undoStack.Push(Path);
 						redoStack.Clear();
 					}
+
+					this.RaiseAndSetIfChanged(ref _path, value);
+					this.RaisePropertyChanged(nameof(FolderName));
+					this.RaisePropertyChanged(nameof(Folders));
 				}
-				this.RaiseAndSetIfChanged(ref _path, value);
-				this.RaisePropertyChanged(nameof(FolderName));
 			}
 		}
 
@@ -348,20 +378,23 @@ namespace FileExplorerCore.ViewModels
 				{
 					var query = Sort is SortEnum.None && !recursive ? GetDirectories(Path).Concat(GetFiles(Path)) : GetFileSystemEntries(Path, search, recursive);
 
-					ThreadPool.QueueUserWorkItem(x =>
+					if (Sort is not SortEnum.None)
 					{
-						options.RecurseSubdirectories = recursive;
-
-						var watch = Stopwatch.StartNew();
-						var count = GetFileSystemEntriesCount(Path, search, options, tokenSource.Token);
-
-						watch.Stop();
-
-						if (!tokenSource.IsCancellationRequested)
+						ThreadPool.QueueUserWorkItem(x =>
 						{
-							FileCount = count;
-						}
-					});
+							options.RecurseSubdirectories = recursive;
+
+							var watch = Stopwatch.StartNew();
+							var count = GetFileSystemEntriesCount(Path, search, options, tokenSource.Token);
+
+							watch.Stop();
+
+							if (!tokenSource.IsCancellationRequested)
+							{
+								FileCount = count;
+							}
+						});
+					}
 
 					if (Sort is SortEnum.None)
 					{
@@ -375,21 +408,13 @@ namespace FileExplorerCore.ViewModels
 					}
 				});
 			}
-			//else
-			//{
-			//	var drives = DriveInfo.GetDrives();
-			//	var files = drives.Where(x => x.IsReady)
-			//										.Select(s => new FileModel(s.RootDirectory.FullName, false));
-
-			//	await Files.ReplaceRange(files, tokenSource.Token);
-			//}
 
 			timer.Stop();
 
 			IsLoading = false;
 		}
 
-		private async Task SetPath(string path)
+		public async Task SetPath(string path)
 		{
 			if (File.Exists(path))
 			{
@@ -410,8 +435,11 @@ namespace FileExplorerCore.ViewModels
 			}
 			else if (Directory.Exists(path))
 			{
-				Path = path;
-				await UpdateFiles(false, "*");
+				if (Path != path)
+				{
+					Path = path;
+					await UpdateFiles(false, "*");
+				}
 			}
 		}
 

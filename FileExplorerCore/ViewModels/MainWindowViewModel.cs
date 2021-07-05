@@ -20,7 +20,7 @@ namespace FileExplorerCore.ViewModels
 	public class MainWindowViewModel : ViewModelBase
 	{
 		private bool isSearching = false;
-		readonly WindowNotificationManager notificationManager;
+		public readonly WindowNotificationManager notificationManager;
 
 		private TabItemViewModel _currentTab;
 		private IEnumerable<string> searchHistory;
@@ -220,19 +220,22 @@ namespace FileExplorerCore.ViewModels
 
 		public void Rename()
 		{
-			var fileIndex = CurrentTab.Files.IndexOf(CurrentTab.Files.First(x => x.IsSelected));
-
-			if (fileIndex is not -1 && CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
 			{
-				var rename = new Rename
+				var fileIndex = CurrentTab.Files.IndexOf(CurrentTab.Files.FirstOrDefault(x => x.IsSelected));
+
+				if (fileIndex is not -1)
 				{
-					Files = CurrentTab.Files,
-					Index = fileIndex,
-				};
+					var rename = new Rename
+					{
+						Files = CurrentTab.Files,
+						Index = fileIndex,
+					};
 
-				CurrentTab.PopupContent = rename;
+					CurrentTab.PopupContent = rename;
 
-				rename.OnPropertyChanged(nameof(rename.File));
+					rename.OnPropertyChanged(nameof(rename.File));
+				}
 			}
 		}
 
@@ -269,7 +272,6 @@ namespace FileExplorerCore.ViewModels
 					Message = CultureInfo.CurrentCulture.TextInfo.ToTitleCase($"Are you sure you want to delete {SelectedFileCount} item{(SelectedFileCount > 1 ? "s" : String.Empty)}?"),
 				};
 
-				choice.OnClose += () => CurrentTab.PopupContent = null;
 				choice.OnSubmit += () =>
 				{
 					var deletedFiles = new List<FileModel>(SelectedFileCount);
@@ -296,6 +298,19 @@ namespace FileExplorerCore.ViewModels
 				};
 
 				CurrentTab.PopupContent = choice;
+			}
+		}
+
+		public void CopyTo()
+		{
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+			{
+				var selector = new TabSelector()
+				{
+					Tabs = Tabs.Where(x => x != CurrentTab),
+				};
+
+				CurrentTab.PopupContent = selector;
 			}
 		}
 

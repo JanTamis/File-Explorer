@@ -3,7 +3,9 @@ using Avalonia.Controls;
 using Avalonia.Controls.Generators;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using FileExplorerCore.ViewModels;
 using ReactiveUI;
@@ -63,6 +65,33 @@ namespace FileExplorerCore.Views
 			if (sender is AutoCompleteBox { IsDropDownOpen: false } && e.Key is Key.Enter && DataContext is MainWindowViewModel model)
 			{
 				model.StartSearch();
+			}
+		}
+
+		private void OnButtonClick(object sender, RoutedEventArgs e)
+		{
+			if (DataContext is MainWindowViewModel model && sender is Button { DataContext: FolderModel folderModel })
+			{
+				model.CurrentTab.Path = folderModel.Path;
+			}
+		}
+
+		private async void OnComboBoxChanged(object sender, SelectionChangedEventArgs e)
+		{
+			if (DataContext is MainWindowViewModel model && e.AddedItems.Count > 0 && sender is ComboBox { SelectedItem: FolderModel folderModel })
+			{
+				await model.CurrentTab.SetPath(folderModel.Path);
+			}
+		}
+
+		private void OnTabCloseClick(object sender, RoutedEventArgs e)
+		{
+			if (DataContext is MainWindowViewModel model && sender is Button { DataContext: TabItemViewModel tab })
+			{
+				if (model.Tabs.Count > 1)
+				{
+					model.Tabs.Remove(tab);
+				}
 			}
 		}
 

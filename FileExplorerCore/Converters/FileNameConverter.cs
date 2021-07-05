@@ -25,9 +25,9 @@ namespace FileExplorerCore.Converters
 						return Path.GetFileName(path);
 					}
 				}
-				else if (path == String.Empty)
+				else if (path is "")
 				{
-					return path;
+					return "Quick Start";
 				}
 				else
 				{

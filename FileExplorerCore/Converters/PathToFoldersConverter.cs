@@ -33,14 +33,14 @@ namespace FileExplorerCore.Converters
 
 				if (!String.IsNullOrEmpty(folderPath))
 				{
-					if (i == 0)
+					if (i is 0)
 					{
 						folderPath += Path.DirectorySeparatorChar;
 						name += Path.DirectorySeparatorChar;
 					}
 
 					yield return new FolderModel(folderPath, name, from directory in Directory.EnumerateDirectories(folderPath, "*", new EnumerationOptions())
-																												 select new FolderModel(directory, Path.GetFileName(directory), subFolders: Enumerable.Empty<FolderModel>()));
+																												 select new FolderModel(directory, Path.GetFileName(directory)));
 				}
 			}
 		}

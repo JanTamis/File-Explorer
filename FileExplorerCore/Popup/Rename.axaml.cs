@@ -43,7 +43,12 @@ namespace FileExplorerCore.Popup
 
 		public void PreviousFile()
 		{
-			Index = Math.Max(0, Index - 1);
+			Index--;
+
+			if (Index < 0)
+			{
+				Index = Files.Count - 1;
+			}
 
 			OnPropertyChanged(nameof(File));
 			OnPropertyChanged(nameof(Title));
@@ -51,7 +56,7 @@ namespace FileExplorerCore.Popup
 
 		public void NextFile()
 		{
-			Index = Math.Min(Files.Count - 1, Index + 1);
+			Index = (Index + 1) % Files.Count;
 
 			OnPropertyChanged(nameof(File));
 			OnPropertyChanged(nameof(Title));

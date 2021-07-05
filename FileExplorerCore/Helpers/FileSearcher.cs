@@ -73,9 +73,11 @@ namespace FileExplorerCore.Helpers
 						}
 						break;
 					case Categories.contains:
-						if (!systemEntry.IsDirectory && !systemEntry.Attributes.HasFlag(FileAttributes.Archive) && !systemEntry.Attributes.HasFlag(FileAttributes.NotContentIndexed))
+						var fileTempExtension = Path.GetExtension(systemEntry.FileName);
+
+						if (!systemEntry.IsDirectory && fileTempExtension != ".dll" && fileTempExtension != ".exe" && !systemEntry.Attributes.HasFlag(FileAttributes.Archive) && !systemEntry.Attributes.HasFlag(FileAttributes.NotContentIndexed))
 						{
-							string searchText = (value as string)!;
+							string searchText = (string)value;
 							string line;
 
 							using (var reader = File.OpenText(systemEntry.ToFullPath()))
@@ -106,7 +108,7 @@ namespace FileExplorerCore.Helpers
 			{
 				var temp = entry.Split(':', StringSplitOptions.RemoveEmptyEntries);
 
-				if (temp.Length == 2 && Enum.TryParse<Categories>(temp[0].ToLower(), out var category))
+				if (temp.Length is 2 && Enum.TryParse<Categories>(temp[0].ToLower(), out var category))
 				{
 					string value = temp[1];
 

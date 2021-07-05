@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<linearGradient x1="0" y1="0.5" x2="1" y2="0.5" id="gradient_1">
+			<stop offset="0" stop-color="#42A3F2" />
+			<stop offset="1" stop-color="#42A4EB" />
+		</linearGradient>
+		<linearGradient x1="0.017441168" y1="0.49999994" x2="1.024147" y2="0.49999994" id="gradient_2">
+			<stop offset="0" stop-color="#3079D6" />
+			<stop offset="1" stop-color="#297CD2" />
+		</linearGradient>
+		<linearGradient x1="0" y1="0.49999714" x2="1" y2="0.49999714" id="gradient_3">
+			<stop offset="0" stop-color="#1D59B3" />
+			<stop offset="1" stop-color="#195BBC" />
+		</linearGradient>
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+		<clipPath id="mask_1">
+			<use xlink:href="#path_1" />
+		</clipPath>
+	</defs>
+	<g id="icons8_filter">
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+		<g clip-path="url(#mask_1)">
+			<path d="M38 4L2 4C0.895 4 0 3.105 0 2L0 2C0 0.895 0.895 0 2 0L38 0C39.105 0 40 0.895 40 2L40 2C40 3.105 39.105 4 38 4L38 4Z" transform="translate(4 6)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+			<path d="M21 17L13 17L0 0L34 0L21 17Z" transform="translate(7 10)" id="Polygon" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+			<path d="M8 0L0 0L0 15.999C0 16.742 0.782 17.226 1.447 16.893L6.894 14.169C7.572 13.831 8 13.138 8 12.381L8 0L8 0Z" transform="translate(20 27)" id="Shape" fill="url(#gradient_3)" fill-rule="evenodd" stroke="none" />
+		</g>
+	</g>
+</svg>
