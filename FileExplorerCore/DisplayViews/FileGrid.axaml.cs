@@ -140,7 +140,7 @@ namespace FileExplorerCore.DisplayViews
 			}
 			else if (range)
 			{
-				foreach (var file in Files.AsValueEnumerable().Where(x => x.IsSelected))
+				foreach (var file in files.AsValueEnumerable().Where(x => x.IsSelected))
 				{
 					file.IsSelected = false;
 				}
@@ -173,7 +173,7 @@ namespace FileExplorerCore.DisplayViews
 			}
 			else
 			{
-				foreach (var file in Files.AsValueEnumerable().Where(x => x.IsSelected))
+				foreach (var file in files.AsValueEnumerable().Where(x => x.IsSelected))
 				{
 					file.IsSelected = false;
 				}
@@ -185,6 +185,8 @@ namespace FileExplorerCore.DisplayViews
 			{
 				anchorIndex = index;
 			}
+
+			files.PropertyChanged("IsSelected");
 		}
 	}
 }

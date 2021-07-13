@@ -1,10 +1,11 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Controls.Shapes;
-using Avalonia.Threading;
+using FileExplorerCore.Converters;
 using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
+using FileExplorerCore.Popup;
+using NetFabric.Hyperlinq;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,6 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
-using System.Reactive;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,9 +26,11 @@ namespace FileExplorerCore.ViewModels
 
 		private int _count;
 		private int _fileCount;
+		private int foundItems;
+		private int _selectionCount;
 
-		private bool _isLoading;
 		private bool isUserEntered = true;
+		private bool _isLoading;
 		private bool _isGrid;
 
 		private readonly Stack<string> undoStack = new();
@@ -51,11 +53,14 @@ namespace FileExplorerCore.ViewModels
 		private TimeSpan predictedTime;
 		private TimeSpan previousLoadTime;
 
-		private int foundItems;
-
-		public ReactiveCommand<Unit, Unit> RemoveTabCommand;
-
 		private SortEnum _sort = SortEnum.None;
+
+		static List<FileIndexModel> drives = new();
+
+		static TabItemViewModel()
+		{
+
+		}
 
 		public SortEnum Sort
 		{
@@ -68,12 +73,9 @@ namespace FileExplorerCore.ViewModels
 				{
 					Files.Sort(new FileModelComparer(Sort));
 				}
-				else
+				else if (!String.IsNullOrWhiteSpace(Path))
 				{
-					if (!String.IsNullOrWhiteSpace(Path))
-					{
-						UpdateFiles(false, "*");
-					}
+					UpdateFiles(false, "*");
 				}
 			}
 		}
@@ -108,7 +110,11 @@ namespace FileExplorerCore.ViewModels
 		public int Count
 		{
 			get => _count;
-			set => this.RaiseAndSetIfChanged(ref _count, value);
+			set
+			{
+				this.RaiseAndSetIfChanged(ref _count, value);
+				this.RaisePropertyChanged(nameof(FileCountText));
+			}
 		}
 
 		public int FileCount
@@ -121,6 +127,43 @@ namespace FileExplorerCore.ViewModels
 				this.RaisePropertyChanged(nameof(SearchProgression));
 				this.RaisePropertyChanged(nameof(SearchText));
 			}
+		}
+
+		public string FileCountText => Count switch
+		{
+			1 => "1 item",
+			_ => $"{Count:N0} items"
+		};
+
+		public string SelectionText
+		{
+			get
+			{
+				var result = String.Empty;
+				var selectedFiles = Files.AsValueEnumerable()
+																 .Where(x => x.IsSelected);
+
+				if (SelectionCount > 0)
+				{
+					result = $"{SelectionCount:N0} items selected";
+
+					if (!selectedFiles.Any(x => x.IsFolder))
+					{
+						var fileSize = selectedFiles.Where(x => !x.IsFolder)
+																				.Sum(s => s.Size);
+
+						result += $", {SizeConverter.ByteSize(fileSize)}";
+					}
+				}
+
+				return result;
+			}
+		}
+
+		public int SelectionCount
+		{
+			get => _selectionCount;
+			private set => this.RaiseAndSetIfChanged(ref _selectionCount, value);
 		}
 
 		public TimeSpan LoadTime => DateTime.Now - startSearchTime;
@@ -190,7 +233,7 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		public bool SearchFailed => !IsLoading && Files.Count == 0 && DisplayControl is not Quickstart;
+		public bool SearchFailed => !IsLoading && Files.Count is 0 && DisplayControl is not Quickstart;
 
 		public ObservableRangeCollection<FileModel> Files { get; set; } = new();
 
@@ -300,18 +343,27 @@ namespace FileExplorerCore.ViewModels
 
 		public bool PopupVisible => PopupContent is not null;
 
-		public TabItemViewModel(ReactiveCommand<Unit, Unit> removeCommand)
+		public TabItemViewModel()
 		{
 			Files.CountChanged += (count) =>
 			{
 				Count = count;
 			};
 
+			Files.OnPropertyChanged += (property) =>
+			{
+				if (property is "IsSelected")
+				{
+					SelectionCount = Files.AsValueEnumerable()
+																.Count(x => x.IsSelected);
+
+					this.RaisePropertyChanged(nameof(SelectionText));
+				}
+			};
+
 			Path = String.Empty;
 
 			UpdateFiles(false, "*");
-
-			RemoveTabCommand = removeCommand;
 		}
 
 		public string? Undo()
@@ -358,7 +410,10 @@ namespace FileExplorerCore.ViewModels
 			tokenSource = new CancellationTokenSource();
 			previousLoadTime = TimeSpan.Zero;
 
-			await Dispatcher.UIThread.InvokeAsync(Files.Clear);
+			Files.ClearTrim();
+
+			SelectionCount = 0;
+			this.RaisePropertyChanged(nameof(SelectionText));
 
 			IsLoading = true;
 
@@ -407,6 +462,56 @@ namespace FileExplorerCore.ViewModels
 						await Files.ReplaceRange(query, tokenSource.Token, comparer);
 					}
 				});
+
+				// try to create or update the tree from the current path
+				if (!recursive)
+				{
+					ThreadPool.QueueUserWorkItem(x =>
+					{
+						var subPaths = Path.Split(new[] { System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+
+						FileIndexModel model = drives.FirstOrDefault(x => x.Name == subPaths[0]) ?? new FileIndexModel(subPaths[0]);
+						FileIndexModel tempParentFolder = model;
+
+						for (int i = 1; i < subPaths.Length; i++)
+						{
+							var tempFolder = tempParentFolder.SubFiles?.FirstOrDefault(x => x.Name == subPaths[i]) ?? new FileIndexModel(subPaths[i]);
+
+							if (i == subPaths.Length - 1)
+							{
+								var enumerable = new FileSystemEnumerable<FileIndexModel>(String.Join(System.IO.Path.DirectorySeparatorChar, subPaths[0..i]), (ref FileSystemEntry x) => new FileIndexModel(x.FileName.ToString()), options);
+
+								tempFolder.SubFiles = new List<FileIndexModel>(enumerable);
+
+								tempParentFolder.SubFiles = new List<FileIndexModel>
+								{
+									tempFolder
+								};
+
+								break;
+							}
+							else if (tempParentFolder.SubFiles is null)
+							{
+								tempParentFolder.SubFiles = new List<FileIndexModel>
+								{
+									tempFolder
+								};
+							}
+							else if (!tempParentFolder.SubFiles.Contains(tempFolder))
+							{
+								tempParentFolder.SubFiles.Add(tempFolder);
+							}
+
+							tempParentFolder = tempFolder;
+						}
+
+						if (!drives.Contains(model))
+						{
+							drives.Add(model);
+						}
+
+					});
+				}
 			}
 
 			timer.Stop();
@@ -449,7 +554,7 @@ namespace FileExplorerCore.ViewModels
 
 			var size = IsGrid ? 100 : 32;
 
-			if (search is "*" or "*.*" or "" && Sort is SortEnum.None && !options.RecurseSubdirectories)
+			if (search is "*" or "*.*" or "" && Sort is SortEnum.None && !recursive)
 			{
 				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToSpecifiedFullPath(), x.IsDirectory, size), options);
 			}
@@ -460,9 +565,16 @@ namespace FileExplorerCore.ViewModels
 
 				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToSpecifiedFullPath(), x.IsDirectory, size), options)
 				{
-					ShouldIncludePredicate = (ref FileSystemEntry x) => regex.IsMatch(new String(x.FileName)) || FileSearcher.IsValidAsync(x, query)
+					ShouldIncludePredicate = (ref FileSystemEntry x) => regex.IsMatch(new String(x.FileName)) || FileSearcher.IsValid(x, query)
 				};
 			}
+
+			//if (readers.TryGetValue(System.IO.Path.GetPathRoot(path), out var reader))
+			//{
+			//	return reader.GetNodes(path).Select(x => new FileModel(x.FullName, Directory.Exists(x.FullName), size));
+			//}
+
+			//return Enumerable.Empty<FileModel>();
 		}
 
 		private int GetFileSystemEntriesCount(string path, string search, EnumerationOptions options, CancellationToken token)
@@ -481,7 +593,7 @@ namespace FileExplorerCore.ViewModels
 
 				enumerable = new FileSystemEnumerable<byte>(path, (ref FileSystemEntry x) => 0, options)
 				{
-					ShouldIncludePredicate = (ref FileSystemEntry x) => regex.IsMatch(new String(x.FileName)) || FileSearcher.IsValidAsync(x, query)
+					ShouldIncludePredicate = (ref FileSystemEntry x) => regex.IsMatch(new String(x.FileName)) || FileSearcher.IsValid(x, query)
 				};
 			}
 

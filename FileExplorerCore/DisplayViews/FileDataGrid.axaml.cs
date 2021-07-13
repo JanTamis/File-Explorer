@@ -33,6 +33,7 @@ namespace FileExplorerCore.DisplayViews
 				return grid.Items as ObservableRangeCollection<FileModel>;
 			}
 		}
+
 		public FileDataGrid() : base()
 		{
 			AvaloniaXamlLoader.Load(this);
@@ -235,6 +236,8 @@ namespace FileExplorerCore.DisplayViews
 			{
 				anchorIndex = index;
 			}
+
+			files.PropertyChanged("IsSelected");
 		}
 	}
 }

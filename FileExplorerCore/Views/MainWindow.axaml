@@ -28,6 +28,7 @@
 		<converters:SizeConverter x:Key="sizeConverter" />
 		<converters:FileNameConverter x:Key="fileNameConverter" />
 		<converters:MinSizeConverter x:Key="minSizeConverter" />
+		<converters:MoreThanConverter x:Key="moreThanConverter" />
 
 		<converters:PathToFoldersConverter x:Key="pathToFoldersConverter" />
 	</Window.Resources>
@@ -115,6 +116,12 @@
 			<Setter Property="Opacity" Value="0.8" />
 			<Setter Property="CornerRadius" Value="7.5 7.5 0 0" />
 			<Setter Property="Background" Value="{DynamicResource MenuBackground}" />
+		</Style>
+
+		<Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushDisabled}" />
+			<Setter Property="TextBlock.Foreground" Value="{DynamicResource ButtonForegroundDisabled}" />
 		</Style>
 
 	</Window.Styles>
@@ -241,7 +248,7 @@
 																		HorizontalAlignment="Right"
 																		Grid.Column="2"
 																		Click="OnTabCloseClick"
-																		IsVisible="{Binding !!$parent[Window].Tabs.Count}" >
+																		IsVisible="{Binding $parent[Window].DataContext.Tabs.Count, Converter={StaticResource moreThanConverter}, ConverterParameter=1}" >
 															<Viewbox>
 																<Image Source="{SvgImage /Assets/UIIcons/Close.svg}" />
 															</Viewbox>
@@ -295,7 +302,8 @@
 									<StackPanel Orientation="Horizontal"
 															Height="70"
 															Margin="2 2 0 0">
-										<Grid RowDefinitions="* Auto">
+										<Grid RowDefinitions="* Auto"
+													IsEnabled="{Binding CurrentTab.SelectionCount, Converter={StaticResource moreThanConverter}, ConverterParameter=0}">
 											<StackPanel Orientation="Horizontal">
 												<Button Cursor="Hand"
 																VerticalAlignment="Stretch"
@@ -367,7 +375,8 @@
 														Background="{DynamicResource Background}"
 														Margin="4"/>
 
-										<Grid RowDefinitions="* Auto">
+										<Grid RowDefinitions="* Auto"
+													IsEnabled="{Binding CurrentTab.SelectionCount, Converter={StaticResource moreThanConverter}, ConverterParameter=0}">
 											<StackPanel Orientation="Horizontal">
 												<Button Cursor="Hand"
 																Background="Transparent">
@@ -403,7 +412,8 @@
 														Background="{DynamicResource Background}"
 														Margin="4"/>
 
-										<Grid RowDefinitions="* Auto">
+										<Grid RowDefinitions="* Auto"
+													IsEnabled="{Binding CurrentTab.SelectionCount, Converter={StaticResource moreThanConverter}, ConverterParameter=0}">
 											<StackPanel Orientation="Horizontal">
 												<Button Cursor="Hand"
 																Command="{Binding DeleteFiles}"
@@ -801,9 +811,19 @@
 										<Grid ColumnDefinitions="Auto, *, Auto">
 
 											<StackPanel Orientation="Horizontal">
-												<Label Content="{Binding CurrentTab.Count, StringFormat={}{0:N0} item(s)}"
-															 Margin="5 0"
-															 FontSize="15"
+												
+												<Label Content="{Binding CurrentTab.FileCountText}"
+															 Margin="5 0 0 0"
+															 FontSize="14"
+															 VerticalAlignment="Center"/>
+
+												<Border Width="1"
+																Background="{DynamicResource Background}"
+																Margin="4 8"/>
+
+												<Label Content="{Binding CurrentTab.SelectionText}"
+															 Margin="0"
+															 FontSize="14"
 															 VerticalAlignment="Center"/>
 
 											</StackPanel>
@@ -827,8 +847,8 @@
 												</StackPanel>
 
 												<Border Width="1"
-																	Background="{DynamicResource Background}"
-																	Margin="4"/>
+																Background="{DynamicResource Background}"
+																Margin="4 8"/>
 
 												<ListBox HorizontalAlignment="Right"
 																 Background="Transparent">
@@ -867,7 +887,6 @@
 													IsVisible="{Binding CurrentTab.IsLoading}"
 													Background="{DynamicResource MenuBackground}"
 													Padding="10 5 10 10"
-													Grid.Row="1"
 													CornerRadius="10"
 													BoxShadow="0 0 30 -5 Black" >
 										<StackPanel>

@@ -138,7 +138,7 @@ namespace FileExplorerCore.Models
 					{
 						size = Size;
 					}
-					else if (Path.EndsWith(@"\") && new DriveInfo(Path[0].ToString()) is { IsReady: true } info)
+					else if (Path.EndsWith("\\") && new DriveInfo(Path[0].ToString()) is { IsReady: true } info)
 					{
 						size = info.TotalSize - info.TotalFreeSpace;
 					}
@@ -149,8 +149,10 @@ namespace FileExplorerCore.Models
 							ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
 						};
 
-						size = query.AsValueEnumerable().Sum();
+						size = query.AsValueEnumerable()
+												.Sum();
 					}
+
 					return SizeConverter.ByteSize(size);
 				});
 			}
@@ -221,12 +223,9 @@ namespace FileExplorerCore.Models
 			{
 				var span = path.AsSpan();
 
-				if (File.Exists(path))
+				if (File.Exists(path) && System.IO.Path.HasExtension(span))
 				{
-					if (System.IO.Path.HasExtension(span))
-					{
-						return System.IO.Path.GetExtension(span).ToString();
-					}
+					return System.IO.Path.GetExtension(span).ToString();
 				}
 
 				return null;

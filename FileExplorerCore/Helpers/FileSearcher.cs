@@ -19,7 +19,7 @@ namespace FileExplorerCore.Helpers
 			{ "!", (x, y) => !x.Equals(y) },
 		};
 
-		public static bool IsValidAsync(FileSystemEntry systemEntry, IEnumerable<(Categories, (Func<object, object, bool>, object))> query)
+		public static bool IsValid(FileSystemEntry systemEntry, IEnumerable<(Categories, (Func<object, object, bool>, object))> query)
 		{
 			foreach (var item in query)
 			{

@@ -16,6 +16,7 @@ namespace FileExplorerCore.Helpers
 	public class ObservableRangeCollection<T> : ObservableCollection<T>, IEnumerable<T>
 	{
 		public event Action<int> CountChanged = delegate { };
+		public event Action<string> OnPropertyChanged = delegate { };
 
 		const int updateTime = 1000;
 		const int updateCountTime = 100;
@@ -24,7 +25,7 @@ namespace FileExplorerCore.Helpers
 		{
 			base.CollectionChanged += delegate
 			{
-				CountChanged.Invoke(Count);
+				CountChanged(Count);
 			};
 		}
 
@@ -173,6 +174,17 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
+		public Task ClearTrim()
+		{
+			if (Items is List<T> list)
+			{
+				list.Clear();
+				list.TrimExcess();
+			}
+
+			return Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
+		}
+
 		public void Sort(IComparer<T>? comparer = null)
 		{
 			comparer ??= Comparer<T>.Default;
@@ -200,17 +212,22 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
+		public void PropertyChanged(string property)
+		{
+			OnPropertyChanged(property);
+		}
+
 		static void ParallelQuickSort(List<T> array, int left, int right, IComparer<T> comparer)
 		{
-			var Threshold = 50;
+			var Threshold = 250;
 			var i = left;
 			var j = right;
 			var m = array[(left + right) / 2];
 
 			while (i <= j)
 			{
-				while (comparer.Compare(array[i], m) == -1) { i++; }
-				while (comparer.Compare(array[j], m) == 1) { j--; }
+				while (comparer.Compare(array[i], m) is -1) { i++; }
+				while (comparer.Compare(array[j], m) is 1) { j--; }
 
 				if (i <= j)
 				{

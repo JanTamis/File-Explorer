@@ -5,7 +5,6 @@ using Avalonia.Controls.Notifications;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using FileExplorerCore.ViewModels;
 using ReactiveUI;
@@ -15,8 +14,6 @@ namespace FileExplorerCore.Views
 {
 	public class MainWindow : FluentWindow
 	{
-		WindowNotificationManager manager;
-
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -24,7 +21,7 @@ namespace FileExplorerCore.Views
 			this.AttachDevTools();
 #endif
 
-			manager = new WindowNotificationManager(this)
+			var manager = new WindowNotificationManager(this)
 			{
 				Position = NotificationPosition.BottomLeft,
 				MaxItems = 3,
@@ -78,7 +75,7 @@ namespace FileExplorerCore.Views
 
 		private async void OnComboBoxChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if (DataContext is MainWindowViewModel model && e.AddedItems.Count > 0 && sender is ComboBox { SelectedItem: FolderModel folderModel })
+			if (DataContext is MainWindowViewModel model && sender is ComboBox { SelectedItem: FolderModel folderModel })
 			{
 				await model.CurrentTab.SetPath(folderModel.Path);
 			}
@@ -128,7 +125,7 @@ namespace FileExplorerCore.Views
 			throw new NotImplementedException();
 		}
 
-		private void ItemContainerGenerator_Materialized(object? sender, Avalonia.Controls.Generators.ItemContainerEventArgs e)
+		private void ItemContainerGenerator_Materialized(object? sender, ItemContainerEventArgs e)
 		{
 			for (int i = 0; i < e.Containers.Count; i++)
 			{

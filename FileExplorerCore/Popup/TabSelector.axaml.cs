@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 
 namespace FileExplorerCore.Popup
 {
-	public partial class TabSelector : UserControl, IPopup
+	public partial class TabSelector : UserControl, IPopup, INotifyPropertyChanged
 	{
 		public new event PropertyChangedEventHandler PropertyChanged = delegate { };
 

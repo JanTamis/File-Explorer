@@ -16,7 +16,6 @@
 	
 	<StackPanel>
 		<ComboBox Items="{Binding Tabs}"
-							SelectedItem="{Binding CurrentTab}"
 							HorizontalAlignment="Stretch"
 							Margin="4"
 							Cursor="Hand" >

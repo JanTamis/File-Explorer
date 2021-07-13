@@ -5,9 +5,9 @@ namespace FileExplorerCore.Models
 {
 	public class FileModelComparer : Comparer<FileModel>
 	{
-		SortEnum sortMember;
+		private readonly SortEnum sortMember;
 
-		public FileModelComparer(SortEnum sortMember)
+		public FileModelComparer(SortEnum sortMember) : base()
 		{
 			this.sortMember = sortMember;
 		}

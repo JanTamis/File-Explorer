@@ -9,7 +9,6 @@ using NetFabric.Hyperlinq;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -96,20 +95,10 @@ namespace FileExplorerCore.ViewModels
 
 		public void AddTab()
 		{
-			var tab = new TabItemViewModel(null);
-
-			tab.PropertyChanged += Tab_PropertyChanged;
+			var tab = new TabItemViewModel();
 
 			Tabs.Add(tab);
 			CurrentTab = tab;
-		}
-
-		private void Tab_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-		{
-			if (sender is TabItemViewModel tab && tab == CurrentTab)
-			{
-				this.RaisePropertyChanged(e.PropertyName);
-			}
 		}
 
 		public void GoUp()
@@ -149,23 +138,9 @@ namespace FileExplorerCore.ViewModels
 
 		public void SetPath(string path)
 		{
-			if (File.Exists(path))
+			if (CurrentTab is not null)
 			{
-				try
-				{
-					var info = new ProcessStartInfo
-					{
-						FileName = path,
-						UseShellExecute = true,
-					};
-
-					Process.Start(info);
-				}
-				catch (Exception) { }
-			}
-			else if (Directory.Exists(path))
-			{
-				Path = path;
+				CurrentTab.SetPath(path);
 			}
 		}
 
@@ -185,6 +160,9 @@ namespace FileExplorerCore.ViewModels
 				{
 					file.IsSelected = true;
 				}
+
+				CurrentTab.RaisePropertyChanged(nameof(CurrentTab.SelectionText));
+				CurrentTab.Files.PropertyChanged("IsSelected");
 			}
 		}
 
@@ -196,6 +174,9 @@ namespace FileExplorerCore.ViewModels
 				{
 					file.IsSelected = false;
 				}
+
+				CurrentTab.RaisePropertyChanged(nameof(CurrentTab.SelectionText));
+				CurrentTab.Files.PropertyChanged("IsSelected");
 			}
 		}
 
@@ -207,6 +188,9 @@ namespace FileExplorerCore.ViewModels
 				{
 					file.IsSelected ^= true;
 				}
+
+				CurrentTab.RaisePropertyChanged(nameof(CurrentTab.SelectionText));
+				CurrentTab.Files.PropertyChanged("IsSelected");
 			}
 		}
 
@@ -309,7 +293,6 @@ namespace FileExplorerCore.ViewModels
 				{
 					Tabs = Tabs.Where(x => x != CurrentTab),
 				};
-
 				CurrentTab.PopupContent = selector;
 			}
 		}

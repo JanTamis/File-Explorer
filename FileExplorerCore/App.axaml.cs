@@ -4,6 +4,7 @@ using Avalonia.Controls.Notifications;
 using Avalonia.Markup.Xaml;
 using FileExplorerCore.ViewModels;
 using FileExplorerCore.Views;
+using DiscUtils.FileSystems;
 
 namespace FileExplorerCore
 {
@@ -16,6 +17,8 @@ namespace FileExplorerCore
 
 		public override void OnFrameworkInitializationCompleted()
 		{
+			SetupHelper.SetupFileSystems();
+
 			if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 			{
 				//if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
