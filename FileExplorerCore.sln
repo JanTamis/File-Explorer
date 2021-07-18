@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31205.134
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31512.422
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileExplorerCore", "FileExplorerCore\FileExplorerCore.csproj", "{8B547594-A893-44CF-BA43-6C0D03910D59}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NtfsReader", "NtfsReader\NtfsReader.csproj", "{D37CFBBE-9280-434F-8849-43CC735141ED}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,14 +21,6 @@ Global
 		{8B547594-A893-44CF-BA43-6C0D03910D59}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8B547594-A893-44CF-BA43-6C0D03910D59}.Release|x64.ActiveCfg = Release|x64
 		{8B547594-A893-44CF-BA43-6C0D03910D59}.Release|x64.Build.0 = Release|x64
-		{D37CFBBE-9280-434F-8849-43CC735141ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D37CFBBE-9280-434F-8849-43CC735141ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D37CFBBE-9280-434F-8849-43CC735141ED}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{D37CFBBE-9280-434F-8849-43CC735141ED}.Debug|x64.Build.0 = Debug|Any CPU
-		{D37CFBBE-9280-434F-8849-43CC735141ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D37CFBBE-9280-434F-8849-43CC735141ED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D37CFBBE-9280-434F-8849-43CC735141ED}.Release|x64.ActiveCfg = Release|Any CPU
-		{D37CFBBE-9280-434F-8849-43CC735141ED}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

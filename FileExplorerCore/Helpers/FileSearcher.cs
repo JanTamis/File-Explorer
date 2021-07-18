@@ -75,18 +75,24 @@ namespace FileExplorerCore.Helpers
 					case Categories.contains:
 						var fileTempExtension = Path.GetExtension(systemEntry.FileName);
 
-						if (!systemEntry.IsDirectory && fileTempExtension != ".dll" && fileTempExtension != ".exe" && !systemEntry.Attributes.HasFlag(FileAttributes.Archive) && !systemEntry.Attributes.HasFlag(FileAttributes.NotContentIndexed))
+						if (!systemEntry.Attributes.HasFlag(FileAttributes.Directory) && !systemEntry.Attributes.HasFlag(FileAttributes.Archive) && !systemEntry.Attributes.HasFlag(FileAttributes.NotContentIndexed))
 						{
 							string searchText = (string)value;
 							string line;
 
-							using (var reader = File.OpenText(systemEntry.ToFullPath()))
+							using (var fileStream = File.OpenRead(systemEntry.ToFullPath()))
 							{
-								while ((line = reader.ReadLine()) is not null && line.Length >= searchText.Length)
+								if (IsTextFile(fileStream, false))
 								{
-									if (line.Contains(searchText!, StringComparison.CurrentCultureIgnoreCase))
+									using (var reader = new StreamReader(fileStream))
 									{
-										return true;
+										while ((line = reader.ReadLine()) is not null && line.Length >= searchText.Length)
+										{
+											if (line.Contains(searchText!, StringComparison.CurrentCultureIgnoreCase))
+											{
+												return true;
+											}
+										}
 									}
 								}
 							}
@@ -230,6 +236,58 @@ namespace FileExplorerCore.Helpers
 
 			return list;
 		}
+
+		public static bool IsTextFile(FileStream srcFile, bool thorough)
+		{
+			byte[] b = new byte[5];
+
+			srcFile.Read(b, 0, 5);
+
+			if (b[0] == 0x00 && b[1] == 0x00 && b[2] == 0xFE && b[3] == 0xFF)
+				return true; // UTF-32, big-endian 
+			else if (b[0] == 0xFF && b[1] == 0xFE && b[2] == 0x00 && b[3] == 0x00)
+				return true; // UTF-32, little-endian
+			else if (b[0] == 0xFE && b[1] == 0xFF)
+				return true; // UTF-16, big-endian
+			else if (b[0] == 0xFF && b[1] == 0xFE)
+				return true; // UTF-16, little-endian
+			else if (b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF)
+				return true;  // UTF-8
+			else if (b[0] == 0x2b && b[1] == 0x2f && b[2] == 0x76)
+				return true;  // UTF-7
+
+
+			// Maybe there is a future encoding ...
+			// PS: The above yields more than this - this doesn't find UTF7 ...
+			if (thorough)
+			{
+				foreach (System.Text.EncodingInfo ei in System.Text.Encoding.GetEncodings())
+				{
+					System.Text.Encoding enc = ei.GetEncoding();
+
+					byte[] preamble = enc.GetPreamble();
+					if (preamble.Length == 0)
+						continue;
+
+					if (preamble.Length > b.Length)
+						continue;
+
+					for (int i = 0; i < preamble.Length; ++i)
+					{
+						if (b[i] != preamble[i])
+						{
+							continue;
+						}
+					} // Next i 
+
+					return true;
+				} // Next ei
+			} // End if (thorough)
+
+			srcFile.Seek(0, SeekOrigin.Begin);
+
+			return false;
+		} // End Function BomInfo 
 	}
 
 	public enum Categories

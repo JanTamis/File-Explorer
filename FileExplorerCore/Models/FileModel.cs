@@ -4,35 +4,38 @@ using Avalonia.Threading;
 using FileExplorerCore.Converters;
 using FileExplorerCore.Helpers;
 using NetFabric.Hyperlinq;
-using ReactiveUI;
 using System;
 using System.Collections.Concurrent;
+using System.ComponentModel;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace FileExplorerCore.Models
 {
-	public class FileModel : ReactiveObject
+	public class FileModel : INotifyPropertyChanged
 	{
 		public readonly static ConcurrentStack<FileModel> FileImageQueue = new();
 		static Task? imageLoadTask;
 
 		private bool _isSelected;
-		private bool needsNewImage = true;
+		private bool needsNewImage;
 
 		private string _name;
 
-		private readonly Lazy<string> _extension;
-		private readonly Lazy<long> _size;
-		private readonly Lazy<DateTime> _editedOn;
+		private string? _extension;
+		private long? _size;
+
+		private DateTime _editedOn;
 
 		private Bitmap _image;
 		private Transform _imageTransform;
 		private int imageSize;
 
-		public event Action<FileModel> SelectionChanged = delegate { };
+		public event Action<FileModel> SelectionChanged;
+		public event PropertyChangedEventHandler? PropertyChanged;
 
 		public int ImageSize
 		{
@@ -49,7 +52,7 @@ namespace FileExplorerCore.Models
 		public Transform ImageTransform
 		{
 			get => _imageTransform;
-			set => this.RaiseAndSetIfChanged(ref _imageTransform, value);
+			set => this.OnPropertyChanged(ref _imageTransform, value);
 		}
 
 		public bool IsSelected
@@ -78,7 +81,7 @@ namespace FileExplorerCore.Models
 					{
 						_name = Path;
 					}
-					else if (File.Exists(Path))
+					else if (!IsFolder)
 					{
 						_name = new String(System.IO.Path.GetFileNameWithoutExtension(span));
 					}
@@ -94,7 +97,7 @@ namespace FileExplorerCore.Models
 			{
 				try
 				{
-					if (File.Exists(Path))
+					if (!IsFolder)
 					{
 						var name = System.IO.Path.GetFileNameWithoutExtension(Path);
 						var extension = Extension;
@@ -114,15 +117,45 @@ namespace FileExplorerCore.Models
 						Path = newPath;
 					}
 
-					this.RaiseAndSetIfChanged(ref _name, value);
+					this.OnPropertyChanged(ref _name, value);
 				}
 				catch (Exception) { }
-
 			}
 		}
-		public string Extension => _extension.Value;
 
-		public long Size => _size.Value;
+		public string Extension
+		{
+			get
+			{
+				if (_extension is null)
+				{
+					var span = Path.AsSpan();
+
+					if (!IsFolder)
+					{
+						_extension = System.IO.Path.GetExtension(span)
+																			 .ToString();
+					}
+
+					_extension = String.Empty;
+				}
+
+				return _extension;
+			}
+		}
+
+		public long Size
+		{
+			get
+			{
+				if (!_size.HasValue)
+				{
+					_size = DirectoryAlternative.GetFileSize(Path);
+				}
+
+				return _size.Value;
+			}
+		}
 
 		public bool IsFolder { get; init; }
 
@@ -134,7 +167,7 @@ namespace FileExplorerCore.Models
 				{
 					long size = 0;
 
-					if (File.Exists(Path))
+					if (!IsFolder)
 					{
 						size = Size;
 					}
@@ -157,7 +190,19 @@ namespace FileExplorerCore.Models
 				});
 			}
 		}
-		public DateTime EditedOn => _editedOn.Value;
+
+		public DateTime EditedOn
+		{
+			get
+			{
+				if (_editedOn == DateTime.MinValue)
+				{
+					_editedOn = DirectoryAlternative.GetFileWriteDate(this);
+				}
+
+				return _editedOn;
+			}
+		}
 
 		public Bitmap? Image
 		{
@@ -206,40 +251,29 @@ namespace FileExplorerCore.Models
 
 				return _image;
 			}
-			set => this.RaiseAndSetIfChanged(ref _image, value);
+			set => this.OnPropertyChanged(ref _image, value);
 		}
 
 		public FileModel(string path, bool isFolder, int imageSize = 32)
 		{
 			Path = path;
-			_name = null;
-			Image = null;
 
-			this.ImageSize = imageSize;
+			SelectionChanged = delegate { };
 
+			ImageSize = imageSize;
 			IsFolder = isFolder;
+		}
 
-			_extension = new Lazy<string>(() =>
-			{
-				var span = path.AsSpan();
+		public void OnPropertyChanged<T>(ref T field, T value, [CallerMemberName] string name = null)
+		{
+			field = value;
 
-				if (File.Exists(path) && System.IO.Path.HasExtension(span))
-				{
-					return System.IO.Path.GetExtension(span).ToString();
-				}
+			OnPropertyChanged(name);
+		}
 
-				return null;
-			});
-
-			_size = new Lazy<long>(() =>
-			{
-				return DirectoryAlternative.GetFileSize(path);
-			});
-
-			_editedOn = new Lazy<DateTime>(() =>
-			{
-				return DirectoryAlternative.GetFileWriteDate(this);
-			});
+		public void OnPropertyChanged([CallerMemberName] string name = null)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 		}
 	}
 

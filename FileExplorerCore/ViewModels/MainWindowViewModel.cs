@@ -1,5 +1,8 @@
 using Avalonia.Controls.Notifications;
+using Avalonia.Controls.Shapes;
 using Avalonia.Input;
+using Avalonia.Threading;
+using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using FileExplorerCore.Popup;
@@ -11,7 +14,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.IO.Enumeration;
 using System.Linq;
+using System.Threading;
 using System.Timers;
 
 namespace FileExplorerCore.ViewModels
@@ -297,9 +302,74 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		public void RemoveTab()
+		public void AnalyzeFolder()
 		{
-			//Tabs.Remove(tab);
+			var view = new AnalyzerView();
+			CurrentTab.DisplayControl = view;
+
+			var drive = new DriveInfo(Path.Substring(0, 1));
+			var parent = new FileIndexModel(Path, true, 0);
+
+			if (drive.Name == Path)
+			{
+				parent = new FileIndexModel(Path, true, drive.TotalSize - drive.TotalFreeSpace);
+			}
+
+			var options = new EnumerationOptions()
+			{
+				IgnoreInaccessible = true,
+				AttributesToSkip = FileAttributes.System,
+			};
+
+			var folderQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(x.FileName, x.IsDirectory, x.Length, parent), options)
+			{
+				ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
+			};
+
+			var fileQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(x.FileName, x.IsDirectory, x.Length, parent), options)
+			{
+				ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
+			};
+
+			ThreadPool.QueueUserWorkItem(x =>
+			{
+				view.Root.AddRange(folderQuery.Concat(fileQuery), default);
+			});
+
+			ThreadPool.QueueUserWorkItem(async x =>
+			{
+				var options = new EnumerationOptions()
+				{
+					IgnoreInaccessible = true,
+					AttributesToSkip = FileAttributes.System,
+					RecurseSubdirectories = true
+				};
+
+				var extensionQuery = new FileSystemEnumerable<ExtensionModel>(Path, (ref FileSystemEntry x) => new ExtensionModel(x.IsDirectory ? String.Empty : System.IO.Path.GetExtension(x.FileName).ToString(), x.Length), options);
+				var comparer = new ExtensionModelComparer();
+
+				foreach (var extension in extensionQuery)
+				{
+					if (!String.IsNullOrEmpty(extension.Extension))
+					{
+						var index = view.Extensions.BinarySearch(extension, comparer);
+
+						if (index >= 0)
+						{
+							var item = view.Extensions[index];
+
+							item.TotalFiles++;
+							item.TotalSize += extension.TotalSize;
+						}
+						else
+						{
+							await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(~index, extension));
+						} 
+					}
+				}
+
+				GC.Collect(2, GCCollectionMode.Forced, false, true);
+			});
 		}
 	}
 }

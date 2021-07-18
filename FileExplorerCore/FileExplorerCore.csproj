@@ -4,11 +4,11 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64</Platforms>
-		<PublishTrimmed>false</PublishTrimmed>
+		<LangVersion>preview</LangVersion>
     <StartupObject>FileExplorerCore.Program</StartupObject>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
-    <AnalysisLevel>preview</AnalysisLevel>
+    <!--<AnalysisLevel>preview</AnalysisLevel>-->
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
   </PropertyGroup>
@@ -160,6 +160,7 @@
     <None Remove="Assets\Lookup\Settings.txt" />
     <None Remove="Assets\Lookup\System.txt" />
     <None Remove="Assets\UIIcons\AddTab.svg" />
+    <None Remove="Assets\UIIcons\AnalyzeFiles.svg" />
     <None Remove="Assets\UIIcons\Close.svg" />
     <None Remove="Assets\UIIcons\Copy.svg" />
     <None Remove="Assets\UIIcons\Cut.svg" />
@@ -193,6 +194,7 @@
     <None Remove="Assets\UIIcons\WriteTime.svg" />
     <None Remove="Assets\Video.svg" />
     <None Remove="Assets\Zip.Svg" />
+    <None Remove="Files.json" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\Lookup\3DImage.txt" />
@@ -242,9 +244,6 @@
     <PackageReference Include="NetFabric.Hyperlinq.Abstractions" Version="1.3.0" />
     <PackageReference Include="Svg.Skia" Version="0.5.6.1" />
     <PackageReference Include="System.Linq.Async" Version="5.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\NtfsReader\NtfsReader.csproj" />
   </ItemGroup>
   <ItemGroup>
     <AvaloniaResource Update="Assets\avalonia-logo.ico">

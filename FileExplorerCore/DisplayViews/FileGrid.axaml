@@ -68,7 +68,7 @@
 												 HorizontalAlignment="Center"
 												 Margin="4 0"/>
 
-							<TextBlock Text="{Binding, Converter={StaticResource sizeConverter}}"
+							<TextBlock Text="{Binding Size, Converter={StaticResource sizeConverter}}"
 												 FontSize="12"
 												 Foreground="{DynamicResource SystemBaseMediumColor}"
 												 HorizontalAlignment="Center" />

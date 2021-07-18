@@ -4,7 +4,6 @@ using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
-using FileExplorerCore.Popup;
 using NetFabric.Hyperlinq;
 using ReactiveUI;
 using System;
@@ -45,7 +44,7 @@ namespace FileExplorerCore.ViewModels
 		{
 			IgnoreInaccessible = true,
 			BufferSize = 16384,
-			AttributesToSkip = FileAttributes.Hidden,
+			AttributesToSkip = FileAttributes.System,
 		};
 
 		private DateTime startSearchTime;
@@ -54,13 +53,6 @@ namespace FileExplorerCore.ViewModels
 		private TimeSpan previousLoadTime;
 
 		private SortEnum _sort = SortEnum.None;
-
-		static List<FileIndexModel> drives = new();
-
-		static TabItemViewModel()
-		{
-
-		}
 
 		public SortEnum Sort
 		{
@@ -319,6 +311,8 @@ namespace FileExplorerCore.ViewModels
 
 					DisplayControl = grid;
 				}
+
+				GC.Collect(2, GCCollectionMode.Forced, false, true);
 			}
 		}
 
@@ -407,10 +401,14 @@ namespace FileExplorerCore.ViewModels
 				tokenSource.Cancel();
 			}
 
+			options.RecurseSubdirectories = recursive;
+
 			tokenSource = new CancellationTokenSource();
 			previousLoadTime = TimeSpan.Zero;
 
 			Files.ClearTrim();
+
+			GC.Collect(2, GCCollectionMode.Forced, false, true);
 
 			SelectionCount = 0;
 			this.RaisePropertyChanged(nameof(SelectionText));
@@ -453,70 +451,22 @@ namespace FileExplorerCore.ViewModels
 
 					if (Sort is SortEnum.None)
 					{
-						await Files.ReplaceRange(query, tokenSource.Token);
+						await Files.ReplaceRange(query.AsValueEnumerable(), tokenSource.Token);
 					}
 					else
 					{
 						var comparer = new FileModelComparer(Sort);
 
-						await Files.ReplaceRange(query, tokenSource.Token, comparer);
+						await Files.ReplaceRange(query.AsValueEnumerable(), tokenSource.Token, comparer);
 					}
 				});
-
-				// try to create or update the tree from the current path
-				if (!recursive)
-				{
-					ThreadPool.QueueUserWorkItem(x =>
-					{
-						var subPaths = Path.Split(new[] { System.IO.Path.DirectorySeparatorChar, System.IO.Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
-
-						FileIndexModel model = drives.FirstOrDefault(x => x.Name == subPaths[0]) ?? new FileIndexModel(subPaths[0]);
-						FileIndexModel tempParentFolder = model;
-
-						for (int i = 1; i < subPaths.Length; i++)
-						{
-							var tempFolder = tempParentFolder.SubFiles?.FirstOrDefault(x => x.Name == subPaths[i]) ?? new FileIndexModel(subPaths[i]);
-
-							if (i == subPaths.Length - 1)
-							{
-								var enumerable = new FileSystemEnumerable<FileIndexModel>(String.Join(System.IO.Path.DirectorySeparatorChar, subPaths[0..i]), (ref FileSystemEntry x) => new FileIndexModel(x.FileName.ToString()), options);
-
-								tempFolder.SubFiles = new List<FileIndexModel>(enumerable);
-
-								tempParentFolder.SubFiles = new List<FileIndexModel>
-								{
-									tempFolder
-								};
-
-								break;
-							}
-							else if (tempParentFolder.SubFiles is null)
-							{
-								tempParentFolder.SubFiles = new List<FileIndexModel>
-								{
-									tempFolder
-								};
-							}
-							else if (!tempParentFolder.SubFiles.Contains(tempFolder))
-							{
-								tempParentFolder.SubFiles.Add(tempFolder);
-							}
-
-							tempParentFolder = tempFolder;
-						}
-
-						if (!drives.Contains(model))
-						{
-							drives.Add(model);
-						}
-
-					});
-				}
 			}
 
 			timer.Stop();
 
 			IsLoading = false;
+
+			GC.Collect(2, GCCollectionMode.Forced, false, true);
 		}
 
 		public async Task SetPath(string path)

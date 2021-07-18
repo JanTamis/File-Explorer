@@ -1,5 +1,6 @@
 ﻿using Avalonia.Threading;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -183,6 +184,16 @@ namespace FileExplorerCore.Helpers
 			}
 
 			return Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
+		}
+
+		public int BinarySearch(T value, IComparer<T> comparer)
+		{
+			if (Items is List<T> list)
+			{
+				return list.BinarySearch(value, comparer);
+			}
+
+			return 0;
 		}
 
 		public void Sort(IComparer<T>? comparer = null)

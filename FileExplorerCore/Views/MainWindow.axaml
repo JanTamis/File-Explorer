@@ -78,22 +78,6 @@
 			</Setter>
 		</Style>
 
-		<Style Selector="TreeView[IsPointerOver=true] TreeViewItem /template/ ToggleButton#PART_ExpandCollapseChevron">
-			<Setter Property="Opacity" Value="1" />
-		</Style>
-
-		<Style Selector="TreeView[IsPointerOver=false] TreeViewItem /template/ ToggleButton#PART_ExpandCollapseChevron">
-			<Setter Property="Opacity" Value="0" />
-		</Style>
-
-		<Style Selector="TreeViewItem /template/ ToggleButton#PART_ExpandCollapseChevron">
-			<Setter Property="Transitions">
-				<Transitions>
-					<DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
-				</Transitions>
-			</Setter>
-		</Style>
-
 		<Style Selector="TabStripItem:selected /template/ Border#PART_LayoutRoot">
 			<Setter Property="Background" Value="{DynamicResource MenuBackground}" />
 			<Setter Property="CornerRadius" Value="7.5 7.5 0 0" />
@@ -166,6 +150,24 @@
 						<TreeView Items="{Binding Folders}"
 											x:Name="FolderTree"
 											ClipToBounds="True">
+							<TreeView.Styles>
+								<Style Selector="TreeView[IsPointerOver=true] TreeViewItem /template/ ToggleButton#PART_ExpandCollapseChevron">
+									<Setter Property="Opacity" Value="1" />
+								</Style>
+
+								<Style Selector="TreeView[IsPointerOver=false] TreeViewItem /template/ ToggleButton#PART_ExpandCollapseChevron">
+									<Setter Property="Opacity" Value="0" />
+								</Style>
+
+								<Style Selector="TreeViewItem /template/ ToggleButton#PART_ExpandCollapseChevron">
+									<Setter Property="Transitions">
+										<Transitions>
+											<DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+										</Transitions>
+									</Setter>
+								</Style>
+							</TreeView.Styles>
+							
 							<TreeView.DataTemplates>
 								<TreeDataTemplate DataType="{x:Type models:FolderModel}" ItemsSource="{Binding SubFolders^}">
 									<StackPanel Orientation="Horizontal">
@@ -187,6 +189,7 @@
 									</StackPanel>
 								</TreeDataTemplate>
 							</TreeView.DataTemplates>
+							
 							<TreeView.ItemsPanel>
 								<ItemsPanelTemplate>
 									<VirtualizingStackPanel Orientation="Vertical" />
@@ -509,6 +512,23 @@
 																 FontSize="12"/>
 										</Grid>
 
+										<Border Width="1"
+														Background="{DynamicResource Background}"
+														Margin="4"/>
+
+										<Button Cursor="Hand"
+														Command="{Binding AnalyzeFolder}"
+														VerticalAlignment="Stretch"
+														Background="Transparent">
+											<StackPanel Orientation="Vertical"
+																	VerticalAlignment="Center">
+												<Viewbox Height="30">
+													<Image Source="{SvgImage /Assets/UIIcons/AnalyzeFiles.svg}" />
+												</Viewbox>
+												<TextBlock Text="Analyze"
+																	 FontSize="12"/>
+											</StackPanel>
+										</Button>
 
 									</StackPanel>
 
@@ -825,17 +845,20 @@
 															 Margin="0"
 															 FontSize="14"
 															 VerticalAlignment="Center"/>
+												
+											
 
 											</StackPanel>
 
 											<StackPanel Grid.Column="2"
 																	Orientation="Horizontal">
 												<StackPanel Orientation="Horizontal">
+														 
 													<Viewbox Width="25"
 																	 Margin="2 0 0 0">
 														<Image Source="{SvgImage /Assets/UIIcons/Filter.svg}" />
 													</Viewbox>
-
+													
 													<ComboBox BorderThickness="0"
 																		Cursor="Hand"
 																		Padding="0 1 2 1"

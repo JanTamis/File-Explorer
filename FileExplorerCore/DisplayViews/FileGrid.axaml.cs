@@ -105,7 +105,7 @@ namespace FileExplorerCore.DisplayViews
 
 		private void Model_SelectionChanged(FileModel obj)
 		{
-			obj.RaisePropertyChanged(nameof(obj.IsSelected));
+			obj.OnPropertyChanged(nameof(obj.IsSelected));
 		}
 
 		/// <summary>

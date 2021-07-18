@@ -2,9 +2,6 @@
 using FileExplorerCore.Models;
 using System;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace FileExplorerCore.Converters
 {
@@ -22,6 +19,15 @@ namespace FileExplorerCore.Converters
 				}
 
 				return ByteSize(model.Size);
+			}
+			else if (value is long size)
+			{
+				if (size == -1)
+				{
+					return null;
+				}
+
+				return ByteSize(size);
 			}
 
 			return String.Empty;
