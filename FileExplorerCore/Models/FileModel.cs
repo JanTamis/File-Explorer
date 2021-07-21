@@ -18,13 +18,16 @@ namespace FileExplorerCore.Models
 	public class FileModel : INotifyPropertyChanged
 	{
 		public readonly static ConcurrentStack<FileModel> FileImageQueue = new();
+
+		public static string BasePath { get; set; }
+
 		static Task? imageLoadTask;
 
 		private bool _isSelected;
 		private bool needsNewImage;
 
 		private string _name;
-
+		private string _relativePath;
 		private string? _extension;
 		private long? _size;
 
@@ -67,7 +70,7 @@ namespace FileExplorerCore.Models
 
 		public bool HasImage => _image is not null;
 
-		public string Path { get; private set; }
+		public string Path => System.IO.Path.Combine(BasePath, _relativePath);
 
 		public string Name
 		{
@@ -105,7 +108,7 @@ namespace FileExplorerCore.Models
 
 						File.Move(Path, newPath);
 
-						Path = newPath;
+						//Path = newPath;
 					}
 					else if (Directory.Exists(Path))
 					{
@@ -114,7 +117,7 @@ namespace FileExplorerCore.Models
 
 						Directory.Move(Path, newPath);
 
-						Path = newPath;
+						//Path = newPath;
 					}
 
 					this.OnPropertyChanged(ref _name, value);
@@ -175,7 +178,7 @@ namespace FileExplorerCore.Models
 					{
 						size = info.TotalSize - info.TotalFreeSpace;
 					}
-					else if (Directory.Exists(Path))
+					else if (IsFolder)
 					{
 						var query = new FileSystemEnumerable<long>(Path, (ref FileSystemEntry x) => x.Length, new EnumerationOptions() { RecurseSubdirectories = true })
 						{
@@ -254,9 +257,9 @@ namespace FileExplorerCore.Models
 			set => this.OnPropertyChanged(ref _image, value);
 		}
 
-		public FileModel(string path, bool isFolder, int imageSize = 32)
+		public FileModel(ReadOnlySpan<char> path, ReadOnlySpan<char> filename, bool isFolder, int imageSize = 32)
 		{
-			Path = path;
+			_relativePath = System.IO.Path.Join(path, filename);
 
 			SelectionChanged = delegate { };
 

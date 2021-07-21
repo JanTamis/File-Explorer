@@ -97,7 +97,7 @@ namespace FileExplorerCore.Models
 
 			Image = WindowsThumbnailProvider.GetThumbnail(Path, 48, 48, ThumbnailOptions.BiggerSizeOk);
 
-			query = subFolders ?? new FileSystemEnumerable<FolderModel>(path, (ref FileSystemEntry x) => new FolderModel(x.ToFullPath()), options)
+			query = subFolders ?? new FileSystemEnumerable<FolderModel>(path, (ref FileSystemEntry x) => new FolderModel(x.ToFullPath(), new string(x.FileName)), options)
 			{
 				ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
 			};

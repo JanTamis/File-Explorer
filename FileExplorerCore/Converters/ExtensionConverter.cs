@@ -21,7 +21,7 @@ namespace FileExplorerCore.Converters
 				}
 				else
 				{
-					if (File.Exists(model.Path))
+					if (!model.IsFolder)
 					{
 						return Path.GetExtension(model.Path);
 					}

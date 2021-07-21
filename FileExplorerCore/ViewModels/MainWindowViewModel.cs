@@ -16,6 +16,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Timers;
 
@@ -318,7 +319,7 @@ namespace FileExplorerCore.ViewModels
 			var options = new EnumerationOptions()
 			{
 				IgnoreInaccessible = true,
-				AttributesToSkip = FileAttributes.System,
+				AttributesToSkip = FileAttributes.Temporary,
 			};
 
 			var folderQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(x.FileName, x.IsDirectory, x.Length, parent), options)
@@ -333,7 +334,20 @@ namespace FileExplorerCore.ViewModels
 
 			ThreadPool.QueueUserWorkItem(x =>
 			{
-				view.Root.AddRange(folderQuery.Concat(fileQuery), default);
+				var query = folderQuery.Concat(fileQuery);
+
+				var comparer = Comparer<FileIndexModel>.Create((x, y) =>
+				{
+					var taskX = x.TaskSize;
+					var taskY = y.TaskSize;
+
+					taskX.Wait();
+					taskY.Wait();
+
+					return taskY.Result.CompareTo(taskX.Result);
+				});
+
+				view.Root.ReplaceRange(query, default, comparer);
 			});
 
 			ThreadPool.QueueUserWorkItem(async x =>
@@ -341,7 +355,7 @@ namespace FileExplorerCore.ViewModels
 				var options = new EnumerationOptions()
 				{
 					IgnoreInaccessible = true,
-					AttributesToSkip = FileAttributes.System,
+					AttributesToSkip = FileAttributes.Temporary,
 					RecurseSubdirectories = true
 				};
 

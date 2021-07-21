@@ -7,11 +7,19 @@
 	</Application.DataTemplates>
 
 	<Application.Resources>
-		<SolidColorBrush Color="#CCC" x:Key="Background" />
+		<!--<SolidColorBrush Color="#CCC" x:Key="Background" />
 		<SolidColorBrush Color="#EEE" x:Key="ContentBackground" />
 		<SolidColorBrush Color="#F8F8F8" x:Key="MenuBackground" />
-		<SolidColorBrush Color="#F5F5F5" x:Key="CardBackground" />
+		<SolidColorBrush Color="#FAFAFA" x:Key="CardBackground" />
 		<SolidColorBrush Color="#DFDFDF" x:Key="CardPointerOverBackground" />
+		<SolidColorBrush Color="#DFDFDF" x:Key="CardHighBackground" />-->
+
+		<SolidColorBrush Color="#454545" x:Key="Background" />
+		<SolidColorBrush Color="#404040" x:Key="ContentBackground" />
+		<SolidColorBrush Color="#505050" x:Key="MenuBackground" />
+		<SolidColorBrush Color="#4C4C4C" x:Key="CardBackground" />
+		<SolidColorBrush Color="#595959" x:Key="CardPointerOverBackground" />
+		<SolidColorBrush Color="#4C4C4C" x:Key="CardHighBackground" />
 	</Application.Resources>
 
 	<Application.Styles>

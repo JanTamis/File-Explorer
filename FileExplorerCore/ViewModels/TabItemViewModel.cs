@@ -43,7 +43,6 @@ namespace FileExplorerCore.ViewModels
 		private readonly EnumerationOptions options = new()
 		{
 			IgnoreInaccessible = true,
-			BufferSize = 16384,
 			AttributesToSkip = FileAttributes.System,
 		};
 
@@ -192,7 +191,7 @@ namespace FileExplorerCore.ViewModels
 		{
 			get
 			{
-				if (IsIndeterminate || Double.IsNaN(SearchProgression) || SearchProgression is 0)
+				if (IsIndeterminate || Double.IsNaN(SearchProgression) || SearchProgression == 0)
 				{
 					return "Almost There...";
 				}
@@ -201,7 +200,7 @@ namespace FileExplorerCore.ViewModels
 					var loadTime = LoadTime;
 					predictedTime = predictedTime.Subtract(TimeSpan.FromSeconds(1));
 
-					if ((loadTime - previousLoadTime).TotalSeconds >= 5)
+					if ((loadTime - previousLoadTime).TotalSeconds >= 3)
 					{
 						var deltaItems = Count - foundItems;
 						var remainingItems = FileCount - Count;
@@ -225,7 +224,7 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		public bool SearchFailed => !IsLoading && Files.Count is 0 && DisplayControl is not Quickstart;
+		public bool SearchFailed => !IsLoading && Files.Count == 0 && DisplayControl is not Quickstart;
 
 		public ObservableRangeCollection<FileModel> Files { get; set; } = new();
 
@@ -408,6 +407,8 @@ namespace FileExplorerCore.ViewModels
 
 			Files.ClearTrim();
 
+			FileModel.BasePath = Path;
+
 			GC.Collect(2, GCCollectionMode.Forced, false, true);
 
 			SelectionCount = 0;
@@ -437,10 +438,7 @@ namespace FileExplorerCore.ViewModels
 						{
 							options.RecurseSubdirectories = recursive;
 
-							var watch = Stopwatch.StartNew();
 							var count = GetFileSystemEntriesCount(Path, search, options, tokenSource.Token);
-
-							watch.Stop();
 
 							if (!tokenSource.IsCancellationRequested)
 							{
@@ -451,13 +449,13 @@ namespace FileExplorerCore.ViewModels
 
 					if (Sort is SortEnum.None)
 					{
-						await Files.ReplaceRange(query.AsValueEnumerable(), tokenSource.Token);
+						await Files.ReplaceRange(query, tokenSource.Token);
 					}
 					else
 					{
 						var comparer = new FileModelComparer(Sort);
 
-						await Files.ReplaceRange(query.AsValueEnumerable(), tokenSource.Token, comparer);
+						await Files.ReplaceRange(query, tokenSource.Token, comparer);
 					}
 				});
 			}
@@ -466,7 +464,7 @@ namespace FileExplorerCore.ViewModels
 
 			IsLoading = false;
 
-			GC.Collect(2, GCCollectionMode.Forced, false, true);
+			GC.Collect(2, GCCollectionMode.Optimized, false, true);
 		}
 
 		public async Task SetPath(string path)
@@ -506,14 +504,14 @@ namespace FileExplorerCore.ViewModels
 
 			if (search is "*" or "*.*" or "" && Sort is SortEnum.None && !recursive)
 			{
-				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToSpecifiedFullPath(), x.IsDirectory, size), options);
+				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.Directory.Slice(x.RootDirectory.Length), x.FileName, x.IsDirectory, size), options);
 			}
 			else
 			{
 				var query = FileSearcher.PrepareQuery(search);
 				var regex = new Wildcard(search, RegexOptions.Singleline | RegexOptions.Compiled);
 
-				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToSpecifiedFullPath(), x.IsDirectory, size), options)
+				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.Directory.Slice(x.RootDirectory.Length), x.FileName, x.IsDirectory, size), options)
 				{
 					ShouldIncludePredicate = (ref FileSystemEntry x) => regex.IsMatch(new String(x.FileName)) || FileSearcher.IsValid(x, query)
 				};
@@ -562,7 +560,7 @@ namespace FileExplorerCore.ViewModels
 		{
 			var size = IsGrid ? 100 : 32;
 
-			return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), true, size), options)
+			return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.Directory.Slice(x.RootDirectory.Length), x.FileName, true, size), options)
 			{
 				ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
 			};
@@ -572,7 +570,7 @@ namespace FileExplorerCore.ViewModels
 		{
 			var size = IsGrid ? 100 : 32;
 
-			return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), false, size), options)
+			return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.Directory.Slice(x.RootDirectory.Length), x.FileName, false, size), options)
 			{
 				ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
 			};

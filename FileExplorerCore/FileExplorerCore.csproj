@@ -176,6 +176,7 @@
     <None Remove="Assets\UIIcons\MoveFile.svg" />
     <None Remove="Assets\UIIcons\Name.svg" />
     <None Remove="Assets\UIIcons\Next.svg" />
+    <None Remove="Assets\UIIcons\OneDrive.svg" />
     <None Remove="Assets\UIIcons\OpenFile.svg" />
     <None Remove="Assets\UIIcons\Paste.svg" />
     <None Remove="Assets\UIIcons\Previous.svg" />

@@ -30,7 +30,6 @@
 						<ControlTemplate>
 							<Border CornerRadius="10" 
 											Name="PART_ContentPresenter"
-											BoxShadow="0 0 15 -5 Black"
 											Margin="8 4.5">
 								<ContentPresenter ClipToBounds="true"
 																	Background="{TemplateBinding Background}"

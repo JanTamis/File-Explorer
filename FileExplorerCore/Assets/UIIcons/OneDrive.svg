@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<linearGradient x1="0.5" y1="0.0011034608" x2="0.5" y2="0.54662067" id="gradient_1">
+			<stop offset="0" stop-color="#0571BF" />
+			<stop offset="1" stop-color="#0268BA" />
+		</linearGradient>
+		<linearGradient x1="0.5" y1="0.0015067458" x2="0.5" y2="0.9993004" id="gradient_2">
+			<stop offset="0" stop-color="#1684DA" />
+			<stop offset="1" stop-color="#107CD4" />
+		</linearGradient>
+		<linearGradient x1="0.5" y1="1.1920929E-07" x2="0.5" y2="1.0638992" id="gradient_3">
+			<stop offset="0" stop-color="#138CDD" />
+			<stop offset="1" stop-color="#0C7DD4" />
+		</linearGradient>
+		<linearGradient x1="0.33766985" y1="0.13628757" x2="0.6514924" y2="1.2068517" id="gradient_4">
+			<stop offset="0" stop-color="#27A7EA" />
+			<stop offset="1" stop-color="#1C94E3" />
+		</linearGradient>
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+		<clipPath id="mask_1">
+			<use xlink:href="#path_1" />
+		</clipPath>
+	</defs>
+	<g id="icons8_microsoft_onedrive_2019">
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+		<g clip-path="url(#mask_1)">
+			<path d="M14.5 0C6.492 0 0 6.492 0 14.5C0 22.508 6.492 29 14.5 29C22.508 29 29 22.508 29 14.5C29 6.492 22.508 0 14.5 0L14.5 0L14.5 0Z" transform="translate(10 7)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+			<path d="M16.155 0.781C14.835 0.276 13.402 0 11.905 0C5.33 0 0 5.33 0 11.905C0 14.381 0.757 16.679 2.05 18.583C2.111 18.557 18.495 11.694 28.456 7.695C22.952 4.377 17.903 1.45 16.155 0.781L16.155 0.781Z" transform="translate(0 14.19104)" id="Shape" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+			<path d="M19.544 9.627C19.544 4.31 15.234 0 9.917 0C8.92 0 7.959 0.152 7.054 0.433001C6.058 0.743 3.402 1.775 0 3.141C8.377 8.191 17.79 14.137 18.252 14.429C19.069 13.014 19.544 11.377 19.544 9.627L19.544 9.627Z" transform="translate(28.456055 18.745972)" id="Shape" fill="url(#gradient_3)" fill-rule="evenodd" stroke="none" />
+			<path d="M44.659 11.288C44.196 10.996 34.784 5.05 26.407 0C16.445 3.998 0.0610001 10.861 0 10.887C0.417 11.501 3.577 16.113 9.854 16.113C14.884 16.113 26.03 16.113 36.208 16.113C41.619 16.113 44.098 12.259 44.659 11.288L44.659 11.288Z" transform="translate(2.0500488 21.886963)" id="Shape" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
+		</g>
+	</g>
+</svg>

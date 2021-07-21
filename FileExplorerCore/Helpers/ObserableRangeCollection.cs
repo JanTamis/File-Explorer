@@ -180,7 +180,7 @@ namespace FileExplorerCore.Helpers
 			if (Items is List<T> list)
 			{
 				list.Clear();
-				list.TrimExcess();
+				list.Capacity = 0;
 			}
 
 			return Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));

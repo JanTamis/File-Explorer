@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FileExplorerCore.Models
@@ -20,16 +21,44 @@ namespace FileExplorerCore.Models
 		static readonly EnumerationOptions sizeOptions = new()
 		{
 			IgnoreInaccessible = true,
-			AttributesToSkip = FileAttributes.System,
+			AttributesToSkip = FileAttributes.Temporary,
 			RecurseSubdirectories = true,
 		};
 
 		Task<long> _taskSize;
+		ObservableRangeCollection<FileIndexModel> _items;
 
 		private readonly IEnumerable<FileIndexModel> query;
 		private readonly IEnumerable<long> sizeQuery;
 
-		public IEnumerable<FileIndexModel> Items => query;
+		public ObservableRangeCollection<FileIndexModel> Items
+		{
+			get
+			{
+				if (_items == null)
+				{
+					_items = new ObservableRangeCollection<FileIndexModel>();
+
+					if (query != null)
+					{
+						var comparer = Comparer<FileIndexModel>.Create((x, y) =>
+						{
+							var taskX = x.TaskSize;
+							var taskY = y.TaskSize;
+
+							taskX.Wait();
+							taskY.Wait();
+
+							return taskY.Result.CompareTo(taskX.Result);
+						});
+
+						ThreadPool.QueueUserWorkItem(async x => await _items.ReplaceRange(query, default, comparer));
+					}
+				}
+
+				return _items;
+			}
+		}
 
 		public FileIndexModel? Parent { get; init; }
 

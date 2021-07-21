@@ -5,6 +5,8 @@ using Avalonia.Markup.Xaml;
 using FileExplorerCore.ViewModels;
 using FileExplorerCore.Views;
 using DiscUtils.FileSystems;
+using Avalonia.Themes.Fluent;
+using System;
 
 namespace FileExplorerCore
 {
@@ -28,12 +30,12 @@ namespace FileExplorerCore
 
 				//	if (value is 0)
 				//	{
-				//		var fluentTheme = new FluentTheme(new Uri(@"avares://FileExplorer"))
-				//		{
-				//			Mode = FluentThemeMode.Dark,
-				//		};
+				var fluentTheme = new FluentTheme(new Uri(@"avares://FileExplorer"))
+				{
+					Mode = FluentThemeMode.Dark,
+				};
 
-				//		App.Current.Styles[0] = fluentTheme;
+				App.Current.Styles[0] = fluentTheme;
 				//	}
 				//}
 

@@ -18,7 +18,7 @@
 									 Margin="0 0 0 5"
 									 x:Name="fileList">
 			<ItemsRepeater.Layout>
-				<UniformGridLayout ItemsStretch="Uniform"
+				<UniformGridLayout ItemsStretch="None"
 													 ItemsJustification="Center"/>
 			</ItemsRepeater.Layout>
 
@@ -29,7 +29,6 @@
 						<ControlTemplate>
 							<Border CornerRadius="10" 
 											Name="PART_ContentPresenter"
-											BoxShadow="0 0 20 -5 Black"
 											Margin="10">
 								<ContentPresenter ClipToBounds="true"
 																	Background="{TemplateBinding Background}"
@@ -52,9 +51,8 @@
 											 ToolTip.Tip="{Binding Name}"
 											 IsSelected="{Binding IsSelected}"
 											 Cursor="Hand"
-											 VerticalContentAlignment="Center"
-											 HorizontalContentAlignment="Center"
-											 Height="175">
+											 VerticalContentAlignment="Stretch"
+											 HorizontalContentAlignment="Stretch">
 						<StackPanel>
 							<Viewbox Width="{Binding ImageSize}"
 											 Height="{Binding ImageSize}"
@@ -70,6 +68,7 @@
 
 							<TextBlock Text="{Binding Size, Converter={StaticResource sizeConverter}}"
 												 FontSize="12"
+												 Margin="0 0 0 5"
 												 Foreground="{DynamicResource SystemBaseMediumColor}"
 												 HorizontalAlignment="Center" />
 						</StackPanel>

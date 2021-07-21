@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
 using Avalonia.Controls.Notifications;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
@@ -69,13 +70,13 @@ namespace FileExplorerCore.Views
 		{
 			if (DataContext is MainWindowViewModel model && sender is Button { DataContext: FolderModel folderModel })
 			{
-				model.CurrentTab.Path = folderModel.Path;
+				model.CurrentTab.SetPath(folderModel.Path);
 			}
 		}
 
 		private async void OnComboBoxChanged(object sender, SelectionChangedEventArgs e)
 		{
-			if (DataContext is MainWindowViewModel model && sender is ComboBox { SelectedItem: FolderModel folderModel })
+			if (DataContext is MainWindowViewModel model && sender is SelectingItemsControl { SelectedItem: FolderModel folderModel })
 			{
 				await model.CurrentTab.SetPath(folderModel.Path);
 			}
@@ -88,6 +89,8 @@ namespace FileExplorerCore.Views
 				if (model.Tabs.Count > 1)
 				{
 					model.Tabs.Remove(tab);
+
+					GC.Collect(2, GCCollectionMode.Optimized, false, true);
 				}
 			}
 		}

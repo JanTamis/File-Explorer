@@ -49,6 +49,7 @@
 
 		<GridSplitter ResizeDirection="Columns"
 									HorizontalAlignment="Left"
+									Background="{DynamicResource MenuBackground}"
 									Width="5"
 									Grid.Column="1" />
 
