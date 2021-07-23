@@ -53,29 +53,6 @@ namespace FileExplorerCore.Helpers
 
 		public static DateTime GetFileWriteDate(FileModel model)
 		{
-			//var findFileData = new WIN32_FIND_DATA();
-			//IntPtr hFindFile = FindFirstFile(path, ref findFileData);
-
-			//var attributes = (FileAttributes)findFileData.dwFileAttributes;
-
-			//if (hFindFile == INVALID_HANDLE_VALUE)
-			//	return DateTime.MinValue;
-
-			//FindClose(hFindFile);
-
-			//return ConvertDateTime(findFileData.ftLastWriteTime_dwHighDateTime, findFileData.ftLastWriteTime_dwLowDateTime);
-
-			//static long CombineHighLowInts(int high, int low)
-			//{
-			//	return (((long)high) << 0x20) | low;
-			//}
-
-			//static DateTime ConvertDateTime(int high, int low)
-			//{
-			//	long fileTime = CombineHighLowInts(high, low);
-			//	return DateTime.FromFileTimeUtc(fileTime);
-			//}
-
 			if (model.IsFolder)
 			{
 				return new DirectoryInfo(model.Path).LastWriteTime;

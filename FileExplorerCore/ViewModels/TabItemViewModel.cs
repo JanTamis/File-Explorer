@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Runtime;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -407,8 +408,6 @@ namespace FileExplorerCore.ViewModels
 
 			Files.ClearTrim();
 
-			FileModel.BasePath = Path;
-
 			GC.Collect(2, GCCollectionMode.Forced, false, true);
 
 			SelectionCount = 0;
@@ -464,6 +463,8 @@ namespace FileExplorerCore.ViewModels
 
 			IsLoading = false;
 
+			GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+
 			GC.Collect(2, GCCollectionMode.Optimized, false, true);
 		}
 
@@ -504,14 +505,14 @@ namespace FileExplorerCore.ViewModels
 
 			if (search is "*" or "*.*" or "" && Sort is SortEnum.None && !recursive)
 			{
-				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.Directory.Slice(x.RootDirectory.Length), x.FileName, x.IsDirectory, size), options);
+				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), x.IsDirectory, size), options);
 			}
 			else
 			{
 				var query = FileSearcher.PrepareQuery(search);
 				var regex = new Wildcard(search, RegexOptions.Singleline | RegexOptions.Compiled);
 
-				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.Directory.Slice(x.RootDirectory.Length), x.FileName, x.IsDirectory, size), options)
+				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), x.IsDirectory, size), options)
 				{
 					ShouldIncludePredicate = (ref FileSystemEntry x) => regex.IsMatch(new String(x.FileName)) || FileSearcher.IsValid(x, query)
 				};
@@ -560,7 +561,7 @@ namespace FileExplorerCore.ViewModels
 		{
 			var size = IsGrid ? 100 : 32;
 
-			return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.Directory.Slice(x.RootDirectory.Length), x.FileName, true, size), options)
+			return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), true, size), options)
 			{
 				ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
 			};
@@ -570,7 +571,7 @@ namespace FileExplorerCore.ViewModels
 		{
 			var size = IsGrid ? 100 : 32;
 
-			return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.Directory.Slice(x.RootDirectory.Length), x.FileName, false, size), options)
+			return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), false, size), options)
 			{
 				ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
 			};

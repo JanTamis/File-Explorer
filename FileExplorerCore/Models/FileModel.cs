@@ -19,7 +19,7 @@ namespace FileExplorerCore.Models
 	{
 		public readonly static ConcurrentStack<FileModel> FileImageQueue = new();
 
-		public static string BasePath { get; set; }
+		private byte[] _path;
 
 		static Task? imageLoadTask;
 
@@ -27,7 +27,6 @@ namespace FileExplorerCore.Models
 		private bool needsNewImage;
 
 		private string _name;
-		private string _relativePath;
 		private string? _extension;
 		private long? _size;
 
@@ -70,7 +69,18 @@ namespace FileExplorerCore.Models
 
 		public bool HasImage => _image is not null;
 
-		public string Path => System.IO.Path.Combine(BasePath, _relativePath);
+		public string Path
+		{
+			get
+			{
+				return new string(CompressHelper.GetString(_path));
+			}
+			private set
+			{
+				_path = CompressHelper.GetBytes(value.AsSpan())
+															.ToArray();
+			}
+		}
 
 		public string Name
 		{
@@ -80,7 +90,7 @@ namespace FileExplorerCore.Models
 				{
 					var span = Path.AsSpan();
 
-					if (span[^1] is '\\')
+					if (span[^1] == '\\')
 					{
 						_name = Path;
 					}
@@ -108,7 +118,7 @@ namespace FileExplorerCore.Models
 
 						File.Move(Path, newPath);
 
-						//Path = newPath;
+						Path = newPath;
 					}
 					else if (Directory.Exists(Path))
 					{
@@ -117,7 +127,7 @@ namespace FileExplorerCore.Models
 
 						Directory.Move(Path, newPath);
 
-						//Path = newPath;
+						Path = newPath;
 					}
 
 					this.OnPropertyChanged(ref _name, value);
@@ -132,12 +142,9 @@ namespace FileExplorerCore.Models
 			{
 				if (_extension is null)
 				{
-					var span = Path.AsSpan();
-
 					if (!IsFolder)
 					{
-						_extension = System.IO.Path.GetExtension(span)
-																			 .ToString();
+						_extension = new string(System.IO.Path.GetExtension(CompressHelper.GetString(_path)));
 					}
 
 					_extension = String.Empty;
@@ -169,12 +176,13 @@ namespace FileExplorerCore.Models
 				return Task.Run(() =>
 				{
 					long size = 0;
+					var span = CompressHelper.GetString(_path);
 
 					if (!IsFolder)
 					{
 						size = Size;
 					}
-					else if (Path.EndsWith("\\") && new DriveInfo(Path[0].ToString()) is { IsReady: true } info)
+					else if (span.EndsWith("\\") && new DriveInfo(new string(span[0], 1)) is { IsReady: true } info)
 					{
 						size = info.TotalSize - info.TotalFreeSpace;
 					}
@@ -257,9 +265,9 @@ namespace FileExplorerCore.Models
 			set => this.OnPropertyChanged(ref _image, value);
 		}
 
-		public FileModel(ReadOnlySpan<char> path, ReadOnlySpan<char> filename, bool isFolder, int imageSize = 32)
+		public FileModel(string path, bool isFolder, int imageSize = 32)
 		{
-			_relativePath = System.IO.Path.Join(path, filename);
+			Path = path;
 
 			SelectionChanged = delegate { };
 
