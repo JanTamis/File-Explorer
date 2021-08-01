@@ -2,10 +2,10 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Notifications;
 using Avalonia.Markup.Xaml;
+using Avalonia.Themes.Fluent;
+using DiscUtils.FileSystems;
 using FileExplorerCore.ViewModels;
 using FileExplorerCore.Views;
-using DiscUtils.FileSystems;
-using Avalonia.Themes.Fluent;
 using System;
 
 namespace FileExplorerCore

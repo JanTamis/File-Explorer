@@ -1,5 +1,4 @@
-﻿using Avalonia.Media.Imaging;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 

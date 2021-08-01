@@ -4,7 +4,6 @@ using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
-using NetFabric.Hyperlinq;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -132,8 +131,7 @@ namespace FileExplorerCore.ViewModels
 			get
 			{
 				var result = String.Empty;
-				var selectedFiles = Files.AsValueEnumerable()
-																 .Where(x => x.IsSelected);
+				var selectedFiles = Files.Where(x => x.IsSelected);
 
 				if (SelectionCount > 0)
 				{
@@ -242,7 +240,9 @@ namespace FileExplorerCore.ViewModels
 					}
 					else
 					{
+#pragma warning disable CA2245 // Do not assign a property to itself
 						IsGrid = IsGrid;
+#pragma warning restore CA2245 // Do not assign a property to itself
 					}
 
 					if (isUserEntered)
@@ -312,7 +312,7 @@ namespace FileExplorerCore.ViewModels
 					DisplayControl = grid;
 				}
 
-				GC.Collect(2, GCCollectionMode.Forced, false, true);
+				GC.Collect(2, GCCollectionMode.Default, false, false);
 			}
 		}
 
@@ -348,8 +348,7 @@ namespace FileExplorerCore.ViewModels
 			{
 				if (property is "IsSelected")
 				{
-					SelectionCount = Files.AsValueEnumerable()
-																.Count(x => x.IsSelected);
+					SelectionCount = Files.Count(x => x.IsSelected);
 
 					this.RaisePropertyChanged(nameof(SelectionText));
 				}
@@ -408,7 +407,7 @@ namespace FileExplorerCore.ViewModels
 
 			Files.ClearTrim();
 
-			GC.Collect(2, GCCollectionMode.Forced, false, true);
+			//GC.Collect(2, GCCollectionMode.Forced, false, true);
 
 			SelectionCount = 0;
 			this.RaisePropertyChanged(nameof(SelectionText));
@@ -465,7 +464,7 @@ namespace FileExplorerCore.ViewModels
 
 			GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
 
-			GC.Collect(2, GCCollectionMode.Optimized, false, true);
+			//GC.Collect(2, GCCollectionMode.Optimized, false, true);
 		}
 
 		public async Task SetPath(string path)

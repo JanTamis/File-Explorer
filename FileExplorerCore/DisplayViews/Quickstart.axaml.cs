@@ -1,8 +1,6 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using FileExplorerCore.Models;
-using NetFabric.Hyperlinq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,7 +24,6 @@ namespace FileExplorerCore.DisplayViews
 			get
 			{
 				return DriveInfo.GetDrives()
-												.AsValueEnumerable()
 												.Where(x => x.IsReady)
 												.Select(x => new FileModel(x.RootDirectory.FullName, true, 128));
 			}

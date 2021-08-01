@@ -1,5 +1,4 @@
 ﻿using FileExplorerCore.Helpers;
-using NetFabric.Hyperlinq;
 using System;
 using System.Collections.Generic;
 using System.IO;

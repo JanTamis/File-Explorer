@@ -1,5 +1,4 @@
 using Avalonia.Controls.Notifications;
-using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Threading;
 using FileExplorerCore.DisplayViews;
@@ -8,7 +7,6 @@ using FileExplorerCore.Models;
 using FileExplorerCore.Popup;
 using Microsoft.VisualBasic.FileIO;
 using Nessos.LinqOptimizer.CSharp;
-using NetFabric.Hyperlinq;
 using ReactiveUI;
 using System;
 using System.Collections.Generic;
@@ -16,7 +14,6 @@ using System.Globalization;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Timers;
 
@@ -378,7 +375,7 @@ namespace FileExplorerCore.ViewModels
 						else
 						{
 							await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(~index, extension));
-						} 
+						}
 					}
 				}
 

@@ -9,7 +9,7 @@ namespace FileExplorerCore.Helpers
 	{
 		static readonly ParallelOptions options = new()
 		{
-			MaxDegreeOfParallelism = Environment.ProcessorCount / 4
+			MaxDegreeOfParallelism = 2
 		};
 
 		public static void While(Func<bool> condition, Action body)
@@ -30,6 +30,16 @@ namespace FileExplorerCore.Helpers
 
 		public static ParallelLoopResult ForEach<T>(IEnumerable<T> collection, Action<T> body)
 		{
+			return Parallel.ForEach(collection, options, body);
+		}
+
+		public static ParallelLoopResult ForEach<T>(IEnumerable<T> collection, Action<T> body, int maxConcurrency)
+		{
+			var options = new ParallelOptions()
+			{
+				MaxDegreeOfParallelism = Math.Max(maxConcurrency, 1),
+			};
+
 			return Parallel.ForEach(collection, options, body);
 		}
 

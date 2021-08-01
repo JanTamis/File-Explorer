@@ -1,4 +1,5 @@
-﻿using Avalonia.Media.Imaging;
+﻿using Avalonia.Controls.Shapes;
+using Avalonia.Media.Imaging;
 using FileExplorerCore.Helpers;
 using ReactiveUI;
 using System;
@@ -8,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace FileExplorerCore.Models
@@ -49,7 +51,7 @@ namespace FileExplorerCore.Models
 							while (!FileImageQueue.IsEmpty)
 							{
 								while (FileImageQueue.TryPop(out var subject))
-								{
+{
 									var img = WindowsThumbnailProvider.GetThumbnail(subject.Path, 48, 48, ThumbnailOptions.ThumbnailOnly);
 
 									if (img is null)
@@ -94,8 +96,6 @@ namespace FileExplorerCore.Models
 			}
 
 			Path = path;
-
-			Image = WindowsThumbnailProvider.GetThumbnail(Path, 48, 48, ThumbnailOptions.BiggerSizeOk);
 
 			query = subFolders ?? new FileSystemEnumerable<FolderModel>(path, (ref FileSystemEntry x) => new FolderModel(x.ToFullPath(), new string(x.FileName)), options)
 			{

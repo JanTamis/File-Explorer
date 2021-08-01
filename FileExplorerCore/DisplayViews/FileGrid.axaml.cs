@@ -5,9 +5,8 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
-using NetFabric.Hyperlinq;
-using ReactiveUI;
 using System;
+using System.Linq;
 
 namespace FileExplorerCore.DisplayViews
 {
@@ -48,7 +47,7 @@ namespace FileExplorerCore.DisplayViews
 		{
 			if (e.Key is Key.A && e.KeyModifiers is KeyModifiers.Control)
 			{
-				foreach (var file in Files.AsValueEnumerable().Where(x => !x.IsSelected))
+				foreach (var file in Files.Where(x => !x.IsSelected))
 				{
 					file.IsSelected = true;
 				}
@@ -140,7 +139,7 @@ namespace FileExplorerCore.DisplayViews
 			}
 			else if (range)
 			{
-				foreach (var file in files.AsValueEnumerable().Where(x => x.IsSelected))
+				foreach (var file in files.Where(x => x.IsSelected))
 				{
 					file.IsSelected = false;
 				}
@@ -173,7 +172,7 @@ namespace FileExplorerCore.DisplayViews
 			}
 			else
 			{
-				foreach (var file in files.AsValueEnumerable().Where(x => x.IsSelected))
+				foreach (var file in files.Where(x => x.IsSelected))
 				{
 					file.IsSelected = false;
 				}

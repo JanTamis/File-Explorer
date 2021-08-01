@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
-using System.Threading.Tasks;
 
 namespace FileExplorerCore.Helpers
 {
