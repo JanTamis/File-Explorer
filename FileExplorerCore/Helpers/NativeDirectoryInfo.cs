@@ -107,7 +107,7 @@ namespace FileExplorerCore.Helpers
 			static DateTime ConvertDateTime(int high, int low)
 			{
 				long fileTime = CombineHighLowInts((uint)high, (uint)low);
-				return DateTime.FromFileTimeUtc(fileTime);
+				return DateTime.FromFileTimeUtc(fileTime).ToLocalTime();
 			}
 		}
 	}

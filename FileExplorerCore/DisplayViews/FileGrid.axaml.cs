@@ -6,6 +6,7 @@ using Avalonia.Markup.Xaml;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using System;
+using System.Collections.Immutable;
 using System.Linq;
 
 namespace FileExplorerCore.DisplayViews
@@ -139,9 +140,9 @@ namespace FileExplorerCore.DisplayViews
 			}
 			else if (range)
 			{
-				foreach (var file in files.Where(x => x.IsSelected))
+				for (int i = 0; i < files.Count; i++)
 				{
-					file.IsSelected = false;
+					files[i].IsSelected = false;
 				}
 
 				if (index > anchorIndex)
@@ -172,9 +173,9 @@ namespace FileExplorerCore.DisplayViews
 			}
 			else
 			{
-				foreach (var file in files.Where(x => x.IsSelected))
+				for (int i = 0; i < files.Count; i++)
 				{
-					file.IsSelected = false;
+					files[i].IsSelected = false;
 				}
 
 				files[index].IsSelected = true;

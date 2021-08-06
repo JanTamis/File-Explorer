@@ -289,6 +289,7 @@ namespace FileExplorerCore.Helpers
 
 			char[]? toReturn = _arrayToReturnToPool;
 			_chars = _arrayToReturnToPool = poolArray;
+
 			if (toReturn != null)
 			{
 				ArrayPool<char>.Shared.Return(toReturn);

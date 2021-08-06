@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace FileExplorerCore.Models
 {
-	public class FileModel : INotifyPropertyChanged
+	public class FileModel : INotifyPropertyChanged, IDisposable
 	{
 		public readonly static ConcurrentStack<FileModel> FileImageQueue = new();
 
@@ -26,7 +26,7 @@ namespace FileExplorerCore.Models
 		static Task? imageLoadTask;
 
 		private bool _isSelected;
-		private bool needsNewImage;
+		public bool NeedsNewImage = true;
 
 		private string _name;
 		private string? _extension;
@@ -36,17 +36,16 @@ namespace FileExplorerCore.Models
 
 		private Bitmap _image;
 		private Transform _imageTransform;
-		private int imageSize;
+		private static int imageSize;
 
 		public event Action<FileModel> SelectionChanged;
 		public event PropertyChangedEventHandler? PropertyChanged;
 
-		public int ImageSize
+		public static int ImageSize
 		{
 			get => imageSize;
 			set
 			{
-				needsNewImage = true;
 				imageSize = value;
 			}
 		}
@@ -64,8 +63,11 @@ namespace FileExplorerCore.Models
 			get => _isSelected;
 			set
 			{
-				_isSelected = value;
-				SelectionChanged(this);
+				if (_isSelected != value)
+				{
+					_isSelected = value;
+					SelectionChanged(this);
+				}
 			}
 		}
 
@@ -80,7 +82,7 @@ namespace FileExplorerCore.Models
 				else
 					return Encoding.Unicode.GetString(_path);
 			}
-			private set
+			set
 			{
 				isAscii = true;
 
@@ -104,7 +106,7 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				if (_name is null)
+				if (_name == null)
 				{
 					ReadOnlySpan<char> path;
 
@@ -258,10 +260,8 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				if (needsNewImage)
+				if (NeedsNewImage)
 				{
-					_image = null;
-
 					ImageTransform = null;
 
 					FileImageQueue.Push(this);
@@ -275,24 +275,24 @@ namespace FileExplorerCore.Models
 								Concurrent.ForEach(Concurrent.AsEnumerable(FileImageQueue), async subject =>
 								{
 									var path = subject.Path;
-									var img = WindowsThumbnailProvider.GetThumbnail(path, subject.ImageSize, subject.ImageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk);
+									var img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk);
 
 									if (img is null)
 									{
-										img = WindowsThumbnailProvider.GetThumbnail(path, subject.ImageSize, subject.ImageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
+										img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
 
 										if (img is not null)
 										{
-											await Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1), DispatcherPriority.MaxValue);
+											await Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1), DispatcherPriority.Normal);
 										}
 									}
 									else if (ImageSize <= 64)
 									{
-										await Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1), DispatcherPriority.MaxValue);
+										await Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1), DispatcherPriority.Normal);
 									}
 
 									subject.Image = img;
-									subject.needsNewImage = false;
+									subject.NeedsNewImage = false;
 								}, Environment.ProcessorCount / 4);
 							}
 						});
@@ -322,6 +322,11 @@ namespace FileExplorerCore.Models
 		public void OnPropertyChanged([CallerMemberName] string name = null)
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+		}
+
+		public void Dispose()
+		{
+			_image.Dispose();
 		}
 	}
 

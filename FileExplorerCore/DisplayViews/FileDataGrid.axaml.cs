@@ -84,7 +84,7 @@ namespace FileExplorerCore.DisplayViews
 				{
 					var index = IndexOf(Char.ToUpper(key[0]));
 
-					if (index is not -1)
+					if (index != -1)
 					{
 						anchorIndex = index;
 
@@ -197,9 +197,9 @@ namespace FileExplorerCore.DisplayViews
 			}
 			else if (range)
 			{
-				foreach (var file in Files.Where(x => x.IsSelected))
+				for (int i = 0; i < files.Count; i++)
 				{
-					file.IsSelected = false;
+					files[i].IsSelected = false;
 				}
 
 				if (index > anchorIndex)
@@ -223,9 +223,9 @@ namespace FileExplorerCore.DisplayViews
 			}
 			else
 			{
-				foreach (var file in Files.Where(x => x.IsSelected))
+				for (int i = 0; i < files.Count; i++)
 				{
-					file.IsSelected = false;
+					files[i].IsSelected = false;
 				}
 
 				files[index].IsSelected = true;

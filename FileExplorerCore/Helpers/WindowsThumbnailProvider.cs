@@ -38,6 +38,8 @@ namespace FileExplorerCore.Helpers
 		[return: MarshalAs(UnmanagedType.Bool)]
 		internal static extern bool DeleteObject(IntPtr hObject);
 
+		private static readonly int bitmapSize = Unsafe.SizeOf<NativeMethods.BITMAP>();
+
 		[SupportedOSPlatform("Windows")]
 		public unsafe static Bitmap? GetThumbnail(string fileName, int width, int height, ThumbnailOptions options)
 		{
@@ -48,7 +50,7 @@ namespace FileExplorerCore.Helpers
 			if (hBitmap != IntPtr.Zero)
 			{
 				var bmp = new NativeMethods.BITMAP();
-				NativeMethods.GetObjectBitmap(hBitmap, Unsafe.SizeOf<NativeMethods.BITMAP>(), ref bmp);
+				NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
 
 				bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
 

@@ -281,9 +281,11 @@ namespace FileExplorerCore.ViewModels
 
 				if (IsGrid is false)
 				{
+					FileModel.ImageSize = 32;
+
 					foreach (var item in Files)
 					{
-						item.ImageSize = 32;
+						item.NeedsNewImage = true;
 					}
 
 					var list = new FileDataGrid
@@ -297,9 +299,11 @@ namespace FileExplorerCore.ViewModels
 				}
 				else
 				{
+					FileModel.ImageSize = 100;
+
 					foreach (var item in Files)
 					{
-						item.ImageSize = 100;
+						item.NeedsNewImage = true;
 					}
 
 					var grid = new FileGrid
@@ -311,8 +315,6 @@ namespace FileExplorerCore.ViewModels
 
 					DisplayControl = grid;
 				}
-
-				GC.Collect(2, GCCollectionMode.Default, false, false);
 			}
 		}
 
@@ -405,6 +407,14 @@ namespace FileExplorerCore.ViewModels
 			tokenSource = new CancellationTokenSource();
 			previousLoadTime = TimeSpan.Zero;
 
+			foreach (var file in Files)
+			{
+				if (file.HasImage)
+				{
+					file.Dispose();
+				}
+			}
+
 			Files.ClearTrim();
 
 			//GC.Collect(2, GCCollectionMode.Forced, false, true);
@@ -464,7 +474,7 @@ namespace FileExplorerCore.ViewModels
 
 			GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
 
-			//GC.Collect(2, GCCollectionMode.Optimized, false, true);
+			GC.Collect(2, GCCollectionMode.Optimized, false, true);
 		}
 
 		public async Task SetPath(string path)

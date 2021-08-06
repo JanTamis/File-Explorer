@@ -42,7 +42,7 @@
 
 			<TreeView.ItemsPanel>
 				<ItemsPanelTemplate>
-					<VirtualizingStackPanel Orientation="Vertical" />
+					<StackPanel Orientation="Vertical" />
 				</ItemsPanelTemplate>
 			</TreeView.ItemsPanel>
 		</TreeView>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -45,9 +46,61 @@ namespace FileExplorerCore.Helpers
 
 		public static IEnumerable<T> AsEnumerable<T>(ConcurrentStack<T> stack)
 		{
-			while (stack.TryPop(out var result))
+			return new StackEnumerable<T>(stack);
+			//while (stack.TryPop(out var result))
+			//{
+			//	yield return result;
+			//}
+		}
+
+		class StackEnumerable<T> : IEnumerable<T>
+		{
+			private ConcurrentStack<T> stack;
+
+			public StackEnumerable(ConcurrentStack<T> stack)
 			{
-				yield return result;
+				this.stack = stack;
+			}
+
+			IEnumerator<T> IEnumerable<T>.GetEnumerator()
+			{
+				return new StackEnumerator<T>(stack);
+			}
+
+			IEnumerator IEnumerable.GetEnumerator()
+			{
+				return new StackEnumerator<T>(stack);
+			}
+
+		}
+		struct StackEnumerator<T> : IEnumerator<T>
+		{
+			private ConcurrentStack<T> stack;
+			private T current;
+
+			public StackEnumerator(ConcurrentStack<T> stack)
+			{
+				this.stack = stack;
+				current = default;
+			}
+
+			public T Current => current;
+
+			object IEnumerator.Current => current;
+
+			public void Dispose()
+			{
+				
+			}
+
+			public bool MoveNext()
+			{
+				return stack.TryPop(out current);
+			}
+
+			public void Reset()
+			{
+
 			}
 		}
 	}

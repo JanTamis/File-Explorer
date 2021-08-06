@@ -42,16 +42,13 @@ namespace FileExplorerCore.Models
 					{
 						var comparer = Comparer<FileIndexModel>.Create((x, y) =>
 						{
-							var taskX = x.TaskSize;
-							var taskY = y.TaskSize;
+							var sizeX = x.sizeQuery?.Sum() ?? x.Size;
+							var sizeY = y.sizeQuery?.Sum() ?? y.Size;
 
-							taskX.Wait();
-							taskY.Wait();
-
-							return taskY.Result.CompareTo(taskX.Result);
+							return sizeY.CompareTo(sizeX);
 						});
 
-						ThreadPool.QueueUserWorkItem(async x => await _items.ReplaceRange(query, default, comparer));
+						ThreadPool.QueueUserWorkItem(x => _items.ReplaceRange(query, default, comparer));
 					}
 				}
 
@@ -120,7 +117,10 @@ namespace FileExplorerCore.Models
 
 				query = folderQuery.Concat(fileQuery);
 
-				sizeQuery = new FileSystemEnumerable<long>(path, (ref FileSystemEntry x) => x.Length, sizeOptions);
+				if (isFolder)
+				{
+					sizeQuery = new FileSystemEnumerable<long>(path, (ref FileSystemEntry x) => x.Length, sizeOptions); 
+				}
 			}
 		}
 

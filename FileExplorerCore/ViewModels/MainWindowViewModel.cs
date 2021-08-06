@@ -378,8 +378,6 @@ namespace FileExplorerCore.ViewModels
 						}
 					}
 				}
-
-				GC.Collect(2, GCCollectionMode.Forced, false, true);
 			});
 		}
 	}
