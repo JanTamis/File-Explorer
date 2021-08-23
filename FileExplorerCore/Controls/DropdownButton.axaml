@@ -2,17 +2,26 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="using:FileExplorerCore.Controls">
   <Design.PreviewWith>
-		<controls:DropdownButton />
+		<controls:DropdownButton Content="hello" />
   </Design.PreviewWith>
 
   <Style Selector="controls|DropdownButton">
+		<Setter Property="Background" Value="Transparent" />
     <Setter Property="Template">
       <ControlTemplate>
-				<Border>
-					<StackPanel Orientation="Horizontal" >
-						<Button Content="{Binding Content}" />
-					</StackPanel>
-				</Border>
+					<Panel Width="100">
+						<Button Background="Transparent"
+										BorderBrush="Transparent"
+										VerticalAlignment="Stretch"
+										HorizontalAlignment="Stretch"
+										Margin="0 0 30 0"
+										Cursor="Hand"/>
+						<DropDown PlaceholderText="{TemplateBinding Content}" 
+											HorizontalAlignment="Stretch"
+											VerticalAlignment="Stretch">
+							
+						</DropDown>
+					</Panel>
       </ControlTemplate>
     </Setter>
   </Style>

@@ -6,7 +6,6 @@ using Avalonia.Themes.Fluent;
 using DiscUtils.FileSystems;
 using FileExplorerCore.ViewModels;
 using FileExplorerCore.Views;
-using System;
 
 namespace FileExplorerCore
 {

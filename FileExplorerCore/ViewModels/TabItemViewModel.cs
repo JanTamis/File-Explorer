@@ -1,20 +1,15 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Threading;
 using FileExplorerCore.Converters;
 using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
 using ReactiveUI;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.IO.Enumeration;
-using System.Linq;
 using System.Runtime;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FileExplorerCore.ViewModels
 {
@@ -34,6 +29,7 @@ namespace FileExplorerCore.ViewModels
 
 		private readonly Stack<string> undoStack = new();
 		private readonly Stack<string> redoStack = new();
+		readonly ObservableRangeCollection<FolderModel> _folders = new();
 
 		private CancellationTokenSource tokenSource;
 		private Control _displayControl;
@@ -75,29 +71,10 @@ namespace FileExplorerCore.ViewModels
 		{
 			get
 			{
-				var path = Path.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
-
-				var names = path.Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
-
-				for (int i = 0; i < names.Length; i++)
-				{
-					var folderPath = String.Join(System.IO.Path.DirectorySeparatorChar, new ArraySegment<string>(names, 0, i + 1));
-					var name = names[i];
-
-					if (!String.IsNullOrEmpty(folderPath))
-					{
-						if (i is 0)
-						{
-							folderPath += System.IO.Path.DirectorySeparatorChar;
-							name += System.IO.Path.DirectorySeparatorChar;
-						}
-
-						yield return new FolderModel(folderPath, name, from directory in Directory.EnumerateDirectories(folderPath, "*", new EnumerationOptions())
-																													 select new FolderModel(directory, System.IO.Path.GetFileName(directory)));
-					}
-				}
+				return _folders;
 			}
 		}
+
 		public int Count
 		{
 			get => _count;
@@ -192,7 +169,7 @@ namespace FileExplorerCore.ViewModels
 			{
 				if (IsIndeterminate || Double.IsNaN(SearchProgression) || SearchProgression == 0)
 				{
-					return "Almost There...";
+					return null;
 				}
 				else
 				{
@@ -253,7 +230,38 @@ namespace FileExplorerCore.ViewModels
 
 					this.RaiseAndSetIfChanged(ref _path, value);
 					this.RaisePropertyChanged(nameof(FolderName));
-					this.RaisePropertyChanged(nameof(Folders));
+
+					ThreadPool.QueueUserWorkItem(async x =>
+					{
+						await Dispatcher.UIThread.InvokeAsync(_folders.Clear);
+						await _folders.ReplaceRange(GetFolders(), tokenSource.Token);
+
+						IEnumerable<FolderModel> GetFolders()
+						{
+							var path = Path.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
+							var names = path.Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+
+							for (int i = 0; i < names.Length; i++)
+							{
+								var folderPath = String.Join(System.IO.Path.DirectorySeparatorChar, new ArraySegment<string>(names, 0, i + 1));
+								var name = names[i];
+
+								if (!String.IsNullOrEmpty(folderPath))
+								{
+									if (i == 0)
+									{
+										folderPath += System.IO.Path.DirectorySeparatorChar;
+										name = $"{new DriveInfo(name).VolumeLabel} ({name}{System.IO.Path.DirectorySeparatorChar})";
+									}
+
+									yield return new FolderModel(folderPath, name, from directory in Directory.EnumerateDirectories(folderPath, "*", new EnumerationOptions())
+																																 select new FolderModel(directory, System.IO.Path.GetFileName(directory)));
+								}
+							}
+						}
+					});
+
+					IsSearching = false;
 				}
 			}
 		}
@@ -271,6 +279,8 @@ namespace FileExplorerCore.ViewModels
 			get => _displayControl;
 			set => this.RaiseAndSetIfChanged(ref _displayControl, value);
 		}
+
+		public bool IsSearching { get; set; }
 
 		public bool IsGrid
 		{
@@ -389,6 +399,7 @@ namespace FileExplorerCore.ViewModels
 		{
 			if (tokenSource is { IsCancellationRequested: false })
 			{
+				IsLoading = false;
 				tokenSource.Cancel();
 			}
 		}
@@ -415,9 +426,7 @@ namespace FileExplorerCore.ViewModels
 				}
 			}
 
-			Files.ClearTrim();
-
-			//GC.Collect(2, GCCollectionMode.Forced, false, true);
+			Files.Clear();
 
 			SelectionCount = 0;
 			this.RaisePropertyChanged(nameof(SelectionText));
@@ -501,7 +510,7 @@ namespace FileExplorerCore.ViewModels
 				if (Path != path)
 				{
 					Path = path;
-					await UpdateFiles(false, "*");
+					await UpdateFiles(IsSearching, "*");
 				}
 			}
 		}

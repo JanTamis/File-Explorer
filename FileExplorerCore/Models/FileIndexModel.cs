@@ -1,11 +1,5 @@
 ﻿using FileExplorerCore.Helpers;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Enumeration;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FileExplorerCore.Models
 {
@@ -119,7 +113,7 @@ namespace FileExplorerCore.Models
 
 				if (isFolder)
 				{
-					sizeQuery = new FileSystemEnumerable<long>(path, (ref FileSystemEntry x) => x.Length, sizeOptions); 
+					sizeQuery = new FileSystemEnumerable<long>(path, (ref FileSystemEntry x) => x.Length, sizeOptions);
 				}
 			}
 		}

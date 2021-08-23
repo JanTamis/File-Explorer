@@ -5,8 +5,6 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
-using System;
-using System.Linq;
 
 namespace FileExplorerCore.DisplayViews
 {

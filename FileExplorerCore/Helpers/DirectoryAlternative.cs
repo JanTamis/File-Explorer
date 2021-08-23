@@ -1,6 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace FileExplorerCore.Helpers
 {
@@ -70,13 +68,6 @@ namespace FileExplorerCore.Helpers
 
 		public static unsafe DateTime GetFileWriteDate(byte[] path, bool isAscii)
 		{
-			//if (model.IsFolder)
-			//{
-			//	return new DirectoryInfo(model.Path).LastWriteTime;
-			//}
-
-			//return new FileInfo(model.Path).LastWriteTime;
-
 			fixed (byte* ptr = path)
 			{
 				if (isAscii)
@@ -108,6 +99,41 @@ namespace FileExplorerCore.Helpers
 			{
 				long fileTime = CombineHighLowInts((uint)high, (uint)low);
 				return DateTime.FromFileTimeUtc(fileTime).ToLocalTime();
+			}
+		}
+
+		public static string GetName(byte[] path, bool isAscii)
+		{
+			fixed (byte* ptr = path)
+			{
+				if (isAscii)
+				{
+					var findFileData = new WIN32_FIND_DATA();
+					IntPtr hFindFile = AnsiFileInfo.FindFirstFile(ptr, ref findFileData);
+
+					var attributes = (FileAttributes)findFileData.dwFileAttributes;
+
+					if (hFindFile == INVALID_HANDLE_VALUE || attributes.HasFlag(FileAttributes.Directory))
+						return String.Empty;
+
+					FindClose(hFindFile);
+
+					return findFileData.cFileName ?? findFileData.cAlternateFileName;
+				}
+				else
+				{
+					var findFileData = new WIN32_FIND_DATA();
+					IntPtr hFindFile = UnicodeFileInfo.FindFirstFile(ptr, ref findFileData);
+
+					var attributes = (FileAttributes)findFileData.dwFileAttributes;
+
+					if (hFindFile == INVALID_HANDLE_VALUE || attributes.HasFlag(FileAttributes.Directory))
+						return String.Empty;
+
+					FindClose(hFindFile);
+
+					return findFileData.cFileName ?? findFileData.cAlternateFileName;
+				}
 			}
 		}
 	}

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace FileExplorerCore.Models
+﻿namespace FileExplorerCore.Models
 {
 	public class FileModelComparer : Comparer<FileModel>
 	{

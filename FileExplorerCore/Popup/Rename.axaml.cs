@@ -3,7 +3,6 @@ using Avalonia.Markup.Xaml;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 

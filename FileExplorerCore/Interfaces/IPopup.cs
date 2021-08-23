@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace FileExplorerCore.Interfaces
+﻿namespace FileExplorerCore.Interfaces
 {
 	public interface IPopup
 	{

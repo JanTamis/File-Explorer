@@ -1,11 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using FileExplorerCore.Models;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Enumeration;
-using System.Linq;
 
 namespace FileExplorerCore.DisplayViews
 {

@@ -1,16 +1,9 @@
-﻿using Avalonia.Controls.Shapes;
-using Avalonia.Media.Imaging;
+﻿using Avalonia.Media.Imaging;
 using FileExplorerCore.Helpers;
 using ReactiveUI;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.IO.Enumeration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FileExplorerCore.Models
 {
@@ -19,13 +12,8 @@ namespace FileExplorerCore.Models
 		private Bitmap _image;
 		static Task imageLoadTask;
 
-		private bool _isSelected;
-
 		public readonly static ConcurrentStack<FolderModel> FileImageQueue = new();
-
-		IEnumerable<FolderModel> query = Enumerable.Empty<FolderModel>();
-
-		public event Action SelectionChanged = delegate { };
+		readonly IEnumerable<FolderModel> query = Enumerable.Empty<FolderModel>();
 
 		public static FolderModel Empty { get; } = new FolderModel();
 
@@ -33,7 +21,6 @@ namespace FileExplorerCore.Models
 		{
 			IgnoreInaccessible = true,
 			RecurseSubdirectories = false,
-			BufferSize = 16384,
 		};
 
 		public Bitmap Image
@@ -51,7 +38,7 @@ namespace FileExplorerCore.Models
 							while (!FileImageQueue.IsEmpty)
 							{
 								while (FileImageQueue.TryPop(out var subject))
-{
+								{
 									var img = WindowsThumbnailProvider.GetThumbnail(subject.Path, 48, 48, ThumbnailOptions.ThumbnailOnly);
 
 									if (img is null)
@@ -76,16 +63,6 @@ namespace FileExplorerCore.Models
 
 		public Task<IEnumerable<FolderModel>> SubFolders => Task.Run(() => (IEnumerable<FolderModel>)query.ToArray());
 
-		public bool IsSelected
-		{
-			get => _isSelected;
-			set
-			{
-				_isSelected = value;
-				SelectionChanged();
-			}
-		}
-
 		public FolderModel(string path, string? name = null, IEnumerable<FolderModel>? subFolders = null)
 		{
 			Name = name ?? System.IO.Path.GetFileName(path);
@@ -101,8 +78,6 @@ namespace FileExplorerCore.Models
 			{
 				ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
 			};
-
-			IsSelected = false;
 		}
 
 		public FolderModel()

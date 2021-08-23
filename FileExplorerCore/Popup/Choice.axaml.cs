@@ -1,7 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using FileExplorerCore.Interfaces;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 

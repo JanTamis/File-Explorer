@@ -1,6 +1,5 @@
 ﻿using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
-using System;
 using System.Runtime.InteropServices;
 
 namespace FileExplorerCore.Helpers

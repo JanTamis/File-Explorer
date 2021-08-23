@@ -1,8 +1,6 @@
 ﻿using Avalonia.Data.Converters;
 using FileExplorerCore.Models;
-using System;
 using System.Globalization;
-using System.IO;
 
 namespace FileExplorerCore.Converters
 {

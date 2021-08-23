@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Enumeration;
+﻿using System.IO.Enumeration;
 
 namespace FileExplorerCore.Helpers
 {
@@ -76,25 +73,29 @@ namespace FileExplorerCore.Helpers
 
 						if (!systemEntry.Attributes.HasFlag(FileAttributes.Directory) && !systemEntry.Attributes.HasFlag(FileAttributes.Archive) && !systemEntry.Attributes.HasFlag(FileAttributes.NotContentIndexed))
 						{
-							string searchText = (string)value;
-							string line;
-
-							using (var fileStream = File.OpenRead(systemEntry.ToFullPath()))
+							try
 							{
-								if (IsTextFile(fileStream, false))
+								string searchText = (string)value;
+								string line;
+
+								using (var fileStream = File.OpenRead(systemEntry.ToFullPath()))
 								{
-									using (var reader = new StreamReader(fileStream))
+									if (IsTextFile(fileStream, false))
 									{
-										while ((line = reader.ReadLine()) is not null && line.Length >= searchText.Length)
+										using (var reader = new StreamReader(fileStream))
 										{
-											if (line.Contains(searchText!, StringComparison.CurrentCultureIgnoreCase))
+											while ((line = reader.ReadLine()) is not null && line.Length >= searchText.Length)
 											{
-												return true;
+												if (line.Contains(searchText!, StringComparison.CurrentCultureIgnoreCase))
+												{
+													return true;
+												}
 											}
 										}
 									}
 								}
 							}
+							catch (Exception) { }
 						}
 						break;
 				}

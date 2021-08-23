@@ -3,16 +3,12 @@ using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using FileExplorerCore.Converters;
 using FileExplorerCore.Helpers;
-using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
-using System.IO;
 using System.IO.Enumeration;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace FileExplorerCore.Models
 {
@@ -37,6 +33,7 @@ namespace FileExplorerCore.Models
 		private Bitmap _image;
 		private Transform _imageTransform;
 		private static int imageSize;
+		private bool needsTranslation;
 
 		public event Action<FileModel> SelectionChanged;
 		public event PropertyChangedEventHandler? PropertyChanged;
@@ -55,7 +52,7 @@ namespace FileExplorerCore.Models
 		public Transform ImageTransform
 		{
 			get => _imageTransform;
-			set => this.OnPropertyChanged(ref _imageTransform, value);
+			set => OnPropertyChanged(ref _imageTransform, value);
 		}
 
 		public bool IsSelected
@@ -66,12 +63,18 @@ namespace FileExplorerCore.Models
 				if (_isSelected != value)
 				{
 					_isSelected = value;
-					SelectionChanged(this);
+					SelectionChanged?.Invoke(this);
 				}
 			}
 		}
 
 		public bool HasImage => _image != null;
+
+		public bool NeedsTranslation
+		{
+			get => needsTranslation;
+			set => OnPropertyChanged(ref needsTranslation, value);
+		}
 
 		public string Path
 		{
@@ -108,28 +111,31 @@ namespace FileExplorerCore.Models
 			{
 				if (_name == null)
 				{
-					ReadOnlySpan<char> path;
-
-					if (isAscii)
+					if (IsFolder)
 					{
-						path = Path;
+						ReadOnlySpan<char> path;
+
+						if (isAscii)
+						{
+							path = Path;
+						}
+						else
+						{
+							path = MemoryMarshal.Cast<byte, char>(_path);
+						}
+
+						if (path[^1] == '\\')
+						{
+							_name = Path;
+						}
+						else
+						{
+							_name = new String(System.IO.Path.GetFileName(path));
+						}
 					}
 					else
 					{
-						path = MemoryMarshal.Cast<byte, char>(_path);
-					}
-
-					if (path[^1] == '\\')
-					{
-						_name = Path;
-					}
-					else if (!IsFolder)
-					{
-						_name = new String(System.IO.Path.GetFileNameWithoutExtension(path));
-					}
-					else
-					{
-						_name = new String(System.IO.Path.GetFileName(path));
+						_name = new String(System.IO.Path.GetFileNameWithoutExtension(DirectoryAlternative.GetName(_path, isAscii)));
 					}
 				}
 
@@ -161,7 +167,7 @@ namespace FileExplorerCore.Models
 						Path = newPath;
 					}
 
-					this.OnPropertyChanged(ref _name, value);
+					OnPropertyChanged(ref _name, value);
 				}
 				catch (Exception) { }
 			}
@@ -224,7 +230,7 @@ namespace FileExplorerCore.Models
 					{
 						size = Size;
 					}
-					else if (path.EndsWith("\\") && new DriveInfo(new string(path[0], 1)) is { IsReady: true } info)
+					else if (path.EndsWith("\\") && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
 					{
 						size = info.TotalSize - info.TotalFreeSpace;
 					}
@@ -247,7 +253,7 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				if (_editedOn == DateTime.MinValue)
+				if (_editedOn == default)
 				{
 					_editedOn = DirectoryAlternative.GetFileWriteDate(_path, isAscii);
 				}
@@ -283,16 +289,16 @@ namespace FileExplorerCore.Models
 
 										if (img is not null)
 										{
-											await Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1), DispatcherPriority.Normal);
+											await Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1));
 										}
 									}
 									else if (ImageSize <= 64)
 									{
-										await Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1), DispatcherPriority.Normal);
+										await Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1));
 									}
 
-									subject.Image = img;
 									subject.NeedsNewImage = false;
+									subject.Image = img;
 								}, Environment.ProcessorCount / 4);
 							}
 						});
@@ -301,7 +307,7 @@ namespace FileExplorerCore.Models
 
 				return _image;
 			}
-			set => this.OnPropertyChanged(ref _image, value);
+			set => OnPropertyChanged(ref _image, value);
 		}
 
 		public FileModel(string path, bool isFolder, int imageSize = 32)

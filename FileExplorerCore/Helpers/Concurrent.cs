@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace FileExplorerCore.Helpers
 {
@@ -90,7 +87,7 @@ namespace FileExplorerCore.Helpers
 
 			public void Dispose()
 			{
-				
+
 			}
 
 			public bool MoveNext()

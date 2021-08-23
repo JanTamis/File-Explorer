@@ -8,20 +8,14 @@ using FileExplorerCore.Popup;
 using Microsoft.VisualBasic.FileIO;
 using Nessos.LinqOptimizer.CSharp;
 using ReactiveUI;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.IO.Enumeration;
-using System.Linq;
-using System.Threading;
 using System.Timers;
 
 namespace FileExplorerCore.ViewModels
 {
 	public class MainWindowViewModel : ViewModelBase
 	{
-		private bool isSearching = false;
 		public readonly WindowNotificationManager notificationManager;
 
 		private TabItemViewModel _currentTab;
@@ -63,8 +57,6 @@ namespace FileExplorerCore.ViewModels
 					CurrentTab.Path = value;
 
 					this.RaisePropertyChanged();
-
-					isSearching = false;
 
 					CurrentTab.UpdateFiles(false, "*").ContinueWith(x =>
 					{
@@ -118,9 +110,9 @@ namespace FileExplorerCore.ViewModels
 		{
 			if (CurrentTab.Search is { Length: > 0 } && Path is { Length: > 0 })
 			{
-				isSearching = true;
+				CurrentTab.IsSearching = true;
 
-				await CurrentTab.UpdateFiles(isSearching, CurrentTab.Search);
+				await CurrentTab.UpdateFiles(CurrentTab.IsSearching, CurrentTab.Search);
 			}
 		}
 
@@ -151,7 +143,7 @@ namespace FileExplorerCore.ViewModels
 		{
 			if (!String.IsNullOrWhiteSpace(Path))
 			{
-				await CurrentTab.UpdateFiles(isSearching, isSearching ? CurrentTab.Search : "*");
+				await CurrentTab.UpdateFiles(CurrentTab.IsSearching, CurrentTab.IsSearching ? CurrentTab.Search : "*");
 			}
 		}
 
@@ -329,7 +321,7 @@ namespace FileExplorerCore.ViewModels
 				ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
 			};
 
-			ThreadPool.QueueUserWorkItem(x =>
+			ThreadPool.QueueUserWorkItem(async x =>
 			{
 				var query = folderQuery.Concat(fileQuery);
 
@@ -344,7 +336,7 @@ namespace FileExplorerCore.ViewModels
 					return taskY.Result.CompareTo(taskX.Result);
 				});
 
-				view.Root.ReplaceRange(query, default, comparer);
+				await view.Root.ReplaceRange(query, default, comparer);
 			});
 
 			ThreadPool.QueueUserWorkItem(async x =>

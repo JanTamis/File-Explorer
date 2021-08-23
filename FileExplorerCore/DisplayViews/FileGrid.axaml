@@ -12,6 +12,7 @@
 		<converters:ExtensionConverter x:Key="extensionConverter" />
 		<converters:SizeConverter x:Key="sizeConverter" />
 		<converters:FileNameConverter x:Key="fileNameConverter" />
+		<converters:ImageTransformConverter x:Key="imageTransformConverter" />
 	</UserControl.Resources>
 	
 	<ScrollViewer>
