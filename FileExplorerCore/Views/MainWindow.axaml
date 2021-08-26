@@ -12,9 +12,9 @@
 							x:Class="FileExplorerCore.Views.MainWindow"
 							x:Name="MainWindow"
 							Icon="/Assets/Icon.ico"
-							MinWidth="600"
+							MinWidth="1000"
 							MinHeight="400"
-							Width="900"
+							Width="1000"
 							Background="Transparent"
 							Height="600"
 							BorderThickness="0"
@@ -334,10 +334,10 @@
 									<StackPanel Orientation="Horizontal"
 															Height="70"
 															Margin="2 2 0 0">
-										<Grid RowDefinitions="* Auto"
-													IsEnabled="{Binding CurrentTab.SelectionCount, Converter={StaticResource moreThanConverter}, ConverterParameter=0}">
+										<Grid RowDefinitions="* Auto" >
 											<StackPanel Orientation="Horizontal">
 												<Button Cursor="Hand"
+																IsEnabled="{Binding CurrentTab.SelectionCount, Converter={StaticResource moreThanConverter}, ConverterParameter=0}"
 																VerticalAlignment="Stretch"
 																Background="Transparent"
 																Command="{Binding CopyFiles}" >
@@ -365,6 +365,7 @@
 
 												<Grid RowDefinitions="*, *">
 													<Button Cursor="Hand"
+																	IsEnabled="{Binding CurrentTab.SelectionCount, Converter={StaticResource moreThanConverter}, ConverterParameter=0}"
 																	Background="Transparent"
 																	HorizontalAlignment="Stretch"
 																	Padding="4">
@@ -559,6 +560,23 @@
 											</StackPanel>
 										</Button>
 
+										<Border Width="1"
+														Background="{DynamicResource Background}"
+														Margin="4"/>
+
+										<Button Cursor="Hand"
+														Command="{Binding ShowProperties}"
+														VerticalAlignment="Stretch"
+														Background="Transparent">
+											<StackPanel Orientation="Vertical"
+																	VerticalAlignment="Center">
+												<Viewbox Height="30">
+													<Image Source="{SvgImage /Assets/UIIcons/Properties.svg}" />
+												</Viewbox>
+												<TextBlock Text="Properties"
+																	 FontSize="12"/>
+											</StackPanel>
+										</Button>
 									</StackPanel>
 
 									<StackPanel Grid.Column="2">
@@ -671,6 +689,7 @@
 																<ComboBox PlaceholderText="{Binding Name}"
 																					HorizontalAlignment="Stretch"
 																					Padding="10 5 5 5"
+																					CornerRadius="10"
 																					Background="Transparent"
 																					BorderBrush="Transparent"
 																					VerticalAlignment="Stretch"
@@ -682,10 +701,6 @@
 																			<Setter Property="BorderBrush" Value="Transparent" />
 																			<Setter Property="Cursor" Value="Hand" />
 																		</Style>
-
-																		<Style Selector="ComboBox /template/ Border#Background">
-																			<Setter Property="CornerRadius" Value="10" />
-																		</Style>
 																	</ComboBox.Styles>
 																</ComboBox>
 
@@ -693,6 +708,7 @@
 																				BorderBrush="Transparent"
 																				VerticalAlignment="Stretch"
 																				HorizontalAlignment="Stretch"
+																				CornerRadius="10"
 																				Margin="0 0 30 0"
 																				Tapped="OnButtonClick"
 																				Cursor="Hand" />
@@ -972,7 +988,7 @@
 						IsVisible="{Binding PopupContent.HasShadow}"
 						PointerPressed="CloseSettings" />-->
 
-		<!-- Settings -->
+		<!-- popup -->
 		<Border VerticalAlignment="Center"
 						HorizontalAlignment="Center"
 						Background="{DynamicResource MenuBackground}"

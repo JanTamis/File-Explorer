@@ -29,6 +29,10 @@ namespace FileExplorerCore.Converters
 					}
 				}
 			}
+			else if (value is string path)
+			{
+				return NativeMethods.GetShellFileType(path);
+			}
 
 			return String.Empty;
 		}

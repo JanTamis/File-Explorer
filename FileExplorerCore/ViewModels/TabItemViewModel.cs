@@ -34,6 +34,8 @@ namespace FileExplorerCore.ViewModels
 		private CancellationTokenSource tokenSource;
 		private Control _displayControl;
 
+		FileSystemWatcher watcher;
+
 		private IPopup _popupContent;
 
 		private readonly EnumerationOptions options = new()
@@ -262,6 +264,26 @@ namespace FileExplorerCore.ViewModels
 					});
 
 					IsSearching = false;
+
+					if (!String.IsNullOrEmpty(Path))
+					{
+						watcher = new FileSystemWatcher(Path)
+						{
+							IncludeSubdirectories = false
+						};
+
+						watcher.Renamed += (_, e) =>
+						{
+							var file = Files.FirstOrDefault(x => System.IO.Path.GetFileName(x.Path) == e.OldName);
+
+							if (file != null)
+							{
+								file.Path = e.FullPath;
+							}
+						};
+
+						watcher.EnableRaisingEvents = true;
+					}
 				}
 			}
 		}

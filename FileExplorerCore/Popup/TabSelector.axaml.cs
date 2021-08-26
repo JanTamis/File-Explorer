@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using FileExplorerCore.ViewModels;
 using System.ComponentModel;
@@ -11,7 +12,7 @@ namespace FileExplorerCore.Popup
 	{
 		public new event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-		private IEnumerable<TabItemViewModel> _tabs;
+		private ObservableRangeCollection<TabItemViewModel> _tabs;
 
 		public TabItemViewModel CurrentTab { get; set; }
 
@@ -20,7 +21,7 @@ namespace FileExplorerCore.Popup
 
 		public string Title => "Select Tab";
 
-		public IEnumerable<TabItemViewModel> Tabs
+		public ObservableRangeCollection<TabItemViewModel> Tabs
 		{
 			get => _tabs;
 			set => OnPropertyChanged(ref _tabs, value);

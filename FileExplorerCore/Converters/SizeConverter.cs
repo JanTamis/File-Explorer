@@ -1,4 +1,5 @@
 ﻿using Avalonia.Data.Converters;
+using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using System.Globalization;
 
@@ -27,6 +28,12 @@ namespace FileExplorerCore.Converters
 				}
 
 				return ByteSize(size);
+			}
+			else if (value is string path && File.Exists(path))
+			{
+				var fileSize = new FileInfo(path).Length;
+
+				return ByteSize(fileSize);
 			}
 
 			return String.Empty;

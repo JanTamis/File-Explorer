@@ -286,7 +286,7 @@ namespace FileExplorerCore.ViewModels
 			{
 				var selector = new TabSelector()
 				{
-					Tabs = Tabs.Where(x => x != CurrentTab),
+					Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab)),
 				};
 				CurrentTab.PopupContent = selector;
 			}
@@ -371,6 +371,21 @@ namespace FileExplorerCore.ViewModels
 					}
 				}
 			});
+		}
+
+		public void ShowProperties()
+		{
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && CurrentTab.Files.FirstOrDefault(x => x.IsSelected) is FileModel model)
+			{
+				//var path = CurrentTab.Files.FirstOrDefault(x => x.IsSelected) is FileModel model ? model.Path : CurrentTab.Path;
+
+				var properties = new Properties()
+				{
+					Model = model,
+				};
+
+				CurrentTab.PopupContent = properties;
+			}
 		}
 	}
 }

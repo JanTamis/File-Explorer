@@ -20,12 +20,6 @@ namespace FileExplorerCore.Views
 #if DEBUG
 			this.AttachDevTools();
 #endif
-
-			var manager = new WindowNotificationManager(this)
-			{
-				Position = NotificationPosition.BottomLeft,
-				MaxItems = 3,
-			};
 		}
 
 		private void InitializeComponent()
@@ -65,11 +59,11 @@ namespace FileExplorerCore.Views
 			}
 		}
 
-		private void OnButtonClick(object sender, RoutedEventArgs e)
+		private async void OnButtonClick(object sender, RoutedEventArgs e)
 		{
 			if (DataContext is MainWindowViewModel model && sender is Button { DataContext: FolderModel folderModel })
 			{
-				model.CurrentTab.SetPath(folderModel.Path);
+				await model.CurrentTab.SetPath(folderModel.Path);
 			}
 		}
 
@@ -98,7 +92,7 @@ namespace FileExplorerCore.Views
 		{
 			foreach (var info in e.Containers)
 			{
-				if (info.ContainerControl is MenuItem item && item.DataContext is FolderModel folder && DataContext is MainWindowViewModel model)
+				if (info.ContainerControl is MenuItem { DataContext: FolderModel folder, ContextMenu: not null } item && DataContext is MainWindowViewModel model)
 				{
 					item.Command = ReactiveCommand.Create(() =>
 					{

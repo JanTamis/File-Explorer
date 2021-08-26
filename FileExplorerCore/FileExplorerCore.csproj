@@ -181,6 +181,7 @@
     <None Remove="Assets\UIIcons\OpenFile.svg" />
     <None Remove="Assets\UIIcons\Paste.svg" />
     <None Remove="Assets\UIIcons\Previous.svg" />
+    <None Remove="Assets\UIIcons\Properties.svg" />
     <None Remove="Assets\UIIcons\Refresh.svg" />
     <None Remove="Assets\UIIcons\Remove.svg" />
     <None Remove="Assets\UIIcons\Rename.svg" />
@@ -229,20 +230,20 @@
     <Resource Include="Assets\UIIcons\FileExplorer.svg" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.6" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.6" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.6" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.6" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.6" />
-    <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.6.2" />
+    <PackageReference Include="Avalonia" Version="0.10.7" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.7" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.7" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.7" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.7" />
+    <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.7.1" />
     <PackageReference Include="DiscUtils.FileSystems" Version="0.16.4" />
     <PackageReference Include="ErrorProne.NET.Structs" Version="0.4.0-beta.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="LinqOptimizer.CSharp" Version="0.7.0" />
-    <PackageReference Include="Microsoft.Win32.Registry" Version="6.0.0-preview.4.21253.7" />
-    <PackageReference Include="Svg.Skia" Version="0.5.6.2" />
+    <PackageReference Include="Microsoft.Win32.Registry" Version="6.0.0-preview.5.21301.5" />
+    <PackageReference Include="Svg.Skia" Version="0.5.7.1" />
     <PackageReference Include="System.Linq.Async" Version="5.0.0" />
     <PackageReference Include="System.Runtime.Experimental" Version="6.0.0-preview.7.21377.19" />
   </ItemGroup>

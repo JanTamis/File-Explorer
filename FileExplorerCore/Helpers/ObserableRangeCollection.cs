@@ -25,6 +25,14 @@ namespace FileExplorerCore.Helpers
 			};
 		}
 
+		public ObservableRangeCollection(IEnumerable<T> items) : this()
+		{
+			ThreadPool.QueueUserWorkItem(async x =>
+			{
+				await ReplaceRange(items, default);
+			});
+		}
+
 		/// <summary> 
 		/// Adds the elements of the specified collection to the end of the ObservableCollection(Of T). 
 		/// </summary> 

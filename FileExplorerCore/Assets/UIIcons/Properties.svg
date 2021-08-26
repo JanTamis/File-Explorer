@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+		<clipPath id="mask_1">
+			<use xlink:href="#path_1" />
+		</clipPath>
+	</defs>
+	<g id="icons8_view_details">
+		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
+		<g clip-path="url(#mask_1)">
+			<path d="M30 2L30 36C30 37.105 29.105 38 28 38L2 38C0.895001 38 0 37.105 0 36L0 2C0 0.895 0.895001 0 2 0L28 0C29.105 0 30 0.895 30 2L30 2Z" transform="translate(9 5)" id="Shape" fill="#50E6FF" fill-rule="evenodd" stroke="none" />
+			<path d="M15 0L1 0C0.448 0 0 0.448 0 1L0 1C0 1.552 0.448 2 1 2L15 2C15.552 2 16 1.552 16 1L16 1C16 0.448 15.552 0 15 0L15 0Z" transform="translate(18 17)" id="Shape" fill="#057093" fill-rule="evenodd" stroke="none" />
+			<path d="M15 0L1 0C0.448 0 0 0.448 0 1L0 1C0 1.552 0.448 2 1 2L15 2C15.552 2 16 1.552 16 1L16 1C16 0.448 15.552 0 15 0L15 0Z" transform="translate(18 11)" id="Shape" fill="#057093" fill-rule="evenodd" stroke="none" />
+			<path d="M0 1C0 0.447715 0.447715 0 1 0C1.55228 0 2 0.447715 2 1C2 1.55228 1.55228 2 1 2C0.447715 2 0 1.55228 0 1Z" transform="translate(14 11)" id="Circle" fill="#057093" fill-rule="evenodd" stroke="none" />
+			<path d="M0 1C0 0.447715 0.447715 0 1 0C1.55228 0 2 0.447715 2 1C2 1.55228 1.55228 2 1 2C0.447715 2 0 1.55228 0 1Z" transform="translate(14 17)" id="Circle" fill="#057093" fill-rule="evenodd" stroke="none" />
+			<path d="M15 0L1 0C0.448 0 0 0.448 0 1L0 1C0 1.552 0.448 2 1 2L15 2C15.552 2 16 1.552 16 1L16 1C16 0.448 15.552 0 15 0L15 0Z" transform="translate(18 23)" id="Shape" fill="#057093" fill-rule="evenodd" stroke="none" />
+			<path d="M0 1C0 0.447715 0.447715 0 1 0C1.55228 0 2 0.447715 2 1C2 1.55228 1.55228 2 1 2C0.447715 2 0 1.55228 0 1Z" transform="translate(14 23)" id="Circle" fill="#057093" fill-rule="evenodd" stroke="none" />
+			<path d="M15 0L1 0C0.448 0 0 0.448 0 1L0 1C0 1.552 0.448 2 1 2L15 2C15.552 2 16 1.552 16 1L16 1C16 0.448 15.552 0 15 0L15 0Z" transform="translate(18 29)" id="Shape" fill="#057093" fill-rule="evenodd" stroke="none" />
+			<path d="M0 1C0 0.447715 0.447715 0 1 0C1.55228 0 2 0.447715 2 1C2 1.55228 1.55228 2 1 2C0.447715 2 0 1.55228 0 1Z" transform="translate(14 29)" id="Circle" fill="#057093" fill-rule="evenodd" stroke="none" />
+			<path d="M15 0L1 0C0.448 0 0 0.448002 0 1L0 1C0 1.552 0.448 2 1 2L15 2C15.552 2 16 1.552 16 1L16 1C16 0.448002 15.552 0 15 0L15 0Z" transform="translate(18 35)" id="Shape" fill="#057093" fill-rule="evenodd" stroke="none" />
+			<path d="M0 1C0 0.447715 0.447715 0 1 0C1.55228 0 2 0.447715 2 1C2 1.55228 1.55228 2 1 2C0.447715 2 0 1.55228 0 1Z" transform="translate(14 35)" id="Circle" fill="#057093" fill-rule="evenodd" stroke="none" />
+			<path d="M8.486 3.82925L4.243 8.07225L0 3.82925L3.536 0.29325C3.927 -0.0977499 4.56 -0.0977499 4.95 0.29325L8.486 3.82925L8.486 3.82925Z" transform="translate(19.757 2.17075)" id="Shape" fill="#50E6FF" fill-rule="evenodd" stroke="none" />
+		</g>
+	</g>
+</svg>

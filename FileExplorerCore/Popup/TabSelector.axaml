@@ -28,12 +28,6 @@
 										 Height="25"
 										 Margin="0 0 4 0"
 										 VerticalAlignment="Center">
-								<Image.RenderTransform>
-									<TransformGroup>
-										<RotateTransform Angle="180" />
-										<ScaleTransform ScaleX="-1" />
-									</TransformGroup>
-								</Image.RenderTransform>
 							</Image>
 
 							<TextBlock Text="{Binding Path, Converter={StaticResource fileNameConverter}}"

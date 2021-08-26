@@ -6,6 +6,7 @@ using FileExplorerCore.Helpers;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.IO.Enumeration;
+using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -102,6 +103,9 @@ namespace FileExplorerCore.Models
 					_path = Encoding.ASCII.GetBytes(value);
 				else
 					_path = Encoding.Unicode.GetBytes(value);
+
+				OnPropertyChanged(nameof(Name));
+				OnPropertyChanged(nameof(Extension));
 			}
 		}
 
@@ -333,6 +337,8 @@ namespace FileExplorerCore.Models
 		public void Dispose()
 		{
 			_image.Dispose();
+
+			GC.SuppressFinalize(this);
 		}
 	}
 
