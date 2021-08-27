@@ -30,7 +30,7 @@ namespace FileExplorerCore.Popup
 
 		public event Action OnClose = delegate { };
 
-		public Bitmap Icon => icon ??= WindowsThumbnailProvider.GetThumbnail(Path, 48, 48, ThumbnailOptions.Win8CropToSquare);
+		public Bitmap Icon => icon ??= WindowsThumbnailProvider.GetThumbnail(Path, 48, 48);
 
 		public string CreatedOn
 		{

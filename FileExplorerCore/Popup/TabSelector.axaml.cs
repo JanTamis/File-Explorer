@@ -12,9 +12,21 @@ namespace FileExplorerCore.Popup
 	{
 		public new event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-		private ObservableRangeCollection<TabItemViewModel> _tabs;
+		public event Action<TabItemViewModel> TabSelectionChanged = delegate { };
 
-		public TabItemViewModel CurrentTab { get; set; }
+		private ObservableRangeCollection<TabItemViewModel> _tabs;
+		private TabItemViewModel _currentTab;
+
+		public TabItemViewModel CurrentTab
+		{
+			get => _currentTab;
+			set
+			{
+				_currentTab = value;
+
+				TabSelectionChanged(CurrentTab);
+			}
+		}
 
 		public bool HasShadow => false;
 		public bool HasToBeCanceled => false;

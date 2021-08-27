@@ -62,7 +62,7 @@ namespace FileExplorerCore.Converters
 			{
 				if (IsWindows)
 				{
-					var image = WindowsThumbnailProvider.GetThumbnail(path, 48, 48, ThumbnailOptions.None);
+					var image = WindowsThumbnailProvider.GetThumbnail(path, 64, 64);
 
 					if (image is { })
 					{

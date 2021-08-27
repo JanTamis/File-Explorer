@@ -282,12 +282,18 @@ namespace FileExplorerCore.ViewModels
 
 		public void CopyTo()
 		{
-			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && Tabs.Count(x => !String.IsNullOrWhiteSpace(x.Path)) > 1)
 			{
 				var selector = new TabSelector()
 				{
-					Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab)),
+					Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab && !String.IsNullOrWhiteSpace(x.Path))),
 				};
+
+				selector.TabSelectionChanged += (tab) =>
+				{
+					selector.Close();
+				};
+
 				CurrentTab.PopupContent = selector;
 			}
 		}

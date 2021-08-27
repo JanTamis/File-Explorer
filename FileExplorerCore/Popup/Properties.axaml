@@ -23,10 +23,6 @@
 				<Viewbox Width="48"
 								 Height="48" 
 								 HorizontalAlignment="Left">
-					<Viewbox.RenderTransform>
-						<ScaleTransform ScaleX="1"
-														ScaleY="-1" />
-					</Viewbox.RenderTransform>
 					<Image Source="{Binding Icon}" />
 				</Viewbox>
 				

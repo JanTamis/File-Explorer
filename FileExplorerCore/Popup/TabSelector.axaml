@@ -14,21 +14,40 @@
 		<converters:PathToFoldersConverter x:Key="pathToFoldersConverter" />
 	</UserControl.Resources>
 	
-	<StackPanel>
-		<ComboBox Items="{Binding Tabs}"
-							HorizontalAlignment="Stretch"
-							Margin="4"
-							Cursor="Hand" >
-			<ComboBox.DataContext>
+		<ListBox Items="{Binding Tabs}"
+						 SelectedItem="{Binding CurrentTab}"
+						 HorizontalAlignment="Stretch"
+						 Margin="4"
+						 SelectionMode="Single"
+						 Background="Transparent">
+			<ListBox.Styles>
+				<Style Selector="ListBoxItem">
+					<Setter Property="Cursor" Value="Hand" />
+					<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+					<Setter Property="VerticalContentAlignment" Value="Stretch" />
+					<Setter Property="CornerRadius" Value="10" />
+					<Setter Property="Margin" Value="0" />
+				</Style>
+			</ListBox.Styles>
+			
+			<ListBox.ItemsPanel>
+				<ItemsPanelTemplate>
+					<UniformGrid />
+				</ItemsPanelTemplate>
+			</ListBox.ItemsPanel>
+			
+			<ListBox.ItemTemplate>
 				<DataTemplate>
-					<StackPanel>
+					<StackPanel HorizontalAlignment="Left"
+											VerticalAlignment="Center" >
 						<StackPanel Orientation="Horizontal"
 												Margin="1">
-							<Image Source="{Binding Path, Converter={StaticResource imageConverter}}"
-										 Height="25"
-										 Margin="0 0 4 0"
-										 VerticalAlignment="Center">
-							</Image>
+							<Viewbox VerticalAlignment="Center"
+											 Margin="0 0 4 0"
+											 Width="48"
+											 Height="48">
+								<Image Source="{Binding Path, Converter={StaticResource imageConverter}}" />
+							</Viewbox>							
 
 							<TextBlock Text="{Binding Path, Converter={StaticResource fileNameConverter}}"
 												 TextTrimming="CharacterEllipsis"
@@ -36,7 +55,7 @@
 						</StackPanel>
 					</StackPanel>
 				</DataTemplate>
-			</ComboBox.DataContext>
-		</ComboBox>
-	</StackPanel>
+			</ListBox.ItemTemplate>
+		</ListBox>
 </UserControl>
+ 

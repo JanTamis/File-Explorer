@@ -40,6 +40,49 @@ namespace FileExplorerCore.Helpers
 		private static readonly int bitmapSize = Unsafe.SizeOf<NativeMethods.BITMAP>();
 
 		[SupportedOSPlatform("Windows")]
+		public unsafe static Bitmap? GetThumbnail(string fileName, int width, int height)
+		{
+			var hBitmap = GetHBitmap(fileName, width, height, ThumbnailOptions.BiggerSizeOk);
+
+			Bitmap? bitmap = null;
+
+			if (hBitmap != IntPtr.Zero)
+			{
+				var bmp = new NativeMethods.BITMAP();
+				NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
+
+				//if (bmp.bmWidth >= 64 || bmp.bmHeight >= 64)
+				//{
+				RotateHorizontal(bmp);
+				//}
+
+				bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
+
+				DeleteObject(hBitmap);
+			}
+			//else
+			//{
+			//	hBitmap = GetHBitmap(fileName, width, height, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
+
+			//	bitmap = null;
+
+			//	if (hBitmap != IntPtr.Zero)
+			//	{
+			//		var bmp = new NativeMethods.BITMAP();
+			//		NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
+
+			//		RotateHorizontal(bmp);
+
+			//		bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
+
+			//		DeleteObject(hBitmap);
+			//	}
+			//}
+
+			return bitmap;
+		}
+
+		[SupportedOSPlatform("Windows")]
 		public unsafe static Bitmap? GetThumbnail(string fileName, int width, int height, ThumbnailOptions options)
 		{
 			var hBitmap = GetHBitmap(fileName, width, height, options);
@@ -57,6 +100,28 @@ namespace FileExplorerCore.Helpers
 			}
 
 			return bitmap;
+		}
+
+		private static unsafe void RotateHorizontal(NativeMethods.BITMAP bitmap)
+		{
+			var w = bitmap.bmWidth;
+			var h = bitmap.bmHeight;
+			var i = 0;
+
+			var p = new Span<int>(bitmap.bmBits.ToPointer(), bitmap.bmWidthBytes * bitmap.bmHeight / sizeof(int));
+			Span<int> pDest = stackalloc int[bitmap.bmWidthBytes * bitmap.bmHeight / sizeof(int)];
+
+			for (var y = h - 1; y >= 0; y--)
+			{
+				for (var x = 0; x < w; x++)
+				{
+					var srcInd = y * w + x;
+					pDest[i] = p[srcInd];
+					i++;
+				}
+			}
+
+			pDest.CopyTo(p);
 		}
 
 		private static IntPtr GetHBitmap(string fileName, int width, int height, ThumbnailOptions options)
