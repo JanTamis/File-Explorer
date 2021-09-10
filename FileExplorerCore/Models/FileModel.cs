@@ -6,7 +6,6 @@ using FileExplorerCore.Helpers;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.IO.Enumeration;
-using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -15,7 +14,7 @@ namespace FileExplorerCore.Models
 {
 	public class FileModel : INotifyPropertyChanged, IDisposable
 	{
-		public readonly static ConcurrentStack<FileModel> FileImageQueue = new();
+		public readonly static ConcurrentBag<FileModel> FileImageQueue = new();
 
 		private byte[] _path;
 		private bool isAscii;
@@ -36,19 +35,18 @@ namespace FileExplorerCore.Models
 		private static int imageSize;
 		private bool needsTranslation;
 
-		public event Action<FileModel> SelectionChanged;
+		public static event Action<FileModel> SelectionChanged = delegate { };
 		public event PropertyChangedEventHandler? PropertyChanged;
 
 		public static int ImageSize
 		{
 			get => imageSize;
-			set
-			{
-				imageSize = value;
-			}
+			set => imageSize = value;
 		}
 
 		public string ExtensionName { get; set; }
+
+		public bool IsVisible { get; set; }
 
 		public Transform ImageTransform
 		{
@@ -63,7 +61,7 @@ namespace FileExplorerCore.Models
 			{
 				if (_isSelected != value)
 				{
-					_isSelected = value;
+					OnPropertyChanged(ref _isSelected, value);
 					SelectionChanged?.Invoke(this);
 				}
 			}
@@ -128,13 +126,16 @@ namespace FileExplorerCore.Models
 							path = MemoryMarshal.Cast<byte, char>(_path);
 						}
 
-						if (path[^1] == '\\')
+						if (path.Length > 0)
 						{
-							_name = Path;
-						}
-						else
-						{
-							_name = new String(System.IO.Path.GetFileName(path));
+							if (path[^1] == '\\')
+							{
+								_name = Path;
+							}
+							else
+							{
+								_name = new String(System.IO.Path.GetFileName(path));
+							}
 						}
 					}
 					else
@@ -274,7 +275,7 @@ namespace FileExplorerCore.Models
 				{
 					ImageTransform = null;
 
-					FileImageQueue.Push(this);
+					FileImageQueue.Add(this);
 
 					if (imageLoadTask is null || imageLoadTask is { IsCompleted: true })
 					{
@@ -314,11 +315,9 @@ namespace FileExplorerCore.Models
 			set => OnPropertyChanged(ref _image, value);
 		}
 
-		public FileModel(string path, bool isFolder, int imageSize = 32)
+		public FileModel(string path, bool isFolder)
 		{
 			Path = path;
-
-			ImageSize = imageSize;
 			IsFolder = isFolder;
 		}
 
@@ -336,7 +335,7 @@ namespace FileExplorerCore.Models
 
 		public void Dispose()
 		{
-			_image.Dispose();
+			_image?.Dispose();
 
 			GC.SuppressFinalize(this);
 		}

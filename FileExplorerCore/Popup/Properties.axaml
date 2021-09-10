@@ -117,7 +117,45 @@
 		</TabItem>
 		
 		<TabItem Header="Details">
-			
+			<DataGrid Items="{Binding MetaData}"
+								Height="500"
+								Background="{DynamicResource CardHighBackground}"
+								BorderBrush="{DynamicResource Background}">
+				<DataGrid.Columns>
+					<DataGridTextColumn Binding="{Binding Name}" 
+															Header="Name"
+															Width="Auto" />
+				</DataGrid.Columns>
+				<DataGrid.Styles>
+					<Style Selector="DataGridRow">
+						<Setter Property="DetailsTemplate">
+							<Setter.Value>
+								<DataTemplate>
+									<ItemsControl Items="{Binding Tags}"
+																Background="{DynamicResource SystemAccentColor}">
+										<ItemsControl.ItemTemplate>
+											<DataTemplate>
+												<Grid ColumnDefinitions="*, *"
+															VerticalAlignment="Stretch"
+															HorizontalAlignment="Stretch"
+															Margin="0 4">
+													<TextBlock Text="{Binding Name}" 
+																		 Grid.Column="0"
+																		 TextTrimming="CharacterEllipsis" />
+													<TextBlock Text="{Binding Description}" 
+																		 Grid.Column="1"
+																		 TextTrimming="CharacterEllipsis" />
+												</Grid>
+												
+											</DataTemplate>
+										</ItemsControl.ItemTemplate>
+									</ItemsControl>
+								</DataTemplate>
+							</Setter.Value>
+						</Setter>
+					</Style>
+				</DataGrid.Styles>
+			</DataGrid>
 		</TabItem>
 	</TabControl>
 </UserControl>

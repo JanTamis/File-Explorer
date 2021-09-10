@@ -31,7 +31,7 @@ namespace FileExplorerCore.ViewModels
 		private readonly Stack<string> redoStack = new();
 		readonly ObservableRangeCollection<FolderModel> _folders = new();
 
-		private CancellationTokenSource tokenSource;
+		public CancellationTokenSource TokenSource;
 		private Control _displayControl;
 
 		FileSystemWatcher watcher;
@@ -148,13 +148,13 @@ namespace FileExplorerCore.ViewModels
 				{
 					this.RaisePropertyChanged(nameof(LoadTime));
 
-					TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.NoProgress);
+					//TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.NoProgress);
 				}
 				else
 				{
 					FileCount = Int32.MaxValue;
 
-					TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.Indeterminate);
+					//TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.Indeterminate);
 				}
 
 				this.RaisePropertyChanged(nameof(SearchFailed));
@@ -219,9 +219,7 @@ namespace FileExplorerCore.ViewModels
 					}
 					else
 					{
-#pragma warning disable CA2245 // Do not assign a property to itself
 						IsGrid = IsGrid;
-#pragma warning restore CA2245 // Do not assign a property to itself
 					}
 
 					if (isUserEntered)
@@ -236,7 +234,7 @@ namespace FileExplorerCore.ViewModels
 					ThreadPool.QueueUserWorkItem(async x =>
 					{
 						await Dispatcher.UIThread.InvokeAsync(_folders.Clear);
-						await _folders.ReplaceRange(GetFolders(), tokenSource.Token);
+						await _folders.AddRange(GetFolders(), token: TokenSource.Token);
 
 						IEnumerable<FolderModel> GetFolders()
 						{
@@ -390,6 +388,20 @@ namespace FileExplorerCore.ViewModels
 
 			Path = String.Empty;
 
+			FileModel.SelectionChanged += (fileModel) =>
+			{
+				if (fileModel.IsSelected)
+				{
+					SelectionCount++;
+				}
+				else
+				{
+					SelectionCount--;
+				}
+
+				this.RaisePropertyChanged(nameof(SelectionText));
+			};
+
 			UpdateFiles(false, "*");
 		}
 
@@ -419,10 +431,10 @@ namespace FileExplorerCore.ViewModels
 
 		public void CancelUpdateFiles()
 		{
-			if (tokenSource is { IsCancellationRequested: false })
+			if (TokenSource is { IsCancellationRequested: false })
 			{
 				IsLoading = false;
-				tokenSource.Cancel();
+				TokenSource.Cancel();
 			}
 		}
 
@@ -430,14 +442,14 @@ namespace FileExplorerCore.ViewModels
 		{
 			FileModel.FileImageQueue.Clear();
 
-			if (tokenSource is { })
+			if (TokenSource is { })
 			{
-				tokenSource.Cancel();
+				TokenSource.Cancel();
 			}
 
 			options.RecurseSubdirectories = recursive;
 
-			tokenSource = new CancellationTokenSource();
+			TokenSource = new CancellationTokenSource();
 			previousLoadTime = TimeSpan.Zero;
 
 			foreach (var file in Files)
@@ -477,9 +489,9 @@ namespace FileExplorerCore.ViewModels
 						{
 							options.RecurseSubdirectories = recursive;
 
-							var count = GetFileSystemEntriesCount(Path, search, options, tokenSource.Token);
+							var count = GetFileSystemEntriesCount(Path, search, options, TokenSource.Token);
 
-							if (!tokenSource.IsCancellationRequested)
+							if (!TokenSource.IsCancellationRequested)
 							{
 								FileCount = count;
 							}
@@ -488,13 +500,13 @@ namespace FileExplorerCore.ViewModels
 
 					if (Sort is SortEnum.None)
 					{
-						await Files.ReplaceRange(query, tokenSource.Token);
+						await Files.AddRange(query, token: TokenSource.Token);
 					}
 					else
 					{
 						var comparer = new FileModelComparer(Sort);
 
-						await Files.ReplaceRange(query, tokenSource.Token, comparer);
+						await Files.AddRange(query, comparer, token: TokenSource.Token);
 					}
 				});
 			}
@@ -541,18 +553,16 @@ namespace FileExplorerCore.ViewModels
 		{
 			options.RecurseSubdirectories = recursive;
 
-			var size = IsGrid ? 100 : 32;
-
 			if (search is "*" or "*.*" or "" && Sort is SortEnum.None && !recursive)
 			{
-				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), x.IsDirectory, size), options);
+				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), x.IsDirectory), options);
 			}
 			else
 			{
 				var query = FileSearcher.PrepareQuery(search);
 				var regex = new Wildcard(search, RegexOptions.Singleline | RegexOptions.Compiled);
 
-				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), x.IsDirectory, size), options)
+				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), x.IsDirectory), options)
 				{
 					ShouldIncludePredicate = (ref FileSystemEntry x) => regex.IsMatch(new String(x.FileName)) || FileSearcher.IsValid(x, query)
 				};
@@ -582,7 +592,7 @@ namespace FileExplorerCore.ViewModels
 
 				enumerable = new FileSystemEnumerable<byte>(path, (ref FileSystemEntry x) => 0, options)
 				{
-					ShouldIncludePredicate = (ref FileSystemEntry x) => regex.IsMatch(new String(x.FileName)) || FileSearcher.IsValid(x, query)
+					ShouldIncludePredicate = (ref FileSystemEntry x) => FileSystemName.MatchesSimpleExpression(search, x.FileName) || FileSearcher.IsValid(x, query)
 				};
 			}
 
@@ -599,9 +609,7 @@ namespace FileExplorerCore.ViewModels
 
 		private IEnumerable<FileModel> GetDirectories(string path)
 		{
-			var size = IsGrid ? 100 : 32;
-
-			return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), true, size), options)
+			return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), true), options)
 			{
 				ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
 			};
@@ -609,9 +617,7 @@ namespace FileExplorerCore.ViewModels
 
 		private IEnumerable<FileModel> GetFiles(string path)
 		{
-			var size = IsGrid ? 100 : 32;
-
-			return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), false, size), options)
+			return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), false), options)
 			{
 				ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
 			};

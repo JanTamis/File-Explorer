@@ -59,6 +59,6 @@ namespace FileExplorerCore.Helpers
 		// Gets whether the task has faulted.
 		public bool IsFaulted => Task.IsFaulted;
 
-		public event PropertyChangedEventHandler PropertyChanged;
+		public event PropertyChangedEventHandler PropertyChanged = delegate { };
 	}
 }

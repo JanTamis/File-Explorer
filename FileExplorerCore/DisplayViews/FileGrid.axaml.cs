@@ -58,7 +58,8 @@ namespace FileExplorerCore.DisplayViews
 			{
 				item.DoubleTapped -= Item_DoubleTapped;
 				item.PointerPressed -= Item_PointerPressed;
-				model.SelectionChanged -= Model_SelectionChanged;
+
+				model.IsVisible = false;
 			}
 		}
 
@@ -88,7 +89,7 @@ namespace FileExplorerCore.DisplayViews
 				item.DoubleTapped += Item_DoubleTapped;
 				item.PointerPressed += Item_PointerPressed;
 
-				model.SelectionChanged += Model_SelectionChanged;
+				model.IsVisible = true;
 			}
 		}
 

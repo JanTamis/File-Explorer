@@ -15,6 +15,8 @@ namespace FileExplorerCore.Models
 		public readonly static ConcurrentStack<FolderModel> FileImageQueue = new();
 		readonly IEnumerable<FolderModel> query = Enumerable.Empty<FolderModel>();
 
+		private ObservableRangeCollection<FolderModel> _folders;
+
 		public static FolderModel Empty { get; } = new FolderModel();
 
 		private readonly EnumerationOptions options = new()
@@ -39,12 +41,7 @@ namespace FileExplorerCore.Models
 							{
 								while (FileImageQueue.TryPop(out var subject))
 								{
-									var img = WindowsThumbnailProvider.GetThumbnail(subject.Path, 48, 48, ThumbnailOptions.ThumbnailOnly);
-
-									if (img is null)
-									{
-										img = WindowsThumbnailProvider.GetThumbnail(subject.Path, 48, 48, ThumbnailOptions.IconOnly);
-									}
+									var img = WindowsThumbnailProvider.GetThumbnail(subject.Path, 48, 48, ThumbnailOptions.BiggerSizeOk);
 
 									subject.Image = img;
 								}
@@ -61,7 +58,15 @@ namespace FileExplorerCore.Models
 		public string Name { get; }
 		public string Path { get; }
 
-		public Task<IEnumerable<FolderModel>> SubFolders => Task.Run(() => (IEnumerable<FolderModel>)query.ToArray());
+		public ObservableRangeCollection<FolderModel> SubFolders
+		{
+			get
+			{
+				return _folders ??= new(query);
+			}
+		}
+
+		//public Task<IEnumerable<FolderModel>> SubFolders => Task.Run(() => (IEnumerable<FolderModel>)query.ToArray());
 
 		public FolderModel(string path, string? name = null, IEnumerable<FolderModel>? subFolders = null)
 		{

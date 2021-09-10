@@ -1,6 +1,4 @@
 using Avalonia.Controls;
-using Avalonia;
-using Avalonia.Controls.Primitives;
 
 namespace FileExplorerCore.Controls
 {

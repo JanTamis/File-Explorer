@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 						 xmlns:converters="using:FileExplorerCore.Converters"
+						 xmlns:controls="using:FileExplorerCore.Controls"
 						 xmlns:models="clr-namespace:FileExplorerCore.Models"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FileExplorerCore.DisplayViews.AnalyzerView">
@@ -14,11 +15,14 @@
 		<converters:FileNameConverter x:Key="fileNameConverter" />
 		<converters:MinSizeConverter x:Key="minSizeConverter" />
 		<converters:MoreThanConverter x:Key="moreThanConverter" />
+		<converters:BackgroundConverter x:Key="backgroundConverter" />
+		<converters:ForegroundConverter x:Key="foregroundConverter" />
 
 		<converters:PathToFoldersConverter x:Key="pathToFoldersConverter" />
 	</UserControl.Resources>
 
-	<Grid ColumnDefinitions="2*, *">
+	<Grid ColumnDefinitions="2*, *"
+				RowDefinitions="*, 0.5*">
 		<TreeView Items="{Binding Root}">
 			<TreeView.DataTemplates>
 				<TreeDataTemplate DataType="{x:Type models:FileIndexModel}" ItemsSource="{Binding Items}">
@@ -51,26 +55,28 @@
 									HorizontalAlignment="Left"
 									Background="{DynamicResource MenuBackground}"
 									Width="5"
+									Grid.RowSpan="2"
 									Grid.Column="1" />
 
 		<DataGrid Grid.Column="1"
+							Grid.RowSpan="2"
 							IsReadOnly="True"
 							Items="{Binding Extensions}"
 							Margin="5 0 0 0">
 			<DataGrid.Columns>
 				<DataGridTemplateColumn Header="Extension"
-																Width="200"
+																Width="*"
 																SortMemberPath="Extension">
 					<DataGridTemplateColumn.CellTemplate>
 						<DataTemplate>
 							<TextBlock Text="{Binding Extension}"
-												 TextTrimming="CharacterEllipsis" 
+												 TextTrimming="CharacterEllipsis"
 												 VerticalAlignment="Center" />
 						</DataTemplate>
 					</DataGridTemplateColumn.CellTemplate>
 				</DataGridTemplateColumn>
-				<DataGridTextColumn Header="Description" 
-														Width="*"/>
+				<!--<DataGridTextColumn Header="Description" 
+														Width="*"/>-->
 				<DataGridTextColumn Header="Bytes"
 														Width="Auto"
 														Binding="{Binding TotalSize, Converter={StaticResource sizeConverter}}"/>
@@ -80,8 +86,78 @@
 														Width="Auto"/>
 			</DataGrid.Columns>
 		</DataGrid>
-		
+
+		<ItemsControl Grid.Row="2"
+									Margin="0 5 0 0"
+									Items="{Binding Root}">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<controls:SquarifiedTreeMapsPanel />
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<Border Background="{Binding Name, Converter={StaticResource backgroundConverter}}"
+									ToolTip.Tip="{Binding Name}"
+									BorderThickness="0">
+							<!--<TextBlock Text="{Binding Name}"
+												 Foreground="{Binding $parent.Background, Converter={StaticResource foregroundConverter}}"
+												 HorizontalAlignment="Center"
+												 VerticalAlignment="Center"
+												 TextTrimming="CharacterEllipsis" />-->
+
+						<ItemsControl Margin="0 5 0 0"
+													Items="{Binding Items}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<controls:SquarifiedTreeMapsPanel />
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<Border Background="{Binding Name, Converter={StaticResource backgroundConverter}}"
+													ToolTip.Tip="{Binding Name}"
+													BorderThickness="1">
+										<TextBlock Text="{Binding Name}"
+															 Foreground="{Binding $parent.Background, Converter={StaticResource foregroundConverter}}"
+															 HorizontalAlignment="Center"
+															 VerticalAlignment="Center"
+															 TextWrapping="WrapWithOverflow"
+															 TextTrimming="CharacterEllipsis" />
+									</Border>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</Border>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+
+		<!--<controls:WeightedPanel Grid.Row="2">
+			<Label Content="Oregon" controls:WeightedPanel.Weight="93381"
+           Background="Bisque" />
+			<Label Content="California" controls:WeightedPanel.Weight="163696"
+						 Background="Lavender" />
+			<Label Content="Colorado" controls:WeightedPanel.Weight="104094"
+						 Background="LightCoral" />
+			<Label Content="Montana" controls:WeightedPanel.Weight="147042"
+						 Background="Honeydew" />
+			<Label Content="Nevada" controls:WeightedPanel.Weight="110561"
+						 Background="Goldenrod" />
+			<Label Content="New Mexico" controls:WeightedPanel.Weight="121589"
+						 Background="Silver" />
+			<Label Content="Texas" controls:WeightedPanel.Weight="268581"
+						 Background="Thistle" />
+			<Label Content="Arizona" controls:WeightedPanel.Weight="113998"
+						 Background="GhostWhite" />
+		</controls:WeightedPanel>-->
+
+		<GridSplitter ResizeDirection="Rows"
+									VerticalAlignment="Top"
+									Background="{DynamicResource MenuBackground}"
+									Height="5"
+									Grid.Row="1" />
 	</Grid>
-
-
 </UserControl>

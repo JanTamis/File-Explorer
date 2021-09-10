@@ -24,6 +24,8 @@ namespace FileExplorerCore.Models
 		private readonly IEnumerable<FileIndexModel> query;
 		private readonly IEnumerable<long> sizeQuery;
 
+		public bool IsFolder { get; init; }
+
 		public ObservableRangeCollection<FileIndexModel> Items
 		{
 			get
@@ -34,15 +36,15 @@ namespace FileExplorerCore.Models
 
 					if (query != null)
 					{
-						var comparer = Comparer<FileIndexModel>.Create((x, y) =>
+						var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
 						{
-							var sizeX = x.sizeQuery?.Sum() ?? x.Size;
-							var sizeY = y.sizeQuery?.Sum() ?? y.Size;
+							var resultX = await x.TaskSize;
+							var resultY = await y.TaskSize;
 
-							return sizeY.CompareTo(sizeX);
+							return resultY.CompareTo(resultX);
 						});
 
-						ThreadPool.QueueUserWorkItem(x => _items.ReplaceRange(query, default, comparer));
+						ThreadPool.QueueUserWorkItem(async x => await _items.AddRange(query, comparer));
 					}
 				}
 
@@ -64,14 +66,7 @@ namespace FileExplorerCore.Models
 			{
 				if (sizeQuery != null && Size == 0)
 				{
-					return _taskSize ??= Task.Run(() =>
-					{
-						var size = sizeQuery.Sum();
-
-						Size = size;
-
-						return Size;
-					});
+					return _taskSize ??= Task.Run(() => Size = sizeQuery.Sum());
 				}
 
 				return Task.FromResult(Size);
@@ -116,6 +111,8 @@ namespace FileExplorerCore.Models
 					sizeQuery = new FileSystemEnumerable<long>(path, (ref FileSystemEntry x) => x.Length, sizeOptions);
 				}
 			}
+
+			IsFolder = isFolder;
 		}
 
 		public override string ToString()

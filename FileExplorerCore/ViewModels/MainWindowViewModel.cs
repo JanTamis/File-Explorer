@@ -116,14 +116,16 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		public void Undo()
+		public async void Undo()
 		{
-			Path = CurrentTab.Undo();
+			CurrentTab.Path = CurrentTab.Undo();
+			await CurrentTab.UpdateFiles(false, "*");
 		}
 
-		public void Redo()
+		public async void Redo()
 		{
-			Path = CurrentTab.Redo();
+			CurrentTab.Path = CurrentTab.Redo();
+			await CurrentTab.UpdateFiles(false, "*");
 		}
 
 		public void CancelUpdateFiles()
@@ -331,18 +333,15 @@ namespace FileExplorerCore.ViewModels
 			{
 				var query = folderQuery.Concat(fileQuery);
 
-				var comparer = Comparer<FileIndexModel>.Create((x, y) =>
+				var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
 				{
-					var taskX = x.TaskSize;
-					var taskY = y.TaskSize;
+					var resultX = await x.TaskSize;
+					var resultY = await y.TaskSize;
 
-					taskX.Wait();
-					taskY.Wait();
-
-					return taskY.Result.CompareTo(taskX.Result);
+					return resultY.CompareTo(resultX);
 				});
 
-				await view.Root.ReplaceRange(query, default, comparer);
+				await view.Root.AddRange(query, comparer, token: CurrentTab.TokenSource.Token);
 			});
 
 			ThreadPool.QueueUserWorkItem(async x =>
@@ -350,40 +349,55 @@ namespace FileExplorerCore.ViewModels
 				var options = new EnumerationOptions()
 				{
 					IgnoreInaccessible = true,
-					AttributesToSkip = FileAttributes.Temporary,
+					AttributesToSkip = FileAttributes.System,
 					RecurseSubdirectories = true
 				};
 
-				var extensionQuery = new FileSystemEnumerable<ExtensionModel>(Path, (ref FileSystemEntry x) => new ExtensionModel(x.IsDirectory ? String.Empty : System.IO.Path.GetExtension(x.FileName).ToString(), x.Length), options);
+				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = true);
+
+				var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(Path, (ref FileSystemEntry x) => (System.IO.Path.GetExtension(x.FileName).ToString(), x.Length), options)
+				{
+					ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
+				}
+					.Where(w => !String.IsNullOrEmpty(w.Extension))
+					.GroupBy(g => g.Extension);
+
 				var comparer = new ExtensionModelComparer();
 
 				foreach (var extension in extensionQuery)
 				{
-					if (!String.IsNullOrEmpty(extension.Extension))
+					if (CurrentTab.TokenSource.IsCancellationRequested)
+						break;
+
+					if (!String.IsNullOrEmpty(extension.Key))
 					{
-						var index = view.Extensions.BinarySearch(extension, comparer);
+						var model = new ExtensionModel(extension.Key, extension.Sum(s => s.Size))
+						{
+							TotalFiles = extension.Count()
+						};
+
+						var index = view.Extensions.BinarySearch(model, comparer);
 
 						if (index >= 0)
 						{
-							var item = view.Extensions[index];
-
-							item.TotalFiles++;
-							item.TotalSize += extension.TotalSize;
+							await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(index, model));
 						}
 						else
 						{
-							await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(~index, extension));
+							await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(~index, model));
 						}
 					}
 				}
+
+				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = false);
 			});
 		}
 
 		public void ShowProperties()
 		{
-			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && CurrentTab.Files.FirstOrDefault(x => x.IsSelected) is FileModel model)
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
 			{
-				//var path = CurrentTab.Files.FirstOrDefault(x => x.IsSelected) is FileModel model ? model.Path : CurrentTab.Path;
+				var model = CurrentTab.Files.FirstOrDefault(x => x.IsSelected) ?? new FileModel(Path, true);
 
 				var properties = new Properties()
 				{

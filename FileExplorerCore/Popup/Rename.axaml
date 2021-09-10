@@ -21,6 +21,7 @@
 
 			<Button Background="Transparent"
 							Cursor="Hand"
+							IsDefault="True"
 							Command="{Binding NextFile}"
 							Padding="5">
 				<Viewbox Height="25">

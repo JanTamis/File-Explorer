@@ -6,7 +6,7 @@ namespace FileExplorerCore.Helpers
 {
 	public static class TaskbarUtility
 	{
-		private static ITaskbarList4 _taskbarList;
+		private static readonly ITaskbarList4 _taskbarList;
 
 		static TaskbarUtility()
 		{

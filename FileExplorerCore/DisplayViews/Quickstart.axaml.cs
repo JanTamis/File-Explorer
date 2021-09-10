@@ -11,7 +11,9 @@ namespace FileExplorerCore.DisplayViews
 		{
 			get
 			{
-				return new FileSystemEnumerable<FileModel>(Environment.GetFolderPath(Environment.SpecialFolder.Recent), (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), x.IsDirectory, 128)).Take(20);
+				FileModel.ImageSize = 128;
+
+				return new FileSystemEnumerable<FileModel>(Environment.GetFolderPath(Environment.SpecialFolder.Recent), (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), x.IsDirectory)).Take(20);
 			}
 		}
 
@@ -19,9 +21,11 @@ namespace FileExplorerCore.DisplayViews
 		{
 			get
 			{
+				FileModel.ImageSize = 128;
+
 				return DriveInfo.GetDrives()
 												.Where(x => x.IsReady)
-												.Select(x => new FileModel(x.RootDirectory.FullName, true, 128));
+												.Select(x => new FileModel(x.RootDirectory.FullName, true));
 			}
 		}
 

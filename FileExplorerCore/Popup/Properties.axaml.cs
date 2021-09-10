@@ -5,7 +5,6 @@ using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
 using System.ComponentModel;
-using System.IO;
 using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
 
@@ -31,6 +30,8 @@ namespace FileExplorerCore.Popup
 		public event Action OnClose = delegate { };
 
 		public Bitmap Icon => icon ??= WindowsThumbnailProvider.GetThumbnail(Path, 48, 48);
+
+		ObservableRangeCollection<MetadataExtractor.Directory> MetaData { get; set; } = new();
 
 		public string CreatedOn
 		{
@@ -70,6 +71,8 @@ namespace FileExplorerCore.Popup
 				OnPropertyChanged(nameof(ItemName));
 				OnPropertyChanged(nameof(Size));
 				OnPropertyChanged(nameof(CreatedOn));
+
+				MetaData.AddRange(MetaDataHelper.GetData(path));
 			}
 		}
 

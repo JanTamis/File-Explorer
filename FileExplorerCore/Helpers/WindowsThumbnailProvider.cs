@@ -25,6 +25,8 @@ namespace FileExplorerCore.Helpers
 	{
 		private const string IShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
 
+		private static readonly object lockObject = new();
+
 		[DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
 		internal static extern int SHCreateItemFromParsingName(
 				[MarshalAs(UnmanagedType.LPWStr)] string path,
@@ -42,42 +44,45 @@ namespace FileExplorerCore.Helpers
 		[SupportedOSPlatform("Windows")]
 		public unsafe static Bitmap? GetThumbnail(string fileName, int width, int height)
 		{
-			var hBitmap = GetHBitmap(fileName, width, height, ThumbnailOptions.BiggerSizeOk);
-
 			Bitmap? bitmap = null;
 
-			if (hBitmap != IntPtr.Zero)
+			if (!String.IsNullOrWhiteSpace(fileName))
 			{
-				var bmp = new NativeMethods.BITMAP();
-				NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
+				var hBitmap = GetHBitmap(fileName, width, height, ThumbnailOptions.BiggerSizeOk);
 
-				//if (bmp.bmWidth >= 64 || bmp.bmHeight >= 64)
+				if (hBitmap != IntPtr.Zero)
+				{
+					var bmp = new NativeMethods.BITMAP();
+					NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
+
+					//if (bmp.bmWidth >= 64 || bmp.bmHeight >= 64)
+					//{
+					RotateHorizontal(bmp);
+					//}
+
+					bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
+
+					DeleteObject(hBitmap);
+				}
+				//else
 				//{
-				RotateHorizontal(bmp);
+				//	hBitmap = GetHBitmap(fileName, width, height, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
+
+				//	bitmap = null;
+
+				//	if (hBitmap != IntPtr.Zero)
+				//	{
+				//		var bmp = new NativeMethods.BITMAP();
+				//		NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
+
+				//		RotateHorizontal(bmp);
+
+				//		bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
+
+				//		DeleteObject(hBitmap);
+				//	}
 				//}
-
-				bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
-
-				DeleteObject(hBitmap);
 			}
-			//else
-			//{
-			//	hBitmap = GetHBitmap(fileName, width, height, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
-
-			//	bitmap = null;
-
-			//	if (hBitmap != IntPtr.Zero)
-			//	{
-			//		var bmp = new NativeMethods.BITMAP();
-			//		NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
-
-			//		RotateHorizontal(bmp);
-
-			//		bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
-
-			//		DeleteObject(hBitmap);
-			//	}
-			//}
 
 			return bitmap;
 		}
@@ -108,7 +113,7 @@ namespace FileExplorerCore.Helpers
 			var h = bitmap.bmHeight;
 			var i = 0;
 
-			var p = new Span<int>(bitmap.bmBits.ToPointer(), bitmap.bmWidthBytes * bitmap.bmHeight / sizeof(int));
+			Span<int> p = new(bitmap.bmBits.ToPointer(), bitmap.bmWidthBytes * bitmap.bmHeight / sizeof(int));
 			Span<int> pDest = stackalloc int[bitmap.bmWidthBytes * bitmap.bmHeight / sizeof(int)];
 
 			for (var y = h - 1; y >= 0; y--)

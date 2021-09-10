@@ -2,6 +2,8 @@
 {
 	public interface IAsyncComparer<T>
 	{
-		ValueTask<int> Compare(T? x, T? y);
+		Task<int> CompareAsync(T? x, T? y);
 	}
+
+	public delegate Task<int> AsyncComparison<in T>(T x, T y);
 }

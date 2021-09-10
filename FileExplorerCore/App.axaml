@@ -84,5 +84,11 @@
 		<Style Selector="ListBoxItem:selected:pressed /template/ Border#PART_ContentPresenter">
 			<Setter Property="TextBlock.Foreground" Value="{DynamicResource SystemControlHighlightAltBaseHighBrush}" />
 		</Style>
+
+
+		<Style Selector="DataGridColumnHeader">
+			<Setter Property="Background" Value="{DynamicResource Background}" />
+			<Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColor}" />
+		</Style>
 	</Application.Styles>
 </Application>

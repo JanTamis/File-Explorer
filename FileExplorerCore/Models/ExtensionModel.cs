@@ -58,11 +58,11 @@ namespace FileExplorerCore.Models
 		}
 	}
 
-	public class ExtensionModelComparer : Comparer<ExtensionModel>
+	public readonly struct ExtensionModelComparer : IComparer<ExtensionModel>
 	{
-		public override int Compare(ExtensionModel? x, ExtensionModel? y)
+		public int Compare(ExtensionModel? x, ExtensionModel? y)
 		{
-			return x.Extension.CompareTo(y.Extension);
+			return y.TotalSize.CompareTo(x.TotalSize);
 		}
 	}
 }

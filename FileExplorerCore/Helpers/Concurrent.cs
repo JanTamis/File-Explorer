@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace FileExplorerCore.Helpers
 {
@@ -43,62 +42,69 @@ namespace FileExplorerCore.Helpers
 
 		public static IEnumerable<T> AsEnumerable<T>(ConcurrentStack<T> stack)
 		{
-			return new StackEnumerable<T>(stack);
-			//while (stack.TryPop(out var result))
-			//{
-			//	yield return result;
-			//}
+			while (stack.TryPop(out var result))
+			{
+				yield return result;
+			}
 		}
 
-		class StackEnumerable<T> : IEnumerable<T>
+		public static IEnumerable<T> AsEnumerable<T>(ConcurrentBag<T> stack)
 		{
-			private ConcurrentStack<T> stack;
-
-			public StackEnumerable(ConcurrentStack<T> stack)
+			while (stack.TryTake(out var result))
 			{
-				this.stack = stack;
-			}
-
-			IEnumerator<T> IEnumerable<T>.GetEnumerator()
-			{
-				return new StackEnumerator<T>(stack);
-			}
-
-			IEnumerator IEnumerable.GetEnumerator()
-			{
-				return new StackEnumerator<T>(stack);
-			}
-
-		}
-		struct StackEnumerator<T> : IEnumerator<T>
-		{
-			private ConcurrentStack<T> stack;
-			private T current;
-
-			public StackEnumerator(ConcurrentStack<T> stack)
-			{
-				this.stack = stack;
-				current = default;
-			}
-
-			public T Current => current;
-
-			object IEnumerator.Current => current;
-
-			public void Dispose()
-			{
-
-			}
-
-			public bool MoveNext()
-			{
-				return stack.TryPop(out current);
-			}
-
-			public void Reset()
-			{
-
+				yield return result;
 			}
 		}
+
+		//class StackEnumerable<T> : IEnumerable<T>
+		//{
+		//	private ConcurrentStack<T> stack;
+
+		//	public StackEnumerable(ConcurrentStack<T> stack)
+		//	{
+		//		this.stack = stack;
+		//	}
+
+		//	IEnumerator<T> IEnumerable<T>.GetEnumerator()
+		//	{
+		//		return new StackEnumerator<T>(stack);
+		//	}
+
+		//	IEnumerator IEnumerable.GetEnumerator()
+		//	{
+		//		return new StackEnumerator<T>(stack);
+		//	}
+
+		//}
+		//struct StackEnumerator<T> : IEnumerator<T>
+		//{
+		//	private ConcurrentStack<T> stack;
+		//	private T current;
+
+		//	public StackEnumerator(ConcurrentStack<T> stack)
+		//	{
+		//		this.stack = stack;
+		//		current = default;
+		//	}
+
+		//	public T Current => current;
+
+		//	object IEnumerator.Current => current;
+
+		//	public void Dispose()
+		//	{
+
+		//	}
+
+		//	public bool MoveNext()
+		//	{
+		//		return stack.TryPop(out current);
+		//	}
+
+		//	public void Reset()
+		//	{
+
+		//	}
+		//}
 	}
 }

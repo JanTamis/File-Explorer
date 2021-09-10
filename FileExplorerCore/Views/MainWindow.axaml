@@ -169,7 +169,7 @@
 							</TreeView.Styles>
 
 							<TreeView.DataTemplates>
-								<TreeDataTemplate DataType="{x:Type models:FolderModel}" ItemsSource="{Binding SubFolders^}">
+								<TreeDataTemplate DataType="{x:Type models:FolderModel}" ItemsSource="{Binding SubFolders}">
 									<StackPanel Orientation="Horizontal">
 										<Viewbox Width="25"
 														 Height="25"
@@ -259,7 +259,6 @@
 															 Margin="0 0 4 0"
 															 VerticalAlignment="Center">
 												</Image>
-
 
 												<TextBlock Text="{Binding Path, Converter={StaticResource fileNameConverter}}"
 																	 TextTrimming="CharacterEllipsis"
@@ -666,8 +665,19 @@
 												</ProgressBar.Styles>
 											</ProgressBar>
 
-											<ScrollViewer HorizontalScrollBarVisibility="Auto">
-												<ItemsRepeater Items="{Binding CurrentTab.Folders}">
+											<!--<TextBox Background="Transparent"
+															 Text="{Binding CurrentTab.Path}"
+															 CornerRadius="10"
+															 VerticalContentAlignment="Center"
+															 BorderBrush="{x:Null}"
+															 x:Name="pathBox"
+															 Watermark="Path" />-->
+
+											<ScrollViewer HorizontalScrollBarVisibility="Auto"
+																		CornerRadius="10" >
+												<ItemsRepeater Items="{Binding CurrentTab.Folders}"
+																			 Background="Transparent"
+																			 IsVisible="{Binding ElementName=pathBox, Path=!IsFocused}">
 													<ItemsRepeater.Styles>
 														<Style Selector="Button /template/ ContentPresenter#PART_ContentPresenter">
 															<Setter Property="CornerRadius" Value="10" />
@@ -688,7 +698,7 @@
 																					BorderBrush="Transparent"
 																					VerticalAlignment="Stretch"
 																					SelectionChanged="OnComboBoxChanged"
-																					Items="{Binding SubFolders^}" >
+																					Items="{Binding SubFolders}" >
 																	<ComboBox.Styles>
 																		<Style Selector="ComboBox:pointerover /template/ Border#Background">
 																			<Setter Property="Background" Value="{DynamicResource MenuBackground}" />
@@ -712,11 +722,6 @@
 												</ItemsRepeater>
 											</ScrollViewer>
 
-											<!--<TextBox Background="{x:Null}"
-														 Text="{Binding Path}"
-														 BorderBrush="{x:Null}"
-														 Watermark="Path" />-->
-
 											<!--<ComboBox PlaceholderText="Path"
 															BorderBrush="{x:Null}"
 															HorizontalAlignment="Stretch"
@@ -727,6 +732,7 @@
 															Grid.Column="1"
 															IsVisible="{Binding !CurrentTab.IsLoading}"
 															Background="Transparent"
+															CornerRadius="10"
 															Width="40"
 															Height="40"
 															Padding="5">
@@ -744,6 +750,7 @@
 											<Button Cursor="Hand"
 															Command="{Binding CancelUpdateFiles}"
 															Grid.Column="1"
+															CornerRadius="10"
 															IsVisible="{Binding CurrentTab.IsLoading}"
 															Background="Transparent"
 															Width="40"
@@ -808,6 +815,7 @@
 											<Button Cursor="Hand"
 															Command="{Binding StartSearch}"
 															Grid.Column="1"
+															CornerRadius="10"
 															Background="Transparent"
 															Width="40"
 															Height="40"

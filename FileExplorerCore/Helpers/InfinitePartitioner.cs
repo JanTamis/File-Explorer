@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
 namespace FileExplorerCore.Helpers
 {
@@ -11,28 +10,22 @@ namespace FileExplorerCore.Helpers
 				throw new ArgumentOutOfRangeException(nameof(partitionCount));
 
 			return (from i in Enumerable.Range(0, partitionCount)
-							select InfiniteEnumerator()).ToArray();
+							select InfiniteEnumerator())
+							.ToArray();
 		}
 
 		public override bool SupportsDynamicPartitions => true;
 
 		public override IEnumerable<bool> GetDynamicPartitions()
 		{
-			return new InfiniteEnumerators();
+			while (true)
+				yield return true;
 		}
 
 		private static IEnumerator<bool> InfiniteEnumerator()
 		{
-			while (true) yield return true;
-		}
-
-		private class InfiniteEnumerators : IEnumerable<bool>
-		{
-			public IEnumerator<bool> GetEnumerator()
-			{
-				return InfiniteEnumerator();
-			}
-			IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
+			while (true)
+				yield return true;
 		}
 	}
 }
