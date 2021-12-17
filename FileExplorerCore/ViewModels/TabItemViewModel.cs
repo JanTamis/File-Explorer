@@ -6,10 +6,16 @@ using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
 using ReactiveUI;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.IO.Enumeration;
+using System.Linq;
 using System.Runtime;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FileExplorerCore.ViewModels
 {

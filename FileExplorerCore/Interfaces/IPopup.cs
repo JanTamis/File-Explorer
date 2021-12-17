@@ -1,4 +1,6 @@
-﻿namespace FileExplorerCore.Interfaces
+﻿using System;
+
+namespace FileExplorerCore.Interfaces
 {
 	public interface IPopup
 	{

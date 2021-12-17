@@ -8,8 +8,13 @@ using FileExplorerCore.Popup;
 using Microsoft.VisualBasic.FileIO;
 using Nessos.LinqOptimizer.CSharp;
 using ReactiveUI;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.IO.Enumeration;
+using System.Linq;
+using System.Threading;
 using System.Timers;
 
 namespace FileExplorerCore.ViewModels

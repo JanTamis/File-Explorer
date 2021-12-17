@@ -1,14 +1,20 @@
-﻿using Avalonia.Media;
+﻿using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using FileExplorerCore.Converters;
 using FileExplorerCore.Helpers;
+using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.IO;
 using System.IO.Enumeration;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace FileExplorerCore.Models
 {
@@ -37,6 +43,39 @@ namespace FileExplorerCore.Models
 
 		public static event Action<FileModel> SelectionChanged = delegate { };
 		public event PropertyChangedEventHandler? PropertyChanged;
+
+		public static ActionBlock<FileModel> ActionBlock;
+		private bool isNotLoading = true;
+
+		static FileModel()
+		{
+			ActionBlock = new ActionBlock<FileModel>(async subject =>
+			{
+				var path = subject.Path;
+				var img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk);
+
+				if (img is null)
+				{
+					img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
+
+					if (img is not null)
+					{
+						await Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1));
+					}
+				}
+				else if (ImageSize <= 64)
+				{
+					await Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1));
+				}
+
+				subject.NeedsNewImage = false;
+				subject.Image = img;
+			}, new ExecutionDataflowBlockOptions
+			{
+				EnsureOrdered = false,
+				MaxDegreeOfParallelism = Environment.ProcessorCount / 4
+			});
+		}
 
 		public static int ImageSize
 		{
@@ -277,37 +316,17 @@ namespace FileExplorerCore.Models
 
 					FileImageQueue.Add(this);
 
-					if (imageLoadTask is null || imageLoadTask is { IsCompleted: true })
+					if (isNotLoading)
 					{
-						imageLoadTask = Task.Run(() =>
+						isNotLoading = false;
+
+						while (FileImageQueue.TryTake(out var item) || !FileImageQueue.IsEmpty)
 						{
-							while (!FileImageQueue.IsEmpty)
-							{
-								Concurrent.ForEach(Concurrent.AsEnumerable(FileImageQueue), async subject =>
-								{
-									var path = subject.Path;
-									var img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk);
+							ActionBlock.Post(item!);
+						}
 
-									if (img is null)
-									{
-										img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
-
-										if (img is not null)
-										{
-											await Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1));
-										}
-									}
-									else if (ImageSize <= 64)
-									{
-										await Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1));
-									}
-
-									subject.NeedsNewImage = false;
-									subject.Image = img;
-								}, Environment.ProcessorCount / 4);
-							}
-						});
-					}
+						isNotLoading = true;
+					}				
 				}
 
 				return _image;

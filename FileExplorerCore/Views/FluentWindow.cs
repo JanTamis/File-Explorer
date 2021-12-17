@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using System;
 
 namespace FileExplorerCore.Views
 {

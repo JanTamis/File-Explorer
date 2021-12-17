@@ -1,4 +1,6 @@
-﻿namespace FileExplorerCore.Interfaces
+﻿using System.Threading.Tasks;
+
+namespace FileExplorerCore.Interfaces
 {
 	public interface IAsyncComparer<T>
 	{

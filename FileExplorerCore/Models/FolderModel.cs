@@ -1,9 +1,14 @@
 ﻿using Avalonia.Media.Imaging;
 using FileExplorerCore.Helpers;
 using ReactiveUI;
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.IO.Enumeration;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace FileExplorerCore.Models
 {

@@ -2,6 +2,9 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using FileExplorerCore.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FileExplorerCore.Controls
 {

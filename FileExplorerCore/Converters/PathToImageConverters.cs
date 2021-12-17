@@ -6,7 +6,11 @@ using Avalonia.Platform;
 using Avalonia.Svg.Skia;
 using FileExplorerCore.Helpers;
 using FileTypeAndIcon;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 

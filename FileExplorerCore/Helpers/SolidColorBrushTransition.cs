@@ -1,5 +1,6 @@
 ﻿using Avalonia.Animation;
 using Avalonia.Media;
+using System;
 using System.Reactive.Linq;
 
 namespace FileExplorerCore.Helpers

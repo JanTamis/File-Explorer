@@ -4,9 +4,12 @@ using Avalonia.Media.Imaging;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
+using System;
 using System.ComponentModel;
+using System.IO;
 using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace FileExplorerCore.Popup
 {
