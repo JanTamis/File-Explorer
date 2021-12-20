@@ -1,5 +1,4 @@
-﻿using Avalonia.Markup.Xaml.MarkupExtensions;
-using Avalonia.Media;
+﻿using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using FileExplorerCore.Converters;
@@ -7,11 +6,11 @@ using FileExplorerCore.Helpers;
 using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -20,7 +19,7 @@ namespace FileExplorerCore.Models
 {
 	public class FileModel : INotifyPropertyChanged, IDisposable
 	{
-		public readonly static ConcurrentBag<FileModel> FileImageQueue = new();
+		public readonly static ConcurrentStack<FileModel> FileImageQueue = new();
 
 		private byte[] _path;
 		private bool isAscii;
@@ -49,9 +48,15 @@ namespace FileExplorerCore.Models
 
 		static FileModel()
 		{
-			ActionBlock = new ActionBlock<FileModel>(async subject =>
+			ActionBlock = new ActionBlock<FileModel>(subject =>
 			{
-				var path = subject.Path;
+				var encoder = subject.GetEncoding();
+				var charCount = encoder.GetCharCount(subject._path);
+
+				Span<char> path = stackalloc char[charCount];
+
+				encoder.GetChars(subject._path, path);
+
 				var img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk);
 
 				if (img is null)
@@ -60,20 +65,20 @@ namespace FileExplorerCore.Models
 
 					if (img is not null)
 					{
-						await Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1));
+						Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1)).Wait();
 					}
 				}
 				else if (ImageSize <= 64)
 				{
-					await Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1));
+					Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1)).Wait();
 				}
 
 				subject.NeedsNewImage = false;
 				subject.Image = img;
 			}, new ExecutionDataflowBlockOptions
 			{
-				EnsureOrdered = false,
-				MaxDegreeOfParallelism = Environment.ProcessorCount / 4
+				EnsureOrdered = true,
+				MaxDegreeOfParallelism = (int)Math.Log2(Environment.ProcessorCount)
 			});
 		}
 
@@ -118,10 +123,7 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				if (isAscii)
-					return Encoding.ASCII.GetString(_path);
-				else
-					return Encoding.Unicode.GetString(_path);
+				return GetEncoding().GetString(_path);
 			}
 			set
 			{
@@ -136,10 +138,7 @@ namespace FileExplorerCore.Models
 					}
 				}
 
-				if (isAscii)
-					_path = Encoding.ASCII.GetBytes(value);
-				else
-					_path = Encoding.Unicode.GetBytes(value);
+				_path = GetEncoding().GetBytes(value);
 
 				OnPropertyChanged(nameof(Name));
 				OnPropertyChanged(nameof(Extension));
@@ -154,16 +153,12 @@ namespace FileExplorerCore.Models
 				{
 					if (IsFolder)
 					{
-						ReadOnlySpan<char> path;
+						var encoder = GetEncoding();
+						var charCount = encoder.GetCharCount(_path);
 
-						if (isAscii)
-						{
-							path = Path;
-						}
-						else
-						{
-							path = MemoryMarshal.Cast<byte, char>(_path);
-						}
+						Span<char> path = stackalloc char[charCount];
+
+						encoder.GetChars(_path, path);
 
 						if (path.Length > 0)
 						{
@@ -183,7 +178,7 @@ namespace FileExplorerCore.Models
 					}
 				}
 
-				return _name;
+				return _name!;
 			}
 			set
 			{
@@ -225,16 +220,12 @@ namespace FileExplorerCore.Models
 				{
 					if (!IsFolder)
 					{
-						ReadOnlySpan<char> path;
+						var encoder = GetEncoding();
+						var charCount = encoder.GetCharCount(_path);
 
-						if (isAscii)
-						{
-							path = Path;
-						}
-						else
-						{
-							path = MemoryMarshal.Cast<byte, char>(_path);
-						}
+						Span<char> path = stackalloc char[charCount];
+
+						encoder.GetChars(_path, path);
 
 						_extension = new string(System.IO.Path.GetExtension(path));
 					}
@@ -267,20 +258,26 @@ namespace FileExplorerCore.Models
 			{
 				return Task.Run(() =>
 				{
-					var path = Path;
+					var encoder = GetEncoding();
+					var charCount = encoder.GetCharCount(_path);
+
+					Span<char> path = stackalloc char[charCount];
+
+					encoder.GetChars(_path, path);
+
 					var size = 0L;
 
 					if (!IsFolder)
 					{
 						size = Size;
 					}
-					else if (path.EndsWith("\\") && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
+					else if (path[^1] == '\\' && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
 					{
 						size = info.TotalSize - info.TotalFreeSpace;
 					}
 					else if (IsFolder)
 					{
-						var query = new FileSystemEnumerable<long>(path, (ref FileSystemEntry x) => x.Length, new EnumerationOptions() { RecurseSubdirectories = true })
+						var query = new FileSystemEnumerable<long>(new string(path), (ref FileSystemEntry x) => x.Length, new EnumerationOptions() { RecurseSubdirectories = true })
 						{
 							ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
 						};
@@ -314,19 +311,19 @@ namespace FileExplorerCore.Models
 				{
 					ImageTransform = null;
 
-					FileImageQueue.Add(this);
+					FileImageQueue.Push(this);
 
 					if (isNotLoading)
 					{
 						isNotLoading = false;
 
-						while (FileImageQueue.TryTake(out var item) || !FileImageQueue.IsEmpty)
+						while (FileImageQueue.TryPop(out var item) || !FileImageQueue.IsEmpty)
 						{
 							ActionBlock.Post(item!);
 						}
 
 						isNotLoading = true;
-					}				
+					}
 				}
 
 				return _image;
@@ -357,6 +354,13 @@ namespace FileExplorerCore.Models
 			_image?.Dispose();
 
 			GC.SuppressFinalize(this);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[NotNull]
+		private Encoding GetEncoding()
+		{
+			return isAscii ? Encoding.ASCII : Encoding.Unicode;
 		}
 	}
 

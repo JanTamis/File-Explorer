@@ -22,7 +22,7 @@ namespace FileExplorerCore.Helpers
 		Win8ScaleUp = 0x100     // Introduced in Windows 8. If necessary, stretch the bitmap so that the height and width fit the given size.
 	}
 
-	public class WindowsThumbnailProvider
+	public unsafe class WindowsThumbnailProvider
 	{
 		private const string IShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
 
@@ -30,7 +30,7 @@ namespace FileExplorerCore.Helpers
 
 		[DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
 		internal static extern int SHCreateItemFromParsingName(
-				[MarshalAs(UnmanagedType.LPWStr)] string path,
+				char* path,
 				// The following parameter is not used - binding context.
 				IntPtr pbc,
 				ref Guid riid,
@@ -43,69 +43,46 @@ namespace FileExplorerCore.Helpers
 		private static readonly int bitmapSize = Unsafe.SizeOf<NativeMethods.BITMAP>();
 
 		[SupportedOSPlatform("Windows")]
-		public unsafe static Bitmap? GetThumbnail(string fileName, int width, int height)
+		public unsafe static Bitmap? GetThumbnail(Span<char> fileName, int width, int height)
 		{
-			Bitmap? bitmap = null;
+			return GetThumbnail(fileName, width, height, ThumbnailOptions.BiggerSizeOk);
+		}
 
-			if (!String.IsNullOrWhiteSpace(fileName))
+		[SupportedOSPlatform("Windows")]
+		public unsafe static Bitmap? GetThumbnail(Span<char> fileName, int width, int height, ThumbnailOptions options)
+		{
+			return GetThumbnail(MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(fileName), fileName.Length), width, height, options);
+		}
+
+		[SupportedOSPlatform("Windows")]
+		public unsafe static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height)
+		{
+			return GetThumbnail(fileName, width, height, ThumbnailOptions.BiggerSizeOk);
+		}
+
+		[SupportedOSPlatform("Windows")]
+		public static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height, ThumbnailOptions options)
+		{
+			if (!fileName.IsEmpty)
 			{
-				var hBitmap = GetHBitmap(fileName, width, height, ThumbnailOptions.BiggerSizeOk);
+				var hBitmap = GetHBitmap(fileName, width, height, options);
+
+				Bitmap? bitmap = null;
 
 				if (hBitmap != IntPtr.Zero)
 				{
 					var bmp = new NativeMethods.BITMAP();
 					NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
 
-					//if (bmp.bmWidth >= 64 || bmp.bmHeight >= 64)
-					//{
-					RotateHorizontal(bmp);
-					//}
-
 					bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
 
 					DeleteObject(hBitmap);
 				}
-				//else
-				//{
-				//	hBitmap = GetHBitmap(fileName, width, height, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
 
-				//	bitmap = null;
-
-				//	if (hBitmap != IntPtr.Zero)
-				//	{
-				//		var bmp = new NativeMethods.BITMAP();
-				//		NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
-
-				//		RotateHorizontal(bmp);
-
-				//		bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
-
-				//		DeleteObject(hBitmap);
-				//	}
-				//}
+				return bitmap;
 			}
 
-			return bitmap;
-		}
-
-		[SupportedOSPlatform("Windows")]
-		public unsafe static Bitmap? GetThumbnail(string fileName, int width, int height, ThumbnailOptions options)
-		{
-			var hBitmap = GetHBitmap(fileName, width, height, options);
-
-			Bitmap? bitmap = null;
-
-			if (hBitmap != IntPtr.Zero)
-			{
-				var bmp = new NativeMethods.BITMAP();
-				NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
-
-				bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
-
-				DeleteObject(hBitmap);
-			}
-
-			return bitmap;
+			return null;
 		}
 
 		private static unsafe void RotateHorizontal(NativeMethods.BITMAP bitmap)
@@ -130,28 +107,31 @@ namespace FileExplorerCore.Helpers
 			pDest.CopyTo(p);
 		}
 
-		private static IntPtr GetHBitmap(string fileName, int width, int height, ThumbnailOptions options)
+		private static unsafe IntPtr GetHBitmap(ReadOnlySpan<char> fileName, int width, int height, ThumbnailOptions options)
 		{
-			var shellItem2Guid = new Guid(IShellItem2Guid);
-			var retCode = SHCreateItemFromParsingName(fileName, IntPtr.Zero, ref shellItem2Guid, out IShellItem nativeShellItem);
-
-			if (retCode != 0)
-				return IntPtr.Zero;
-
-			NativeSize nativeSize = new()
+			fixed (char* data = &fileName[0])
 			{
-				Width = width,
-				Height = height
-			};
+				var shellItem2Guid = new Guid(IShellItem2Guid);
+				var retCode = SHCreateItemFromParsingName(data, IntPtr.Zero, ref shellItem2Guid, out IShellItem nativeShellItem);
 
-			HResult hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out IntPtr hBitmap);
+				if (retCode != 0)
+					return IntPtr.Zero;
 
-			Marshal.ReleaseComObject(nativeShellItem);
+				NativeSize nativeSize = new()
+				{
+					Width = width,
+					Height = height
+				};
 
-			if (hr == HResult.Ok)
-				return hBitmap;
+				HResult hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out IntPtr hBitmap);
 
-			return IntPtr.Zero;
+				Marshal.ReleaseComObject(nativeShellItem);
+
+				if (hr == HResult.Ok)
+					return hBitmap;
+
+				return IntPtr.Zero;
+			}
 		}
 
 		[ComImport]
