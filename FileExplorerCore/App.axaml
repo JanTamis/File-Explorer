@@ -25,7 +25,6 @@
 	<Application.Styles>
 		<FluentTheme Mode="Light" />
 		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
-
 		<Style Selector="ListBoxItem /template/ Border#PART_ContentPresenter">
 			<Setter Property="TextBlock.FontWeight" Value="Normal" />
 			<Setter Property="Background" Value="{DynamicResource CardBackground}" />

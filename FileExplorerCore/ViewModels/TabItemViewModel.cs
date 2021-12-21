@@ -1,4 +1,6 @@
-﻿using Avalonia.Controls;
+﻿using System;
+using System.Collections.Generic;
+using Avalonia.Controls;
 using Avalonia.Threading;
 using FileExplorerCore.Converters;
 using FileExplorerCore.DisplayViews;
@@ -77,10 +79,7 @@ namespace FileExplorerCore.ViewModels
 
 		public IEnumerable<FolderModel> Folders
 		{
-			get
-			{
-				return _folders;
-			}
+			get { return _folders; }
 		}
 
 		public int Count
@@ -125,7 +124,7 @@ namespace FileExplorerCore.ViewModels
 					if (!selectedFiles.Any(x => x.IsFolder))
 					{
 						var fileSize = selectedFiles.Where(x => !x.IsFolder)
-																				.Sum(s => s.Size);
+							.Sum(s => s.Size);
 
 						result += $", {SizeConverter.ByteSize(fileSize)}";
 					}
@@ -247,9 +246,10 @@ namespace FileExplorerCore.ViewModels
 							var path = Path.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
 							var names = path.Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
 
-							for (int i = 0; i < names.Length; i++)
+							for (var i = 0; i < names.Length; i++)
 							{
-								var folderPath = String.Join(System.IO.Path.DirectorySeparatorChar, new ArraySegment<string>(names, 0, i + 1));
+								var folderPath = String.Join(System.IO.Path.DirectorySeparatorChar,
+									new ArraySegment<string>(names, 0, i + 1));
 								var name = names[i];
 
 								if (!String.IsNullOrEmpty(folderPath))
@@ -260,8 +260,9 @@ namespace FileExplorerCore.ViewModels
 										name = $"{new DriveInfo(name).VolumeLabel} ({name}{System.IO.Path.DirectorySeparatorChar})";
 									}
 
-									yield return new FolderModel(folderPath, name, from directory in Directory.EnumerateDirectories(folderPath, "*", new EnumerationOptions())
-																																 select new FolderModel(directory, System.IO.Path.GetFileName(directory)));
+									yield return new FolderModel(folderPath, name,
+										from directory in Directory.EnumerateDirectories(folderPath, "*", new EnumerationOptions())
+										select new FolderModel(directory, System.IO.Path.GetFileName(directory)));
 								}
 							}
 						}
@@ -363,10 +364,7 @@ namespace FileExplorerCore.ViewModels
 
 				if (PopupContent is not null)
 				{
-					PopupContent.OnClose += delegate
-					{
-						PopupContent = null;
-					};
+					PopupContent.OnClose += delegate { PopupContent = null; };
 				}
 
 				this.RaisePropertyChanged(nameof(PopupVisible));
@@ -377,10 +375,7 @@ namespace FileExplorerCore.ViewModels
 
 		public TabItemViewModel()
 		{
-			Files.CountChanged += (count) =>
-			{
-				Count = count;
-			};
+			Files.CountChanged += (count) => { Count = count; };
 
 			Files.OnPropertyChanged += (property) =>
 			{
@@ -474,10 +469,7 @@ namespace FileExplorerCore.ViewModels
 			IsLoading = true;
 
 			var timer = new System.Timers.Timer(1000);
-			timer.Elapsed += delegate
-			{
-				this.RaisePropertyChanged(nameof(SearchText));
-			};
+			timer.Elapsed += delegate { this.RaisePropertyChanged(nameof(SearchText)); };
 
 			startSearchTime = DateTime.Now;
 
@@ -487,7 +479,9 @@ namespace FileExplorerCore.ViewModels
 			{
 				await Task.Run(async () =>
 				{
-					var query = Sort is SortEnum.None && !recursive ? GetDirectories(Path).Concat(GetFiles(Path)) : GetFileSystemEntries(Path, search, recursive);
+					var query = Sort is SortEnum.None && !recursive
+						? GetDirectories(Path).Concat(GetFiles(Path))
+						: GetFileSystemEntries(Path, search, recursive);
 
 					if (Sort is not SortEnum.None)
 					{
@@ -542,7 +536,9 @@ namespace FileExplorerCore.ViewModels
 
 						Process.Start(info);
 					}
-					catch (Exception) { }
+					catch (Exception)
+					{
+					}
 				});
 			}
 			else if (Directory.Exists(path))
@@ -561,16 +557,17 @@ namespace FileExplorerCore.ViewModels
 
 			if (search is "*" or "*.*" or "" && Sort is SortEnum.None && !recursive)
 			{
-				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), x.IsDirectory), options);
+				return new FileSystemEnumerable<FileModel>(path, GetFileModel, options);
 			}
 			else
 			{
 				var query = FileSearcher.PrepareQuery(search);
 				var regex = new Wildcard(search, RegexOptions.Singleline | RegexOptions.Compiled);
 
-				return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), x.IsDirectory), options)
+				return new FileSystemEnumerable<FileModel>(path, GetFileModel, options)
 				{
-					ShouldIncludePredicate = (ref FileSystemEntry x) => regex.IsMatch(new String(x.FileName)) || FileSearcher.IsValid(x, query)
+					ShouldIncludePredicate = (ref FileSystemEntry x) =>
+						regex.IsMatch(new String(x.FileName)) || FileSearcher.IsValid(x, query)
 				};
 			}
 
@@ -582,40 +579,33 @@ namespace FileExplorerCore.ViewModels
 			//return Enumerable.Empty<FileModel>();
 		}
 
-		private int GetFileSystemEntriesCount(string path, string search, EnumerationOptions options, CancellationToken token)
+		private int GetFileSystemEntriesCount(string path, string search, EnumerationOptions options,
+			CancellationToken token)
 		{
-			var count = 0;
-			FileSystemEnumerable<byte> enumerable;
+			FileSystemEnumerable<bool> enumerable;
 
 			if (search is "*" or "*.*" or "" && Sort is SortEnum.None && !options.RecurseSubdirectories)
 			{
-				enumerable = new FileSystemEnumerable<byte>(path, (ref FileSystemEntry x) => 0, options);
+				enumerable = new(path, null, options);
 			}
 			else
 			{
 				var query = FileSearcher.PrepareQuery(search);
 				var regex = new Wildcard(search, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-				enumerable = new FileSystemEnumerable<byte>(path, (ref FileSystemEntry x) => 0, options)
+				enumerable = new(path, null, options)
 				{
-					ShouldIncludePredicate = (ref FileSystemEntry x) => FileSystemName.MatchesSimpleExpression(search, x.FileName) || FileSearcher.IsValid(x, query)
+					ShouldIncludePredicate = (ref FileSystemEntry x) =>
+						FileSystemName.MatchesSimpleExpression(search, x.FileName) || FileSearcher.IsValid(x, query)
 				};
 			}
 
-			foreach (var item in enumerable)
-			{
-				if (token.IsCancellationRequested)
-					break;
-
-				count++;
-			}
-
-			return count;
+			return enumerable.TakeWhile(_ => !token.IsCancellationRequested).Count();
 		}
 
 		private IEnumerable<FileModel> GetDirectories(string path)
 		{
-			return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), true), options)
+			return new FileSystemEnumerable<FileModel>(path, GetFileModel, options)
 			{
 				ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
 			};
@@ -623,10 +613,23 @@ namespace FileExplorerCore.ViewModels
 
 		private IEnumerable<FileModel> GetFiles(string path)
 		{
-			return new FileSystemEnumerable<FileModel>(path, (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), false), options)
+			return new FileSystemEnumerable<FileModel>(path, GetFileModel, options)
 			{
 				ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
 			};
+		}
+
+		public static FileModel GetFileModel(ref FileSystemEntry entry)
+		{
+			using var builder = new ValueStringBuilder(stackalloc char[entry.Directory.Length + entry.FileName.Length + 1]);
+
+			builder.Append(entry.Directory);
+			builder.Append('\\');
+			builder.Append(entry.FileName);
+
+			return new FileModel(builder.AsSpan(), false);
+
+			static bool IsDirectorySeparator(char c) => c is '\\' or '/';
 		}
 	}
 }

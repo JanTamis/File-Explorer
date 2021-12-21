@@ -2,45 +2,41 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Threading.Tasks.Dataflow;
 
 namespace FileExplorerCore.Helpers
 {
 	public static class Concurrent
 	{
-		static readonly ParallelOptions options = new()
+		private static ExecutionDataflowBlockOptions options = new()
 		{
-			MaxDegreeOfParallelism = 2
+			MaxDegreeOfParallelism = (int)Math.Log2(Environment.ProcessorCount)
 		};
-
-		public static void While(Func<bool> condition, Action body)
+		
+		public static Task For(int begin, int count, Action<int> body)
 		{
-			Parallel.ForEach(new InfinitePartitioner(), options, (ignored, loopState) =>
+			var block = new ActionBlock<int>(body, options);
+
+			for (var i = begin; i < count; i++)
 			{
-				if (condition())
-					body();
-				else
-					loopState.Stop();
-			});
+				block.Post(i);
+			}
+			
+			block.Complete();
+			return block.Completion;
 		}
 
-		public static ParallelLoopResult For(int begin, int count, Action<int> body)
+		public static Task ForEach<T>(IEnumerable<T> collection, Action<T> body)
 		{
-			return Parallel.For(begin, count, options, body);
-		}
+			var block = new ActionBlock<T>(body, options);
 
-		public static ParallelLoopResult ForEach<T>(IEnumerable<T> collection, Action<T> body)
-		{
-			return Parallel.ForEach(collection, options, body);
-		}
-
-		public static ParallelLoopResult ForEach<T>(IEnumerable<T> collection, Action<T> body, int maxConcurrency)
-		{
-			var options = new ParallelOptions()
+			foreach (var item in collection)
 			{
-				MaxDegreeOfParallelism = Math.Max(maxConcurrency, 1),
-			};
-
-			return Parallel.ForEach(collection, options, body);
+				block.Post(item);
+			}
+			
+			block.Complete();
+			return block.Completion;
 		}
 
 		public static IEnumerable<T> AsEnumerable<T>(ConcurrentStack<T> stack)
@@ -58,56 +54,5 @@ namespace FileExplorerCore.Helpers
 				yield return result;
 			}
 		}
-
-		//class StackEnumerable<T> : IEnumerable<T>
-		//{
-		//	private ConcurrentStack<T> stack;
-
-		//	public StackEnumerable(ConcurrentStack<T> stack)
-		//	{
-		//		this.stack = stack;
-		//	}
-
-		//	IEnumerator<T> IEnumerable<T>.GetEnumerator()
-		//	{
-		//		return new StackEnumerator<T>(stack);
-		//	}
-
-		//	IEnumerator IEnumerable.GetEnumerator()
-		//	{
-		//		return new StackEnumerator<T>(stack);
-		//	}
-
-		//}
-		//struct StackEnumerator<T> : IEnumerator<T>
-		//{
-		//	private ConcurrentStack<T> stack;
-		//	private T current;
-
-		//	public StackEnumerator(ConcurrentStack<T> stack)
-		//	{
-		//		this.stack = stack;
-		//		current = default;
-		//	}
-
-		//	public T Current => current;
-
-		//	object IEnumerator.Current => current;
-
-		//	public void Dispose()
-		//	{
-
-		//	}
-
-		//	public bool MoveNext()
-		//	{
-		//		return stack.TryPop(out current);
-		//	}
-
-		//	public void Reset()
-		//	{
-
-		//	}
-		//}
 	}
 }

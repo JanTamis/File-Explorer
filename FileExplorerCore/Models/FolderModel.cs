@@ -1,4 +1,5 @@
-﻿using Avalonia.Media.Imaging;
+﻿using System;
+using Avalonia.Media.Imaging;
 using FileExplorerCore.Helpers;
 using ReactiveUI;
 using System;
@@ -38,7 +39,7 @@ namespace FileExplorerCore.Models
 				{
 					FileImageQueue.Push(this);
 
-					if (imageLoadTask is null || imageLoadTask is { IsCompleted: true })
+					if (imageLoadTask is null or { IsCompleted: true })
 					{
 						imageLoadTask = Task.Run(() =>
 						{

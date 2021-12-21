@@ -1,9 +1,9 @@
-﻿using Avalonia;
+﻿using System;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Platform;
 using Avalonia.Styling;
-using System;
 
 namespace FileExplorerCore.Views
 {
@@ -15,14 +15,7 @@ namespace FileExplorerCore.Views
 		{
 			ExtendClientAreaToDecorationsHint = true;
 			ExtendClientAreaTitleBarHeightHint = -1;
-
-			TransparencyLevelHint = WindowTransparencyLevel.None;
-
-			if (ActualTransparencyLevel != WindowTransparencyLevel.AcrylicBlur)
-			{
-				TransparencyLevelHint = WindowTransparencyLevel.None;
-			}
-
+			
 			this.GetObservable(WindowStateProperty)
 					.Subscribe(x =>
 					{

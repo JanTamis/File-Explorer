@@ -1,4 +1,6 @@
-﻿using Avalonia.Data.Converters;
+﻿using System;
+using System.Collections.Generic;
+using Avalonia.Data.Converters;
 using FileExplorerCore.Models;
 using System;
 using System.Collections.Generic;

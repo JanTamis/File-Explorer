@@ -49,13 +49,7 @@ namespace FileExplorerCore.Helpers
 		}
 
 		[SupportedOSPlatform("Windows")]
-		public unsafe static Bitmap? GetThumbnail(Span<char> fileName, int width, int height, ThumbnailOptions options)
-		{
-			return GetThumbnail(MemoryMarshal.CreateReadOnlySpan(ref MemoryMarshal.GetReference(fileName), fileName.Length), width, height, options);
-		}
-
-		[SupportedOSPlatform("Windows")]
-		public unsafe static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height)
+		public static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height)
 		{
 			return GetThumbnail(fileName, width, height, ThumbnailOptions.BiggerSizeOk);
 		}
@@ -107,12 +101,12 @@ namespace FileExplorerCore.Helpers
 			pDest.CopyTo(p);
 		}
 
-		private static unsafe IntPtr GetHBitmap(ReadOnlySpan<char> fileName, int width, int height, ThumbnailOptions options)
+		private static IntPtr GetHBitmap(ReadOnlySpan<char> fileName, int width, int height, ThumbnailOptions options)
 		{
 			fixed (char* data = &fileName[0])
 			{
 				var shellItem2Guid = new Guid(IShellItem2Guid);
-				var retCode = SHCreateItemFromParsingName(data, IntPtr.Zero, ref shellItem2Guid, out IShellItem nativeShellItem);
+				var retCode = SHCreateItemFromParsingName(data, IntPtr.Zero, ref shellItem2Guid, out var nativeShellItem);
 
 				if (retCode != 0)
 					return IntPtr.Zero;
@@ -123,14 +117,13 @@ namespace FileExplorerCore.Helpers
 					Height = height
 				};
 
-				HResult hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out IntPtr hBitmap);
+				var hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out IntPtr hBitmap);
 
 				Marshal.ReleaseComObject(nativeShellItem);
 
-				if (hr == HResult.Ok)
-					return hBitmap;
-
-				return IntPtr.Zero;
+				return hr == HResult.Ok 
+					? hBitmap
+					: IntPtr.Zero;
 			}
 		}
 

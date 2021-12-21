@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
@@ -123,7 +124,7 @@ namespace FileExplorerCore.Views
 
 		private void ItemContainerGenerator_Materialized(object? sender, ItemContainerEventArgs e)
 		{
-			for (int i = 0; i < e.Containers.Count; i++)
+			for (var i = 0; i < e.Containers.Count; i++)
 			{
 				if (e.Containers[i].ContainerControl is ListBoxItem item)
 				{

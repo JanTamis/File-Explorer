@@ -1,4 +1,6 @@
-﻿using Avalonia.Threading;
+﻿using System;
+using System.Collections.Generic;
+using Avalonia.Threading;
 using FileExplorerCore.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -22,7 +24,7 @@ namespace FileExplorerCore.Helpers
 		const int updateTime = 500;
 		const int updateCountTime = 50;
 
-		public ObservableRangeCollection() : base()
+		public ObservableRangeCollection()
 		{
 			base.CollectionChanged += delegate
 			{
@@ -61,7 +63,7 @@ namespace FileExplorerCore.Helpers
 			var buffer = new Queue<T>();
 			Task? task = null;
 
-			int index = 0;
+			var index = 0;
 
 			if (Items is List<T> list)
 			{
@@ -75,7 +77,7 @@ namespace FileExplorerCore.Helpers
 
 					if (comparer != null && list.Count > 0)
 					{
-						int i = list.BinarySearch(item, comparer);
+						var i = list.BinarySearch(item, comparer);
 
 						if (i >= 0)
 							list.Insert(i, item);
@@ -115,7 +117,7 @@ namespace FileExplorerCore.Helpers
 
 						}
 
-						if (comparer == null && list.Count <= index)
+						if (comparer == null && list.Count >= index && list.Count > 0 && index > 0)
 						{
 							if (Dispatcher.UIThread.CheckAccess())
 							{

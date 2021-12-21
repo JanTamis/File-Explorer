@@ -1,4 +1,5 @@
-﻿using Avalonia.Data.Converters;
+﻿using System;
+using Avalonia.Data.Converters;
 using FileExplorerCore.Models;
 using System;
 using System.Globalization;
@@ -16,14 +17,7 @@ namespace FileExplorerCore.Converters
 				{
 					var name = Path.GetFileName(path);
 
-					if (String.IsNullOrEmpty(name))
-					{
-						return path;
-					}
-					else
-					{
-						return Path.GetFileName(path);
-					}
+					return String.IsNullOrEmpty(name) ? path : Path.GetFileName(path);
 				}
 				else if (path is "")
 				{

@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using FileExplorerCore.Models;
@@ -6,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
+using FileExplorerCore.ViewModels;
 
 namespace FileExplorerCore.DisplayViews
 {
@@ -17,7 +21,7 @@ namespace FileExplorerCore.DisplayViews
 			{
 				FileModel.ImageSize = 128;
 
-				return new FileSystemEnumerable<FileModel>(Environment.GetFolderPath(Environment.SpecialFolder.Recent), (ref FileSystemEntry x) => new FileModel(x.ToFullPath(), x.IsDirectory)).Take(20);
+				return new FileSystemEnumerable<FileModel>(Environment.GetFolderPath(Environment.SpecialFolder.Recent), TabItemViewModel.GetFileModel).Take(20);
 			}
 		}
 
@@ -27,9 +31,10 @@ namespace FileExplorerCore.DisplayViews
 			{
 				FileModel.ImageSize = 128;
 
-				return DriveInfo.GetDrives()
-												.Where(x => x.IsReady)
-												.Select(x => new FileModel(x.RootDirectory.FullName, true));
+				return DriveInfo
+					.GetDrives()
+					.Where(x => x.IsReady)
+					.Select(x => new FileModel(x.RootDirectory.FullName, true));
 			}
 		}
 

@@ -1,4 +1,6 @@
-﻿using Avalonia;
+﻿using System;
+using System.Collections.Generic;
+using Avalonia;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -13,19 +15,20 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+// ReSharper disable InvertIf
 
 namespace FileExplorerCore.Converters
 {
 	public class PathToImageConverter : IValueConverter
 	{
-		readonly static bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+		private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 
-		static readonly Dictionary<string, string> fileTypes = RegisteredFileType.GetFileTypeAndIcon();
+		private static readonly Dictionary<string, string> fileTypes = RegisteredFileType.GetFileTypeAndIcon();
 
-		readonly Dictionary<string, IImage> Images = new();
-		readonly Dictionary<string, string[]> TypeMap = new();
+		private readonly Dictionary<string, IImage> Images = new();
+		private readonly Dictionary<string, string[]> TypeMap = new();
 
-		readonly EnumerationOptions enumerationOptions = new()
+		private readonly EnumerationOptions enumerationOptions = new()
 		{
 			AttributesToSkip = FileAttributes.Hidden
 		};
@@ -37,7 +40,7 @@ namespace FileExplorerCore.Converters
 				var assembly = Assembly.GetExecutingAssembly();
 				var files = assembly.GetManifestResourceNames();
 
-				var basePathMapping = "FileExplorerCore.Assets.Lookup.";
+				const string basePathMapping = "FileExplorerCore.Assets.Lookup.";
 
 				foreach (var file in files)
 				{
@@ -46,12 +49,12 @@ namespace FileExplorerCore.Converters
 						var name = file.Split('.')[^2];
 						var stream = assembly.GetManifestResourceStream(file);
 
-						if (stream is { })
+						if (stream is { })   
 						{
 							var reader = new StreamReader(stream);
 
 							TypeMap.Add(name, reader.ReadToEnd()
-																			.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+																			.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
 						}
 					}
 				}
@@ -80,10 +83,10 @@ namespace FileExplorerCore.Converters
 
 					foreach (var folder in Enum.GetValues<KnownFolder>())
 					{
-						var folderText = folder.ToString();
+						var folderText = Enum.GetName(folder);
 						path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
 
-						if (ImageExists(folderText) && path.ToUpper() == KnownFolders.GetPath(folder).ToUpper())
+						if (folderText is not null && ImageExists(folderText) && path.ToUpper() == KnownFolders.GetPath(folder).ToUpper())
 						{
 							name = folderText;
 						}
@@ -97,21 +100,14 @@ namespace FileExplorerCore.Converters
 						{
 							if (drive.IsReady && drive.Name == path)
 							{
-								name = drive.DriveType.ToString();
+								name = Enum.GetName(drive.DriveType);
 							}
 						}
 					}
 
 					if (name == String.Empty)
 					{
-						if (Directory.EnumerateFileSystemEntries(path, "*", enumerationOptions).Any())
-						{
-							name = "FolderFiles";
-						}
-						else
-						{
-							name = "Folder";
-						}
+						name = Directory.EnumerateFileSystemEntries(path, "*", enumerationOptions).Any() ? "FolderFiles" : "Folder";
 					}
 				}
 				else if (File.Exists(path))
@@ -132,7 +128,7 @@ namespace FileExplorerCore.Converters
 						{
 							foreach (var item in TypeMap)
 							{
-								for (int i = 0; i < item.Value.Length; i++)
+								for (var i = 0; i < item.Value.Length; i++)
 								{
 									if (extension == item.Value[i])
 									{
@@ -167,7 +163,7 @@ namespace FileExplorerCore.Converters
 
 		private IImage? GetImage(string key)
 		{
-			if (!Images.TryGetValue(key, out IImage? image))
+			if (!Images.TryGetValue(key, out var image))
 			{
 				using var source = SvgSource.Load<SvgSource>($"avares://FileExplorerCore/Assets/Icons/{key}.svg", null);
 				using var memoryStream = new MemoryStream();

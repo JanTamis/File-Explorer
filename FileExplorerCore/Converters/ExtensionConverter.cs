@@ -1,4 +1,5 @@
-﻿using Avalonia.Data.Converters;
+﻿using System;
+using Avalonia.Data.Converters;
 using FileExplorerCore.Models;
 using System;
 using System.Globalization;
@@ -9,34 +10,17 @@ namespace FileExplorerCore.Converters
 {
 	public class ExtensionConverter : IValueConverter
 	{
-		readonly static bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
+		private static readonly bool IsWindows = OperatingSystem.IsWindows();
 
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			if (value is FileModel model)
+			return value switch
 			{
-				if (IsWindows)
-				{
-					return model.ExtensionName ??= NativeMethods.GetShellFileType(model.Path);
-				}
-				else
-				{
-					if (!model.IsFolder)
-					{
-						return Path.GetExtension(model.Path);
-					}
-					else
-					{
-						return "System Folder";
-					}
-				}
-			}
-			else if (value is string path)
-			{
-				return NativeMethods.GetShellFileType(path);
-			}
-
-			return String.Empty;
+				FileModel model when IsWindows => model.ExtensionName ??= NativeMethods.GetShellFileType(model.Path),
+				FileModel model => !model.IsFolder ? Path.GetExtension(model.Path) : "System Folder",
+				string path => NativeMethods.GetShellFileType(path),
+				_ => String.Empty
+			};
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

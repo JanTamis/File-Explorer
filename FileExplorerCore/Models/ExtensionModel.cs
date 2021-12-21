@@ -60,7 +60,7 @@ namespace FileExplorerCore.Models
 		}
 	}
 
-	public readonly struct ExtensionModelComparer : IComparer<ExtensionModel>
+	public class ExtensionModelComparer : IComparer<ExtensionModel>
 	{
 		public int Compare(ExtensionModel? x, ExtensionModel? y)
 		{

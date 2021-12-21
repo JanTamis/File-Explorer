@@ -1,6 +1,6 @@
-﻿using FileExplorerCore.Interfaces;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using FileExplorerCore.Interfaces;
 
 namespace FileExplorerCore.Helpers
 {

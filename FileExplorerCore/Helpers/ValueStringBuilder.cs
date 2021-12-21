@@ -2,6 +2,7 @@
 using System.Buffers;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+// ReSharper disable MemberCanBePrivate.Global
 
 namespace FileExplorerCore.Helpers
 {
@@ -25,14 +26,7 @@ namespace FileExplorerCore.Helpers
 			_pos = 0;
 		}
 
-		public int Length
-		{
-			get => _pos;
-			set
-			{
-				_pos = value;
-			}
-		}
+		public int Length => _pos;
 
 		public int Capacity => _chars.Length;
 
@@ -65,20 +59,15 @@ namespace FileExplorerCore.Helpers
 				EnsureCapacity(Length + 1);
 				_chars[Length] = '\0';
 			}
+
 			return ref MemoryMarshal.GetReference(_chars);
 		}
 
-		public ref char this[int index]
-		{
-			get
-			{
-				return ref _chars[index];
-			}
-		}
+		public ref char this[int index] => ref _chars[index];
 
 		public override string ToString()
 		{
-			string s = _chars.Slice(0, _pos).ToString();
+			var s = _chars[.._pos].ToString();
 			Dispose();
 			return s;
 		}
@@ -97,16 +86,17 @@ namespace FileExplorerCore.Helpers
 				EnsureCapacity(Length + 1);
 				_chars[Length] = '\0';
 			}
-			return _chars.Slice(0, _pos);
+
+			return _chars[.._pos];
 		}
 
-		public ReadOnlySpan<char> AsSpan() => _chars.Slice(0, _pos);
+		public ReadOnlySpan<char> AsSpan() => _chars[.._pos];
 		public ReadOnlySpan<char> AsSpan(int start) => _chars.Slice(start, _pos - start);
 		public ReadOnlySpan<char> AsSpan(int start, int length) => _chars.Slice(start, length);
 
 		public bool TryCopyTo(Span<char> destination, out int charsWritten)
 		{
-			if (_chars.Slice(0, _pos).TryCopyTo(destination))
+			if (_chars[.._pos].TryCopyTo(destination))
 			{
 				charsWritten = _pos;
 				Dispose();
@@ -127,8 +117,8 @@ namespace FileExplorerCore.Helpers
 				Grow(count);
 			}
 
-			int remaining = _pos - index;
-			_chars.Slice(index, remaining).CopyTo(_chars.Slice(index + count));
+			var remaining = _pos - index;
+			_chars.Slice(index, remaining).CopyTo(_chars[(index + count)..]);
 			_chars.Slice(index, count).Fill(value);
 			_pos += count;
 		}
@@ -140,27 +130,27 @@ namespace FileExplorerCore.Helpers
 				return;
 			}
 
-			int count = s.Length;
+			var count = s.Length;
 
 			if (_pos > (_chars.Length - count))
 			{
 				Grow(count);
 			}
 
-			int remaining = _pos - index;
-			_chars.Slice(index, remaining).CopyTo(_chars.Slice(index + count));
+			var remaining = _pos - index;
+			_chars.Slice(index, remaining).CopyTo(_chars[(index + count)..]);
 			s
 #if !NET6_0_OR_GREATER
                 .AsSpan()
 #endif
-								.CopyTo(_chars.Slice(index));
+				.CopyTo(_chars[index..]);
 			_pos += count;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Append(char c)
 		{
-			int pos = _pos;
+			var pos = _pos;
 			if ((uint)pos < (uint)_chars.Length)
 			{
 				_chars[pos] = c;
@@ -180,8 +170,10 @@ namespace FileExplorerCore.Helpers
 				return;
 			}
 
-			int pos = _pos;
-			if (s.Length == 1 && (uint)pos < (uint)_chars.Length) // very common case, e.g. appending strings from NumberFormatInfo like separators, percent symbols, etc.
+			var pos = _pos;
+			if (s.Length == 1 &&
+			    (uint)pos < (uint)_chars
+				    .Length) // very common case, e.g. appending strings from NumberFormatInfo like separators, percent symbols, etc.
 			{
 				_chars[pos] = s[0];
 				_pos = pos + 1;
@@ -194,7 +186,7 @@ namespace FileExplorerCore.Helpers
 
 		private void AppendSlow(string s)
 		{
-			int pos = _pos;
+			var pos = _pos;
 			if (pos > _chars.Length - s.Length)
 			{
 				Grow(s.Length);
@@ -204,7 +196,7 @@ namespace FileExplorerCore.Helpers
 #if !NET6_0_OR_GREATER
                 .AsSpan()
 #endif
-								.CopyTo(_chars.Slice(pos));
+				.CopyTo(_chars[pos..]);
 			_pos += s.Length;
 		}
 
@@ -215,46 +207,48 @@ namespace FileExplorerCore.Helpers
 				Grow(count);
 			}
 
-			Span<char> dst = _chars.Slice(_pos, count);
-			for (int i = 0; i < dst.Length; i++)
+			var dst = _chars.Slice(_pos, count);
+			for (var i = 0; i < dst.Length; i++)
 			{
 				dst[i] = c;
 			}
+
 			_pos += count;
 		}
 
 		public unsafe void Append(char* value, int length)
 		{
-			int pos = _pos;
+			var pos = _pos;
 			if (pos > _chars.Length - length)
 			{
 				Grow(length);
 			}
 
-			Span<char> dst = _chars.Slice(_pos, length);
-			for (int i = 0; i < dst.Length; i++)
+			var dst = _chars.Slice(_pos, length);
+			for (var i = 0; i < dst.Length; i++)
 			{
 				dst[i] = *value++;
 			}
+
 			_pos += length;
 		}
 
 		public void Append(ReadOnlySpan<char> value)
 		{
-			int pos = _pos;
+			var pos = _pos;
 			if (pos > _chars.Length - value.Length)
 			{
 				Grow(value.Length);
 			}
 
-			value.CopyTo(_chars.Slice(_pos));
+			value.CopyTo(_chars[_pos..]);
 			_pos += value.Length;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public Span<char> AppendSpan(int length)
 		{
-			int origPos = _pos;
+			var origPos = _pos;
 			if (origPos > _chars.Length - length)
 			{
 				Grow(length);
@@ -283,11 +277,11 @@ namespace FileExplorerCore.Helpers
 		private void Grow(int additionalCapacityBeyondPos)
 		{
 			// Make sure to let Rent throw an exception if the caller has a bug and the desired capacity is negative
-			char[] poolArray = ArrayPool<char>.Shared.Rent((int)Math.Max((uint)(_pos + additionalCapacityBeyondPos), (uint)_chars.Length * 2));
+			var poolArray = ArrayPool<char>.Shared.Rent((int)Math.Max((uint)(_pos + additionalCapacityBeyondPos), (uint)_chars.Length * 2));
 
-			_chars.Slice(0, _pos).CopyTo(poolArray);
+			_chars[.._pos].CopyTo(poolArray);
 
-			char[]? toReturn = _arrayToReturnToPool;
+			var toReturn = _arrayToReturnToPool;
 			_chars = _arrayToReturnToPool = poolArray;
 
 			if (toReturn != null)
@@ -296,10 +290,21 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
+		public void Replace(char source, char replace)
+		{
+			for (var i = 0; i < Length; i++)
+			{
+				if (_chars[i] == source)
+				{
+					_chars[i] = replace;
+				}
+			}
+		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Dispose()
 		{
-			char[]? toReturn = _arrayToReturnToPool;
+			var toReturn = _arrayToReturnToPool;
 			this = default; // for safety, to avoid using pooled array if this instance is erroneously appended to again
 			if (toReturn != null)
 			{

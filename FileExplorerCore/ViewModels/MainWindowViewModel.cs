@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input;
 using Avalonia.Threading;
@@ -57,18 +59,17 @@ namespace FileExplorerCore.ViewModels
 			get => CurrentTab.Path;
 			set
 			{
-				if (value != Path)
+				if (value == Path) return;
+				
+				CurrentTab.Path = value;
+
+				this.RaisePropertyChanged();
+
+				CurrentTab.UpdateFiles(false, "*").ContinueWith(x =>
 				{
-					CurrentTab.Path = value;
-
-					this.RaisePropertyChanged();
-
-					CurrentTab.UpdateFiles(false, "*").ContinueWith(x =>
-					{
-						var categories = Enum.GetValues<Categories>().Select(s => s.ToString() + ":");
-						SearchHistory = categories.Concat(CurrentTab.Files.Select(s => "*" + s.Extension).Distinct());
-					});
-				}
+					var categories = Enum.GetValues<Categories>().Select(s => s + ":");
+					SearchHistory = categories.Concat(CurrentTab.Files.Select(s => "*" + s.Extension).Distinct());
+				});
 			}
 		}
 
