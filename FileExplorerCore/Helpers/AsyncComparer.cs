@@ -15,7 +15,7 @@ namespace FileExplorerCore.Helpers
 			this.comparison = comparison;
 		}
 
-		public Task<int> CompareAsync(T? x, T? y)
+		public ValueTask<int> CompareAsync(T? x, T? y)
 		{
 			return comparison(x, y);
 		}

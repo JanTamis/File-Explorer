@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Avalonia.Threading;
+﻿using Avalonia.Threading;
 using FileExplorerCore.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -117,19 +115,19 @@ namespace FileExplorerCore.Helpers
 
 						}
 
-						if (comparer == null && list.Count >= index && list.Count > 0 && index > 0)
-						{
-							if (Dispatcher.UIThread.CheckAccess())
-							{
-								OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index));
-							}
-							else
-							{
-								await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index)));
-							}
-						}
-						else
-						{
+						//if (comparer == null && list.Count >= index && list.Count > 0 && index > 0)
+						//{
+						//	if (Dispatcher.UIThread.CheckAccess())
+						//	{
+						//		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, Math.Min(index - 1, 0)));
+						//	}
+						//	else
+						//	{
+						//		await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, 0)));
+						//	}
+						//}
+						//else
+						//{
 							if (Dispatcher.UIThread.CheckAccess())
 							{
 								OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
@@ -138,9 +136,9 @@ namespace FileExplorerCore.Helpers
 							{
 								await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
 							}
-						}
+						//}
 
-						index = list.Count - 1;
+						index = list.Count;
 
 						watch.Restart();
 					}
@@ -167,19 +165,19 @@ namespace FileExplorerCore.Helpers
 					}, token);
 				}
 
-				if (comparer == null && list.Count <= index && list.Count > 0 && index > 0)
-				{
-					if (Dispatcher.UIThread.CheckAccess())
-					{
-						OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index));
-					}
-					else
-					{
-						await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index)));
-					}
-				}
-				else
-				{
+				//if (comparer == null && list.Count <= index && list.Count > 0 && index > 0)
+				//{
+				//	if (Dispatcher.UIThread.CheckAccess())
+				//	{
+				//		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index));
+				//	}
+				//	else
+				//	{
+				//		await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index)));
+				//	}
+				//}
+				//else
+				//{
 					if (Dispatcher.UIThread.CheckAccess())
 					{
 						OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
@@ -188,7 +186,7 @@ namespace FileExplorerCore.Helpers
 					{
 						await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
 					}
-				}
+				//}
 			}
 		}
 
@@ -256,8 +254,8 @@ namespace FileExplorerCore.Helpers
 
 						}
 
-						if (comparer == null && list.Count <= index)
-						{
+						//if (comparer == null && list.Count <= index)
+						//{
 							if (Dispatcher.UIThread.CheckAccess())
 							{
 								OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index));
@@ -266,18 +264,18 @@ namespace FileExplorerCore.Helpers
 							{
 								await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index)));
 							}
-						}
-						else
-						{
-							if (Dispatcher.UIThread.CheckAccess())
-							{
-								OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-							}
-							else
-							{
-								await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
-							}
-						}
+						//}
+						//else
+						//{
+						//	if (Dispatcher.UIThread.CheckAccess())
+						//	{
+						//		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+						//	}
+						//	else
+						//	{
+						//		await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
+						//	}
+						//}
 
 						index = list.Count - 1;
 

@@ -627,9 +627,7 @@ namespace FileExplorerCore.ViewModels
 			builder.Append('\\');
 			builder.Append(entry.FileName);
 
-			return new FileModel(builder.AsSpan(), false);
-
-			static bool IsDirectorySeparator(char c) => c is '\\' or '/';
+			return new FileModel(builder.AsSpan(), entry.IsDirectory);
 		}
 	}
 }

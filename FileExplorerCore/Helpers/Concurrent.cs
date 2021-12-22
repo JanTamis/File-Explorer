@@ -41,17 +41,27 @@ namespace FileExplorerCore.Helpers
 
 		public static IEnumerable<T> AsEnumerable<T>(ConcurrentStack<T> stack)
 		{
-			while (stack.TryPop(out var result))
+			var attempts = 0;
+
+			while (!stack.IsEmpty && (++attempts) <= 5)
 			{
-				yield return result;
+				while (stack.TryPop(out var result))
+				{
+					yield return result;
+				}
 			}
 		}
 
 		public static IEnumerable<T> AsEnumerable<T>(ConcurrentBag<T> stack)
 		{
-			while (stack.TryTake(out var result))
+			var attempts = 0;
+
+			while (!stack.IsEmpty && (++attempts) <= 5)
 			{
-				yield return result;
+				while (stack.TryTake(out var result))
+				{
+					yield return result;
+				}
 			}
 		}
 	}

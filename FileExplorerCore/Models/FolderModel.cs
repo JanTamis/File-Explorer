@@ -43,9 +43,9 @@ namespace FileExplorerCore.Models
 					{
 						imageLoadTask = Task.Run(() =>
 						{
-							while (!FileImageQueue.IsEmpty)
+							if (OperatingSystem.IsWindows())
 							{
-								while (FileImageQueue.TryPop(out var subject))
+								foreach (var subject in Concurrent.AsEnumerable(FileImageQueue))
 								{
 									var img = WindowsThumbnailProvider.GetThumbnail(subject.Path, 48, 48, ThumbnailOptions.BiggerSizeOk);
 

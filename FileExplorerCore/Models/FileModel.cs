@@ -4,9 +4,9 @@ using Avalonia.Threading;
 using FileExplorerCore.Converters;
 using FileExplorerCore.Helpers;
 using System;
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
@@ -19,12 +19,12 @@ namespace FileExplorerCore.Models
 {
 	public class FileModel : INotifyPropertyChanged, IDisposable
 	{
+		public delegate void ReadOnlySpanAction<T>(ReadOnlySpan<T> span);
+
 		public readonly static ConcurrentStack<FileModel> FileImageQueue = new();
 
 		private byte[] _path;
 		private bool isAscii;
-
-		static Task? imageLoadTask;
 
 		private bool _isSelected;
 		public bool NeedsNewImage = true;
@@ -37,15 +37,14 @@ namespace FileExplorerCore.Models
 
 		private Bitmap? _image;
 		private Transform _imageTransform;
-		private static int imageSize;
 		private bool needsTranslation;
 
 		public static event Action<FileModel> SelectionChanged = delegate { };
 		public event PropertyChangedEventHandler? PropertyChanged;
 
-		public static ActionBlock<FileModel> ActionBlock;
+		private readonly static ActionBlock<FileModel> ActionBlock;
 		private bool isNotLoading = true;
-		private bool _isVisible;
+		private bool _isVisible = true;
 
 		static FileModel()
 		{
@@ -53,37 +52,34 @@ namespace FileExplorerCore.Models
 			{
 				if (subject.IsVisible)
 				{
-					var encoder = subject.GetEncoding();
-					var charCount = encoder.GetCharCount(subject._path);
-
-					Span<char> path = stackalloc char[charCount];
-
-					encoder.GetChars(subject._path, path);
-
-					var img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize,
-						ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk);
-
-					if (img is null)
+					subject.GetPath(path =>
 					{
-						img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize,
-							ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
-
-						if (img is not null)
+						if (OperatingSystem.IsWindows())
 						{
-							Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1)).Wait();
-						}
-					}
-					else if (ImageSize <= 64)
-					{
-						Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1)).Wait();
-					}
+							var img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk);
 
-					subject.NeedsNewImage = false;
-					subject.Image = img;
+							if (img is null)
+							{
+								img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
+
+								if (img is not null)
+								{
+									Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1)).Wait();
+								}
+							}
+							else if (ImageSize <= 64)
+							{
+								Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1)).Wait();
+							}
+
+							subject.NeedsNewImage = false;
+							subject.OnPropertyChanged(ref subject._image, img, nameof(Image)).Wait();
+						}
+					});
 				}
 			}, new ExecutionDataflowBlockOptions
 			{
-				EnsureOrdered = true,
+				EnsureOrdered = false,
 				MaxDegreeOfParallelism = (int)Math.Log2(Environment.ProcessorCount)
 			});
 		}
@@ -102,19 +98,19 @@ namespace FileExplorerCore.Models
 				if (value)
 				{
 					NeedsNewImage = true;
-				
+
 					OnPropertyChanged(nameof(Image));
 				}
 				else
 				{
 					NeedsNewImage = false;
-					
+
 					_image?.Dispose();
 					Image = null;
 
 					NeedsNewImage = true;
 				}
-			} 
+			}
 		}
 
 		public Transform ImageTransform
@@ -173,16 +169,12 @@ namespace FileExplorerCore.Models
 			{
 				if (_name is null)
 				{
-					var encoder = GetEncoding();
-					var charCount = encoder.GetCharCount(_path);
-
-					Span<char> path = stackalloc char[charCount];
-
-					encoder.GetChars(_path, path);
-
-					_name = IsFolder 
-						? new String(System.IO.Path.GetFileName(path)) 
+					GetPath(path =>
+					{
+						_name = IsFolder
+						? new String(System.IO.Path.GetFileName(path))
 						: new String(System.IO.Path.GetFileNameWithoutExtension(path));
+					});
 				}
 
 				return _name;
@@ -230,14 +222,10 @@ namespace FileExplorerCore.Models
 				{
 					if (!IsFolder)
 					{
-						var encoder = GetEncoding();
-						var charCount = encoder.GetCharCount(_path);
-
-						Span<char> path = stackalloc char[charCount];
-
-						encoder.GetChars(_path, path);
-
-						_extension = new string(System.IO.Path.GetExtension(path));
+						GetPath(path =>
+						{
+							_extension = new string(System.IO.Path.GetExtension(path));
+						});
 					}
 
 					_extension = String.Empty;
@@ -253,14 +241,7 @@ namespace FileExplorerCore.Models
 			{
 				if (_size == -2)
 				{
-					var encoder = GetEncoding();
-					var charCount = encoder.GetCharCount(_path);
-
-					Span<char> path = stackalloc char[charCount];
-
-					encoder.GetChars(_path, path);
-
-					_size = DirectoryAlternative.GetFileSize(path);
+					GetPath(path => _size = DirectoryAlternative.GetFileSize(path));
 				}
 
 				return _size;
@@ -275,33 +256,29 @@ namespace FileExplorerCore.Models
 			{
 				return Task.Run(() =>
 				{
-					var encoder = GetEncoding();
-					var charCount = encoder.GetCharCount(_path);
-
-					Span<char> path = stackalloc char[charCount];
-
-					encoder.GetChars(_path, path);
-
 					var size = 0L;
 
-					if (!IsFolder)
+					GetPath(path =>
 					{
-						size = Size;
-					}
-					else if (path[^1] == '\\' && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
-					{
-						size = info.TotalSize - info.TotalFreeSpace;
-					}
-					else if (IsFolder)
-					{
-						var query = new FileSystemEnumerable<long>(new string(path), (ref FileSystemEntry x) => x.Length,
-							new EnumerationOptions() { RecurseSubdirectories = true })
+						if (!IsFolder)
 						{
-							ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
-						};
+							size = Size;
+						}
+						else if (path[^1] == '\\' && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
+						{
+							size = info.TotalSize - info.TotalFreeSpace;
+						}
+						else if (IsFolder)
+						{
+							var query = new FileSystemEnumerable<long>(new string(path), (ref FileSystemEntry x) => x.Length,
+								new EnumerationOptions() { RecurseSubdirectories = true })
+							{
+								ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
+							};
 
-						size = query.Sum();
-					}
+							size = query.Sum();
+						}
+					});
 
 					return SizeConverter.ByteSize(size);
 				});
@@ -314,14 +291,7 @@ namespace FileExplorerCore.Models
 			{
 				if (_editedOn == default)
 				{
-					var encoder = GetEncoding();
-					var charCount = encoder.GetCharCount(_path);
-
-					Span<char> path = stackalloc char[charCount];
-
-					encoder.GetChars(_path, path);
-
-					_editedOn = DirectoryAlternative.GetFileWriteDate(path);
+					GetPath(path => _editedOn = DirectoryAlternative.GetFileWriteDate(path));
 				}
 
 				return _editedOn;
@@ -400,16 +370,23 @@ namespace FileExplorerCore.Models
 			IsFolder = isFolder;
 		}
 
-		public void OnPropertyChanged<T>(ref T field, T value, [CallerMemberName] string name = null)
+		public Task OnPropertyChanged<T>(ref T field, T value, [CallerMemberName] string name = null)
 		{
 			field = value;
 
-			OnPropertyChanged(name);
+			return OnPropertyChanged(name);
 		}
 
-		public void OnPropertyChanged([CallerMemberName] string name = null)
+		public async Task OnPropertyChanged([CallerMemberName] string name = null)
 		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+			if (Dispatcher.UIThread.CheckAccess())
+			{
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+			}
+			else
+			{
+				await Dispatcher.UIThread.InvokeAsync(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
+			}
 		}
 
 		public void Dispose()
@@ -423,6 +400,19 @@ namespace FileExplorerCore.Models
 		private Encoding GetEncoding()
 		{
 			return isAscii ? Encoding.ASCII : Encoding.Unicode;
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private void GetPath(ReadOnlySpanAction<char> action)
+		{
+			var encoder = GetEncoding();
+			var charCount = encoder.GetCharCount(_path);
+
+			Span<char> path = stackalloc char[charCount];
+
+			encoder.GetChars(_path, path);
+
+			action(path);
 		}
 	}
 
