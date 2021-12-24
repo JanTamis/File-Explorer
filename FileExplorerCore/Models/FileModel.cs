@@ -4,7 +4,6 @@ using Avalonia.Threading;
 using FileExplorerCore.Converters;
 using FileExplorerCore.Helpers;
 using System;
-using System.Buffers;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.IO;
@@ -12,16 +11,14 @@ using System.IO.Enumeration;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 
 namespace FileExplorerCore.Models
 {
 	public class FileModel : INotifyPropertyChanged, IDisposable
 	{
-		public delegate void ReadOnlySpanAction<T>(ReadOnlySpan<T> span);
-
-		public readonly static ConcurrentStack<FileModel> FileImageQueue = new();
+		public static readonly ConcurrentBag<FileModel> FileImageQueue = new();
 
 		private byte[] _path;
 		private bool isAscii;
@@ -29,7 +26,7 @@ namespace FileExplorerCore.Models
 		private bool _isSelected;
 		public bool NeedsNewImage = true;
 
-		private string _name;
+		private string? _name;
 		private string? _extension;
 		private long _size = -2;
 
@@ -42,51 +39,12 @@ namespace FileExplorerCore.Models
 		public static event Action<FileModel> SelectionChanged = delegate { };
 		public event PropertyChangedEventHandler? PropertyChanged;
 
-		private readonly static ActionBlock<FileModel> ActionBlock;
-		private bool isNotLoading = true;
+		private static bool _isNotLoading = true;
 		private bool _isVisible = true;
-
-		static FileModel()
-		{
-			ActionBlock = new ActionBlock<FileModel>(subject =>
-			{
-				if (subject.IsVisible)
-				{
-					subject.GetPath(path =>
-					{
-						if (OperatingSystem.IsWindows())
-						{
-							var img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk);
-
-							if (img is null)
-							{
-								img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
-
-								if (img is not null)
-								{
-									Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1)).Wait();
-								}
-							}
-							else if (ImageSize <= 64)
-							{
-								Dispatcher.UIThread.InvokeAsync(() => subject.ImageTransform = new ScaleTransform(1, -1)).Wait();
-							}
-
-							subject.NeedsNewImage = false;
-							subject.OnPropertyChanged(ref subject._image, img, nameof(Image)).Wait();
-						}
-					});
-				}
-			}, new ExecutionDataflowBlockOptions
-			{
-				EnsureOrdered = false,
-				MaxDegreeOfParallelism = (int)Math.Log2(Environment.ProcessorCount)
-			});
-		}
 
 		public static int ImageSize { get; set; }
 
-		public string ExtensionName { get; set; }
+		public string? ExtensionName { get; set; }
 
 		public bool IsVisible
 		{
@@ -147,7 +105,7 @@ namespace FileExplorerCore.Models
 			{
 				isAscii = true;
 
-				for (int i = 0; i < value.Length; i++)
+				for (var i = 0; i < value.Length; i++)
 				{
 					if (!Char.IsAscii(value[i]))
 					{
@@ -177,7 +135,7 @@ namespace FileExplorerCore.Models
 					});
 				}
 
-				return _name;
+				return _name!;
 			}
 			set
 			{
@@ -302,22 +260,38 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				if (NeedsNewImage)
+				if (NeedsNewImage && !HasImage)
 				{
 					ImageTransform = null;
 
-					FileImageQueue.Push(this);
+					FileImageQueue.Add(this);
 
-					if (isNotLoading)
+					if (_isNotLoading)
 					{
-						isNotLoading = false;
+						_isNotLoading = false;
 
-						while (FileImageQueue.TryPop(out var item) || !FileImageQueue.IsEmpty)
+						ThreadPool.QueueUserWorkItem(x =>
 						{
-							ActionBlock.Post(item!);
-						}
+							foreach (var subject in Concurrent.AsEnumerable(FileImageQueue))
+							{
+								if (subject.IsVisible && OperatingSystem.IsWindows())
+								{
+									subject.GetPath(path =>
+									{
+										if (OperatingSystem.IsWindows())
+										{
+											var img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk) ??
+																				WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
 
-						isNotLoading = true;
+											subject.NeedsNewImage = false;
+											subject.OnPropertyChanged(ref subject._image, img, nameof(Image));
+										}
+									});
+								}
+							}
+							
+							_isNotLoading = true;
+						});
 					}
 				}
 
@@ -325,28 +299,6 @@ namespace FileExplorerCore.Models
 			}
 			set => OnPropertyChanged(ref _image, value);
 		}
-
-		// public FileModel(Span<char> path, bool isFolder)
-		// {
-		// 	isAscii = true;
-		//
-		// 	for (var i = 0; i < path.Length; i++)
-		// 	{
-		// 		if (!Char.IsAscii(path[i]))
-		// 		{
-		// 			isAscii = false;
-		// 			break;
-		// 		}
-		// 	}
-		//
-		// 	var encoder = GetEncoding();
-		// 	var byteCount = encoder.GetByteCount(path);
-		//
-		// 	_path = new byte[byteCount];
-		// 	encoder.GetBytes(path, _path);
-		// 	
-		// 	IsFolder = isFolder;
-		// }
 
 		public FileModel(ReadOnlySpan<char> path, bool isFolder)
 		{
@@ -370,14 +322,14 @@ namespace FileExplorerCore.Models
 			IsFolder = isFolder;
 		}
 
-		public Task OnPropertyChanged<T>(ref T field, T value, [CallerMemberName] string name = null)
+		public void OnPropertyChanged<T>(ref T field, T value, [CallerMemberName] string? name = null)
 		{
 			field = value;
 
-			return OnPropertyChanged(name);
+			OnPropertyChanged(name);
 		}
 
-		public async Task OnPropertyChanged([CallerMemberName] string name = null)
+		public Task OnPropertyChanged([CallerMemberName] string? name = null)
 		{
 			if (Dispatcher.UIThread.CheckAccess())
 			{
@@ -385,8 +337,10 @@ namespace FileExplorerCore.Models
 			}
 			else
 			{
-				await Dispatcher.UIThread.InvokeAsync(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
+				return Dispatcher.UIThread.InvokeAsync(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
 			}
+
+			return Task.CompletedTask;
 		}
 
 		public void Dispose()
@@ -399,27 +353,19 @@ namespace FileExplorerCore.Models
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private Encoding GetEncoding()
 		{
-			return isAscii ? Encoding.ASCII : Encoding.Unicode;
+			return isAscii ? Encoding.UTF8 : Encoding.Unicode;
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void GetPath(ReadOnlySpanAction<char> action)
 		{
 			var encoder = GetEncoding();
-			var charCount = encoder.GetCharCount(_path);
+			var charCount = encoder.GetMaxCharCount(_path.Length);
 
 			Span<char> path = stackalloc char[charCount];
 
-			encoder.GetChars(_path, path);
+			charCount = encoder.GetChars(_path, path);
 
-			action(path);
+			action(path[..charCount]);
 		}
-	}
-
-	public enum FileType
-	{
-		File,
-		Directory,
-		Drive
 	}
 }

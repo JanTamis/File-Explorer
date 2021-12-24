@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -43,7 +44,7 @@ namespace FileExplorerCore.Helpers
 		{
 			var attempts = 0;
 
-			while (!stack.IsEmpty && (++attempts) <= 5)
+			while (!stack.IsEmpty && ++attempts <= 5)
 			{
 				while (stack.TryPop(out var result))
 				{
@@ -56,7 +57,7 @@ namespace FileExplorerCore.Helpers
 		{
 			var attempts = 0;
 
-			while (!stack.IsEmpty && (++attempts) <= 5)
+			while (!stack.IsEmpty && ++attempts <= 5)
 			{
 				while (stack.TryTake(out var result))
 				{

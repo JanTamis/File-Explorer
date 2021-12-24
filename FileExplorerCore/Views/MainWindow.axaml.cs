@@ -10,6 +10,7 @@ using FileExplorerCore.Models;
 using FileExplorerCore.ViewModels;
 using ReactiveUI;
 using System;
+using System.Runtime;
 
 namespace FileExplorerCore.Views
 {
@@ -82,9 +83,11 @@ namespace FileExplorerCore.Views
 			{
 				if (model.Tabs.Count > 1)
 				{
+					tab.CancelUpdateFiles();
 					model.Tabs.Remove(tab);
 
-					GC.Collect(2, GCCollectionMode.Optimized, false, true);
+					GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+					GC.Collect(2, GCCollectionMode.Forced, false, true);
 				}
 			}
 		}
