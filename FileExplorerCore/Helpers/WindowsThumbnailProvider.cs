@@ -43,7 +43,7 @@ namespace FileExplorerCore.Helpers
 		private static readonly int bitmapSize = Unsafe.SizeOf<NativeMethods.BITMAP>();
 
 		[SupportedOSPlatform("Windows")]
-		public unsafe static Bitmap? GetThumbnail(Span<char> fileName, int width, int height)
+		public static Bitmap? GetThumbnail(Span<char> fileName, int width, int height)
 		{
 			return GetThumbnail(fileName, width, height, ThumbnailOptions.BiggerSizeOk);
 		}
@@ -57,45 +57,51 @@ namespace FileExplorerCore.Helpers
 		[SupportedOSPlatform("Windows")]
 		public static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height, ThumbnailOptions options)
 		{
+			Bitmap? bitmap = null;
+			
 			if (!fileName.IsEmpty)
 			{
 				var hBitmap = GetHBitmap(fileName, width, height, options);
-
-				Bitmap? bitmap = null;
 
 				if (hBitmap != IntPtr.Zero)
 				{
 					var bmp = new NativeMethods.BITMAP();
 					NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
 
+					if ((options.HasFlag(ThumbnailOptions.ThumbnailOnly) && width <= 64) || options.HasFlag(ThumbnailOptions.IconOnly))
+					{
+						RotateHorizontal(bmp);
+					}
+
 					bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
 
 					DeleteObject(hBitmap);
 				}
-
-				return bitmap;
 			}
 
-			return null;
+			return bitmap;
 		}
 
-		private static unsafe void RotateHorizontal(NativeMethods.BITMAP bitmap)
+		private static void RotateHorizontal(NativeMethods.BITMAP bitmap)
 		{
 			var w = bitmap.bmWidth;
 			var h = bitmap.bmHeight;
-			var i = 0;
 
 			Span<int> p = new(bitmap.bmBits.ToPointer(), bitmap.bmWidthBytes * bitmap.bmHeight / sizeof(int));
-			Span<int> pDest = stackalloc int[bitmap.bmWidthBytes * bitmap.bmHeight / sizeof(int)];
+			Span<int> pDest = stackalloc int[p.Length];
 
-			for (var y = h - 1; y >= 0; y--)
+			for (var i = 0; i < p.Length; i++)
 			{
-				for (var x = 0; x < w; x++)
-				{
-					var srcInd = y * w + x;
-					pDest[i] = p[srcInd];
-					i++;
-				}
+				var x = i % w;
+				var y = i / w;
+				var yOffset = h - (y + 1);
+				
+				if (yOffset < 0 && yOffset >= h)
+					yOffset = 0;
+
+				var val = yOffset * w + x;
+
+				pDest[i] = p[val];
 			}
 
 			pDest.CopyTo(p);
@@ -117,7 +123,7 @@ namespace FileExplorerCore.Helpers
 					Height = height
 				};
 
-				var hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out IntPtr hBitmap);
+				var hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out var hBitmap);
 
 				Marshal.ReleaseComObject(nativeShellItem);
 
@@ -192,12 +198,12 @@ namespace FileExplorerCore.Helpers
 
 			public int Width
 			{
-				set { width = value; }
+				set => width = value;
 			}
 
 			public int Height
 			{
-				set { height = value; }
+				set => height = value;
 			}
 		}
 	}

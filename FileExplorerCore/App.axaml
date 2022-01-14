@@ -25,6 +25,8 @@
 	<Application.Styles>
 		<FluentTheme Mode="Light" />
 		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+		<StyleInclude Source="avares://DataBox/Themes/Fluent.axaml" />
+		
 		<Style Selector="ListBoxItem /template/ Border#PART_ContentPresenter">
 			<Setter Property="TextBlock.FontWeight" Value="Normal" />
 			<Setter Property="Background" Value="{DynamicResource CardBackground}" />
@@ -86,6 +88,11 @@
 
 
 		<Style Selector="DataGridColumnHeader">
+			<Setter Property="Background" Value="{DynamicResource Background}" />
+			<Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColor}" />
+		</Style>
+		
+		<Style Selector="DataBoxColumnHeader">
 			<Setter Property="Background" Value="{DynamicResource Background}" />
 			<Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColor}" />
 		</Style>

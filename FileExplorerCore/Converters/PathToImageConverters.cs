@@ -13,15 +13,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+
 // ReSharper disable InvertIf
 
 namespace FileExplorerCore.Converters
 {
 	public class PathToImageConverter : IValueConverter
 	{
-		private static readonly bool IsWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-
-		private static readonly Dictionary<string, string> fileTypes = RegisteredFileType.GetFileTypeAndIcon();
+		private static readonly Dictionary<string, string>? fileTypes = OperatingSystem.IsWindows() ? RegisteredFileType.GetFileTypeAndIcon() : new();
 
 		private readonly Dictionary<string, IImage> Images = new();
 		private readonly Dictionary<string, string[]> TypeMap = new();
@@ -33,7 +32,7 @@ namespace FileExplorerCore.Converters
 
 		public PathToImageConverter()
 		{
-			if (!IsWindows)
+			if (!OperatingSystem.IsWindows())
 			{
 				var assembly = Assembly.GetExecutingAssembly();
 				var files = assembly.GetManifestResourceNames();
@@ -47,32 +46,29 @@ namespace FileExplorerCore.Converters
 						var name = file.Split('.')[^2];
 						var stream = assembly.GetManifestResourceStream(file);
 
-						if (stream is { })   
+						if (stream is { })
 						{
 							var reader = new StreamReader(stream);
 
 							TypeMap.Add(name, reader.ReadToEnd()
-																			.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+								.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
 						}
 					}
 				}
 			}
 		}
 
-		public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{
 			var name = String.Empty;
 
-			if (value is string path)
+			if (OperatingSystem.IsWindows() && value is string path)
 			{
-				if (IsWindows)
-				{
-					var image = WindowsThumbnailProvider.GetThumbnail(path, 64, 64);
+				var image = WindowsThumbnailProvider.GetThumbnail(path, 64, 64);
 
-					if (image is { })
-					{
-						return image;
-					}
+				if (image is { })
+				{
+					return image;
 				}
 
 				if (Directory.Exists(path))
@@ -84,7 +80,8 @@ namespace FileExplorerCore.Converters
 						var folderText = Enum.GetName(folder);
 						path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
 
-						if (folderText is not null && ImageExists(folderText) && path.ToUpper() == KnownFolders.GetPath(folder).ToUpper())
+						if (folderText is not null && ImageExists(folderText) &&
+						    String.Compare(path, KnownFolders.GetPath(folder), StringComparison.OrdinalIgnoreCase) == 0)
 						{
 							name = folderText;
 						}
@@ -139,15 +136,10 @@ namespace FileExplorerCore.Converters
 				}
 			}
 
-			if (!String.IsNullOrEmpty(name))
-			{
-				return GetImage(name);
-			}
-
-			return null;
+			return GetImage(name);
 		}
 
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{
 			throw new NotImplementedException();
 		}
@@ -159,9 +151,9 @@ namespace FileExplorerCore.Converters
 			return loader.Exists(new Uri($"avares://FileExplorerCore/Assets/Icons/{key}.svg"));
 		}
 
-		private IImage? GetImage(string key)
+		private IImage? GetImage(string? key)
 		{
-			if (!Images.TryGetValue(key, out var image))
+			if (!Images.TryGetValue(key, out var image) && image is not null)
 			{
 				using var source = SvgSource.Load<SvgSource>($"avares://FileExplorerCore/Assets/Icons/{key}.svg", null);
 				using var memoryStream = new MemoryStream();
@@ -184,44 +176,44 @@ namespace FileExplorerCore.Converters
 		private string GetOfficeName(string extension, string defaultName) => extension switch
 		{
 			"doc" or
-			"docm" or
-			"docx" or
-			"dotm" or
-			"dotx" or
-			"odt" or
-			"wps" => "Word",
+				"docm" or
+				"docx" or
+				"dotm" or
+				"dotx" or
+				"odt" or
+				"wps" => "Word",
 
 			"csv" or
-			"dbf" or
-			"dif" or
-			"ods" or
-			"prn" or
-			"slk" or
-			"xla" or
-			"xla" or
-			"xlam" or
-			"xls" or
-			"xlsb" or
-			"xlsm" or
-			"xlsx" or
-			"xlt" or
-			"xltm" or
-			"xltx" or
-			"xlw" => "Excel",
+				"dbf" or
+				"dif" or
+				"ods" or
+				"prn" or
+				"slk" or
+				"xla" or
+				"xla" or
+				"xlam" or
+				"xls" or
+				"xlsb" or
+				"xlsm" or
+				"xlsx" or
+				"xlt" or
+				"xltm" or
+				"xltx" or
+				"xlw" => "Excel",
 
 			"odp" or
-			"pot" or
-			"potm" or
-			"potx" or
-			"ppa" or
-			"ppam" or
-			"pps" or
-			"ppsm" or
-			"ppsx" or
-			"ppt" or
-			"pptm" or
-			"pptx" or
-			"thmx" => "PowerPoint",
+				"pot" or
+				"potm" or
+				"potx" or
+				"ppa" or
+				"ppam" or
+				"pps" or
+				"ppsm" or
+				"ppsx" or
+				"ppt" or
+				"pptm" or
+				"pptx" or
+				"thmx" => "PowerPoint",
 			_ => defaultName
 		};
 	}

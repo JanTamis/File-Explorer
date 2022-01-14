@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Win32;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace FileTypeAndIcon
 {
@@ -36,6 +37,7 @@ namespace FileTypeAndIcon
 		/// Gets registered file types and their associated icon in the system.
 		/// </summary>
 		/// <returns>Returns a hash table which contains the file extension as keys, the icon file and param as values.</returns>
+		[SupportedOSPlatform("Windows")]
 		public static Dictionary<string, string> GetFileTypeAndIcon()
 		{
 			try

@@ -1,12 +1,12 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-						 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-						 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-						 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-						 xmlns:converters="using:FileExplorerCore.Converters"
-						 xmlns:models="clr-namespace:FileExplorerCore.Models"
-						 xmlns:helpers="clr-namespace:FileExplorerCore.Helpers"
-						 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-						 x:Class="FileExplorerCore.DisplayViews.FileDataGrid">
+						xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+						xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+						xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+						xmlns:converters="using:FileExplorerCore.Converters"
+						xmlns:models="clr-namespace:FileExplorerCore.Models"
+						xmlns:helpers="clr-namespace:FileExplorerCore.Helpers"
+						mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+						x:Class="FileExplorerCore.DisplayViews.FileDataGrid">
 	<UserControl.Resources>
 		<converters:PathToImageConverter x:Key="imageConverter" />
 		<converters:EditedOnConverter x:Key="editedOnConverter" />
@@ -16,80 +16,124 @@
 		<converters:ImageTransformConverter x:Key="imageTransformConverter" />
 	</UserControl.Resources>
 
-	<DataGrid x:Name="fileList"
-						Items="{Binding Files}"
-						CanUserReorderColumns="True"
-						CanUserResizeColumns="True"
-						AlternatingRowBackground="{DynamicResource Background}" >
-		<DataGrid.Columns>
-			<DataGridTemplateColumn CanUserSort="False"
-															CanUserResize="False"
-															CanUserReorder="False">
-				<DataGridTemplateColumn.CellTemplate>
+	<DataBox Items="{Binding Files}"
+					CanUserResizeColumns="True"
+					x:Name="fileList">
+		<DataBox.Columns>
+			<DataBoxTemplateColumn CanUserSort="False"
+														CanUserResize="False"
+														CanUserReorder="False">
+				<DataBoxTemplateColumn.CellTemplate>
 					<DataTemplate>
 						<Viewbox Width="{Binding ImageSize}"
-												 Height="{Binding ImageSize}"
-												 Margin="2.5"
-												 RenderTransform="{Binding ImageTransform}">
+										Height="{Binding ImageSize}"
+										Margin="2.5">
 							<Image Source="{Binding Image}" />
 						</Viewbox>
 					</DataTemplate>
-				</DataGridTemplateColumn.CellTemplate>
-			</DataGridTemplateColumn>
-			
-			<DataGridTextColumn Binding="{Binding Name}"
-													Header="Name"
-													CanUserResize="True"
-													CanUserReorder="True"
-													Width="Auto"/>
+				</DataBoxTemplateColumn.CellTemplate>
+			</DataBoxTemplateColumn>
 
-			<DataGridTemplateColumn CanUserSort="True"
-															CanUserReorder="True"
-															Header="Extension"
-															SortMemberPath="Extension">
-				<DataGridTemplateColumn.CellTemplate>
+			<DataBoxTextColumn Binding="{Binding Name}"
+												Header="Name"
+												CanUserResize="True"
+												CanUserReorder="True"
+												Width="Auto" />
+
+			<DataBoxTemplateColumn CanUserSort="True"
+														CanUserReorder="True"
+														Header="Extension"
+														Width="Auto"
+														SortMemberPath="Extension">
+				<DataBoxTemplateColumn.CellTemplate>
 					<DataTemplate>
 						<TextBlock Text="{Binding, Converter={StaticResource extensionConverter}}"
-											 TextTrimming="CharacterEllipsis" 
-											 VerticalAlignment="Center" 
-											 Margin="10 0 0 0" />
+											TextTrimming="CharacterEllipsis"
+											VerticalAlignment="Center"
+											Margin="10 0 0 0" />
 					</DataTemplate>
-				</DataGridTemplateColumn.CellTemplate>
-			</DataGridTemplateColumn>
+				</DataBoxTemplateColumn.CellTemplate>
+			</DataBoxTemplateColumn>
 
-			<DataGridTextColumn Binding="{Binding EditedOn}"
-													Header="Edited On"
-													CanUserResize="True"
-													CanUserReorder="True"
-													Width="Auto" />
+			<DataBoxTextColumn Binding="{Binding EditedOn}"
+												Header="Edited On"
+												CanUserResize="True"
+												CanUserReorder="True"
+												Width="Auto" />
 
-			<DataGridTextColumn Binding="{Binding, Converter={StaticResource sizeConverter}}"
-													SortMemberPath="Size"
-													Header="Size"
-													CanUserResize="True"
-													CanUserReorder="True"
-													Width="Auto" />
-		</DataGrid.Columns>
+			<DataBoxTextColumn Binding="{Binding, Converter={StaticResource sizeConverter}}"
+												SortMemberPath="Size"
+												Header="Size"
+												CanUserResize="True"
+												CanUserReorder="True"
+												Width="*" />
+		</DataBox.Columns>
+	</DataBox>
 
-		<DataGrid.Styles>
-			<Style Selector="TextBox">
-				<Setter Property="VerticalContentAlignment" Value="Center" />
-				<Setter Property="Background" Value="Transparent" />
-			</Style>
-			<!--<Style Selector="DataGridRow">
-				<Setter Property="DetailsTemplate">
-					<Setter.Value>
-						<DataTemplate>
-							<TextBlock Text="Hello" />
-						</DataTemplate>
-					</Setter.Value>
-				</Setter>
-				<Setter Property="Background" Value="{DynamicResource Background}" />
-			</Style>-->
-		</DataGrid.Styles>
-	</DataGrid>
-	
-		<!--<ScrollViewer>
+	<!-- <DataGrid x:Name="fileList" -->
+	<!-- 					Items="{Binding Files}" -->
+	<!-- 					CanUserReorderColumns="True" -->
+	<!-- 					CanUserResizeColumns="True" -->
+	<!-- 					AlternatingRowBackground="{DynamicResource Background}" > -->
+	<!-- 	<DataGrid.Columns> -->
+	<!-- 		<DataGridTemplateColumn CanUserSort="False" -->
+	<!-- 														CanUserResize="False" -->
+	<!-- 														CanUserReorder="False"> -->
+	<!-- 			<DataGridTemplateColumn.CellTemplate> -->
+	<!-- 				<DataTemplate> -->
+	<!-- 					<Viewbox Width="{Binding ImageSize}" -->
+	<!-- 											 Height="{Binding ImageSize}" -->
+	<!-- 											 Margin="2.5" -->
+	<!-- 											 RenderTransform="{Binding ImageTransform}"> -->
+	<!-- 						<Image Source="{Binding Image}" /> -->
+	<!-- 					</Viewbox> -->
+	<!-- 				</DataTemplate> -->
+	<!-- 			</DataGridTemplateColumn.CellTemplate> -->
+	<!-- 		</DataGridTemplateColumn> -->
+	<!-- 		 -->
+	<!-- 		<DataGridTextColumn Binding="{Binding Name}" -->
+	<!-- 												Header="Name" -->
+	<!-- 												CanUserResize="True" -->
+	<!-- 												CanUserReorder="True" -->
+	<!-- 												Width="Auto"/> -->
+	<!-- -->
+	<!-- 		<DataGridTemplateColumn CanUserSort="True" -->
+	<!-- 														CanUserReorder="True" -->
+	<!-- 														Header="Extension" -->
+	<!-- 														SortMemberPath="Extension"> -->
+	<!-- 			<DataGridTemplateColumn.CellTemplate> -->
+	<!-- 				<DataTemplate> -->
+	<!-- 					<TextBlock Text="{Binding, Converter={StaticResource extensionConverter}}" -->
+	<!-- 										 TextTrimming="CharacterEllipsis"  -->
+	<!-- 										 VerticalAlignment="Center"  -->
+	<!-- 										 Margin="10 0 0 0" /> -->
+	<!-- 				</DataTemplate> -->
+	<!-- 			</DataGridTemplateColumn.CellTemplate> -->
+	<!-- 		</DataGridTemplateColumn> -->
+	<!-- -->
+	<!-- 		<DataGridTextColumn Binding="{Binding EditedOn}" -->
+	<!-- 												Header="Edited On" -->
+	<!-- 												CanUserResize="True" -->
+	<!-- 												CanUserReorder="True" -->
+	<!-- 												Width="Auto" /> -->
+	<!-- -->
+	<!-- 		<DataGridTextColumn Binding="{Binding, Converter={StaticResource sizeConverter}}" -->
+	<!-- 												SortMemberPath="Size" -->
+	<!-- 												Header="Size" -->
+	<!-- 												CanUserResize="True" -->
+	<!-- 												CanUserReorder="True" -->
+	<!-- 												Width="Auto" /> -->
+	<!-- 	</DataGrid.Columns> -->
+	<!-- -->
+	<!-- 	<DataGrid.Styles> -->
+	<!-- 		<Style Selector="TextBox"> -->
+	<!-- 			<Setter Property="VerticalContentAlignment" Value="Center" /> -->
+	<!-- 			<Setter Property="Background" Value="Transparent" /> -->
+	<!-- 		</Style> -->
+	<!-- 	</DataGrid.Styles> -->
+	<!-- </DataGrid> -->
+
+	<!--<ScrollViewer>
 			<ItemsRepeater Items="{Binding Files}"
 										 Margin="10 5"
 										 x:Name="fileList">

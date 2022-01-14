@@ -560,21 +560,13 @@ namespace FileExplorerCore.ViewModels
 			else
 			{
 				var query = FileSearcher.PrepareQuery(search);
-				var regex = new Wildcard(search, RegexOptions.Singleline | RegexOptions.Compiled);
 
 				return new FileSystemEnumerable<FileModel>(path, GetFileModel, options)
 				{
 					ShouldIncludePredicate = (ref FileSystemEntry x) =>
-						regex.IsMatch(new String(x.FileName)) || FileSearcher.IsValid(x, query)
+						FileSystemName.MatchesSimpleExpression(search, x.FileName) || FileSearcher.IsValid(x, query)
 				};
 			}
-
-			//if (readers.TryGetValue(System.IO.Path.GetPathRoot(path), out var reader))
-			//{
-			//	return reader.GetNodes(path).Select(x => new FileModel(x.FullName, Directory.Exists(x.FullName), size));
-			//}
-
-			//return Enumerable.Empty<FileModel>();
 		}
 
 		private int GetFileSystemEntriesCount(string path, string search, EnumerationOptions options,
@@ -622,8 +614,15 @@ namespace FileExplorerCore.ViewModels
 			using var builder = new ValueStringBuilder(stackalloc char[entry.Directory.Length + entry.FileName.Length + 1]);
 
 			builder.Append(entry.Directory);
-			builder.Append('\\');
+			
+			if (!System.IO.Path.EndsInDirectorySeparator(entry.Directory))
+			{
+				builder.Append(System.IO.Path.DirectorySeparatorChar);
+			}
+			
 			builder.Append(entry.FileName);
+			
+			builder.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
 
 			return new FileModel(builder.AsSpan(), entry.IsDirectory);
 		}

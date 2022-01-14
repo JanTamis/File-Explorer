@@ -115,19 +115,19 @@ namespace FileExplorerCore.Helpers
 
 						}
 
-						//if (comparer == null && list.Count >= index && list.Count > 0 && index > 0)
-						//{
-						//	if (Dispatcher.UIThread.CheckAccess())
-						//	{
-						//		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, Math.Min(index - 1, 0)));
-						//	}
-						//	else
-						//	{
-						//		await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, 0)));
-						//	}
-						//}
-						//else
-						//{
+						if (comparer == null && list.Count >= index && list.Count > 0 && index > 0)
+						{
+							if (Dispatcher.UIThread.CheckAccess())
+							{
+								OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, Math.Min(index - 1, 0)));
+							}
+							else
+							{
+								await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, Math.Min(index - 1, 0))));
+							}
+						}
+						else
+						{
 							if (Dispatcher.UIThread.CheckAccess())
 							{
 								OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
@@ -136,7 +136,7 @@ namespace FileExplorerCore.Helpers
 							{
 								await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
 							}
-						//}
+						}
 
 						index = list.Count;
 
@@ -165,19 +165,19 @@ namespace FileExplorerCore.Helpers
 					}, token);
 				}
 
-				//if (comparer == null && list.Count <= index && list.Count > 0 && index > 0)
-				//{
-				//	if (Dispatcher.UIThread.CheckAccess())
-				//	{
-				//		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index));
-				//	}
-				//	else
-				//	{
-				//		await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index)));
-				//	}
-				//}
-				//else
-				//{
+				if (comparer == null && list.Count <= index && list.Count > 0 && index > 0)
+				{
+					if (Dispatcher.UIThread.CheckAccess())
+					{
+						OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, Math.Min(index - 1, 0)));
+					}
+					else
+					{
+						await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, Math.Min(index - 1, 0))));
+					}
+				}
+				else
+				{
 					if (Dispatcher.UIThread.CheckAccess())
 					{
 						OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
@@ -186,7 +186,7 @@ namespace FileExplorerCore.Helpers
 					{
 						await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
 					}
-				//}
+				}
 			}
 		}
 
@@ -359,13 +359,13 @@ namespace FileExplorerCore.Helpers
 
 		public async Task<int> BinarySearchAsync(T value, int index, int length, IAsyncComparer<T> comparer)
 		{
-			int lo = index;
-			int hi = index + length - 1;
+			var lo = index;
+			var hi = index + length - 1;
 
 			while (lo <= hi)
 			{
 				// i might overflow if lo and hi are both large positive numbers.
-				int i = GetMedian(lo, hi);
+				var i = GetMedian(lo, hi);
 
 				int c;
 
@@ -378,19 +378,19 @@ namespace FileExplorerCore.Helpers
 					return default;
 				}
 
-				if (c == 0)
+				switch (c)
 				{
-					return i;
-				}
-				if (c < 0)
-				{
-					lo = i + 1;
-				}
-				else
-				{
-					hi = i - 1;
+					case 0:
+						return i;
+					case < 0:
+						lo = i + 1;
+						break;
+					default:
+						hi = i - 1;
+						break;
 				}
 			}
+			
 			return ~lo;
 
 			static int GetMedian(int low, int hi)

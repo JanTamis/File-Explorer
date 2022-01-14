@@ -20,12 +20,9 @@ namespace FileExplorerCore.Helpers
 
 		public static bool IsValid(FileSystemEntry systemEntry, IEnumerable<(Categories, (Func<object, object, bool>, object))> query)
 		{
-			foreach (var item in query)
+			foreach (var (categories, (method, value)) in query)
 			{
-				var method = item.Item2.Item1;
-				var value = item.Item2.Item2;
-
-				switch (item.Item1)
+				switch (categories)
 				{
 					case Categories.date:
 						if (method(systemEntry.LastWriteTimeUtc.LocalDateTime.Date, value))
@@ -78,7 +75,7 @@ namespace FileExplorerCore.Helpers
 						{
 							try
 							{
-								string searchText = (string)value;
+								var searchText = (string)value;
 								string line;
 
 								using (var fileStream = File.OpenRead(systemEntry.ToFullPath()))
@@ -106,12 +103,12 @@ namespace FileExplorerCore.Helpers
 			return false;
 		}
 
-		public static IEnumerable<(Categories, (Func<object, object, bool>, object))> PrepareQuery(string pattern)
+		public static IEnumerable<(Categories, (Func<object?, object?, bool>, object))> PrepareQuery(string pattern)
 		{
 			var entries = pattern.Split('|', StringSplitOptions.RemoveEmptyEntries);
-			var list = new List<(Categories, (Func<object, object, bool>, object))>();
+			var list = new List<(Categories, (Func<object?, object?, bool>, object))>();
 
-			Func<object, object, bool> function;
+			Func<object?, object?, bool> function;
 
 			foreach (var entry in entries)
 			{
@@ -119,120 +116,121 @@ namespace FileExplorerCore.Helpers
 
 				if (temp.Length is 2 && Enum.TryParse<Categories>(temp[0].ToLower(), out var category))
 				{
-					string value = temp[1];
+					var value = temp[1];
 
-					switch (category)
+					if (category == Categories.date)
 					{
-						case Categories.date:
-							DateTime datetime;
+						DateTime datetime;
 
-							foreach (var operatorValue in operators)
+						foreach (var (key, func) in operators)
+						{
+							if (value.StartsWith(key))
 							{
-								if (value.StartsWith(operatorValue.Key))
-								{
-									value = value[operatorValue.Key.Length..];
+								value = value[key.Length..];
 
-									if (!DateTime.TryParse(value, out datetime))
+								if (!DateTime.TryParse(value, out datetime))
+								{
+									if (String.Equals(value, "today", StringComparison.CurrentCultureIgnoreCase))
 									{
-										if (String.Equals(value, "today", StringComparison.CurrentCultureIgnoreCase))
-										{
-											datetime = DateTime.Today;
-										}
-										else if (String.Equals(value, "yesterday", StringComparison.CurrentCultureIgnoreCase))
-										{
-											datetime = DateTime.Today.AddDays(-1);
-										}
+										datetime = DateTime.Today;
 									}
-									list.Add((category, (operatorValue.Value, datetime.Date)));
-									break;
+									else if (String.Equals(value, "yesterday", StringComparison.CurrentCultureIgnoreCase))
+									{
+										datetime = DateTime.Today.AddDays(-1);
+									}
 								}
-							}
 
-							if (!DateTime.TryParse(value, out datetime))
+								list.Add((category, (Value: func, datetime.Date)));
+								break;
+							}
+						}
+
+						if (!DateTime.TryParse(value, out datetime))
+						{
+							if (String.Equals(value, "today", StringComparison.CurrentCultureIgnoreCase))
 							{
-								if (String.Equals(value, "today", StringComparison.CurrentCultureIgnoreCase))
-								{
-									datetime = DateTime.Today;
-								}
-								else if (String.Equals(value, "yesterday", StringComparison.CurrentCultureIgnoreCase))
-								{
-									datetime = DateTime.Today.AddDays(-1);
-								}
+								datetime = DateTime.Today;
 							}
-
-							if (operators.TryGetValue("=", out function!))
+							else if (String.Equals(value, "yesterday", StringComparison.CurrentCultureIgnoreCase))
 							{
-								list.Add((category, (function, datetime.Date)));
+								datetime = DateTime.Today.AddDays(-1);
 							}
+						}
 
-							break;
-						case Categories.size:
-							long size;
+						if (operators.TryGetValue("=", out function!))
+						{
+							list.Add((category, (function, datetime.Date)));
+						}
+					}
+					else if (category == Categories.size)
+					{
+						long size;
 
-							foreach (var operatorValue in operators)
+						foreach (var operatorValue in operators)
+						{
+							if (value.StartsWith(operatorValue.Key) && Int64.TryParse(value[operatorValue.Key.Length..], out size))
 							{
-								if (value.StartsWith(operatorValue.Key) && Int64.TryParse(value[operatorValue.Key.Length..], out size))
-								{
-									list.Add((category, (operatorValue.Value, size)));
-									break;
-								}
+								list.Add((category, (operatorValue.Value, size)));
+								break;
 							}
+						}
 
-							if (operators.TryGetValue("=", out function!) && Int64.TryParse(value, out size))
+						if (operators.TryGetValue("=", out function!) && Int64.TryParse(value, out size))
+						{
+							list.Add((category, (function, size)));
+						}
+					}
+					else if (category == Categories.name)
+					{
+						foreach (var operatorValue in operators)
+						{
+							if (value.StartsWith(operatorValue.Key))
 							{
-								list.Add((category, (function, size)));
+								list.Add((category, (operatorValue.Value, value[operatorValue.Key.Length..])));
+								break;
 							}
-							break;
-						case Categories.name:
-							foreach (var operatorValue in operators)
-							{
-								if (value.StartsWith(operatorValue.Key))
-								{
-									list.Add((category, (operatorValue.Value, value[operatorValue.Key.Length..])));
-									break;
-								}
-							}
+						}
 
-							if (operators.TryGetValue("=", out function!))
+						if (operators.TryGetValue("=", out function!))
+						{
+							list.Add((category, (function, value)));
+						}
+					}
+					else if (category == Categories.ext)
+					{
+						foreach (var (key, func) in operators)
+						{
+							if (value.StartsWith(key))
 							{
-								list.Add((category, (function, value)));
+								list.Add((category, (Value: func, value[key.Length..])));
+								break;
 							}
-							break;
-						case Categories.ext:
-							foreach (var operatorValue in operators)
+						}
+
+						if (operators.TryGetValue("=", out function!))
+						{
+							list.Add((category, (function, value)));
+						}
+					}
+					else if (category == Categories.@is)
+					{
+						FileAttributes attribute;
+
+						if (Enum.TryParse(value, out attribute))
+						{
+							if (value.StartsWith('!'))
 							{
-								if (value.StartsWith(operatorValue.Key))
-								{
-									list.Add((category, (operatorValue.Value, value[operatorValue.Key.Length..])));
-									break;
-								}
+								list.Add((category, ((_, _) => false, attribute)));
 							}
-
-							if (operators.TryGetValue("=", out function!))
+							else if (value.StartsWith('=') || operators.ContainsKey("="))
 							{
-								list.Add((category, (function, value)));
+								list.Add((category, ((_, _) => true, attribute)));
 							}
-							break;
-						case Categories.@is:
-							FileAttributes attribute;
-
-							if (Enum.TryParse(value, out attribute))
-							{
-								if (value.StartsWith('!'))
-								{
-									list.Add((category, ((x, y) => false, attribute)));
-								}
-								else if (value.StartsWith('=') || operators.ContainsKey("="))
-								{
-									list.Add((category, ((x, y) => true, attribute)));
-								}
-							}
-							break;
-						case Categories.contains:
-
-
-							list.Add((category, (null, value)));
-							break;
+						}
+					}
+					else if (category == Categories.contains)
+					{
+						list.Add((category, (null, value)));
 					}
 				}
 			}
@@ -242,46 +240,40 @@ namespace FileExplorerCore.Helpers
 
 		public static bool IsTextFile(FileStream srcFile, bool thorough)
 		{
-			byte[] b = new byte[5];
+			Span<byte> b = stackalloc byte[5];
 
-			srcFile.Read(b, 0, 5);
+			srcFile.Read(b);
 
-			if (b[0] == 0x00 && b[1] == 0x00 && b[2] == 0xFE && b[3] == 0xFF)
-				return true; // UTF-32, big-endian 
-			else if (b[0] == 0xFF && b[1] == 0xFE && b[2] == 0x00 && b[3] == 0x00)
-				return true; // UTF-32, little-endian
-			else if (b[0] == 0xFE && b[1] == 0xFF)
-				return true; // UTF-16, big-endian
-			else if (b[0] == 0xFF && b[1] == 0xFE)
-				return true; // UTF-16, little-endian
-			else if (b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF)
-				return true;  // UTF-8
-			else if (b[0] == 0x2b && b[1] == 0x2f && b[2] == 0x76)
-				return true;  // UTF-7
-
+			switch (b[0])
+			{
+				case 0x00 when b[1] == 0x00 && b[2] == 0xFE && b[3] == 0xFF:
+				// UTF-32, little-endian
+				case 0xFF when b[1] == 0xFE && b[2] == 0x00 && b[3] == 0x00:
+				// UTF-16, big-endian
+				case 0xFE when b[1] == 0xFF:
+				// UTF-16, little-endian
+				case 0xFF when b[1] == 0xFE:
+				// UTF-8
+				case 0xEF when b[1] == 0xBB && b[2] == 0xBF:
+				// UTF-7
+				case 0x2b when b[1] == 0x2f && b[2] == 0x76:
+					return true; // UTF-32, big-endian 
+			}
 
 			// Maybe there is a future encoding ...
 			// PS: The above yields more than this - this doesn't find UTF7 ...
 			if (thorough)
 			{
-				foreach (System.Text.EncodingInfo ei in System.Text.Encoding.GetEncodings())
+				foreach (var ei in System.Text.Encoding.GetEncodings())
 				{
-					System.Text.Encoding enc = ei.GetEncoding();
-
-					byte[] preamble = enc.GetPreamble();
+					var enc = ei.GetEncoding();
+					var preamble = enc.GetPreamble();
+					
 					if (preamble.Length == 0)
 						continue;
 
 					if (preamble.Length > b.Length)
 						continue;
-
-					for (int i = 0; i < preamble.Length; ++i)
-					{
-						if (b[i] != preamble[i])
-						{
-							continue;
-						}
-					} // Next i 
 
 					return true;
 				} // Next ei

@@ -230,13 +230,14 @@
     <Resource Include="Assets\UIIcons\FileExplorer.svg" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.11-rc.2" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.11-rc.2" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.11-rc.2" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.11-rc.2" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.11-rc.2" />
-    <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.11-rc.2" />
+    <PackageReference Include="Avalonia" Version="0.10.11" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.11" />
+    <PackageReference Include="Avalonia.Desktop" Version="0.10.11" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.11" />
+    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.11" />
+    <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.11" />
     <PackageReference Include="AvaloniaUIRibbon" Version="1.1.0-beta" />
+    <PackageReference Include="DataBox" Version="0.10.11" />
     <PackageReference Include="DiscUtils.FileSystems" Version="0.16.13" />
     <PackageReference Include="ErrorProne.NET.Structs" Version="0.4.0-beta.1">
       <PrivateAssets>all</PrivateAssets>
@@ -245,7 +246,7 @@
     <PackageReference Include="LinqOptimizer.CSharp" Version="0.7.0" />
     <PackageReference Include="MetadataExtractor" Version="2.7.1" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="6.0.0-preview.5.21301.5" />
-    <PackageReference Include="Svg.Skia" Version="0.5.11-rc.2" />
+    <PackageReference Include="Svg.Skia" Version="0.5.11" />
     <PackageReference Include="System.Linq.Async" Version="5.1.0" />
     <PackageReference Include="System.Runtime.Experimental" Version="6.0.0" />
   </ItemGroup>

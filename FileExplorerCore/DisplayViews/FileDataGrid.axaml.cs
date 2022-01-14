@@ -8,15 +8,14 @@ using Avalonia.Markup.Xaml;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
+using DataBox;
 
 namespace FileExplorerCore.DisplayViews
 {
 	public partial class FileDataGrid : UserControl, INotifyPropertyChanged
 	{
 		private int anchorIndex;
-		private double elementHeight;
 
 		public event Action<string> PathChanged = delegate { };
 		public new event PropertyChangedEventHandler PropertyChanged = delegate { };
@@ -44,8 +43,6 @@ namespace FileExplorerCore.DisplayViews
 			}
 		}
 
-		public DataGridCollectionView View => new(Files);
-
 		public FileDataGrid() : base()
 		{
 			AvaloniaXamlLoader.Load(this);
@@ -57,35 +54,60 @@ namespace FileExplorerCore.DisplayViews
 
 			//grid.KeyDown += Grid_KeyDown;
 
-			var grid = this.FindControl<DataGrid>("fileList");
+			var grid = this.FindControl<DataBox.DataBox>("fileList");
 
-			grid.LoadingRow += Grid_LoadingRow;
-			grid.UnloadingRow += Grid_UnloadingRow;
+			// grid.LoadingRow += Grid_LoadingRow;
+			// grid.UnloadingRow += Grid_UnloadingRow;
+			//
+			// grid.SelectionChanged += Grid_SelectionChanged;
 
-			grid.SelectionChanged += Grid_SelectionChanged;
-
-			ListBoxItem.BoundsProperty.Changed.Subscribe(x =>
+			DataContextProperty.Changed.Subscribe(s =>
 			{
-				if (elementHeight < x.NewValue.Value.Height && x.Sender is ListBoxItem)
+				if (s.Sender is DataBoxRow row)
 				{
-					elementHeight = x.NewValue.Value.Height;
+					if (s.OldValue.Value is FileModel oldModel)
+					{
+						oldModel.IsVisible = false;
+					}
+
+					if (s.NewValue.Value is FileModel newModel)
+					{
+						newModel.IsVisible = true;
+					}
 				}
-			}, delegate { }, delegate { }, default);
+			});
 
-			FileModel.SelectionChanged += (file) =>
+			grid.DoubleTapped += (sender, args) =>
 			{
-				if (grid.Items != null)
+				if (args.Source is { InteractiveParent: DataBoxCell { DataContext: FileModel model } })
 				{
-					if (file.IsSelected)
-					{
-						grid.SelectedItems.Add(file);
-					}
-					else
-					{
-						grid.SelectedItems.Remove(file);
-					}
+					PathChanged?.Invoke(model.Path);
 				}
 			};
+
+			ListBoxItem.IsSelectedProperty.Changed.Subscribe(s =>
+			{
+				if (s.Sender is DataBoxRow { DataContext: FileModel model })
+				{
+					model.IsSelected = s.NewValue.Value;
+				}
+			});
+
+
+			// FileModel.SelectionChanged += (file) =>
+			// {
+			// 	if (grid.Items != null)
+			// 	{
+			// 		if (file.IsSelected)
+			// 		{
+			// 			grid.SelectedItems.Add(file);
+			// 		}
+			// 		else
+			// 		{
+			// 			grid.SelectedItems.Remove(file);
+			// 		}
+			// 	}
+			// };
 		}
 
 		private void Grid_SelectionChanged(object? sender, SelectionChangedEventArgs e)
@@ -121,63 +143,63 @@ namespace FileExplorerCore.DisplayViews
 			}
 		}
 
-		private void Grid_KeyDown(object? sender, KeyEventArgs e)
-		{
-			if (sender is ItemsRepeater { Parent: ScrollViewer viewer } repeater)
-			{
-				if (e.Key is Key.A && e.KeyModifiers is KeyModifiers.Control)
-				{
-					foreach (var file in Files.Where(x => !x.IsSelected))
-					{
-						file.IsSelected = true;
-					}
-				}
-				else if (e.Key is Key.Down)
-				{
-					anchorIndex = Math.Min(Files.Count - 1, anchorIndex + 1);
-
-					UpdateSelection(anchorIndex);
-
-					viewer.Offset = new Vector(0, anchorIndex * elementHeight - viewer.Bounds.Height / 2 + elementHeight / 2);
-				}
-				else if (e.Key is Key.Up)
-				{
-					anchorIndex = Math.Max(0, anchorIndex - 1);
-
-					UpdateSelection(anchorIndex);
-
-					viewer.Offset = new Vector(0, anchorIndex * elementHeight - viewer.Bounds.Height / 2 + elementHeight / 2);
-				}
-				else if (e.Key.ToString() is { Length: 1 } key)
-				{
-					var index = IndexOf(Char.ToUpper(key[0]));
-
-					if (index != -1)
-					{
-						anchorIndex = index;
-
-						UpdateSelection(anchorIndex);
-
-						viewer.Offset = new Vector(0, anchorIndex * elementHeight - viewer.Bounds.Height / 2 + elementHeight / 2);
-					}
-				}
-			}
-
-			int IndexOf(char startChar)
-			{
-				var files = Files;
-
-				for (int i = 0; i < files.Count; i++)
-				{
-					if (Char.ToUpper(files[i].Name[0]) == startChar)
-					{
-						return i;
-					}
-				}
-
-				return -1;
-			}
-		}
+		// private void Grid_KeyDown(object? sender, KeyEventArgs e)
+		// {
+		// 	if (sender is ItemsRepeater { Parent: ScrollViewer viewer } repeater)
+		// 	{
+		// 		if (e.Key is Key.A && e.KeyModifiers is KeyModifiers.Control)
+		// 		{
+		// 			foreach (var file in Files.Where(x => !x.IsSelected))
+		// 			{
+		// 				file.IsSelected = true;
+		// 			}
+		// 		}
+		// 		else if (e.Key is Key.Down)
+		// 		{
+		// 			anchorIndex = Math.Min(Files.Count - 1, anchorIndex + 1);
+		//
+		// 			UpdateSelection(anchorIndex);
+		//
+		// 			viewer.Offset = new Vector(0, anchorIndex * elementHeight - viewer.Bounds.Height / 2 + elementHeight / 2);
+		// 		}
+		// 		else if (e.Key is Key.Up)
+		// 		{
+		// 			anchorIndex = Math.Max(0, anchorIndex - 1);
+		//
+		// 			UpdateSelection(anchorIndex);
+		//
+		// 			viewer.Offset = new Vector(0, anchorIndex * elementHeight - viewer.Bounds.Height / 2 + elementHeight / 2);
+		// 		}
+		// 		else if (e.Key.ToString() is { Length: 1 } key)
+		// 		{
+		// 			var index = IndexOf(Char.ToUpper(key[0]));
+		//
+		// 			if (index != -1)
+		// 			{
+		// 				anchorIndex = index;
+		//
+		// 				UpdateSelection(anchorIndex);
+		//
+		// 				viewer.Offset = new Vector(0, anchorIndex * elementHeight - viewer.Bounds.Height / 2 + elementHeight / 2);
+		// 			}
+		// 		}
+		// 	}
+		//
+		// 	int IndexOf(char startChar)
+		// 	{
+		// 		var files = Files;
+		//
+		// 		for (int i = 0; i < files.Count; i++)
+		// 		{
+		// 			if (Char.ToUpper(files[i].Name[0]) == startChar)
+		// 			{
+		// 				return i;
+		// 			}
+		// 		}
+		//
+		// 		return -1;
+		// 	}
+		// }
 
 		private void Grid_ElementClearing(object? sender, ItemsRepeaterElementClearingEventArgs e)
 		{
@@ -199,10 +221,10 @@ namespace FileExplorerCore.DisplayViews
 					var index = Files.IndexOf(model);
 
 					UpdateSelection(
-												index,
-												true,
-												e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
-												e.KeyModifiers.HasAllFlags(KeyModifiers.Control));
+						index,
+						true,
+						e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
+						e.KeyModifiers.HasAllFlags(KeyModifiers.Control));
 				}
 			}
 		}
@@ -238,10 +260,10 @@ namespace FileExplorerCore.DisplayViews
 		/// <param name="toggleModifier">Whether the toggle modifier is enabled (i.e. ctrl key).</param>
 		/// <param name="rightButton">Whether the event is a right-click.</param>
 		protected void UpdateSelection(
-				int index,
-				bool select = true,
-				bool rangeModifier = false,
-				bool toggleModifier = false)
+			int index,
+			bool select = true,
+			bool rangeModifier = false,
+			bool toggleModifier = false)
 		{
 			var files = Files;
 
