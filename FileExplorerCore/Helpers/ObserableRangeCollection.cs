@@ -254,8 +254,8 @@ namespace FileExplorerCore.Helpers
 
 						}
 
-						//if (comparer == null && list.Count <= index)
-						//{
+						if (comparer == null && list.Count <= index)
+						{
 							if (Dispatcher.UIThread.CheckAccess())
 							{
 								OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index));
@@ -264,18 +264,18 @@ namespace FileExplorerCore.Helpers
 							{
 								await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index)));
 							}
-						//}
-						//else
-						//{
-						//	if (Dispatcher.UIThread.CheckAccess())
-						//	{
-						//		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-						//	}
-						//	else
-						//	{
-						//		await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
-						//	}
-						//}
+						}
+						else
+						{
+							if (Dispatcher.UIThread.CheckAccess())
+							{
+								OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+							}
+							else
+							{
+								await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
+							}
+						}
 
 						index = list.Count - 1;
 

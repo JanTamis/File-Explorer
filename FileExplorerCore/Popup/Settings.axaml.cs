@@ -4,7 +4,6 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Themes.Fluent;
 using Avalonia.Threading;
 using FileExplorerCore.Interfaces;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;

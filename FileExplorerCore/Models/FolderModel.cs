@@ -2,7 +2,6 @@
 using Avalonia.Media.Imaging;
 using FileExplorerCore.Helpers;
 using ReactiveUI;
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

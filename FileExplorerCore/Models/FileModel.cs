@@ -4,7 +4,6 @@ using Avalonia.Threading;
 using FileExplorerCore.Converters;
 using FileExplorerCore.Helpers;
 using System;
-using System.Buffers;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.IO;

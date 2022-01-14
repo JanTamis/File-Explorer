@@ -10,8 +10,6 @@ using FileExplorerCore.Popup;
 using Microsoft.VisualBasic.FileIO;
 using Nessos.LinqOptimizer.CSharp;
 using ReactiveUI;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Enumeration;
