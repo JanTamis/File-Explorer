@@ -14,6 +14,7 @@
 		<converters:SizeConverter x:Key="sizeConverter" />
 		<converters:FileNameConverter x:Key="fileNameConverter" />
 		<converters:ImageTransformConverter x:Key="imageTransformConverter" />
+    <converters:DateTimeConverter x:Key="dateTimeConverter" />
 	</UserControl.Resources>
 
 	<DataBox Items="{Binding Files}"
@@ -55,11 +56,12 @@
 				</DataBoxTemplateColumn.CellTemplate>
 			</DataBoxTemplateColumn>
 
-			<DataBoxTextColumn Binding="{Binding EditedOn}"
-												Header="Edited On"
-												CanUserResize="True"
-												CanUserReorder="True"
-												Width="Auto" />
+			<DataBoxTextColumn Binding="{Binding EditedOn, Converter={StaticResource dateTimeConverter}}"
+                         SortMemberPath="EditedOn"
+												 Header="Edited On"
+												 CanUserResize="True"
+												 CanUserReorder="True"
+												 Width="Auto" />
 
 			<DataBoxTextColumn Binding="{Binding, Converter={StaticResource sizeConverter}}"
 												SortMemberPath="Size"

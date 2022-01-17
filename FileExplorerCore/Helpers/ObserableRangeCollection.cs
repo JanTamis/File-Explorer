@@ -115,7 +115,7 @@ namespace FileExplorerCore.Helpers
 
 						}
 
-						if (comparer == null && list.Count >= index && list.Count > 0 && index > 0)
+						if (comparer is null && list.Count >= index && list.Count > 0 && index > 0)
 						{
 							if (Dispatcher.UIThread.CheckAccess())
 							{
@@ -366,17 +366,7 @@ namespace FileExplorerCore.Helpers
 			{
 				// i might overflow if lo and hi are both large positive numbers.
 				var i = GetMedian(lo, hi);
-
-				int c;
-
-				try
-				{
-					c = await comparer.CompareAsync(Items[i], value);
-				}
-				catch (Exception)
-				{
-					return default;
-				}
+				var c = await comparer.CompareAsync(Items[i], value);
 
 				switch (c)
 				{
@@ -427,7 +417,7 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
-		public void PropertyChanged(string property)
+		public new void PropertyChanged(string property)
 		{
 			OnPropertyChanged(property);
 		}

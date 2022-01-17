@@ -17,7 +17,7 @@ namespace FileExplorerCore.Models
 			var result = sortMember switch
 			{
 				SortEnum.Name => String.Compare(x.Name, y.Name),
-				SortEnum.Edited => x.EditedOn.CompareTo(y.EditedOn),
+				SortEnum.Edited => y.EditedOn.CompareTo(x.EditedOn),
 				SortEnum.Size => x.Size.CompareTo(y.Size),
 				SortEnum.Extension => String.Compare(x.Extension, y.Extension),
 				_ => 0

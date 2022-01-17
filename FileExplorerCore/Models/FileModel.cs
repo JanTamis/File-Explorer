@@ -1,8 +1,8 @@
 ﻿using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
-using FileExplorerCore.Converters;
 using FileExplorerCore.Helpers;
+using Humanizer;
 using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
@@ -238,7 +238,7 @@ namespace FileExplorerCore.Models
 						}
 					});
 
-					return SizeConverter.ByteSize(size);
+					return size.Bytes().ToString();
 				});
 			}
 		}

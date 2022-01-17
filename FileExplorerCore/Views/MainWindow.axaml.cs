@@ -9,7 +9,6 @@ using Avalonia.Markup.Xaml;
 using FileExplorerCore.Models;
 using FileExplorerCore.ViewModels;
 using ReactiveUI;
-using System;
 using System.Runtime;
 
 namespace FileExplorerCore.Views

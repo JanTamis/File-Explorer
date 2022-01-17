@@ -1,19 +1,20 @@
-﻿using System;
-using Avalonia.Data.Converters;
+﻿using Avalonia.Data.Converters;
+using Humanizer;
+using System;
 using System.Globalization;
 
 namespace FileExplorerCore.Converters
 {
-	public class MoreThanConverter : IValueConverter
+	public class DateTimeConverter : IValueConverter
 	{
 		public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{
-			if (value is int amount && parameter is string number && Int32.TryParse(number, out var threshold))
+			if (value is DateTime dateTime)
 			{
-				return amount > threshold;
+				return dateTime.Humanize();
 			}
 
-			return false;
+			return String.Empty;
 		}
 
 		public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
