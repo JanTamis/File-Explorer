@@ -611,7 +611,7 @@ namespace FileExplorerCore.ViewModels
 
 		public static FileModel GetFileModel(ref FileSystemEntry entry)
 		{
-			using var builder = new ValueStringBuilder(stackalloc char[entry.Directory.Length + entry.FileName.Length + 1]);
+			using var builder = new ValueStringBuilder(entry.Directory.Length + entry.FileName.Length + 1);
 
 			builder.Append(entry.Directory);
 			
