@@ -135,25 +135,6 @@
 			</ItemsControl.ItemTemplate>
 		</ItemsControl>
 
-		<!--<controls:WeightedPanel Grid.Row="2">
-			<Label Content="Oregon" controls:WeightedPanel.Weight="93381"
-           Background="Bisque" />
-			<Label Content="California" controls:WeightedPanel.Weight="163696"
-						 Background="Lavender" />
-			<Label Content="Colorado" controls:WeightedPanel.Weight="104094"
-						 Background="LightCoral" />
-			<Label Content="Montana" controls:WeightedPanel.Weight="147042"
-						 Background="Honeydew" />
-			<Label Content="Nevada" controls:WeightedPanel.Weight="110561"
-						 Background="Goldenrod" />
-			<Label Content="New Mexico" controls:WeightedPanel.Weight="121589"
-						 Background="Silver" />
-			<Label Content="Texas" controls:WeightedPanel.Weight="268581"
-						 Background="Thistle" />
-			<Label Content="Arizona" controls:WeightedPanel.Weight="113998"
-						 Background="GhostWhite" />
-		</controls:WeightedPanel>-->
-
 		<GridSplitter ResizeDirection="Rows"
 									VerticalAlignment="Top"
 									Background="{DynamicResource MenuBackground}"

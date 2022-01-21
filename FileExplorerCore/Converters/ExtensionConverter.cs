@@ -10,7 +10,7 @@ namespace FileExplorerCore.Converters
 	{
 		private static readonly bool IsWindows = OperatingSystem.IsWindows();
 
-		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{
 			return value switch
 			{
@@ -21,7 +21,7 @@ namespace FileExplorerCore.Converters
 			};
 		}
 
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{
 			return String.Empty;
 		}

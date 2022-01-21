@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Threading;
-using FileExplorerCore.Converters;
 using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
@@ -16,6 +15,7 @@ using System.Runtime;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Humanizer;
 
 namespace FileExplorerCore.ViewModels
 {
@@ -124,7 +124,7 @@ namespace FileExplorerCore.ViewModels
 						var fileSize = selectedFiles.Where(x => !x.IsFolder)
 							.Sum(s => s.Size);
 
-						result += $", {SizeConverter.ByteSize(fileSize)}";
+						result += $", {fileSize.Bytes()}";
 					}
 				}
 
@@ -583,7 +583,7 @@ namespace FileExplorerCore.ViewModels
 				var query = FileSearcher.PrepareQuery(search);
 				var regex = new Wildcard(search, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-				enumerable = new(path, null, options)
+				enumerable = new(path, delegate { return false; }, options)
 				{
 					ShouldIncludePredicate = (ref FileSystemEntry x) =>
 						FileSystemName.MatchesSimpleExpression(search, x.FileName) || FileSearcher.IsValid(x, query)
@@ -611,7 +611,7 @@ namespace FileExplorerCore.ViewModels
 
 		public static FileModel GetFileModel(ref FileSystemEntry entry)
 		{
-			using var builder = new ValueStringBuilder(stackalloc char[entry.Directory.Length + entry.FileName.Length + 1]);
+			using var builder = new ValueStringBuilder(entry.Directory.Length + entry.FileName.Length + 1);
 
 			builder.Append(entry.Directory);
 			

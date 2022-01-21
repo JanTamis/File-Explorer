@@ -1,8 +1,8 @@
 ﻿using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Threading;
-using FileExplorerCore.Converters;
+using FileExplorerCore.Extensions;
 using FileExplorerCore.Helpers;
+using Humanizer;
 using System;
 using System.Collections.Concurrent;
 using System.ComponentModel;
@@ -57,7 +57,7 @@ namespace FileExplorerCore.Models
 				{
 					NeedsNewImage = true;
 
-					OnPropertyChanged(nameof(Image));
+					this.OnPropertyChanged(nameof(Image));
 				}
 				else
 				{
@@ -74,7 +74,7 @@ namespace FileExplorerCore.Models
 		public Transform ImageTransform
 		{
 			get => _imageTransform;
-			set => OnPropertyChanged(ref _imageTransform, value);
+			set => this.OnPropertyChanged(ref _imageTransform, value);
 		}
 
 		public bool IsSelected
@@ -84,7 +84,7 @@ namespace FileExplorerCore.Models
 			{
 				if (_isSelected != value)
 				{
-					OnPropertyChanged(ref _isSelected, value);
+					this.OnPropertyChanged(ref _isSelected, value);
 					SelectionChanged?.Invoke(this);
 				}
 			}
@@ -95,7 +95,7 @@ namespace FileExplorerCore.Models
 		public bool NeedsTranslation
 		{
 			get => needsTranslation;
-			set => OnPropertyChanged(ref needsTranslation, value);
+			set => this.OnPropertyChanged(ref needsTranslation, value);
 		}
 
 		public string Path
@@ -116,8 +116,8 @@ namespace FileExplorerCore.Models
 
 				_path = GetEncoding().GetBytes(value);
 
-				OnPropertyChanged(nameof(Name));
-				OnPropertyChanged(nameof(Extension));
+				this.OnPropertyChanged(nameof(Name));
+				this.OnPropertyChanged(nameof(Extension));
 			}
 		}
 
@@ -163,7 +163,7 @@ namespace FileExplorerCore.Models
 						Path = newPath;
 					}
 
-					OnPropertyChanged(ref _name, value);
+					this.OnPropertyChanged(ref _name, value);
 				}
 				catch (Exception)
 				{
@@ -238,7 +238,7 @@ namespace FileExplorerCore.Models
 						}
 					});
 
-					return SizeConverter.ByteSize(size);
+					return size.Bytes().ToString();
 				});
 			}
 		}
@@ -297,7 +297,7 @@ namespace FileExplorerCore.Models
 
 				return _image;
 			}
-			set => OnPropertyChanged(ref _image, value);
+			set => this.OnPropertyChanged(ref _image, value);
 		}
 
 		public FileModel(ReadOnlySpan<char> path, bool isFolder)
@@ -320,27 +320,6 @@ namespace FileExplorerCore.Models
 			encoder.GetBytes(path, _path);
 
 			IsFolder = isFolder;
-		}
-
-		public void OnPropertyChanged<T>(ref T field, T value, [CallerMemberName] string? name = null)
-		{
-			field = value;
-
-			OnPropertyChanged(name);
-		}
-
-		public Task OnPropertyChanged([CallerMemberName] string? name = null)
-		{
-			if (Dispatcher.UIThread.CheckAccess())
-			{
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-			}
-			else
-			{
-				return Dispatcher.UIThread.InvokeAsync(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
-			}
-
-			return Task.CompletedTask;
 		}
 
 		public void Dispose()
