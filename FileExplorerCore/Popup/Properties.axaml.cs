@@ -83,7 +83,7 @@ namespace FileExplorerCore.Popup
 		{
 			get
 			{
-				if (size == -1 && !String.IsNullOrWhiteSpace(Path))
+				if (size is -1 && !String.IsNullOrWhiteSpace(Path))
 				{
 					if (!model.IsFolder)
 					{

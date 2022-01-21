@@ -2,6 +2,7 @@
 using Avalonia.Media.Imaging;
 using FileExplorerCore.Extensions;
 using FileExplorerCore.Helpers;
+using FileExplorerCore.ViewModels;
 using Humanizer;
 using System;
 using System.Collections.Concurrent;
@@ -16,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace FileExplorerCore.Models
 {
-	public class FileModel : INotifyPropertyChanged, IDisposable
+	public class FileModel : ViewModelBase, IDisposable
 	{
 		public static readonly ConcurrentBag<FileModel> FileImageQueue = new();
 
@@ -37,7 +38,6 @@ namespace FileExplorerCore.Models
 		private bool needsTranslation;
 
 		public static event Action<FileModel> SelectionChanged = delegate { };
-		public event PropertyChangedEventHandler? PropertyChanged;
 
 		private static bool _isNotLoading = true;
 		private bool _isVisible = true;
@@ -56,7 +56,6 @@ namespace FileExplorerCore.Models
 				if (value)
 				{
 					NeedsNewImage = true;
-
 					this.OnPropertyChanged(nameof(Image));
 				}
 				else

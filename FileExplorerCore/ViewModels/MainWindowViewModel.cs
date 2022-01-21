@@ -37,7 +37,7 @@ namespace FileExplorerCore.ViewModels
 		public IEnumerable<string> SearchHistory
 		{
 			get => searchHistory;
-			set => this.RaiseAndSetIfChanged(ref searchHistory, value);
+			set => this.OnPropertyChanged(ref searchHistory, value);
 		}
 
 		public TabItemViewModel CurrentTab
@@ -45,10 +45,10 @@ namespace FileExplorerCore.ViewModels
 			get => _currentTab;
 			set
 			{
-				this.RaiseAndSetIfChanged(ref _currentTab, value);
+				this.OnPropertyChanged(ref _currentTab, value);
 
-				this.RaisePropertyChanged(nameof(Files));
-				this.RaisePropertyChanged(nameof(Path));
+				this.OnPropertyChanged(nameof(Files));
+				this.OnPropertyChanged(nameof(Path));
 			}
 		}
 
@@ -61,7 +61,7 @@ namespace FileExplorerCore.ViewModels
 				
 				CurrentTab.Path = value;
 
-				this.RaisePropertyChanged();
+				this.OnPropertyChanged();
 
 				CurrentTab.UpdateFiles(false, "*").ContinueWith(x =>
 				{
@@ -162,7 +162,7 @@ namespace FileExplorerCore.ViewModels
 					file.IsSelected = true;
 				}
 
-				CurrentTab.RaisePropertyChanged(nameof(CurrentTab.SelectionText));
+				CurrentTab.OnPropertyChanged(nameof(CurrentTab.SelectionText));
 				CurrentTab.Files.PropertyChanged("IsSelected");
 			}
 		}
@@ -176,7 +176,7 @@ namespace FileExplorerCore.ViewModels
 					file.IsSelected = false;
 				}
 
-				CurrentTab.RaisePropertyChanged(nameof(CurrentTab.SelectionText));
+				CurrentTab.OnPropertyChanged(nameof(CurrentTab.SelectionText));
 				CurrentTab.Files.PropertyChanged("IsSelected");
 			}
 		}
@@ -190,7 +190,7 @@ namespace FileExplorerCore.ViewModels
 					file.IsSelected ^= true;
 				}
 
-				CurrentTab.RaisePropertyChanged(nameof(CurrentTab.SelectionText));
+				CurrentTab.OnPropertyChanged(nameof(CurrentTab.SelectionText));
 				CurrentTab.Files.PropertyChanged("IsSelected");
 			}
 		}

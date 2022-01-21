@@ -62,7 +62,7 @@ namespace FileExplorerCore.ViewModels
 			get => _sort;
 			set
 			{
-				this.RaiseAndSetIfChanged(ref _sort, value);
+				this.OnPropertyChanged(ref _sort, value);
 
 				if (!IsLoading && Files.Count > 1)
 				{
@@ -85,8 +85,8 @@ namespace FileExplorerCore.ViewModels
 			get => _count;
 			set
 			{
-				this.RaiseAndSetIfChanged(ref _count, value);
-				this.RaisePropertyChanged(nameof(FileCountText));
+				this.OnPropertyChanged(ref _count, value);
+				this.OnPropertyChanged(nameof(FileCountText));
 			}
 		}
 
@@ -95,10 +95,10 @@ namespace FileExplorerCore.ViewModels
 			get => _fileCount;
 			set
 			{
-				this.RaiseAndSetIfChanged(ref _fileCount, value);
-				this.RaisePropertyChanged(nameof(IsIndeterminate));
-				this.RaisePropertyChanged(nameof(SearchProgression));
-				this.RaisePropertyChanged(nameof(SearchText));
+				this.OnPropertyChanged(ref _fileCount, value);
+				this.OnPropertyChanged(nameof(IsIndeterminate));
+				this.OnPropertyChanged(nameof(SearchProgression));
+				this.OnPropertyChanged(nameof(SearchText));
 			}
 		}
 
@@ -135,7 +135,7 @@ namespace FileExplorerCore.ViewModels
 		public int SelectionCount
 		{
 			get => _selectionCount;
-			private set => this.RaiseAndSetIfChanged(ref _selectionCount, value);
+			private set => this.OnPropertyChanged(ref _selectionCount, value);
 		}
 
 		public TimeSpan LoadTime => DateTime.Now - startSearchTime;
@@ -145,11 +145,11 @@ namespace FileExplorerCore.ViewModels
 			get => _isLoading;
 			set
 			{
-				this.RaiseAndSetIfChanged(ref _isLoading, value);
+				this.OnPropertyChanged(ref _isLoading, value);
 
 				if (!IsLoading)
 				{
-					this.RaisePropertyChanged(nameof(LoadTime));
+					this.OnPropertyChanged(nameof(LoadTime));
 
 					//TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.NoProgress);
 				}
@@ -160,7 +160,7 @@ namespace FileExplorerCore.ViewModels
 					//TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.Indeterminate);
 				}
 
-				this.RaisePropertyChanged(nameof(SearchFailed));
+				this.OnPropertyChanged(nameof(SearchFailed));
 			}
 		}
 
@@ -231,8 +231,8 @@ namespace FileExplorerCore.ViewModels
 						redoStack.Clear();
 					}
 
-					this.RaiseAndSetIfChanged(ref _path, value);
-					this.RaisePropertyChanged(nameof(FolderName));
+					this.OnPropertyChanged(ref _path, value);
+					this.OnPropertyChanged(nameof(FolderName));
 
 					ThreadPool.QueueUserWorkItem(async x =>
 					{
@@ -296,13 +296,13 @@ namespace FileExplorerCore.ViewModels
 		public string? Search
 		{
 			get => _search;
-			set => this.RaiseAndSetIfChanged(ref _search, value);
+			set => this.OnPropertyChanged(ref _search, value);
 		}
 
 		public Control DisplayControl
 		{
 			get => _displayControl;
-			set => this.RaiseAndSetIfChanged(ref _displayControl, value);
+			set => this.OnPropertyChanged(ref _displayControl, value);
 		}
 
 		public bool IsSearching { get; set; }
@@ -312,7 +312,7 @@ namespace FileExplorerCore.ViewModels
 			get => _isGrid;
 			set
 			{
-				this.RaiseAndSetIfChanged(ref _isGrid, value);
+				this.OnPropertyChanged(ref _isGrid, value);
 
 				if (IsGrid is false)
 				{
@@ -358,14 +358,14 @@ namespace FileExplorerCore.ViewModels
 			get => _popupContent;
 			set
 			{
-				this.RaiseAndSetIfChanged(ref _popupContent, value);
+				this.OnPropertyChanged(ref _popupContent, value);
 
 				if (PopupContent is not null)
 				{
 					PopupContent.OnClose += delegate { PopupContent = null; };
 				}
 
-				this.RaisePropertyChanged(nameof(PopupVisible));
+				this.OnPropertyChanged(nameof(PopupVisible));
 			}
 		}
 
@@ -381,7 +381,7 @@ namespace FileExplorerCore.ViewModels
 				{
 					SelectionCount = Files.Count(x => x.IsSelected);
 
-					this.RaisePropertyChanged(nameof(SelectionText));
+					this.OnPropertyChanged(nameof(SelectionText));
 				}
 			};
 
@@ -398,7 +398,7 @@ namespace FileExplorerCore.ViewModels
 					SelectionCount--;
 				}
 
-				this.RaisePropertyChanged(nameof(SelectionText));
+				this.OnPropertyChanged(nameof(SelectionText));
 			};
 
 			UpdateFiles(false, "*");
@@ -462,12 +462,12 @@ namespace FileExplorerCore.ViewModels
 			Files.Clear();
 
 			SelectionCount = 0;
-			this.RaisePropertyChanged(nameof(SelectionText));
+			this.OnPropertyChanged(nameof(SelectionText));
 
 			IsLoading = true;
 
 			var timer = new System.Timers.Timer(1000);
-			timer.Elapsed += delegate { this.RaisePropertyChanged(nameof(SearchText)); };
+			timer.Elapsed += delegate { this.OnPropertyChanged(nameof(SearchText)); };
 
 			startSearchTime = DateTime.Now;
 
