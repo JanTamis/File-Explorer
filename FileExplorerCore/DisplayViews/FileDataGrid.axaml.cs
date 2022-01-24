@@ -9,7 +9,6 @@ using FileExplorerCore.Models;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using DataBox;
-using FileExplorerCore.Extensions;
 
 namespace FileExplorerCore.DisplayViews
 {

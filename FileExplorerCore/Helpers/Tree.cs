@@ -24,7 +24,7 @@ namespace FileExplorerCore.Helpers
 		/// Get the amount of children recursively
 		/// </summary>
 		/// <returns>the amount of children recursively</returns>
-		public int GetChilrenCount()
+		public int GetChildrenCount()
 		{
 			var count = Children.Count;
 
@@ -60,9 +60,9 @@ namespace FileExplorerCore.Helpers
 		/// <summary>
 		/// Enumerates all the items in the tree
 		/// </summary>
-		/// <remarks>if you want to know how much items are in the tree use the <see cref="GetChilrenCount"/> method</remarks>
+		/// <remarks>if you want to know how much items are in the tree use the <see cref="GetChildrenCount"/> method</remarks>
 		/// <returns></returns>
-		public IEnumerable<TTreeItem> EnumerateChilren(uint layers = UInt32.MaxValue)
+		public IEnumerable<TTreeItem> EnumerateChildren(uint layers = UInt32.MaxValue)
 		{
 			foreach (var child in Children)
 			{

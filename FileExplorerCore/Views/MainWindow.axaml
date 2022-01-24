@@ -178,12 +178,6 @@
 										<Viewbox Width="25"
 														Height="25"
 														Margin="0 0 3 0">
-											<Viewbox.RenderTransform>
-												<TransformGroup>
-													<RotateTransform Angle="180" />
-													<ScaleTransform ScaleX="-1" />
-												</TransformGroup>
-											</Viewbox.RenderTransform>
 											<Image Source="{Binding Image}" />
 										</Viewbox>
 
@@ -262,11 +256,7 @@
 													Source="{Binding Path, Converter={StaticResource imageConverter}}"
 													Height="25"
 													Margin="0 0 4 0"
-													VerticalAlignment="Center">
-													<Image.RenderTransform>
-														<ScaleTransform ScaleY="-1"></ScaleTransform>
-													</Image.RenderTransform>
-												</Image>
+													VerticalAlignment="Center" />
 
 												<TextBlock
 													Text="{Binding Path, Converter={StaticResource fileNameConverter}}"

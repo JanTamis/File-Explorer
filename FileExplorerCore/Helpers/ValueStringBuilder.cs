@@ -147,6 +147,21 @@ namespace FileExplorerCore.Helpers
 			_pos += count;
 		}
 
+		public void Insert(int index, ReadOnlySpan<char> s)
+		{
+			var count = s.Length;
+
+			if (_pos > (_chars.Length - count))
+			{
+				Grow(count);
+			}
+
+			var remaining = _pos - index;
+			_chars.Slice(index, remaining).CopyTo(_chars[(index + count)..]);
+			s.CopyTo(_chars[index..]);
+			_pos += count;
+		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Append(char c)
 		{

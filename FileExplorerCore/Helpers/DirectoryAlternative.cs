@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace FileExplorerCore.Helpers
 {
+	[SupportedOSPlatform("Windows")]
 	public static unsafe class DirectoryAlternative
 	{
 		[Serializable, StructLayout(LayoutKind.Sequential)]

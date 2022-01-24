@@ -1,5 +1,4 @@
 using Avalonia.Threading;
-using ReactiveUI;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;

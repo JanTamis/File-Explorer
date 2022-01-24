@@ -1,5 +1,4 @@
-﻿using Avalonia.Collections.Pooled;
-using Avalonia.Threading;
+﻿using Avalonia.Threading;
 using FileExplorerCore.Interfaces;
 using System;
 using System.Collections;
@@ -22,25 +21,25 @@ namespace FileExplorerCore.Helpers
 
 		public event NotifyCollectionChangedEventHandler CollectionChanged = delegate { };
 
-		private readonly List<T> Data = new List<T>();
+		private readonly List<T> Data = new();
 
 		const int updateTime = 500;
-		const int updateCountTime = 50;
+		const int updateCountTime = 15;
 
-		public new int Count => Data.Count;
+		public int Count => Data.Count;
 
 		public bool IsReadOnly => false;
 
-		public bool IsFixedSize => throw new NotImplementedException();
+		public bool IsFixedSize => false;
 
-		public bool IsSynchronized => throw new NotImplementedException();
+		public bool IsSynchronized => false;
 
-		public object SyncRoot => throw new NotImplementedException();
+		public object SyncRoot => new();
 
 		object? IList.this[int index] 
 		{
 			get => Data[index];
-			set => throw new NotImplementedException(); 
+			set => Data[index] = value is null ? Data[index] : (T)value; 		
 		}
 
 		public T this[int index] 
@@ -367,10 +366,9 @@ namespace FileExplorerCore.Helpers
 			CollectionChanged(this, notifyCollectionChangedEventArgs);
 		}
 
-		public void ClearTrim()
+		public async ValueTask ClearTrim()
 		{
 			Data.Clear();
-			Data.Capacity = 0;
 
 			if (Dispatcher.UIThread.CheckAccess())
 			{
@@ -378,8 +376,15 @@ namespace FileExplorerCore.Helpers
 			}
 			else
 			{
-				Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, Data)));
+				await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, Data)));
 			}
+
+			Data.Capacity = 0;
+		}
+
+		public void Trim()
+		{
+			Data.Capacity = 0;
 		}
 
 		public int BinarySearch(T value, IComparer<T> comparer)

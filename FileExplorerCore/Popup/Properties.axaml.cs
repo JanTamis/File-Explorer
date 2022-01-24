@@ -19,7 +19,7 @@ namespace FileExplorerCore.Popup
 
 		private string path;
 
-		private Bitmap icon;
+		private Bitmap? icon;
 
 		private long size = -1;
 
@@ -32,7 +32,9 @@ namespace FileExplorerCore.Popup
 
 		public event Action OnClose = delegate { };
 
-		public Bitmap Icon => icon ??= WindowsThumbnailProvider.GetThumbnail(Path, 48, 48);
+		public Bitmap? Icon => icon ??= OperatingSystem.IsWindows() 
+			? WindowsThumbnailProvider.GetThumbnail(Path, 48, 48)
+			: null;
 
 		ObservableRangeCollection<MetadataExtractor.Directory> MetaData { get; set; } = new();
 

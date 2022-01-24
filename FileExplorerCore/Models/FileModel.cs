@@ -1,12 +1,10 @@
 ﻿using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using FileExplorerCore.Extensions;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.ViewModels;
 using Humanizer;
 using System;
 using System.Collections.Concurrent;
-using System.ComponentModel;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
@@ -33,7 +31,7 @@ namespace FileExplorerCore.Models
 
 		private DateTime _editedOn;
 
-		private Bitmap? _image;
+		private IImage? _image;
 		private Transform _imageTransform;
 		private bool needsTranslation;
 
@@ -56,13 +54,12 @@ namespace FileExplorerCore.Models
 				if (value)
 				{
 					NeedsNewImage = true;
-					this.OnPropertyChanged(nameof(Image));
+					OnPropertyChanged(nameof(Image));
 				}
 				else
 				{
 					NeedsNewImage = false;
 
-					_image?.Dispose();
 					Image = null;
 
 					NeedsNewImage = true;
@@ -73,7 +70,7 @@ namespace FileExplorerCore.Models
 		public Transform ImageTransform
 		{
 			get => _imageTransform;
-			set => this.OnPropertyChanged(ref _imageTransform, value);
+			set => OnPropertyChanged(ref _imageTransform, value);
 		}
 
 		public bool IsSelected
@@ -83,7 +80,7 @@ namespace FileExplorerCore.Models
 			{
 				if (_isSelected != value)
 				{
-					this.OnPropertyChanged(ref _isSelected, value);
+					OnPropertyChanged(ref _isSelected, value);
 					SelectionChanged?.Invoke(this);
 				}
 			}
@@ -94,7 +91,7 @@ namespace FileExplorerCore.Models
 		public bool NeedsTranslation
 		{
 			get => needsTranslation;
-			set => this.OnPropertyChanged(ref needsTranslation, value);
+			set => OnPropertyChanged(ref needsTranslation, value);
 		}
 
 		public string Path
@@ -115,8 +112,8 @@ namespace FileExplorerCore.Models
 
 				_path = GetEncoding().GetBytes(value);
 
-				this.OnPropertyChanged(nameof(Name));
-				this.OnPropertyChanged(nameof(Extension));
+				OnPropertyChanged(nameof(Name));
+				OnPropertyChanged(nameof(Extension));
 			}
 		}
 
@@ -162,7 +159,7 @@ namespace FileExplorerCore.Models
 						Path = newPath;
 					}
 
-					this.OnPropertyChanged(ref _name, value);
+					OnPropertyChanged(ref _name, value);
 				}
 				catch (Exception)
 				{
@@ -255,7 +252,8 @@ namespace FileExplorerCore.Models
 			}
 		}
 
-		public Bitmap? Image
+
+		public IImage? Image
 		{
 			get
 			{
@@ -277,14 +275,19 @@ namespace FileExplorerCore.Models
 								{
 									subject.GetPath(path =>
 									{
-										if (OperatingSystem.IsWindows())
-										{
-											var img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk) ??
-																				WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
+										var img = ThumbnailProvider.GetFileImage(path.ToString());
 
-											subject.NeedsNewImage = false;
-											subject.OnPropertyChanged(ref subject._image, img, nameof(Image));
-										}
+										subject.NeedsNewImage = false;
+										subject.OnPropertyChanged(ref subject._image, img, nameof(Image));
+
+										//if (OperatingSystem.IsWindows())
+										//{
+										//	var img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk) ??
+										//										WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
+
+										//	subject.NeedsNewImage = false;
+										//	subject.OnPropertyChanged(ref subject._image, img, nameof(Image));
+										//}
 									});
 								}
 							}
@@ -296,7 +299,7 @@ namespace FileExplorerCore.Models
 
 				return _image;
 			}
-			set => this.OnPropertyChanged(ref _image, value);
+			set => OnPropertyChanged(ref _image, value);
 		}
 
 		public FileModel(ReadOnlySpan<char> path, bool isFolder)
@@ -323,8 +326,6 @@ namespace FileExplorerCore.Models
 
 		public void Dispose()
 		{
-			_image?.Dispose();
-
 			GC.SuppressFinalize(this);
 		}
 

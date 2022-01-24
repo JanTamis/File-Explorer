@@ -1,12 +1,10 @@
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using FileExplorerCore.Extensions;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 

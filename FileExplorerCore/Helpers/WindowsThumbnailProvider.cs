@@ -1,5 +1,6 @@
 ﻿using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Microsoft.CodeAnalysis;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -22,6 +23,7 @@ namespace FileExplorerCore.Helpers
 		Win8ScaleUp = 0x100     // Introduced in Windows 8. If necessary, stretch the bitmap so that the height and width fit the given size.
 	}
 
+	[SupportedOSPlatform("Windows")]
 	public unsafe class WindowsThumbnailProvider
 	{
 		private const string IShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
@@ -42,19 +44,16 @@ namespace FileExplorerCore.Helpers
 
 		private static readonly int bitmapSize = Unsafe.SizeOf<NativeMethods.BITMAP>();
 
-		[SupportedOSPlatform("Windows")]
 		public static Bitmap? GetThumbnail(Span<char> fileName, int width, int height)
 		{
 			return GetThumbnail(fileName, width, height, ThumbnailOptions.BiggerSizeOk);
 		}
 
-		[SupportedOSPlatform("Windows")]
 		public static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height)
 		{
 			return GetThumbnail(fileName, width, height, ThumbnailOptions.BiggerSizeOk);
 		}
 
-		[SupportedOSPlatform("Windows")]
 		public static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height, ThumbnailOptions options)
 		{
 			Bitmap? bitmap = null;
@@ -68,10 +67,10 @@ namespace FileExplorerCore.Helpers
 					var bmp = new NativeMethods.BITMAP();
 					NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
 
-					if ((options.HasFlag(ThumbnailOptions.ThumbnailOnly) && width <= 64) || options.HasFlag(ThumbnailOptions.IconOnly))
-					{
+					//if ((options.HasFlag(ThumbnailOptions.ThumbnailOnly) && width <= 64) || options.HasFlag(ThumbnailOptions.IconOnly))
+					//{
 						RotateHorizontal(bmp);
-					}
+					//}
 
 					bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
 
