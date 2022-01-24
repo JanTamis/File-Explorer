@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace FileExplorerCore.Helpers
 {
 	/// <summary>
 	/// Class containing methods to retrieve specific file system paths.
 	/// </summary>
+	[SupportedOSPlatform("Windows")]
 	public static class KnownFolders
 	{
 		private static readonly string[] _knownFolderGuids = new string[]
@@ -31,6 +33,7 @@ namespace FileExplorerCore.Helpers
 		/// <returns>The default path of the known folder.</returns>
 		/// <exception cref="ExternalException">Thrown if the path
 		///     could not be retrieved.</exception>
+		
 		public static string GetPath(KnownFolder knownFolder)
 		{
 			return GetPath(knownFolder, false);

@@ -199,7 +199,9 @@ namespace FileExplorerCore.Models
 			{
 				if (_size == -2)
 				{
-					GetPath(path => _size = DirectoryAlternative.GetFileSize(path));
+					GetPath(path => _size = OperatingSystem.IsWindows() 
+						? DirectoryAlternative.GetFileSize(path)
+						: File.Exists(path.ToString()) ? new FileInfo(path.ToString()).Length : -1);
 				}
 
 				return _size;
@@ -249,7 +251,9 @@ namespace FileExplorerCore.Models
 			{
 				if (_editedOn == default)
 				{
-					GetPath(path => _editedOn = DirectoryAlternative.GetFileWriteDate(path));
+					GetPath(path => _editedOn = OperatingSystem.IsWindows() 
+						? DirectoryAlternative.GetFileWriteDate(path)
+						: new FileInfo(path.ToString()).LastWriteTime);
 				}
 
 				return _editedOn;

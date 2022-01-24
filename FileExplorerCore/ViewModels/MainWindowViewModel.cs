@@ -60,7 +60,7 @@ namespace FileExplorerCore.ViewModels
 			set
 			{
 				if (value == Path) return;
-				
+
 				CurrentTab.Path = value;
 
 				this.RaisePropertyChanged();
@@ -78,13 +78,19 @@ namespace FileExplorerCore.ViewModels
 			notificationManager = manager;
 
 			var drives = from drive in DriveInfo.GetDrives()
-									 where drive.IsReady
-									 select new FolderModel(drive.RootDirectory.FullName, $"{drive.VolumeLabel} ({drive.Name})");
+				where drive.IsReady
+				select new FolderModel(drive.RootDirectory.FullName, $"{drive.VolumeLabel} ({drive.Name})");
 
-			var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
-												select new FolderModel(KnownFolders.GetPath(specialFolder));
+			if (OperatingSystem.IsWindows())
+			{
+				var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
+													select new FolderModel(KnownFolders.GetPath(specialFolder));
 
-			Folders = quickAccess.Concat(drives);
+				drives = quickAccess.Concat(drives);
+			}
+
+
+			Folders = drives;
 
 			AddTab();
 		}
@@ -230,8 +236,8 @@ namespace FileExplorerCore.ViewModels
 		{
 			var data = new DataObject();
 			data.Set(DataFormats.FileNames, CurrentTab.Files.Where(x => x.IsSelected)
-																											.Select(s => s.Path)
-																											.ToArray());
+				.Select(s => s.Path)
+				.ToArray());
 
 			await App.Current.Clipboard.SetDataObjectAsync(data);
 
@@ -275,9 +281,12 @@ namespace FileExplorerCore.ViewModels
 							{
 								FileSystem.DeleteDirectory(file.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
 							}
+
 							deletedFiles.Add(file);
 						}
-						catch (Exception) { }
+						catch (Exception)
+						{
+						}
 					}
 
 					CurrentTab.Files.RemoveRange(deletedFiles);
@@ -297,10 +306,7 @@ namespace FileExplorerCore.ViewModels
 					Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab && !String.IsNullOrWhiteSpace(x.Path))),
 				};
 
-				selector.TabSelectionChanged += (tab) =>
-				{
-					selector.Close();
-				};
+				selector.TabSelectionChanged += (tab) => { selector.Close(); };
 
 				CurrentTab.PopupContent = selector;
 			}
@@ -362,9 +368,9 @@ namespace FileExplorerCore.ViewModels
 				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = true);
 
 				var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(Path, (ref FileSystemEntry x) => (System.IO.Path.GetExtension(x.FileName).ToString(), x.Length), options)
-				{
-					ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
-				}
+					{
+						ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
+					}
 					.Where(w => !String.IsNullOrEmpty(w.Extension))
 					.GroupBy(g => g.Extension);
 

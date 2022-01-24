@@ -24,18 +24,12 @@ namespace FileExplorerCore.Helpers
 
 		public ObservableRangeCollection()
 		{
-			base.CollectionChanged += delegate
-			{
-				CountChanged(Count);
-			};
+			base.CollectionChanged += delegate { CountChanged(Count); };
 		}
 
 		public ObservableRangeCollection(IEnumerable<T> items) : this()
 		{
-			ThreadPool.QueueUserWorkItem(async x =>
-			{
-				await AddRange(items);
-			});
+			ThreadPool.QueueUserWorkItem(async x => { await AddRange(items); });
 		}
 
 		/// <summary> 
@@ -112,7 +106,6 @@ namespace FileExplorerCore.Helpers
 									}
 								}
 							}, token);
-
 						}
 
 						if (comparer == null && list.Count >= index && list.Count > 0 && index > 0)
@@ -251,19 +244,18 @@ namespace FileExplorerCore.Helpers
 									}
 								}
 							}, token);
-
 						}
 
 						//if (comparer == null && list.Count <= index)
 						//{
-							if (Dispatcher.UIThread.CheckAccess())
-							{
-								OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index));
-							}
-							else
-							{
-								await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index)));
-							}
+						if (Dispatcher.UIThread.CheckAccess())
+						{
+							OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index));
+						}
+						else
+						{
+							await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, list, index)));
+						}
 						//}
 						//else
 						//{
@@ -390,7 +382,7 @@ namespace FileExplorerCore.Helpers
 						break;
 				}
 			}
-			
+
 			return ~lo;
 
 			static int GetMedian(int low, int hi)
@@ -441,8 +433,15 @@ namespace FileExplorerCore.Helpers
 
 			while (i <= j)
 			{
-				while (comparer.Compare(array[i], m) is -1) { i++; }
-				while (comparer.Compare(array[j], m) is 1) { j--; }
+				while (comparer.Compare(array[i], m) is -1)
+				{
+					i++;
+				}
+
+				while (comparer.Compare(array[j], m) is 1)
+				{
+					j--;
+				}
 
 				if (i <= j)
 				{
@@ -465,8 +464,15 @@ namespace FileExplorerCore.Helpers
 			}
 			else
 			{
-				if (j > left) { ParallelQuickSort(array, left, j, comparer); }
-				if (i < right) { ParallelQuickSort(array, i, right, comparer); }
+				if (j > left)
+				{
+					ParallelQuickSort(array, left, j, comparer);
+				}
+
+				if (i < right)
+				{
+					ParallelQuickSort(array, i, right, comparer);
+				}
 			}
 		}
 	}

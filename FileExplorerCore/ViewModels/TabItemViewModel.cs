@@ -260,9 +260,11 @@ namespace FileExplorerCore.ViewModels
 										name = $"{new DriveInfo(name).VolumeLabel} ({name}{System.IO.Path.DirectorySeparatorChar})";
 									}
 
-									yield return new FolderModel(folderPath, name,
-										from directory in Directory.EnumerateDirectories(folderPath, "*", new EnumerationOptions())
-										select new FolderModel(directory, System.IO.Path.GetFileName(directory)));
+
+									yield return new FolderModel(folderPath, name, Directory.EnumerateDirectories(folderPath, "*", 
+										new EnumerationOptions())
+										.Where(Directory.Exists)
+										.Select(directory => new FolderModel(directory, System.IO.Path.GetFileName(directory))));
 								}
 							}
 						}

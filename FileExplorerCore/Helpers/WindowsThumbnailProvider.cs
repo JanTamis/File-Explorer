@@ -22,7 +22,8 @@ namespace FileExplorerCore.Helpers
 		Win8ScaleUp = 0x100     // Introduced in Windows 8. If necessary, stretch the bitmap so that the height and width fit the given size.
 	}
 
-	public unsafe class WindowsThumbnailProvider
+	[SupportedOSPlatform("Windows")]
+	public static unsafe class WindowsThumbnailProvider
 	{
 		private const string IShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
 
@@ -42,19 +43,16 @@ namespace FileExplorerCore.Helpers
 
 		private static readonly int bitmapSize = Unsafe.SizeOf<NativeMethods.BITMAP>();
 
-		[SupportedOSPlatform("Windows")]
 		public static Bitmap? GetThumbnail(Span<char> fileName, int width, int height)
 		{
 			return GetThumbnail(fileName, width, height, ThumbnailOptions.BiggerSizeOk);
 		}
 
-		[SupportedOSPlatform("Windows")]
 		public static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height)
 		{
 			return GetThumbnail(fileName, width, height, ThumbnailOptions.BiggerSizeOk);
 		}
 
-		[SupportedOSPlatform("Windows")]
 		public static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height, ThumbnailOptions options)
 		{
 			Bitmap? bitmap = null;

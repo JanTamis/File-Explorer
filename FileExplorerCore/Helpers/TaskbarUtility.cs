@@ -3,9 +3,11 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using System;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace FileExplorerCore.Helpers
 {
+	[SupportedOSPlatform("Windows")]
 	public static class TaskbarUtility
 	{
 		private static readonly ITaskbarList4 _taskbarList;

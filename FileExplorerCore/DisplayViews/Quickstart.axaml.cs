@@ -18,7 +18,11 @@ namespace FileExplorerCore.DisplayViews
 			{
 				FileModel.ImageSize = 128;
 
-				return new FileSystemEnumerable<FileModel>(Environment.GetFolderPath(Environment.SpecialFolder.Recent), TabItemViewModel.GetFileModel).Take(20);
+				var path = Environment.GetFolderPath(Environment.SpecialFolder.Recent);
+
+				return !String.IsNullOrEmpty(path) 
+					? new FileSystemEnumerable<FileModel>(Environment.GetFolderPath(Environment.SpecialFolder.Recent), TabItemViewModel.GetFileModel).Take(20) 
+					: Enumerable.Empty<FileModel>();
 			}
 		}
 
