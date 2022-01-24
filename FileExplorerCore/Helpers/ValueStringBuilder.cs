@@ -91,7 +91,7 @@ namespace FileExplorerCore.Helpers
 		}
 
 		public ReadOnlySpan<char> AsSpan() => _chars[.._pos];
-		public ReadOnlySpan<char> AsSpan(int start) => _chars.Slice(start, _pos - start);
+		public ReadOnlySpan<char> AsSpan(int start) => _chars[start.._pos];
 		public ReadOnlySpan<char> AsSpan(int start, int length) => _chars.Slice(start, length);
 
 		public bool TryCopyTo(Span<char> destination, out int charsWritten)
@@ -147,6 +147,21 @@ namespace FileExplorerCore.Helpers
 			_pos += count;
 		}
 
+		public void Insert(int index, ReadOnlySpan<char> s)
+		{
+			var count = s.Length;
+
+			if (_pos > (_chars.Length - count))
+			{
+				Grow(count);
+			}
+
+			var remaining = _pos - index;
+			_chars.Slice(index, remaining).CopyTo(_chars[(index + count)..]);
+			s.CopyTo(_chars[index..]);
+			_pos += count;
+		}
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Append(char c)
 		{
@@ -165,7 +180,7 @@ namespace FileExplorerCore.Helpers
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Append(string? s)
 		{
-			if (s == null)
+			if (s is null)
 			{
 				return;
 			}

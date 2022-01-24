@@ -1,11 +1,10 @@
 ﻿using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Threading;
-using FileExplorerCore.Converters;
 using FileExplorerCore.Helpers;
+using FileExplorerCore.ViewModels;
+using Humanizer;
 using System;
 using System.Collections.Concurrent;
-using System.ComponentModel;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
@@ -16,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace FileExplorerCore.Models
 {
-	public class FileModel : INotifyPropertyChanged, IDisposable
+	public class FileModel : ViewModelBase, IDisposable
 	{
 		public static readonly ConcurrentBag<FileModel> FileImageQueue = new();
 
@@ -32,12 +31,11 @@ namespace FileExplorerCore.Models
 
 		private DateTime _editedOn;
 
-		private Bitmap? _image;
+		private IImage? _image;
 		private Transform _imageTransform;
 		private bool needsTranslation;
 
 		public static event Action<FileModel> SelectionChanged = delegate { };
-		public event PropertyChangedEventHandler? PropertyChanged;
 
 		private static bool _isNotLoading = true;
 		private bool _isVisible = true;
@@ -56,14 +54,12 @@ namespace FileExplorerCore.Models
 				if (value)
 				{
 					NeedsNewImage = true;
-
 					OnPropertyChanged(nameof(Image));
 				}
 				else
 				{
 					NeedsNewImage = false;
 
-					_image?.Dispose();
 					Image = null;
 
 					NeedsNewImage = true;
@@ -240,7 +236,7 @@ namespace FileExplorerCore.Models
 						}
 					});
 
-					return SizeConverter.ByteSize(size);
+					return size.Bytes().ToString();
 				});
 			}
 		}
@@ -260,7 +256,8 @@ namespace FileExplorerCore.Models
 			}
 		}
 
-		public Bitmap? Image
+
+		public IImage? Image
 		{
 			get
 			{
@@ -282,14 +279,19 @@ namespace FileExplorerCore.Models
 								{
 									subject.GetPath(path =>
 									{
-										if (OperatingSystem.IsWindows())
-										{
-											var img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk) ??
-																				WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
+										var img = ThumbnailProvider.GetFileImage(path.ToString());
 
-											subject.NeedsNewImage = false;
-											subject.OnPropertyChanged(ref subject._image, img, nameof(Image));
-										}
+										subject.NeedsNewImage = false;
+										subject.OnPropertyChanged(ref subject._image, img, nameof(Image));
+
+										//if (OperatingSystem.IsWindows())
+										//{
+										//	var img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk) ??
+										//										WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
+
+										//	subject.NeedsNewImage = false;
+										//	subject.OnPropertyChanged(ref subject._image, img, nameof(Image));
+										//}
 									});
 								}
 							}
@@ -326,31 +328,8 @@ namespace FileExplorerCore.Models
 			IsFolder = isFolder;
 		}
 
-		public void OnPropertyChanged<T>(ref T field, T value, [CallerMemberName] string? name = null)
-		{
-			field = value;
-
-			OnPropertyChanged(name);
-		}
-
-		public Task OnPropertyChanged([CallerMemberName] string? name = null)
-		{
-			if (Dispatcher.UIThread.CheckAccess())
-			{
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-			}
-			else
-			{
-				return Dispatcher.UIThread.InvokeAsync(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
-			}
-
-			return Task.CompletedTask;
-		}
-
 		public void Dispose()
 		{
-			_image?.Dispose();
-
 			GC.SuppressFinalize(this);
 		}
 

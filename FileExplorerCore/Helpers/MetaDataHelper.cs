@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using MetadataExtractor;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Directory = MetadataExtractor.Directory;
 
 namespace FileExplorerCore.Helpers

@@ -1,6 +1,5 @@
 ﻿using System;
 using Avalonia.Controls.Notifications;
-using System;
 
 namespace FileExplorerCore.Models
 {

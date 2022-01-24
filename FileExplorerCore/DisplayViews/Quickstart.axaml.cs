@@ -35,7 +35,7 @@ namespace FileExplorerCore.DisplayViews
 				return DriveInfo
 					.GetDrives()
 					.Where(x => x.IsReady)
-					.Select(x => new FileModel(x.RootDirectory.FullName, true));
+					.Select(x => new FileModel(x.Name, true));
 			}
 		}
 

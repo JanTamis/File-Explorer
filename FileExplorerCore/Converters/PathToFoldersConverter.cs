@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using Avalonia.Data.Converters;
 using FileExplorerCore.Models;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -12,7 +10,7 @@ namespace FileExplorerCore.Converters
 {
 	public class PathToFoldersConverter : IValueConverter
 	{
-		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{
 			if (value is string path)
 			{
@@ -47,9 +45,9 @@ namespace FileExplorerCore.Converters
 			}
 		}
 
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{
-			return null;
+			return String.Empty;
 		}
 	}
 }

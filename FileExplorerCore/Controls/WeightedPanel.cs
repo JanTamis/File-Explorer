@@ -5,9 +5,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using FileExplorerCore.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace FileExplorerCore.Controls
 {
@@ -43,8 +40,6 @@ namespace FileExplorerCore.Controls
 			{
 				if (indexModel.IsFolder)
 				{
-					indexModel.TaskSize.Wait();
-
 					return indexModel.TaskSize.Result;
 				}
 				return 0;

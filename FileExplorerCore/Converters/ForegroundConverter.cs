@@ -1,14 +1,13 @@
 ﻿using System;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
-using System;
 using System.Globalization;
 
 namespace FileExplorerCore.Converters
 {
 	public class ForegroundConverter : IValueConverter
 	{
-		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+		public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{
 			if (value is SolidColorBrush brush)
 			{
@@ -21,9 +20,9 @@ namespace FileExplorerCore.Converters
 			return Brushes.Black;
 		}
 
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{
-			return null;
+			return String.Empty;
 		}
 	}
 }

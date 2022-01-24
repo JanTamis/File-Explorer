@@ -16,7 +16,7 @@ namespace FileExplorerCore.Helpers
 			ReadOnlySpan<T> Span { get; }
 			T Separator { get; }
 
-			public Enumerator1<T> GetEnumerator() => new Enumerator1<T>(Span, Separator);
+			public Enumerator1<T> GetEnumerator() => new(Span, Separator);
 		}
 
 		public ref struct Enumerable2<T> where T : IEquatable<T>
@@ -32,7 +32,7 @@ namespace FileExplorerCore.Helpers
 			T Separator1 { get; }
 			T Separator2 { get; }
 
-			public Enumerator2<T> GetEnumerator() => new Enumerator2<T>(Span, Separator1, Separator2);
+			public Enumerator2<T> GetEnumerator() => new(Span, Separator1, Separator2);
 		}
 
 		public ref struct Enumerable3<T> where T : IEquatable<T>
@@ -51,7 +51,7 @@ namespace FileExplorerCore.Helpers
 			T Separator3 { get; }
 
 			public Enumerator3<T> GetEnumerator() =>
-					new Enumerator3<T>(Span, Separator1, Separator2, Separator3);
+					new(Span, Separator1, Separator2, Separator3);
 		}
 
 		public ref struct EnumerableN<T> where T : IEquatable<T>
@@ -65,7 +65,7 @@ namespace FileExplorerCore.Helpers
 			ReadOnlySpan<T> Span { get; }
 			ReadOnlySpan<T> Separators { get; }
 
-			public EnumeratorN<T> GetEnumerator() => new EnumeratorN<T>(Span, Separators);
+			public EnumeratorN<T> GetEnumerator() => new(Span, Separators);
 		}
 
 		public ref struct Enumerator1<T> where T : IEquatable<T>
@@ -82,7 +82,7 @@ namespace FileExplorerCore.Helpers
 
 			ReadOnlySpan<T> Span { get; set; }
 			T Separator { get; }
-			int SeparatorLength => 1;
+			readonly int SeparatorLength => 1;
 
 			ReadOnlySpan<T> TrailingEmptyItemSentinel => Unsafe.As<T[]>(nameof(TrailingEmptyItemSentinel)).AsSpan();
 
@@ -143,7 +143,7 @@ namespace FileExplorerCore.Helpers
 			ReadOnlySpan<T> Span { get; set; }
 			T Separator1 { get; }
 			T Separator2 { get; }
-			int SeparatorLength => 1;
+			readonly int SeparatorLength => 1;
 
 			ReadOnlySpan<T> TrailingEmptyItemSentinel => Unsafe.As<T[]>(nameof(TrailingEmptyItemSentinel)).AsSpan();
 
@@ -206,7 +206,7 @@ namespace FileExplorerCore.Helpers
 			T Separator1 { get; }
 			T Separator2 { get; }
 			T Separator3 { get; }
-			int SeparatorLength => 1;
+			readonly int SeparatorLength => 1;
 
 			ReadOnlySpan<T> TrailingEmptyItemSentinel => Unsafe.As<T[]>(nameof(TrailingEmptyItemSentinel)).AsSpan();
 
@@ -265,7 +265,7 @@ namespace FileExplorerCore.Helpers
 
 			ReadOnlySpan<T> Span { get; set; }
 			ReadOnlySpan<T> Separators { get; }
-			int SeparatorLength => 1;
+			readonly int SeparatorLength => 1;
 
 			ReadOnlySpan<T> TrailingEmptyItemSentinel => Unsafe.As<T[]>(nameof(TrailingEmptyItemSentinel)).AsSpan();
 
@@ -310,9 +310,9 @@ namespace FileExplorerCore.Helpers
 			public ReadOnlySpan<T> Current { get; private set; }
 		}
 
-		public static Enumerable1<T> Split<T>(this ReadOnlySpan<T> span, T separator) where T : IEquatable<T> => new Enumerable1<T>(span, separator);
-		public static Enumerable2<T> Split<T>(this ReadOnlySpan<T> span, T separator1, T separator2) where T : IEquatable<T> => new Enumerable2<T>(span, separator1, separator2);
-		public static Enumerable3<T> Split<T>(this ReadOnlySpan<T> span, T separator1, T separator2, T separator3) where T : IEquatable<T> => new Enumerable3<T>(span, separator1, separator2, separator3);
-		public static EnumerableN<T> Split<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> values) where T : IEquatable<T> => new EnumerableN<T>(span, values);
+		public static Enumerable1<T> Split<T>(this ReadOnlySpan<T> span, T separator) where T : IEquatable<T> => new(span, separator);
+		public static Enumerable2<T> Split<T>(this ReadOnlySpan<T> span, T separator1, T separator2) where T : IEquatable<T> => new(span, separator1, separator2);
+		public static Enumerable3<T> Split<T>(this ReadOnlySpan<T> span, T separator1, T separator2, T separator3) where T : IEquatable<T> => new(span, separator1, separator2, separator3);
+		public static EnumerableN<T> Split<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> values) where T : IEquatable<T> => new(span, values);
 	}
 }

@@ -9,15 +9,15 @@ using FileExplorerCore.Models;
 using FileExplorerCore.Popup;
 using Microsoft.VisualBasic.FileIO;
 using Nessos.LinqOptimizer.CSharp;
-using ReactiveUI;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
 using System.Threading;
 using System.Timers;
+using System.Threading.Tasks;
+using System.Diagnostics;
+using Avalonia.Controls.Shapes;
 
 namespace FileExplorerCore.ViewModels
 {
@@ -32,14 +32,18 @@ namespace FileExplorerCore.ViewModels
 
 		public IEnumerable<FolderModel> Folders { get; set; }
 
+		public static Tree<FileSystemTreeItem, string> Tree;
+
 		public ObservableRangeCollection<FileModel> Files => CurrentTab.Files;
 
 		public ObservableRangeCollection<TabItemViewModel> Tabs { get; set; } = new();
 
+		FileSystemWatcher watcher;
+
 		public IEnumerable<string> SearchHistory
 		{
 			get => searchHistory;
-			set => this.RaiseAndSetIfChanged(ref searchHistory, value);
+			set => OnPropertyChanged(ref searchHistory, value);
 		}
 
 		public TabItemViewModel CurrentTab
@@ -47,10 +51,10 @@ namespace FileExplorerCore.ViewModels
 			get => _currentTab;
 			set
 			{
-				this.RaiseAndSetIfChanged(ref _currentTab, value);
+				OnPropertyChanged(ref _currentTab, value);
 
-				this.RaisePropertyChanged(nameof(Files));
-				this.RaisePropertyChanged(nameof(Path));
+				OnPropertyChanged(nameof(Files));
+				OnPropertyChanged(nameof(Path));
 			}
 		}
 
@@ -60,12 +64,12 @@ namespace FileExplorerCore.ViewModels
 			set
 			{
 				if (value == Path) return;
-
+				
 				CurrentTab.Path = value;
 
-				this.RaisePropertyChanged();
+				OnPropertyChanged();
 
-				CurrentTab.UpdateFiles(false, "*").ContinueWith(x =>
+				CurrentTab.UpdateFiles(false, "*").AsTask().ContinueWith(x =>
 				{
 					var categories = Enum.GetValues<Categories>().Select(s => s + ":");
 					SearchHistory = categories.Concat(CurrentTab.Files.Select(s => "*" + s.Extension).Distinct());
@@ -77,22 +81,46 @@ namespace FileExplorerCore.ViewModels
 		{
 			notificationManager = manager;
 
-			var drives = from drive in DriveInfo.GetDrives()
-				where drive.IsReady
-				select new FolderModel(drive.RootDirectory.FullName, $"{drive.VolumeLabel} ({drive.Name})");
-
 			if (OperatingSystem.IsWindows())
 			{
+				var drives = from drive in DriveInfo.GetDrives()
+										 where drive.IsReady
+										 select new FolderModel(drive.RootDirectory.FullName, $"{drive.VolumeLabel} ({drive.Name})");
+
 				var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
 													select new FolderModel(KnownFolders.GetPath(specialFolder));
 
-				drives = quickAccess.Concat(drives);
+				Folders = quickAccess.Concat(drives);
+			}
+			else if (OperatingSystem.IsMacOS())
+			{
+
 			}
 
-
-			Folders = drives;
-
 			AddTab();
+
+			watcher = new FileSystemWatcher("C://", "*");
+
+			watcher.Created += Watcher_Created;
+			watcher.Deleted += Watcher_Deleted;
+			watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName;
+			watcher.IncludeSubdirectories = true;
+			watcher.EnableRaisingEvents = true;
+
+			Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
+				.GetDrives()
+				.Where(w => w.DriveType == DriveType.Fixed)
+				.Select(s => new FileSystemTreeItem(s.RootDirectory.FullName, null)));
+		}
+
+		private void Watcher_Deleted(object sender, FileSystemEventArgs e)
+		{
+			Debug.WriteLine("Deleted: " + e.FullPath);
+		}
+
+		private void Watcher_Created(object sender, FileSystemEventArgs e)
+		{
+			Debug.WriteLine("Created: " + e.FullPath);
 		}
 
 		private void Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -118,7 +146,7 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		public async void StartSearch()
+		public async ValueTask StartSearch()
 		{
 			if (CurrentTab.Search is { Length: > 0 } && Path is { Length: > 0 })
 			{
@@ -128,13 +156,13 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		public async void Undo()
+		public async ValueTask Undo()
 		{
 			CurrentTab.Path = CurrentTab.Undo();
 			await CurrentTab.UpdateFiles(false, "*");
 		}
 
-		public async void Redo()
+		public async ValueTask Redo()
 		{
 			CurrentTab.Path = CurrentTab.Redo();
 			await CurrentTab.UpdateFiles(false, "*");
@@ -145,15 +173,15 @@ namespace FileExplorerCore.ViewModels
 			CurrentTab.CancelUpdateFiles();
 		}
 
-		public void SetPath(string path)
+		public async ValueTask SetPath(string path)
 		{
 			if (CurrentTab is not null)
 			{
-				CurrentTab.SetPath(path);
+				await CurrentTab.SetPath(path);
 			}
 		}
 
-		public async void Refresh()
+		public async ValueTask Refresh()
 		{
 			if (!String.IsNullOrWhiteSpace(Path))
 			{
@@ -170,7 +198,7 @@ namespace FileExplorerCore.ViewModels
 					file.IsSelected = true;
 				}
 
-				CurrentTab.RaisePropertyChanged(nameof(CurrentTab.SelectionText));
+				CurrentTab.OnPropertyChanged(nameof(CurrentTab.SelectionText));
 				CurrentTab.Files.PropertyChanged("IsSelected");
 			}
 		}
@@ -184,7 +212,7 @@ namespace FileExplorerCore.ViewModels
 					file.IsSelected = false;
 				}
 
-				CurrentTab.RaisePropertyChanged(nameof(CurrentTab.SelectionText));
+				CurrentTab.OnPropertyChanged(nameof(CurrentTab.SelectionText));
 				CurrentTab.Files.PropertyChanged("IsSelected");
 			}
 		}
@@ -198,7 +226,7 @@ namespace FileExplorerCore.ViewModels
 					file.IsSelected ^= true;
 				}
 
-				CurrentTab.RaisePropertyChanged(nameof(CurrentTab.SelectionText));
+				CurrentTab.OnPropertyChanged(nameof(CurrentTab.SelectionText));
 				CurrentTab.Files.PropertyChanged("IsSelected");
 			}
 		}
@@ -236,8 +264,8 @@ namespace FileExplorerCore.ViewModels
 		{
 			var data = new DataObject();
 			data.Set(DataFormats.FileNames, CurrentTab.Files.Where(x => x.IsSelected)
-				.Select(s => s.Path)
-				.ToArray());
+																											.Select(s => s.Path)
+																											.ToArray());
 
 			await App.Current.Clipboard.SetDataObjectAsync(data);
 
@@ -281,12 +309,9 @@ namespace FileExplorerCore.ViewModels
 							{
 								FileSystem.DeleteDirectory(file.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
 							}
-
 							deletedFiles.Add(file);
 						}
-						catch (Exception)
-						{
-						}
+						catch (Exception) { }
 					}
 
 					CurrentTab.Files.RemoveRange(deletedFiles);
@@ -306,7 +331,10 @@ namespace FileExplorerCore.ViewModels
 					Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab && !String.IsNullOrWhiteSpace(x.Path))),
 				};
 
-				selector.TabSelectionChanged += (tab) => { selector.Close(); };
+				selector.TabSelectionChanged += (tab) =>
+				{
+					selector.Close();
+				};
 
 				CurrentTab.PopupContent = selector;
 			}
@@ -368,9 +396,9 @@ namespace FileExplorerCore.ViewModels
 				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = true);
 
 				var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(Path, (ref FileSystemEntry x) => (System.IO.Path.GetExtension(x.FileName).ToString(), x.Length), options)
-					{
-						ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
-					}
+				{
+					ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
+				}
 					.Where(w => !String.IsNullOrEmpty(w.Extension))
 					.GroupBy(g => g.Extension);
 

@@ -7,8 +7,6 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
-using System;
-using System.Linq;
 
 namespace FileExplorerCore.DisplayViews
 {
@@ -103,11 +101,6 @@ namespace FileExplorerCore.DisplayViews
 			{
 				PathChanged(model.Path);
 			}
-		}
-
-		private void Model_SelectionChanged(FileModel obj)
-		{
-			obj.OnPropertyChanged(nameof(obj.IsSelected));
 		}
 
 		/// <summary>

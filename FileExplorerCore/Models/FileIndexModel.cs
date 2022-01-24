@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using FileExplorerCore.Helpers;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
 using System.Threading;
@@ -63,22 +60,22 @@ namespace FileExplorerCore.Models
 
 		public FileIndexModel? Parent { get; init; }
 
-		public Task<long> ParentSize => Parent?.TaskSize ?? Task.FromResult(0L);
+		public ValueTask<long> ParentSize => Parent?.TaskSize ?? ValueTask.FromResult(0L);
 
 		public string Name { get; init; }
 
 		public long Size { get; set; }
 
-		public Task<long> TaskSize
+		public ValueTask<long> TaskSize
 		{
 			get
 			{
-				if (sizeQuery != null && Size == 0)
+				if (sizeQuery is not null && _taskSize is null or { IsCompleted: false } && Size == 0)
 				{
-					return _taskSize ??= Task.Run(() => Size = sizeQuery.Sum());
+					return new ValueTask<long>(_taskSize ??= Task.Run(() => Size = sizeQuery.Sum()));
 				}
 
-				return Task.FromResult(Size);
+				return ValueTask.FromResult(Size);
 			}
 		}
 

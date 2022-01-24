@@ -1,5 +1,6 @@
 ﻿using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Microsoft.CodeAnalysis;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -23,7 +24,7 @@ namespace FileExplorerCore.Helpers
 	}
 
 	[SupportedOSPlatform("Windows")]
-	public static unsafe class WindowsThumbnailProvider
+	public unsafe class WindowsThumbnailProvider
 	{
 		private const string IShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
 
@@ -66,10 +67,10 @@ namespace FileExplorerCore.Helpers
 					var bmp = new NativeMethods.BITMAP();
 					NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
 
-					if ((options.HasFlag(ThumbnailOptions.ThumbnailOnly) && width <= 64) || options.HasFlag(ThumbnailOptions.IconOnly))
-					{
+					//if ((options.HasFlag(ThumbnailOptions.ThumbnailOnly) && width <= 64) || options.HasFlag(ThumbnailOptions.IconOnly))
+					//{
 						RotateHorizontal(bmp);
-					}
+					//}
 
 					bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
 

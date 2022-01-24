@@ -4,8 +4,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using FileExplorerCore.Models;
-using System;
-using System.Collections.Generic;
 
 namespace FileExplorerCore.Controls
 {
@@ -58,8 +56,6 @@ namespace FileExplorerCore.Controls
 			{
 				if (indexModel.IsFolder)
 				{
-					indexModel.TaskSize.Wait();
-
 					return indexModel.TaskSize.Result;
 				}
 				return 0;
@@ -97,18 +93,30 @@ namespace FileExplorerCore.Controls
 			EmptyArea = new Rect(0, 0, constraint.Width, constraint.Height);
 			PrepareItems();
 
-			double area = EmptyArea.Width * EmptyArea.Height;
-			foreach (WeightUIElement item in ManagedItems)
+			var area = EmptyArea.Width * EmptyArea.Height;
+			var count = ManagedItems.Count;
+
+			for (int i = 0; i < count; i++)
+			{
+				var item = ManagedItems[i];
+
 				item.RealArea = area * item.Weight / _weightSum;
+
+				count = ManagedItems.Count;
+			}
 
 			ComputeBounds();
 
-			foreach (WeightUIElement child in ManagedItems)
+			for (int i = 0; i < count; i++)
 			{
+				var child = ManagedItems[i];
+
 				if (IsValidSize(child.ComputedSize))
 					child.UIElement.Measure(child.ComputedSize);
 				else
 					child.UIElement.Measure(new Size(0, 0));
+
+				count = ManagedItems.Count;
 			}
 
 			return constraint;

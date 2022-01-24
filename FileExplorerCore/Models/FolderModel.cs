@@ -2,7 +2,6 @@
 using Avalonia.Media.Imaging;
 using FileExplorerCore.Helpers;
 using ReactiveUI;
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -10,12 +9,13 @@ using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Media;
 
 namespace FileExplorerCore.Models
 {
 	public class FolderModel : ReactiveObject
 	{
-		private Bitmap _image;
+		private IImage _image;
 		static Task imageLoadTask;
 
 		public readonly static ConcurrentStack<FolderModel> FileImageQueue = new();
@@ -31,7 +31,7 @@ namespace FileExplorerCore.Models
 			RecurseSubdirectories = false,
 		};
 
-		public Bitmap Image
+		public IImage Image
 		{
 			get
 			{
@@ -47,7 +47,7 @@ namespace FileExplorerCore.Models
 							{
 								foreach (var subject in Concurrent.AsEnumerable(FileImageQueue))
 								{
-									var img = WindowsThumbnailProvider.GetThumbnail(subject.Path, 48, 48, ThumbnailOptions.BiggerSizeOk);
+									var img = ThumbnailProvider.GetFileImage(subject.Path);
 
 									subject.Image = img;
 								}

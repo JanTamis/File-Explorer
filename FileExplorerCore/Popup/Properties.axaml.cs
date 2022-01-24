@@ -5,7 +5,6 @@ using Avalonia.Media.Imaging;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
-using System;
 using System.ComponentModel;
 using System.IO;
 using System.IO.Enumeration;
@@ -20,7 +19,7 @@ namespace FileExplorerCore.Popup
 
 		private string path;
 
-		private Bitmap icon;
+		private Bitmap? icon;
 
 		private long size = -1;
 
@@ -33,7 +32,9 @@ namespace FileExplorerCore.Popup
 
 		public event Action OnClose = delegate { };
 
-		public Bitmap Icon => icon ??= WindowsThumbnailProvider.GetThumbnail(Path, 48, 48);
+		public Bitmap? Icon => icon ??= OperatingSystem.IsWindows() 
+			? WindowsThumbnailProvider.GetThumbnail(Path, 48, 48)
+			: null;
 
 		ObservableRangeCollection<MetadataExtractor.Directory> MetaData { get; set; } = new();
 
@@ -84,7 +85,7 @@ namespace FileExplorerCore.Popup
 		{
 			get
 			{
-				if (size == -1 && !String.IsNullOrWhiteSpace(Path))
+				if (size is -1 && !String.IsNullOrWhiteSpace(Path))
 				{
 					if (!model.IsFolder)
 					{

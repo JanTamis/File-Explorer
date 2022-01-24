@@ -1,13 +1,11 @@
 using System;
 using Avalonia;
-using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using DataBox;
