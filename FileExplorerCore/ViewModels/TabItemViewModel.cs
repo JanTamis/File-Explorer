@@ -532,17 +532,24 @@ namespace FileExplorerCore.ViewModels
 
 			path = System.IO.Path.GetFullPath(path);
 
-			if (search is "*" or "*.*" or "" && Sort is SortEnum.None && !recursive)
-			{
-				return new FileSystemEnumerable<FileModel>(path, GetFileModel, options);
-			}
-
+			var item = GetItem(MainWindowViewModel.Tree.Children[0], path.Split('/'), 0);
 			var query = FileSearcher.PrepareQuery(search);
 
-			return new FileSystemEnumerable<FileModel>(path, GetFileModel, options)
-			{
-				ShouldIncludePredicate = (ref FileSystemEntry x) => FileSystemName.MatchesSimpleExpression(search, x.FileName) || FileSearcher.IsValid(x, query)
-			};
+			return item.EnumerateChildren()
+				.Where(w => FileSystemName.MatchesSimpleExpression(search, w.Value))
+				.Select(s => new FileModel(s as FileSystemTreeItem));
+
+			//if (search is "*" or "*.*" or "" && Sort is SortEnum.None && !recursive)
+			//{
+			//	return new FileSystemEnumerable<FileModel>(path, GetFileModel, options);
+			//}
+
+			//var query = FileSearcher.PrepareQuery(search);
+
+			//return new FileSystemEnumerable<FileModel>(path, GetFileModel, options)
+			//{
+			//	ShouldIncludePredicate = (ref FileSystemEntry x) => FileSystemName.MatchesSimpleExpression(search, x.FileName) || FileSearcher.IsValid(x, query)
+			//};
 		}
 
 		private async Task<int> GetFileSystemEntriesCount(string path, string search, EnumerationOptions options, CancellationToken token)
@@ -597,35 +604,40 @@ namespace FileExplorerCore.ViewModels
 
 		private IEnumerable<FileModel> GetDirectories(string path)
 		{
-			return new FileSystemEnumerable<FileModel>(path, GetFileModel, options)
-			{
-				ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
-			};
+			//return new FileSystemEnumerable<FileModel>(path, GetFileModel, options)
+			//{
+			//	ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
+			//};
+
+			return Enumerable.Empty<FileModel>();
 		}
 
 		private IEnumerable<FileModel> GetFiles(string path)
 		{
-			return new FileSystemEnumerable<FileModel>(path, GetFileModel, options)
-			{
-				ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
-			};
+			//return new FileSystemEnumerable<FileModel>(path, GetFileModel, options)
+			//{
+			//	ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
+			//};
+
+			return Enumerable.Empty<FileModel>();
 		}
 
-		public static FileModel GetFileModel(ref FileSystemEntry entry)
+		private FileSystemTreeItem GetItem(FileSystemTreeItem item, string[] path, int index)
 		{
-			using var builder = new ValueStringBuilder(entry.Directory.Length + entry.FileName.Length + 1);
-
-			builder.Append(entry.Directory);
-			
-			if (!System.IO.Path.EndsInDirectorySeparator(entry.Directory))
+			if (index == path.Length)
 			{
-				builder.Append(System.IO.Path.DirectorySeparatorChar);
+				return item;
 			}
-			
-			builder.Append(entry.FileName);
-			//builder.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
 
-			return new FileModel(builder.AsSpan(), entry.IsDirectory);
+			foreach (var child in item.Children)
+			{
+				if (child.Value == path[index])
+				{
+					return GetItem(child as FileSystemTreeItem, path, index + 1);
+				}
+			}
+
+			return item;
 		}
 	}
 }

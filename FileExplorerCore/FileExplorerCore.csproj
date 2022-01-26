@@ -256,6 +256,7 @@
     <PackageReference Include="LinqOptimizer.CSharp" Version="0.7.0" />
     <PackageReference Include="MetadataExtractor" Version="2.7.1" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="6.0.0-preview.5.21301.5" />
+    <PackageReference Include="protobuf-net" Version="3.0.101" />
     <PackageReference Include="Svg.Skia" Version="0.5.11.1" />
     <PackageReference Include="System.Linq.Async" Version="5.1.0" />
     <PackageReference Include="System.Runtime.Experimental" Version="6.0.0" />

@@ -1,11 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using FileExplorerCore.Models;
-using FileExplorerCore.ViewModels;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Enumeration;
 using System.Linq;
 
 namespace FileExplorerCore.DisplayViews
@@ -20,9 +17,11 @@ namespace FileExplorerCore.DisplayViews
 
 				var path = Environment.GetFolderPath(Environment.SpecialFolder.Recent);
 
-				return !String.IsNullOrEmpty(path) 
-					? new FileSystemEnumerable<FileModel>(Environment.GetFolderPath(Environment.SpecialFolder.Recent), TabItemViewModel.GetFileModel).Take(20) 
-					: Enumerable.Empty<FileModel>();
+				//return !String.IsNullOrEmpty(path) 
+				//	? new FileSystemEnumerable<FileModel>(Environment.GetFolderPath(Environment.SpecialFolder.Recent), TabItemViewModel.GetFileModel).Take(20) 
+				//	: Enumerable.Empty<FileModel>();
+
+				return Enumerable.Empty<FileModel>();
 			}
 		}
 
@@ -32,10 +31,15 @@ namespace FileExplorerCore.DisplayViews
 			{
 				FileModel.ImageSize = 128;
 
-				return DriveInfo
-					.GetDrives()
-					.Where(x => x.IsReady)
-					.Select(x => new FileModel(x.Name, true));
+				//return MainWindowViewModel.Tree.Children
+				//	.Select(s => new FileModel(s));
+
+				return Enumerable.Empty<FileModel>();
+
+				//return DriveInfo
+				//	.GetDrives()
+				//	.Where(x => x.IsReady)
+				//	.Select(x => new FileModel(x.Name, true));
 			}
 		}
 

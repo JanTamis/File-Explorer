@@ -1,15 +1,21 @@
-﻿using System;
+﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace FileExplorerCore.Helpers
 {
+	[ProtoContract]
+	[ProtoInclude(500, typeof(FileSystemTreeItem))]
 	public class TreeItem<T>
 	{
 		protected IEnumerable<TreeItem<T>> Query;
 		private List<TreeItem<T>>? children;
 
+		[ProtoMember(1, DataFormat = DataFormat.Group)]
 		public List<TreeItem<T>> Children
 		{
 			get
@@ -22,13 +28,7 @@ namespace FileExplorerCore.Helpers
 					{
 						foreach (var item in Query)
 						{
-							try
-							{
-								children.Add(item);
-							}
-							catch (Exception e)
-							{
-							}
+							children.Add(item);
 						}
 					}
 					catch (Exception e)
@@ -40,8 +40,9 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
-		public TreeItem<T>? Parent { get; private set; }
+		public TreeItem<T>? Parent { get; set; }
 
+		[ProtoMember(2)]
 		public T Value { get; set; }
 
 		public bool HasParent => Parent is not null;
@@ -51,6 +52,10 @@ namespace FileExplorerCore.Helpers
 		{
 			get => Children[index];
 			set => Children[index] = value;
+		}
+
+		public TreeItem() : this(default)
+		{
 		}
 
 		public TreeItem(T value, IEnumerable<TreeItem<T>>? children = null, TreeItem<T>? parent = null)
@@ -81,7 +86,7 @@ namespace FileExplorerCore.Helpers
 		/// removes a item from the tree
 		/// </summary>
 		/// <remarks>this method will remove all the sub items of the item</remarks>
-		public async Task Remove()
+		public void Remove()
 		{
 			Parent = null;
 
@@ -151,27 +156,13 @@ namespace FileExplorerCore.Helpers
 
 		public IEnumerable<TreeItem<T>> EnumerateChildren(uint layers = UInt32.MaxValue)
 		{
-			var enumerable = children ?? Query;
-
-			if (children is null)
-			{
-				children = new List<TreeItem<T>>();
-			}
-
-			foreach (var child in enumerable)
+			foreach (var child in Children)
 			{
 				yield return child;
+			}
 
-				if (children.Contains(child))
-				{
-					children.Add(child);
-				}
-
-				// if (!Equals(enumerable, children))
-				// {
-				// 	children.Add(child);
-				// }
-
+			foreach (var child in Children)
+			{
 				if (layers > 0)
 				{
 					foreach (var childOfChild in child.EnumerateChildren(layers - 1))

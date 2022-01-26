@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using ProtoBuf;
+using System;
 using System.IO;
 using System.IO.Enumeration;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using FileExplorerCore.Models;
+using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 
 namespace FileExplorerCore.Helpers
 {
+	[ProtoContract]
 	public class FileSystemTreeItem : TreeItem<string>
 	{
 		private static readonly EnumerationOptions options = new()
@@ -17,6 +16,11 @@ namespace FileExplorerCore.Helpers
 			RecurseSubdirectories = false,
 			AttributesToSkip = FileAttributes.System,
 		};
+
+		public FileSystemTreeItem() : base()
+		{
+
+		}
 
 		public FileSystemTreeItem(string path, FileSystemTreeItem parent = null) : base(Path.GetFileName(path), parent: parent)
 		{

@@ -16,6 +16,10 @@ using System.Linq;
 using System.Threading;
 using System.Timers;
 using System.Threading.Tasks;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
+using System.Text.Json;
+using ProtoBuf;
 
 namespace FileExplorerCore.ViewModels
 {
@@ -82,11 +86,11 @@ namespace FileExplorerCore.ViewModels
 			if (OperatingSystem.IsWindows())
 			{
 				var drives = from drive in DriveInfo.GetDrives()
-					where drive.IsReady
-					select new FolderModel(drive.RootDirectory.FullName, $"{drive.VolumeLabel} ({drive.Name})");
+										 where drive.IsReady
+										 select new FolderModel(drive.RootDirectory.FullName, $"{drive.VolumeLabel} ({drive.Name})");
 
 				var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
-					select new FolderModel(KnownFolders.GetPath(specialFolder));
+													select new FolderModel(KnownFolders.GetPath(specialFolder));
 
 				Folders = quickAccess.Concat(drives);
 			}
@@ -94,6 +98,44 @@ namespace FileExplorerCore.ViewModels
 			{
 				Folders = new[] { new FolderModel("/", "root") };
 			}
+
+			ThreadPool.QueueUserWorkItem(x =>
+			{
+				var path = System.IO.Path.Combine(Environment.CurrentDirectory, "Index.bin");
+
+				if (File.Exists(path))
+				{
+					using (var stream = File.OpenRead(path))
+					{
+						Tree = Serializer.Deserialize<Tree<FileSystemTreeItem, string>>(stream);
+
+						foreach (var child in Tree.Children)
+						{
+							SetParents(child);
+						}
+					}
+				}
+
+				if (Tree is null)
+				{
+					if (OperatingSystem.IsWindows())
+					{
+						Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
+							.GetDrives()
+							.Where(w => w.DriveType == DriveType.Fixed)
+							.Select(s => new FileSystemTreeItem(s.RootDirectory.FullName)));
+					}
+					else if (OperatingSystem.IsMacOS())
+					{
+						Tree = new Tree<FileSystemTreeItem, string>(new[] { new FileSystemTreeItem("/") });
+					}
+
+					using (var stream = File.OpenWrite(path))
+					{
+						Serializer.Serialize(stream, Tree);
+					}
+				}
+			});
 
 			AddTab();
 
@@ -104,20 +146,14 @@ namespace FileExplorerCore.ViewModels
 			watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName;
 			watcher.IncludeSubdirectories = true;
 			watcher.EnableRaisingEvents = true;
+		}
 
-			if (OperatingSystem.IsWindows())
+		private void SetParents<T>(TreeItem<T> item)
+		{
+			foreach (var child in item.Children)
 			{
-				Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
-					.GetDrives()
-					.Where(w => w.DriveType == DriveType.Fixed)
-					.Select(s => new FileSystemTreeItem(s.RootDirectory.FullName)));
-			}
-			else if (OperatingSystem.IsMacOS())
-			{
-				Tree = new Tree<FileSystemTreeItem, string>(new[] { new FileSystemTreeItem("/") });
-
-				Testing();
-				Testing();
+				child.Parent = item;
+				SetParents(child);
 			}
 		}
 
@@ -141,6 +177,7 @@ namespace FileExplorerCore.ViewModels
 			watch.Stop();
 			
 			Debug.WriteLine(watch.Elapsed);
+			Debug.WriteLine(count);
 		}
 
 		private void Watcher_Deleted(object sender, FileSystemEventArgs e)
@@ -153,9 +190,9 @@ namespace FileExplorerCore.ViewModels
 			// Debug.WriteLine("Created: " + e.FullPath);
 		}
 
-		private void Timer_Elapsed(object sender, ElapsedEventArgs e)
+		private async ValueTask Timer_Elapsed(object sender, ElapsedEventArgs e)
 		{
-			StartSearch();
+			await StartSearch();
 		}
 
 		public void AddTab()
@@ -465,17 +502,17 @@ namespace FileExplorerCore.ViewModels
 
 		public void ShowProperties()
 		{
-			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
-			{
-				var model = CurrentTab.Files.FirstOrDefault(x => x.IsSelected) ?? new FileModel(Path, true);
+			//if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+			//{
+			//	var model = CurrentTab.Files.FirstOrDefault(x => x.IsSelected) ?? new FileModel(Path, true);
 
-				var properties = new Properties()
-				{
-					Model = model,
-				};
+			//	var properties = new Properties()
+			//	{
+			//		Model = model,
+			//	};
 
-				CurrentTab.PopupContent = properties;
-			}
+			//	CurrentTab.PopupContent = properties;
+			//}
 		}
 	}
 }

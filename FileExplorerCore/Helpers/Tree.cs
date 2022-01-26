@@ -1,11 +1,14 @@
-﻿using System;
+﻿using ProtoBuf;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace FileExplorerCore.Helpers
 {
+	[ProtoContract]
 	public class Tree<TTreeItem, TValue> where TTreeItem : TreeItem<TValue>
 	{
+		[ProtoMember(1)]
 		public List<TTreeItem> Children { get; }
 
 		public bool HasChildren => Children.Count > 0;
@@ -14,6 +17,11 @@ namespace FileExplorerCore.Helpers
 		{
 			get => Children[index];
 			set => Children[index] = value;
+		}
+
+		public Tree()
+		{
+			Children = new List<TTreeItem>();
 		}
 
 		public Tree(IEnumerable<TTreeItem> items)

@@ -1,6 +1,5 @@
 ﻿using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using Microsoft.CodeAnalysis;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;

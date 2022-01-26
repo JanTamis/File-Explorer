@@ -14,6 +14,8 @@ namespace FileExplorerCore.Helpers
 
 		public ValueStringBuilder(Span<char> initialBuffer)
 		{
+			initialBuffer.Clear();
+
 			_arrayToReturnToPool = null;
 			_chars = initialBuffer;
 			_pos = 0;

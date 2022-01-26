@@ -24,7 +24,7 @@ namespace FileExplorerCore.Helpers
 		private readonly List<T> Data = new();
 
 		const int updateTime = 500;
-		const int updateCountTime = 15;
+		const int updateCountTime = 50;
 
 		public int Count => Data.Count;
 

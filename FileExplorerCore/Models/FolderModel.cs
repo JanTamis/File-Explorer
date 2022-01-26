@@ -1,10 +1,8 @@
 ﻿using System;
-using Avalonia.Media.Imaging;
 using FileExplorerCore.Helpers;
 using ReactiveUI;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
