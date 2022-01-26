@@ -107,7 +107,8 @@ namespace FileExplorerCore.Helpers
 					return false;
 				}
 
-				int idx = Span.IndexOf(Separator);
+				var idx = Span.IndexOf(Separator);
+				
 				if (idx < 0)
 				{
 					Current = Span;
@@ -115,8 +116,9 @@ namespace FileExplorerCore.Helpers
 				}
 				else
 				{
-					Current = Span.Slice(0, idx);
+					Current = Span[..idx];
 					Span = Span[(idx + SeparatorLength)..];
+					
 					if (Span.IsEmpty)
 						TrailingEmptyItem = true;
 				}
@@ -168,7 +170,7 @@ namespace FileExplorerCore.Helpers
 					return false;
 				}
 
-				int idx = Span.IndexOfAny(Separator1, Separator2);
+				var idx = Span.IndexOfAny(Separator1, Separator2);
 				if (idx < 0)
 				{
 					Current = Span;
@@ -231,7 +233,7 @@ namespace FileExplorerCore.Helpers
 					return false;
 				}
 
-				int idx = Span.IndexOfAny(Separator1, Separator2, Separator3);
+				var idx = Span.IndexOfAny(Separator1, Separator2, Separator3);
 				if (idx < 0)
 				{
 					Current = Span;
@@ -290,7 +292,7 @@ namespace FileExplorerCore.Helpers
 					return false;
 				}
 
-				int idx = Span.IndexOfAny(Separators);
+				var idx = Span.IndexOfAny(Separators);
 				if (idx < 0)
 				{
 					Current = Span;

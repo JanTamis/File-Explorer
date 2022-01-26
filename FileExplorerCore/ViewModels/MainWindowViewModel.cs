@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input;
 using Avalonia.Threading;
@@ -8,7 +9,6 @@ using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using FileExplorerCore.Popup;
 using Microsoft.VisualBasic.FileIO;
-using Nessos.LinqOptimizer.CSharp;
 using System.Globalization;
 using System.IO;
 using System.IO.Enumeration;
@@ -16,14 +16,12 @@ using System.Linq;
 using System.Threading;
 using System.Timers;
 using System.Threading.Tasks;
-using System.Diagnostics;
-using Avalonia.Controls.Shapes;
 
 namespace FileExplorerCore.ViewModels
 {
 	public class MainWindowViewModel : ViewModelBase
 	{
-		public readonly WindowNotificationManager notificationManager;
+		public readonly WindowNotificationManager NotificationManager;
 
 		private TabItemViewModel _currentTab;
 		private IEnumerable<string> searchHistory;
@@ -38,7 +36,7 @@ namespace FileExplorerCore.ViewModels
 
 		public ObservableRangeCollection<TabItemViewModel> Tabs { get; set; } = new();
 
-		FileSystemWatcher watcher;
+		private FileSystemWatcher watcher;
 
 		public IEnumerable<string> SearchHistory
 		{
@@ -64,7 +62,7 @@ namespace FileExplorerCore.ViewModels
 			set
 			{
 				if (value == Path) return;
-				
+
 				CurrentTab.Path = value;
 
 				OnPropertyChanged();
@@ -79,27 +77,27 @@ namespace FileExplorerCore.ViewModels
 
 		public MainWindowViewModel(WindowNotificationManager manager)
 		{
-			notificationManager = manager;
+			NotificationManager = manager;
 
 			if (OperatingSystem.IsWindows())
 			{
 				var drives = from drive in DriveInfo.GetDrives()
-										 where drive.IsReady
-										 select new FolderModel(drive.RootDirectory.FullName, $"{drive.VolumeLabel} ({drive.Name})");
+					where drive.IsReady
+					select new FolderModel(drive.RootDirectory.FullName, $"{drive.VolumeLabel} ({drive.Name})");
 
 				var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
-													select new FolderModel(KnownFolders.GetPath(specialFolder));
+					select new FolderModel(KnownFolders.GetPath(specialFolder));
 
 				Folders = quickAccess.Concat(drives);
 			}
 			else if (OperatingSystem.IsMacOS())
 			{
-
+				Folders = new[] { new FolderModel("/", "root") };
 			}
 
 			AddTab();
 
-			watcher = new FileSystemWatcher("C://", "*");
+			watcher = new FileSystemWatcher("/", "*");
 
 			watcher.Created += Watcher_Created;
 			watcher.Deleted += Watcher_Deleted;
@@ -107,20 +105,52 @@ namespace FileExplorerCore.ViewModels
 			watcher.IncludeSubdirectories = true;
 			watcher.EnableRaisingEvents = true;
 
-			Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
-				.GetDrives()
-				.Where(w => w.DriveType == DriveType.Fixed)
-				.Select(s => new FileSystemTreeItem(s.RootDirectory.FullName, null)));
+			if (OperatingSystem.IsWindows())
+			{
+				Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
+					.GetDrives()
+					.Where(w => w.DriveType == DriveType.Fixed)
+					.Select(s => new FileSystemTreeItem(s.RootDirectory.FullName)));
+			}
+			else if (OperatingSystem.IsMacOS())
+			{
+				Tree = new Tree<FileSystemTreeItem, string>(new[] { new FileSystemTreeItem("/") });
+
+				Testing();
+				Testing();
+			}
+		}
+
+		public void Testing()
+		{
+			var count = 0;
+			var watch = Stopwatch.StartNew();
+			var time = DateTime.Now;
+
+			foreach (var _ in Tree.EnumerateChildren())
+			{
+				count++;
+
+				if ((DateTime.Now - time).TotalSeconds >= 1)
+				{
+					Debug.WriteLine(count.ToString("N0"));
+					time = DateTime.Now;
+				}
+			}
+			
+			watch.Stop();
+			
+			Debug.WriteLine(watch.Elapsed);
 		}
 
 		private void Watcher_Deleted(object sender, FileSystemEventArgs e)
 		{
-			Debug.WriteLine("Deleted: " + e.FullPath);
+			// Debug.WriteLine("Deleted: " + e.FullPath);
 		}
 
 		private void Watcher_Created(object sender, FileSystemEventArgs e)
 		{
-			Debug.WriteLine("Created: " + e.FullPath);
+			// Debug.WriteLine("Created: " + e.FullPath);
 		}
 
 		private void Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -264,19 +294,19 @@ namespace FileExplorerCore.ViewModels
 		{
 			var data = new DataObject();
 			data.Set(DataFormats.FileNames, CurrentTab.Files.Where(x => x.IsSelected)
-																											.Select(s => s.Path)
-																											.ToArray());
+				.Select(s => s.Path)
+				.ToArray());
 
 			await App.Current.Clipboard.SetDataObjectAsync(data);
 
-			notificationManager.Show(new Notification("Copy Files", "Files has been copied"));
+			NotificationManager.Show(new Notification("Copy Files", "Files has been copied"));
 		}
 
 		public async void CopyPath()
 		{
 			await App.Current.Clipboard.SetTextAsync(CurrentTab.Path);
 
-			notificationManager.Show(new Notification("Copy Path", "The path has been copied"));
+			NotificationManager.Show(new Notification("Copy Path", "The path has been copied"));
 		}
 
 		public void DeleteFiles()
@@ -309,9 +339,12 @@ namespace FileExplorerCore.ViewModels
 							{
 								FileSystem.DeleteDirectory(file.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
 							}
+
 							deletedFiles.Add(file);
 						}
-						catch (Exception) { }
+						catch (Exception)
+						{
+						}
 					}
 
 					CurrentTab.Files.RemoveRange(deletedFiles);
@@ -331,10 +364,7 @@ namespace FileExplorerCore.ViewModels
 					Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab && !String.IsNullOrWhiteSpace(x.Path))),
 				};
 
-				selector.TabSelectionChanged += (tab) =>
-				{
-					selector.Close();
-				};
+				selector.TabSelectionChanged += (tab) => { selector.Close(); };
 
 				CurrentTab.PopupContent = selector;
 			}
@@ -396,9 +426,9 @@ namespace FileExplorerCore.ViewModels
 				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = true);
 
 				var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(Path, (ref FileSystemEntry x) => (System.IO.Path.GetExtension(x.FileName).ToString(), x.Length), options)
-				{
-					ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
-				}
+					{
+						ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
+					}
 					.Where(w => !String.IsNullOrEmpty(w.Extension))
 					.GroupBy(g => g.Extension);
 

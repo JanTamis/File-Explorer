@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FileExplorerCore.Helpers
 {
@@ -24,13 +25,13 @@ namespace FileExplorerCore.Helpers
 		/// Get the amount of children recursively
 		/// </summary>
 		/// <returns>the amount of children recursively</returns>
-		public int GetChildrenCount()
+		public async ValueTask<int> GetChildrenCount()
 		{
 			var count = Children.Count;
 
 			foreach (var child in Children)
 			{
-				count += child.GetChilrenCount();
+				count += await child.GetChildrenCount();
 			}
 
 			return count;
@@ -67,15 +68,15 @@ namespace FileExplorerCore.Helpers
 			foreach (var child in Children)
 			{
 				yield return child;
-			}
 
-			if (layers > 0)
-			{
-				foreach (var child in Children)
+				if (layers > 0)
 				{
-					foreach (var ChildOfChild in child.EnumerateChildren(layers))
+					foreach (var childOfChild in child.EnumerateChildren(layers - 1))
 					{
-						yield return (TTreeItem)ChildOfChild;
+						if (childOfChild is TTreeItem item)
+						{
+							yield return item;
+						}
 					}
 				}
 			}

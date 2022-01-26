@@ -1,29 +1,29 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.IO.Enumeration;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
+using FileExplorerCore.Models;
 
 namespace FileExplorerCore.Helpers
 {
 	public class FileSystemTreeItem : TreeItem<string>
 	{
-		static EnumerationOptions options = new EnumerationOptions
+		private static readonly EnumerationOptions options = new()
 		{
 			IgnoreInaccessible = true,
 			RecurseSubdirectories = false,
-			AttributesToSkip = FileAttributes.System
+			AttributesToSkip = FileAttributes.System,
 		};
 
-		public FileSystemTreeItem(string path, FileSystemTreeItem parent) : base(Path.GetFileName(path), parent: parent)
+		public FileSystemTreeItem(string path, FileSystemTreeItem parent = null) : base(Path.GetFileName(path), parent: parent)
 		{
 			if (Directory.Exists(path))
 			{
-				Children.AddRange(Directory.EnumerateFileSystemEntries(path, "*", options).Select(s => new FileSystemTreeItem(s, this)));
+				Query = new FileSystemEnumerable<FileSystemTreeItem>(path, (ref FileSystemEntry x) => new FileSystemTreeItem(x.ToFullPath(), this), options);
 			}
-		}
-
-		public FileSystemTreeItem(string value, IEnumerable<TreeItem<string>>? children = null, TreeItem<string>? parent = null) : base(value, children, parent)
-		{
 		}
 	}
 }

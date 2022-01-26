@@ -21,7 +21,7 @@ namespace FileExplorerCore.Helpers
 
 		private static readonly EnumerationOptions enumerationOptions = new()
 		{
-			AttributesToSkip = FileAttributes.Hidden
+			AttributesToSkip = FileAttributes.Hidden,
 		};
 
 		static ThumbnailProvider()
@@ -72,15 +72,18 @@ namespace FileExplorerCore.Helpers
 			{
 				path = Path.GetFullPath(path);
 
-				foreach (var folder in Enum.GetValues<KnownFolder>())
+				if (OperatingSystem.IsWindows())
 				{
-					var folderText = Enum.GetName(folder);
-					path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-
-					if (folderText is not null && ImageExists(folderText) &&
-							String.Compare(path, KnownFolders.GetPath(folder), StringComparison.OrdinalIgnoreCase) == 0)
+					foreach (var folder in Enum.GetValues<KnownFolder>())
 					{
-						name = folderText;
+						var folderText = Enum.GetName(folder);
+						path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+
+						if (folderText is not null && ImageExists(folderText) &&
+						    String.Compare(path, KnownFolders.GetPath(folder), StringComparison.OrdinalIgnoreCase) == 0)
+						{
+							name = folderText;
+						}
 					}
 				}
 
@@ -118,13 +121,13 @@ namespace FileExplorerCore.Helpers
 					}
 					else
 					{
-						foreach (var item in TypeMap)
+						foreach (var (key, value) in TypeMap)
 						{
-							for (var i = 0; i < item.Value.Length; i++)
+							foreach (var val in value)
 							{
-								if (extension == item.Value[i])
+								if (extension == val)
 								{
-									name = item.Key;
+									name = key;
 								}
 							}
 						}

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
-using Avalonia.Threading;
 using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
@@ -11,7 +10,6 @@ using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
 using System.Runtime;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Humanizer;
@@ -61,7 +59,7 @@ namespace FileExplorerCore.ViewModels
 			get => _sort;
 			set
 			{
-				this.OnPropertyChanged(ref _sort, value);
+				OnPropertyChanged(ref _sort, value);
 
 				if (!IsLoading && Files.Count > 1)
 				{
@@ -84,8 +82,8 @@ namespace FileExplorerCore.ViewModels
 			get => _count;
 			set
 			{
-				this.OnPropertyChanged(ref _count, value);
-				this.OnPropertyChanged(nameof(FileCountText));
+				OnPropertyChanged(ref _count, value);
+				OnPropertyChanged(nameof(FileCountText));
 			}
 		}
 
@@ -94,17 +92,17 @@ namespace FileExplorerCore.ViewModels
 			get => _fileCount;
 			set
 			{
-				this.OnPropertyChanged(ref _fileCount, value);
-				this.OnPropertyChanged(nameof(IsIndeterminate));
-				this.OnPropertyChanged(nameof(SearchProgression));
-				this.OnPropertyChanged(nameof(SearchText));
+				OnPropertyChanged(ref _fileCount, value);
+				OnPropertyChanged(nameof(IsIndeterminate));
+				OnPropertyChanged(nameof(SearchProgression));
+				OnPropertyChanged(nameof(SearchText));
 			}
 		}
 
 		public string FileCountText => Count switch
 		{
 			1 => "1 item",
-			_ => $"{Count:N0} items"
+			_ => $"{Count:N0} items",
 		};
 
 		public string SelectionText
@@ -120,7 +118,8 @@ namespace FileExplorerCore.ViewModels
 
 					if (!selectedFiles.Any(x => x.IsFolder))
 					{
-						var fileSize = selectedFiles.Where(x => !x.IsFolder)
+						var fileSize = selectedFiles
+							.Where(x => !x.IsFolder)
 							.Sum(s => s.Size);
 
 						result += $", {fileSize.Bytes()}";
@@ -134,7 +133,7 @@ namespace FileExplorerCore.ViewModels
 		public int SelectionCount
 		{
 			get => _selectionCount;
-			private set => this.OnPropertyChanged(ref _selectionCount, value);
+			private set => OnPropertyChanged(ref _selectionCount, value);
 		}
 
 		public TimeSpan LoadTime => DateTime.Now - startSearchTime;
@@ -144,11 +143,11 @@ namespace FileExplorerCore.ViewModels
 			get => _isLoading;
 			set
 			{
-				this.OnPropertyChanged(ref _isLoading, value);
+				OnPropertyChanged(ref _isLoading, value);
 
 				if (!IsLoading)
 				{
-					this.OnPropertyChanged(nameof(LoadTime));
+					OnPropertyChanged(nameof(LoadTime));
 
 					//TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.NoProgress);
 				}
@@ -162,7 +161,7 @@ namespace FileExplorerCore.ViewModels
 				GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
 				GC.Collect(2, GCCollectionMode.Forced, false, true);
 
-				this.OnPropertyChanged(nameof(SearchFailed));
+				OnPropertyChanged(nameof(SearchFailed));
 			}
 		}
 
@@ -174,36 +173,34 @@ namespace FileExplorerCore.ViewModels
 		{
 			get
 			{
-				if (IsIndeterminate || Double.IsNaN(SearchProgression) || SearchProgression == 0)
+				if (IsIndeterminate || SearchProgression is 0 or Double.NaN)
 				{
-					return null;
+					return String.Empty;
 				}
-				else
+
+				var loadTime = LoadTime;
+				predictedTime = predictedTime.Subtract(TimeSpan.FromSeconds(1));
+
+				if ((loadTime - previousLoadTime).TotalSeconds >= 3)
 				{
-					var loadTime = LoadTime;
-					predictedTime = predictedTime.Subtract(TimeSpan.FromSeconds(1));
+					var deltaItems = Count - foundItems;
+					var remainingItems = FileCount - Count;
+					var elapsed = loadTime - previousLoadTime;
 
-					if ((loadTime - previousLoadTime).TotalSeconds >= 3)
+					previousLoadTime = loadTime;
+
+					if (deltaItems > 0)
 					{
-						var deltaItems = Count - foundItems;
-						var remainingItems = FileCount - Count;
-						var elapsed = loadTime - previousLoadTime;
-
-						previousLoadTime = loadTime;
-
-						if (deltaItems > 0)
-						{
-							predictedTime = TimeSpan.FromSeconds(remainingItems / (double)deltaItems * elapsed.TotalSeconds);
-						}
-
-						foundItems = Count;
+						predictedTime = TimeSpan.FromSeconds(remainingItems / (double)deltaItems * elapsed.TotalSeconds);
 					}
 
-					TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.Normal);
-					TaskbarUtility.SetProgressValue((int)(SearchProgression * Int32.MaxValue), Int32.MaxValue);
-
-					return $"Remaining Time: {predictedTime:hh\\:mm\\:ss}";
+					foundItems = Count;
 				}
+
+				TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.Normal);
+				TaskbarUtility.SetProgressValue((int)(SearchProgression * Int32.MaxValue), Int32.MaxValue);
+
+				return $"Remaining Time: {predictedTime:hh\\:mm\\:ss}";
 			}
 		}
 
@@ -233,8 +230,8 @@ namespace FileExplorerCore.ViewModels
 						redoStack.Clear();
 					}
 
-					this.OnPropertyChanged(ref _path, value);
-					this.OnPropertyChanged(nameof(FolderName));
+					OnPropertyChanged(ref _path, value);
+					OnPropertyChanged(nameof(FolderName));
 
 					ThreadPool.QueueUserWorkItem(async x =>
 					{
@@ -260,37 +257,16 @@ namespace FileExplorerCore.ViewModels
 										name = $"{new DriveInfo(name).VolumeLabel} ({name}{System.IO.Path.DirectorySeparatorChar})";
 									}
 
-
-									yield return new FolderModel(folderPath, name, Directory.EnumerateDirectories(folderPath, "*", 
-										new EnumerationOptions())
-										.Where(Directory.Exists)
-										.Select(directory => new FolderModel(directory, System.IO.Path.GetFileName(directory))));
+									yield return new FolderModel(folderPath, name, new FileSystemEnumerable<FolderModel>(path, (ref FileSystemEntry x) => new FolderModel(x.ToFullPath(), new string(x.FileName)), options)
+									{
+										ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
+									});
 								}
 							}
 						}
 					});
 
 					IsSearching = false;
-
-					if (!String.IsNullOrEmpty(Path))
-					{
-						watcher = new FileSystemWatcher(Path)
-						{
-							IncludeSubdirectories = false
-						};
-
-						watcher.Renamed += (_, e) =>
-						{
-							var file = Files.FirstOrDefault(x => System.IO.Path.GetFileName(x.Path) == e.OldName);
-
-							if (file != null)
-							{
-								file.Path = e.FullPath;
-							}
-						};
-
-						watcher.EnableRaisingEvents = true;
-					}
 				}
 			}
 		}
@@ -300,13 +276,13 @@ namespace FileExplorerCore.ViewModels
 		public string Search
 		{
 			get => _search;
-			set => this.OnPropertyChanged(ref _search, value);
+			set => OnPropertyChanged(ref _search, value);
 		}
 
 		public Control DisplayControl
 		{
 			get => _displayControl;
-			set => this.OnPropertyChanged(ref _displayControl, value);
+			set => OnPropertyChanged(ref _displayControl, value);
 		}
 
 		public bool IsSearching { get; set; }
@@ -316,7 +292,7 @@ namespace FileExplorerCore.ViewModels
 			get => _isGrid;
 			set
 			{
-				this.OnPropertyChanged(ref _isGrid, value);
+				OnPropertyChanged(ref _isGrid, value);
 
 				if (IsGrid is false)
 				{
@@ -362,14 +338,14 @@ namespace FileExplorerCore.ViewModels
 			get => _popupContent;
 			set
 			{
-				this.OnPropertyChanged(ref _popupContent, value);
+				OnPropertyChanged(ref _popupContent, value);
 
 				if (PopupContent is not null)
 				{
 					PopupContent.OnClose += delegate { PopupContent = null; };
 				}
 
-				this.OnPropertyChanged(nameof(PopupVisible));
+				OnPropertyChanged(nameof(PopupVisible));
 			}
 		}
 
@@ -385,7 +361,7 @@ namespace FileExplorerCore.ViewModels
 				{
 					SelectionCount = Files.Count(x => x.IsSelected);
 
-					this.OnPropertyChanged(nameof(SelectionText));
+					OnPropertyChanged(nameof(SelectionText));
 				}
 			};
 
@@ -402,7 +378,7 @@ namespace FileExplorerCore.ViewModels
 					SelectionCount--;
 				}
 
-				this.OnPropertyChanged(nameof(SelectionText));
+				OnPropertyChanged(nameof(SelectionText));
 			};
 
 			UpdateFiles(false, "*");
@@ -467,7 +443,7 @@ namespace FileExplorerCore.ViewModels
 			Files.Trim();
 
 			SelectionCount = 0;
-			await this.OnPropertyChanged(nameof(SelectionText));
+			await OnPropertyChanged(nameof(SelectionText));
 
 			IsLoading = true;
 
@@ -488,11 +464,11 @@ namespace FileExplorerCore.ViewModels
 
 					if (Sort is not SortEnum.None)
 					{
-						ThreadPool.QueueUserWorkItem(x =>
+						ThreadPool.QueueUserWorkItem(async x =>
 						{
 							options.RecurseSubdirectories = recursive;
 
-							var count = GetFileSystemEntriesCount(Path, search, options, TokenSource.Token);
+							var count = await GetFileSystemEntriesCount(Path, search, options, TokenSource.Token);
 
 							if (!TokenSource.IsCancellationRequested)
 							{
@@ -554,24 +530,22 @@ namespace FileExplorerCore.ViewModels
 		{
 			options.RecurseSubdirectories = recursive;
 
+			path = System.IO.Path.GetFullPath(path);
+
 			if (search is "*" or "*.*" or "" && Sort is SortEnum.None && !recursive)
 			{
 				return new FileSystemEnumerable<FileModel>(path, GetFileModel, options);
 			}
-			else
-			{
-				var query = FileSearcher.PrepareQuery(search);
 
-				return new FileSystemEnumerable<FileModel>(path, GetFileModel, options)
-				{
-					ShouldIncludePredicate = (ref FileSystemEntry x) =>
-						FileSystemName.MatchesSimpleExpression(search, x.FileName) || FileSearcher.IsValid(x, query)
-				};
-			}
+			var query = FileSearcher.PrepareQuery(search);
+
+			return new FileSystemEnumerable<FileModel>(path, GetFileModel, options)
+			{
+				ShouldIncludePredicate = (ref FileSystemEntry x) => FileSystemName.MatchesSimpleExpression(search, x.FileName) || FileSearcher.IsValid(x, query)
+			};
 		}
 
-		private int GetFileSystemEntriesCount(string path, string search, EnumerationOptions options,
-			CancellationToken token)
+		private async Task<int> GetFileSystemEntriesCount(string path, string search, EnumerationOptions options, CancellationToken token)
 		{
 			//FileSystemEnumerable<bool> enumerable;
 
@@ -602,24 +576,23 @@ namespace FileExplorerCore.ViewModels
 
 			//return count;
 
-			var temp = path.Split('/');
+			var temp =  path.Split('/');
 
 			TreeItem<string> item = MainWindowViewModel.Tree.Children[0];
 
-			for (int i = 1; i < temp.Length; i++)
+			foreach (var split in temp)
 			{
-				if (item is not null)
+				foreach (var child in item.EnumerateChildren())
 				{
-					item = item.EnumerateChildren(0).FirstOrDefault(f => f.Value == temp[i]);
+					if (child.Value == split)
+					{
+						item = child;
+						break;
+					}
 				}
 			}
 
-			if (options.RecurseSubdirectories)
-			{
-				return item.EnumerateChildren().Count();
-			}
-
-			return item.GetChilrenCount();
+			return await item.GetChildrenCount();
 		}
 
 		private IEnumerable<FileModel> GetDirectories(string path)
@@ -650,8 +623,7 @@ namespace FileExplorerCore.ViewModels
 			}
 			
 			builder.Append(entry.FileName);
-			
-			builder.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
+			//builder.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
 
 			return new FileModel(builder.AsSpan(), entry.IsDirectory);
 		}

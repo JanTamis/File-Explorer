@@ -23,7 +23,7 @@ namespace FileExplorerCore.Models
 
 		private ObservableRangeCollection<FolderModel> _folders;
 
-		public static FolderModel Empty { get; } = new FolderModel();
+		public static FolderModel Empty { get; } = new();
 
 		private readonly EnumerationOptions options = new()
 		{
@@ -119,7 +119,7 @@ namespace FileExplorerCore.Models
 			return x.Path == y.Path;
 		}
 
-		public int GetHashCode([DisallowNull] FolderModel obj)
+		public int GetHashCode(FolderModel obj)
 		{
 			return obj.Path.GetHashCode();
 		}
