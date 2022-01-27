@@ -73,13 +73,15 @@ namespace FileExplorerCore.Helpers
 		/// <returns></returns>
 		public IEnumerable<TTreeItem> EnumerateChildren(uint layers = UInt32.MaxValue)
 		{
-			foreach (var child in Children)
+			var count = Children.Count;
+			
+			for (var i = 0; i < count; i++)
 			{
-				yield return child;
+				yield return Children[i];
 
 				if (layers > 0)
 				{
-					foreach (var childOfChild in child.EnumerateChildren(layers - 1))
+					foreach (var childOfChild in Children[i].EnumerateChildren(layers - 1))
 					{
 						if (childOfChild is TTreeItem item)
 						{
@@ -87,6 +89,36 @@ namespace FileExplorerCore.Helpers
 						}
 					}
 				}
+
+				count = Children.Count;
+			}
+		}
+
+		/// <summary>
+		/// Enumerates all the items in the tree
+		/// </summary>
+		/// <remarks>if you want to know how much items are in the tree use the <see cref="GetChildrenCount"/> method</remarks>
+		/// <returns></returns>
+		public async IAsyncEnumerable<TTreeItem> EnumerateChildrenAsync(uint layers = UInt32.MaxValue)
+		{
+			var count = Children.Count;
+
+			for (var i = 0; i < count; i++)
+			{
+				yield return Children[i];
+
+				if (layers > 0)
+				{
+					await foreach (var childOfChild in Children[i].EnumerateChildrenAsync(layers - 1))
+					{
+						if (childOfChild is TTreeItem item)
+						{
+							yield return item;
+						}
+					}
+				}
+
+				count = Children.Count;
 			}
 		}
 	}

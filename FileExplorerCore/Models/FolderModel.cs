@@ -19,7 +19,7 @@ namespace FileExplorerCore.Models
 		public readonly static ConcurrentStack<FolderModel> FileImageQueue = new();
 		readonly IEnumerable<FolderModel> query = Enumerable.Empty<FolderModel>();
 
-		private ObservableRangeCollection<FolderModel> _folders;
+		private ObservableRangeCollection<FolderModel>? _folders;
 
 		public static FolderModel Empty { get; } = new();
 
@@ -45,7 +45,7 @@ namespace FileExplorerCore.Models
 							{
 								foreach (var subject in Concurrent.AsEnumerable(FileImageQueue))
 								{
-									var img = ThumbnailProvider.GetFileImage(subject.Path);
+									var img = ThumbnailProvider.GetFileImage(subject.Path).Result;
 
 									subject.Image = img;
 								}
@@ -62,13 +62,7 @@ namespace FileExplorerCore.Models
 		public string Name { get; }
 		public string Path { get; }
 
-		public ObservableRangeCollection<FolderModel> SubFolders
-		{
-			get
-			{
-				return _folders ??= new(query);
-			}
-		}
+		public ObservableRangeCollection<FolderModel> SubFolders => _folders ??= new ObservableRangeCollection<FolderModel>(query);
 
 		//public Task<IEnumerable<FolderModel>> SubFolders => Task.Run(() => (IEnumerable<FolderModel>)query.ToArray());
 

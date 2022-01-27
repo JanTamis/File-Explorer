@@ -150,6 +150,9 @@ namespace FileExplorerCore.ViewModels
 					OnPropertyChanged(nameof(LoadTime));
 
 					//TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.NoProgress);
+
+					GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+					GC.Collect(2, GCCollectionMode.Forced, false);
 				}
 				else
 				{
@@ -157,9 +160,6 @@ namespace FileExplorerCore.ViewModels
 
 					//TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.Indeterminate);
 				}
-
-				GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-				GC.Collect(2, GCCollectionMode.Forced, false, true);
 
 				OnPropertyChanged(nameof(SearchFailed));
 			}
@@ -583,7 +583,7 @@ namespace FileExplorerCore.ViewModels
 
 			//return count;
 
-			var temp =  path.Split('/');
+			var temp =  path.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
 			TreeItem<string> item = MainWindowViewModel.Tree.Children[0];
 
@@ -609,7 +609,26 @@ namespace FileExplorerCore.ViewModels
 			//	ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
 			//};
 
-			return Enumerable.Empty<FileModel>();
+			var temp = path.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+			var item = MainWindowViewModel.Tree.Children[0];
+
+			foreach (var split in temp)
+			{
+				foreach (FileSystemTreeItem child in item.EnumerateChildren())
+				{
+					if (child.Value == split)
+					{
+						item = child;
+						break;
+					}
+				}
+			}
+
+			return item.EnumerateChildren(0)
+				.Cast<FileSystemTreeItem>()
+				.Where(w => w.IsFolder)
+				.Select(s => new FileModel(s));
 		}
 
 		private IEnumerable<FileModel> GetFiles(string path)
@@ -619,7 +638,26 @@ namespace FileExplorerCore.ViewModels
 			//	ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
 			//};
 
-			return Enumerable.Empty<FileModel>();
+			var temp = path.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+			var item = MainWindowViewModel.Tree.Children[0];
+
+			foreach (var split in temp)
+			{
+				foreach (FileSystemTreeItem child in item.EnumerateChildren())
+				{
+					if (child.Value == split)
+					{
+						item = child;
+						break;
+					}
+				}
+			}
+
+			return item.EnumerateChildren(0)
+				.Cast<FileSystemTreeItem>()
+				.Where(w => !w.IsFolder)
+				.Select(s => new FileModel(s));
 		}
 
 		private FileSystemTreeItem GetItem(FileSystemTreeItem item, string[] path, int index)

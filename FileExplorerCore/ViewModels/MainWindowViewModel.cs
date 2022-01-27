@@ -19,6 +19,8 @@ using System.Threading.Tasks;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 using System.Text.Json;
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 using ProtoBuf;
 
 namespace FileExplorerCore.ViewModels
@@ -34,7 +36,7 @@ namespace FileExplorerCore.ViewModels
 
 		public IEnumerable<FolderModel> Folders { get; set; }
 
-		public static Tree<FileSystemTreeItem, string> Tree;
+		public static Tree<FileSystemTreeItem, string>? Tree { get; protected set; }
 
 		public ObservableRangeCollection<FileModel> Files => CurrentTab.Files;
 
@@ -82,15 +84,17 @@ namespace FileExplorerCore.ViewModels
 		public MainWindowViewModel(WindowNotificationManager manager)
 		{
 			NotificationManager = manager;
+			
+			Serializer.PrepareSerializer<Tree<FileSystemTreeItem, string>>();
 
 			if (OperatingSystem.IsWindows())
 			{
 				var drives = from drive in DriveInfo.GetDrives()
-										 where drive.IsReady
-										 select new FolderModel(drive.RootDirectory.FullName, $"{drive.VolumeLabel} ({drive.Name})");
+					where drive.IsReady
+					select new FolderModel(drive.RootDirectory.FullName, $"{drive.VolumeLabel} ({drive.Name})");
 
 				var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
-													select new FolderModel(KnownFolders.GetPath(specialFolder));
+					select new FolderModel(KnownFolders.GetPath(specialFolder));
 
 				Folders = quickAccess.Concat(drives);
 			}
@@ -99,43 +103,35 @@ namespace FileExplorerCore.ViewModels
 				Folders = new[] { new FolderModel("/", "root") };
 			}
 
-			ThreadPool.QueueUserWorkItem(x =>
+			var path = System.IO.Path.Combine(Environment.CurrentDirectory, "Index.bin");
+
+			if (File.Exists(path))
 			{
-				var path = System.IO.Path.Combine(Environment.CurrentDirectory, "Index.bin");
-
-				if (File.Exists(path))
+				using (var stream = File.OpenRead(path))
 				{
-					using (var stream = File.OpenRead(path))
-					{
-						Tree = Serializer.Deserialize<Tree<FileSystemTreeItem, string>>(stream);
+					Tree = Serializer.Deserialize<Tree<FileSystemTreeItem, string>>(stream);
 
-						foreach (var child in Tree.Children)
-						{
-							SetParents(child);
-						}
+					foreach (var child in Tree.Children)
+					{
+						SetParents(child);
 					}
 				}
+			}
 
-				if (Tree is null)
+			if (Tree is null or { Children.Count: 0 })
+			{
+				if (OperatingSystem.IsWindows())
 				{
-					if (OperatingSystem.IsWindows())
-					{
-						Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
-							.GetDrives()
-							.Where(w => w.DriveType == DriveType.Fixed)
-							.Select(s => new FileSystemTreeItem(s.RootDirectory.FullName)));
-					}
-					else if (OperatingSystem.IsMacOS())
-					{
-						Tree = new Tree<FileSystemTreeItem, string>(new[] { new FileSystemTreeItem("/") });
-					}
-
-					using (var stream = File.OpenWrite(path))
-					{
-						Serializer.Serialize(stream, Tree);
-					}
+					Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
+						.GetDrives()
+						.Where(w => w.DriveType == DriveType.Fixed)
+						.Select(s => new FileSystemTreeItem(s.RootDirectory.FullName, true)));
 				}
-			});
+				else if (OperatingSystem.IsMacOS())
+				{
+					Tree = new Tree<FileSystemTreeItem, string>(new[] { new FileSystemTreeItem("/", true) });
+				}
+			}
 
 			AddTab();
 
@@ -146,11 +142,31 @@ namespace FileExplorerCore.ViewModels
 			watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName;
 			watcher.IncludeSubdirectories = true;
 			watcher.EnableRaisingEvents = true;
+
+			if (Application.Current?.ApplicationLifetime is ClassicDesktopStyleApplicationLifetime applicationLifetime)
+			{
+				applicationLifetime.Exit += delegate
+				{
+					var path = System.IO.Path.Combine(Environment.CurrentDirectory, "Index.bin");
+
+					if (File.Exists(path))
+					{
+						File.Delete(path);
+					}
+
+					using (var stream = File.OpenWrite(path))
+					{
+						Serializer.Serialize(stream, Tree);
+					}
+				};
+			}
+			
+			//Testing();
 		}
 
 		private void SetParents<T>(TreeItem<T> item)
 		{
-			foreach (var child in item.Children)
+			foreach (var child in item.EnumerateChildrenWitoutInitialize())
 			{
 				child.Parent = item;
 				SetParents(child);
@@ -173,9 +189,9 @@ namespace FileExplorerCore.ViewModels
 					time = DateTime.Now;
 				}
 			}
-			
+
 			watch.Stop();
-			
+
 			Debug.WriteLine(watch.Elapsed);
 			Debug.WriteLine(count);
 		}

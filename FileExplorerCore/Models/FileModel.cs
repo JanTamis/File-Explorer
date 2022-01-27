@@ -98,7 +98,7 @@ namespace FileExplorerCore.Models
 
 				foreach (var item in treeItem.EnumerateValuesToRoot())
 				{
-					builder.Insert(0, '\\', 1);
+					builder.Insert(0, '/', 1);
 					builder.Insert(0, item);
 				}
 
@@ -167,9 +167,7 @@ namespace FileExplorerCore.Models
 				{
 					if (!IsFolder)
 					{
-						var path = Path;
-
-						_extension = System.IO.Path.GetExtension(path);
+						_extension = GetPath(path => System.IO.Path.GetExtension(path).ToString());
 					}
 
 					_extension = String.Empty;
@@ -195,7 +193,7 @@ namespace FileExplorerCore.Models
 			}
 		}
 
-		public bool IsFolder { get; init; }
+		public bool IsFolder => treeItem.IsFolder;
 
 		public Task<string> SizeFromTask
 		{
@@ -203,27 +201,31 @@ namespace FileExplorerCore.Models
 			{
 				return Task.Run(() =>
 				{
-					var size = 0L;
-					var path = Path;
+					var size = GetPath(path =>
+					{
+						var result = 0L;
 
-					if (!IsFolder)
-					{
-						size = Size;
-					}
-					else if (path[^1] == '\\' && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
-					{
-						size = info.TotalSize - info.TotalFreeSpace;
-					}
-					else if (IsFolder)
-					{
-						var query = new FileSystemEnumerable<long>(path, (ref FileSystemEntry x) => x.Length,
-							new EnumerationOptions() { RecurseSubdirectories = true })
+						if (!IsFolder)
 						{
-							ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
-						};
+							result = Size;
+						}
+						else if (path[^1] == '\\' && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
+						{
+							result = info.TotalSize - info.TotalFreeSpace;
+						}
+						else if (IsFolder)
+						{
+							var query = new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length,
+								new EnumerationOptions() { RecurseSubdirectories = true })
+							{
+								ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
+							};
 
-						size = query.Sum();
-					}
+							result = query.Sum();
+						}
+
+						return result;
+					});
 
 					return size.Bytes().ToString();
 				});
@@ -261,17 +263,17 @@ namespace FileExplorerCore.Models
 					{
 						_isNotLoading = false;
 
-						ThreadPool.QueueUserWorkItem(x =>
+						ThreadPool.QueueUserWorkItem(async x =>
 						{
 							foreach (var subject in Concurrent.AsEnumerable(FileImageQueue))
 							{
 								if (subject.IsVisible && OperatingSystem.IsWindows())
 								{
 									var path = subject.Path;
-									var img = ThumbnailProvider.GetFileImage(path.ToString());
+									var img = await ThumbnailProvider.GetFileImage(path);
 
 									subject.NeedsNewImage = false;
-									subject.OnPropertyChanged(ref subject._image, img, nameof(Image));
+									await subject.OnPropertyChanged(ref subject._image, img, nameof(Image));
 
 									//if (OperatingSystem.IsWindows())
 									//{
@@ -328,16 +330,30 @@ namespace FileExplorerCore.Models
 		//	return isAscii ? Encoding.UTF8 : Encoding.Unicode;
 		//}
 
-		//private void GetPath(ReadOnlySpanAction<char> action)
-		//{
-		//	var encoder = GetEncoding();
-		//	var charCount = encoder.GetMaxCharCount(_path.Length);
+		private void GetPath(ReadOnlySpanAction<char> action)
+		{
+			var builder = new ValueStringBuilder(stackalloc char[512]);
 
-		//	Span<char> path = stackalloc char[charCount];
+			foreach (var item in treeItem.EnumerateValuesToRoot())
+			{
+				builder.Insert(0, '/', 1);
+				builder.Insert(0, item);
+			}
 
-		//	charCount = encoder.GetChars(_path, path);
+			action(builder.AsSpan(0, builder.Length - 1));
+		}
 
-		//	action(path[..charCount]);
-		//}
+		private T GetPath<T>(ReadOnlySpanFunc<char, T> action)
+		{
+			var builder = new ValueStringBuilder(stackalloc char[512]);
+
+			foreach (var item in treeItem.EnumerateValuesToRoot())
+			{
+				builder.Insert(0, '/', 1);
+				builder.Insert(0, item);
+			}
+
+			return action(builder.AsSpan(0, builder.Length - 1));
+		}
 	}
 }

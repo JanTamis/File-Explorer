@@ -14,12 +14,12 @@ namespace FileExplorerCore.Helpers
 	/// Represents a dynamic data collection that provides notifications when items get added, removed, or when the whole list is refreshed. 
 	/// </summary> 
 	/// <typeparam name="T"></typeparam> 
-	public class ObservableRangeCollection<T> : INotifyCollectionChanged, IEnumerable<T>, IList<T>, IList
+	public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, IList
 	{
 		public event Action<int> CountChanged = delegate { };
 		public event Action<string> OnPropertyChanged = delegate { };
 
-		public event NotifyCollectionChangedEventHandler CollectionChanged = delegate { };
+		public event NotifyCollectionChangedEventHandler? CollectionChanged = delegate { };
 
 		private readonly List<T> Data = new();
 

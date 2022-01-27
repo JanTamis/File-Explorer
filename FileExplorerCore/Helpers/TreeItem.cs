@@ -12,10 +12,12 @@ namespace FileExplorerCore.Helpers
 	[ProtoInclude(500, typeof(FileSystemTreeItem))]
 	public class TreeItem<T>
 	{
-		protected IEnumerable<TreeItem<T>> Query;
-		private List<TreeItem<T>>? children;
+		public virtual IEnumerable<TreeItem<T>> Query { get; }
 
 		[ProtoMember(1, DataFormat = DataFormat.Group)]
+		private List<TreeItem<T>>? children;
+
+		
 		public List<TreeItem<T>> Children
 		{
 			get
@@ -90,7 +92,7 @@ namespace FileExplorerCore.Helpers
 		{
 			Parent = null;
 
-			foreach (var child in EnumerateChildren())
+			foreach (var child in EnumerateChildren(0))
 			{
 				child.Parent = null;
 				Children.Remove(child);
@@ -145,10 +147,7 @@ namespace FileExplorerCore.Helpers
 
 			foreach (var child in currentChildren)
 			{
-				foreach (var _ in child.EnumerateChildren())
-				{
-					count++;
-				}
+				count += await child.GetChildrenCount();
 			}
 
 			return count;
@@ -156,21 +155,56 @@ namespace FileExplorerCore.Helpers
 
 		public IEnumerable<TreeItem<T>> EnumerateChildren(uint layers = UInt32.MaxValue)
 		{
-			foreach (var child in Children)
+			var count = Children.Count;
+			
+			for (var i = 0; i < count; i++)
 			{
-				yield return child;
+				yield return Children[i];
+
+				count = Children.Count;
 			}
 
-			foreach (var child in Children)
+			if (layers > 0)
 			{
-				if (layers > 0)
+				for (var i = 0; i < count; i++)
 				{
-					foreach (var childOfChild in child.EnumerateChildren(layers - 1))
+					foreach (var childOfChild in Children[i].EnumerateChildren(layers - 1))
 					{
 						yield return childOfChild;
 					}
 				}
 			}
+		}
+
+		public async IAsyncEnumerable<TreeItem<T>> EnumerateChildrenAsync(uint layers = UInt32.MaxValue)
+		{
+			var items = children ?? await Task.Run(() => Children);
+			var count = items.Count;
+
+			for (var i = 0; i < count; i++)
+			{
+				yield return items[i];
+
+				count = items.Count;
+			}
+
+			if (layers > 0)
+			{
+				for (var i = 0; i < count; i++)
+				{
+					await foreach (var childOfChild in Children[i].EnumerateChildrenAsync(layers - 1))
+					{
+						yield return childOfChild;
+					}
+
+					count = items.Count;
+				}
+			}
+		}
+
+		public IEnumerable<TreeItem<T>> EnumerateChildrenWitoutInitialize()
+		{
+			return children ?? Enumerable.Empty<TreeItem<T>>();
 		}
 	}
 }

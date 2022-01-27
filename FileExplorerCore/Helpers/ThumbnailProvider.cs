@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using Avalonia.Platform;
 using System.Reflection;
+using System.Threading.Tasks;
 using FileTypeAndIcon;
 using Avalonia.Threading;
 
@@ -49,7 +50,7 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
-		public static IImage? GetFileImage(string? path)
+		public static async ValueTask<IImage?> GetFileImage(string? path)
 		{
 			if (path is null)
 			{
@@ -135,7 +136,7 @@ namespace FileExplorerCore.Helpers
 				}
 			}
 
-			return GetImage(name);
+			return await GetImage(name);
 		}
 
 		private static bool ImageExists(string key)
@@ -145,7 +146,7 @@ namespace FileExplorerCore.Helpers
 			return loader?.Exists(new Uri($"avares://FileExplorerCore/Assets/Icons/{key}.svg")) ?? false;
 		}
 
-		private static IImage? GetImage(string key)
+		private static async ValueTask<IImage?> GetImage(string key)
 		{
 			if (!Images.TryGetValue(key, out var image) && image is null && ImageExists(key))
 			{
@@ -156,7 +157,7 @@ namespace FileExplorerCore.Helpers
 				{
 					memoryStream.Seek(0, SeekOrigin.Begin);
 
-					Dispatcher.UIThread.InvokeAsync(() =>
+					await Dispatcher.UIThread.InvokeAsync(() =>
 					{
 						image = new SvgImage()
 						{
@@ -167,7 +168,7 @@ namespace FileExplorerCore.Helpers
 						{
 							Images.Add(key, image);
 						}
-					}).Wait();					
+					});					
 				}
 			}
 
