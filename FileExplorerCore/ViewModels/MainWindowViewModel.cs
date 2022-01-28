@@ -67,7 +67,8 @@ namespace FileExplorerCore.ViewModels
 			get => CurrentTab.Path;
 			set
 			{
-				if (value == Path) return;
+				if (value == Path)
+					return;
 
 				CurrentTab.Path = value;
 
@@ -84,17 +85,17 @@ namespace FileExplorerCore.ViewModels
 		public MainWindowViewModel(WindowNotificationManager manager)
 		{
 			NotificationManager = manager;
-			
+
 			Serializer.PrepareSerializer<Tree<FileSystemTreeItem, string>>();
 
 			if (OperatingSystem.IsWindows())
 			{
 				var drives = from drive in DriveInfo.GetDrives()
-					where drive.IsReady
-					select new FolderModel(drive.RootDirectory.FullName, $"{drive.VolumeLabel} ({drive.Name})");
+										 where drive.IsReady
+										 select new FolderModel(drive.RootDirectory.FullName, $"{drive.VolumeLabel} ({drive.Name})");
 
 				var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
-					select new FolderModel(KnownFolders.GetPath(specialFolder));
+													select new FolderModel(KnownFolders.GetPath(specialFolder).ToString());
 
 				Folders = quickAccess.Concat(drives);
 			}
@@ -118,18 +119,29 @@ namespace FileExplorerCore.ViewModels
 				}
 			}
 
-			if (Tree is null or { Children.Count: 0 })
+			if (Tree is null or { Children: { Count: 0 } })
 			{
 				if (OperatingSystem.IsWindows())
 				{
 					Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
 						.GetDrives()
-						.Where(w => w.DriveType == DriveType.Fixed)
 						.Select(s => new FileSystemTreeItem(s.RootDirectory.FullName, true)));
 				}
 				else if (OperatingSystem.IsMacOS())
 				{
 					Tree = new Tree<FileSystemTreeItem, string>(new[] { new FileSystemTreeItem("/", true) });
+				}
+			}
+			else if (OperatingSystem.IsWindows())
+			{
+				var drives = DriveInfo.GetDrives();
+
+				foreach (var drive in drives)
+				{
+					if (!Tree.EnumerateChildren(0).Any(a => a.Value == drive.RootDirectory.FullName))
+					{
+						Tree.Children.Add(new FileSystemTreeItem(drive.RootDirectory.FullName, true));
+					}
 				}
 			}
 
@@ -160,7 +172,7 @@ namespace FileExplorerCore.ViewModels
 					}
 				};
 			}
-			
+
 			//Testing();
 		}
 
@@ -479,9 +491,9 @@ namespace FileExplorerCore.ViewModels
 				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = true);
 
 				var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(Path, (ref FileSystemEntry x) => (System.IO.Path.GetExtension(x.FileName).ToString(), x.Length), options)
-					{
-						ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
-					}
+				{
+					ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
+				}
 					.Where(w => !String.IsNullOrEmpty(w.Extension))
 					.GroupBy(g => g.Extension);
 

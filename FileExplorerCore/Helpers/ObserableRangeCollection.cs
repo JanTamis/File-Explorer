@@ -36,13 +36,13 @@ namespace FileExplorerCore.Helpers
 
 		public object SyncRoot => new();
 
-		object? IList.this[int index] 
+		object? IList.this[int index]
 		{
 			get => Data[index];
-			set => Data[index] = value is null ? Data[index] : (T)value; 		
+			set => Data[index] = value is null ? Data[index] : (T)value;
 		}
 
-		public T this[int index] 
+		public T this[int index]
 		{
 			get => Data[index];
 			set
@@ -57,7 +57,7 @@ namespace FileExplorerCore.Helpers
 				{
 					Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value)));
 				}
-			} 
+			}
 		}
 
 		public ObservableRangeCollection()
@@ -437,6 +437,13 @@ namespace FileExplorerCore.Helpers
 			});
 		}
 
+		public async Task SortAsync(IAsyncComparer<T> comparer)
+		{
+			await ParallelQuickSortAsync(Data, 0, Data.Count - 1, comparer);
+
+			Dispatcher.UIThread.Post(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
+		}
+
 		public new IEnumerator<T> GetEnumerator()
 		{
 			var max = Data.Count;
@@ -493,6 +500,54 @@ namespace FileExplorerCore.Helpers
 				{ ParallelQuickSort(array, left, j, comparer); }
 				if (i < right)
 				{ ParallelQuickSort(array, i, right, comparer); }
+			}
+		}
+
+		static async Task ParallelQuickSortAsync(IList<T> array, int left, int right, IAsyncComparer<T> comparer)
+		{
+			var Threshold = 250;
+			var i = left;
+			var j = right;
+			var m = array[(left + right) / 2];
+
+			while (i <= j)
+			{
+				while (await comparer.CompareAsync(array[i], m) is -1)
+				{
+					i++;
+				}
+
+				while (await comparer.CompareAsync(array[j], m) is 1)
+				{
+					j--;
+				}
+
+				if (i <= j)
+				{
+					var temp = array[i];
+
+					array[i] = array[j];
+					array[j] = temp;
+
+					i++;
+					j--;
+				}
+			}
+
+			if (j - left > Threshold && right - i > Threshold)
+			{
+				await Task.WhenAll(ParallelQuickSortAsync(array, left, j, comparer), ParallelQuickSortAsync(array, i, right, comparer));
+			}
+			else
+			{
+				if (j > left)
+				{ 
+					await ParallelQuickSortAsync(array, left, j, comparer); 
+				}
+				if (i < right)
+				{ 
+					await ParallelQuickSortAsync(array, i, right, comparer); 
+				}
 			}
 		}
 

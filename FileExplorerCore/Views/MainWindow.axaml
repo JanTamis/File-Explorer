@@ -913,6 +913,11 @@
 															Margin="0"
 															FontSize="14"
 															VerticalAlignment="Center" />
+
+                        <Label Content="{Binding CurrentTab.SearchText}"
+															Margin="0"
+															FontSize="14"
+															VerticalAlignment="Center" />
 											</StackPanel>
 
 											<StackPanel Grid.Column="2"

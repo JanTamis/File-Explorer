@@ -54,5 +54,27 @@ namespace FileExplorerCore.Helpers
 		{
 			IsFolder = isFolder;
 		}
+
+		public T GetPath<T>(ReadOnlySpanFunc<char, T> action)
+		{
+			var builder = new ValueStringBuilder(stackalloc char[512]);
+
+			foreach (var item in EnumerateValuesToRoot())
+			{
+				if (!item.EndsWith('\\'))
+				{
+					builder.Insert(0, '\\', 1);
+				}
+
+				builder.Insert(0, item);
+			}
+
+			if (builder[^1] is '\\')
+			{
+				return action(builder.AsSpan(0, builder.Length - 1));
+			}
+
+			return action(builder.AsSpan(0, builder.Length));
+		}
 	}
 }

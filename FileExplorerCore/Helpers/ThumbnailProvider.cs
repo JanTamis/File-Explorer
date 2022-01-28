@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using FileTypeAndIcon;
 using Avalonia.Threading;
+using FileExplorerCore.ViewModels;
 
 namespace FileExplorerCore.Helpers
 {
@@ -63,7 +64,7 @@ namespace FileExplorerCore.Helpers
 			//{
 			//	var image = WindowsThumbnailProvider.GetThumbnail(path, 64, 64);
 
-			//	if (image is { })
+			//	if (image is not null)
 			//	{
 			//		return image;
 			//	}
@@ -81,7 +82,7 @@ namespace FileExplorerCore.Helpers
 						path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
 
 						if (folderText is not null && ImageExists(folderText) &&
-						    String.Compare(path, KnownFolders.GetPath(folder), StringComparison.OrdinalIgnoreCase) == 0)
+								String.Compare(path, KnownFolders.GetPath(folder).ToString(), StringComparison.OrdinalIgnoreCase) == 0)
 						{
 							name = folderText;
 						}
@@ -103,7 +104,11 @@ namespace FileExplorerCore.Helpers
 
 				if (name == String.Empty)
 				{
-					name = Directory.EnumerateFileSystemEntries(path, "*", enumerationOptions).Any() ? "FolderFiles" : "Folder";
+					var item = TabItemViewModel.GetTreeItem(path);
+
+					name = item.HasChildren
+						? "FolderFiles"
+						: "Folder";
 				}
 			}
 			else if (File.Exists(path))
@@ -111,6 +116,93 @@ namespace FileExplorerCore.Helpers
 				name = "File";
 
 				var extension = Path.GetExtension(path).ToLower();
+
+				if (extension.Length > 1)
+				{
+					extension = extension[1..];
+
+					if (Images.ContainsKey(extension))
+					{
+						name = extension;
+					}
+					else
+					{
+						foreach (var (key, value) in TypeMap)
+						{
+							foreach (var val in value)
+							{
+								if (extension == val)
+								{
+									name = key;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			return await GetImage(name);
+		}
+
+		public static async ValueTask<IImage?> GetFileImage(FileSystemTreeItem? treeItem)
+		{
+			if (treeItem is null)
+			{
+				return null;
+			}
+
+			var name = String.Empty;
+
+			//if (OperatingSystem.IsWindows())
+			//{
+			//	var image = treeItem.GetPath(path => WindowsThumbnailProvider.GetThumbnail(path, 64, 64));
+
+			//	if (image is not null)
+			//	{
+			//		return image;
+			//	}
+			//}
+
+			if (treeItem.IsFolder)
+			{
+				//if (OperatingSystem.IsWindows())
+				//{
+				//	foreach (var folder in Enum.GetValues<KnownFolder>())
+				//	{
+				//		var folderText = Enum.GetName(folder);
+
+				//		if (folderText is not null && treeItem.GetPath(x => x.SequenceEqual(KnownFolders.GetPath(folder))))
+				//		{
+				//			name = folderText;
+				//		}
+				//	}
+				//}
+
+				//if (name == String.Empty)
+				//{
+				//	var driveInfos = DriveInfo.GetDrives();
+
+				//	foreach (var drive in driveInfos)
+				//	{
+				//		if (drive.IsReady && treeItem.GetPath(path => drive.Name == path))
+				//		{
+				//			name = Enum.GetName(drive.DriveType);
+				//		}
+				//	}
+				//}
+
+				if (name == String.Empty)
+				{
+					name = treeItem.HasChildren
+						? "FolderFiles"
+						: "Folder";
+				}
+			}
+			else
+			{
+				name = "File";
+
+				var extension = Path.GetExtension(treeItem.Value).ToLower();
 
 				if (extension.Length > 1)
 				{
@@ -148,27 +240,46 @@ namespace FileExplorerCore.Helpers
 
 		private static async ValueTask<IImage?> GetImage(string key)
 		{
-			if (!Images.TryGetValue(key, out var image) && image is null && ImageExists(key))
+			if (!Images.TryGetValue(key, out var image) && image is null)
 			{
 				var source = SvgSource.Load<SvgSource>($"avares://FileExplorerCore/Assets/Icons/{key}.svg", null);
-				using var memoryStream = new MemoryStream();
 
-				if (source?.Save(memoryStream, new SkiaSharp.SKColor(0)) == true)
+				if (source is not null)
 				{
-					memoryStream.Seek(0, SeekOrigin.Begin);
+					using var memoryStream = new MemoryStream();
 
-					await Dispatcher.UIThread.InvokeAsync(() =>
+					if (source.Save(memoryStream, SkiaSharp.SKColors.Transparent) == true)
 					{
-						image = new SvgImage()
-						{
-							Source = source,
-						};
+						memoryStream.Seek(0, SeekOrigin.Begin);
 
-						if (!Images.ContainsKey(key))
+						if (Dispatcher.UIThread.CheckAccess())
 						{
-							Images.Add(key, image);
+							image = new SvgImage()
+							{
+								Source = source,
+							};
+
+							if (!Images.ContainsKey(key))
+							{
+								Images.Add(key, image);
+							}
 						}
-					});					
+						else
+						{
+							await Dispatcher.UIThread.InvokeAsync(() =>
+							{
+								image = new SvgImage()
+								{
+									Source = source,
+								};
+
+								if (!Images.ContainsKey(key))
+								{
+									Images.Add(key, image);
+								}
+							});
+						}
+					} 
 				}
 			}
 

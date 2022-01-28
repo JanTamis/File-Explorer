@@ -172,6 +172,8 @@ namespace FileExplorerCore.Helpers
 					{
 						yield return childOfChild;
 					}
+
+					count = Children.Count;
 				}
 			}
 		}

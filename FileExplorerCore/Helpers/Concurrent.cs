@@ -10,7 +10,7 @@ namespace FileExplorerCore.Helpers
 	{
 		private static ExecutionDataflowBlockOptions options = new()
 		{
-			MaxDegreeOfParallelism = (int)Math.Log2(Environment.ProcessorCount)
+			MaxDegreeOfParallelism = 1,//(int)Math.Log2(Environment.ProcessorCount)
 		};
 		
 		public static Task For(int begin, int count, Action<int> body)
@@ -43,7 +43,7 @@ namespace FileExplorerCore.Helpers
 		{
 			var attempts = 0;
 
-			while (!stack.IsEmpty && ++attempts <= 5)
+			while (!stack.IsEmpty && ++attempts <= 10)
 			{
 				while (stack.TryPop(out var result))
 				{
@@ -56,7 +56,7 @@ namespace FileExplorerCore.Helpers
 		{
 			var attempts = 0;
 
-			while (!stack.IsEmpty && ++attempts <= 5)
+			while (!stack.IsEmpty && ++attempts <= 10)
 			{
 				while (stack.TryTake(out var result))
 				{

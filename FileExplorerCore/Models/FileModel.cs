@@ -23,7 +23,7 @@ namespace FileExplorerCore.Models
 
 		private string? _name;
 		private string? _extension;
-		private long _size = -2;
+		private long _size = -1;
 
 		private DateTime _editedOn;
 
@@ -94,15 +94,7 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				var builder = new ValueStringBuilder(stackalloc char[512]);
-
-				foreach (var item in treeItem.EnumerateValuesToRoot())
-				{
-					builder.Insert(0, '/', 1);
-					builder.Insert(0, item);
-				}
-
-				return builder.AsSpan(0, builder.Length - 1).ToString();
+				return treeItem.GetPath(path => path.ToString());
 			}
 		}
 
@@ -110,52 +102,39 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				return treeItem.Value;
-				//if (_name is null)
-				//{
-				//	GetPath(path =>
-				//	{
-				//		_name = IsFolder
-				//		? new String(System.IO.Path.GetFileName(path))
-				//		: new String(System.IO.Path.GetFileNameWithoutExtension(path));
-				//	});
-				//}
-
-				//return _name!;
+				return treeItem.IsFolder
+					? treeItem.Value
+					: System.IO.Path.GetFileNameWithoutExtension(treeItem.Value);
 			}
 			set
 			{
 				treeItem.Value = value;
-				//try
-				//{
-				//	var path = Path;
+				try
+				{
+					var path = Path;
 
-				//	if (!IsFolder)
-				//	{
-				//		var name = System.IO.Path.GetFileNameWithoutExtension(path);
-				//		var extension = Extension;
-				//		var newPath = path.Replace(name + extension, value + extension);
+					if (!IsFolder)
+					{
+						var name = System.IO.Path.GetFileNameWithoutExtension(path);
+						var extension = Extension;
+						var newPath = path.Replace(name + extension, value + extension);
 
-				//		File.Move(path, newPath);
+						File.Move(path, newPath);
+					}
+					else if (Directory.Exists(path))
+					{
+						var name = System.IO.Path.GetFileNameWithoutExtension(path);
+						var newPath = path.Replace(name, value);
 
-				//		Path = newPath;
-				//	}
-				//	else if (Directory.Exists(path))
-				//	{
-				//		var name = System.IO.Path.GetFileNameWithoutExtension(path);
-				//		var newPath = path.Replace(name, value);
+						Directory.Move(path, newPath);
+					}
 
-				//		Directory.Move(path, newPath);
-
-				//		Path = newPath;
-				//	}
-
-				//	OnPropertyChanged(ref _name, value);
-				//}
-				//catch (Exception)
-				//{
-				//	// ignored
-				//}
+					OnPropertyChanged(ref _name, value);
+				}
+				catch (Exception)
+				{
+					// ignored
+				}
 			}
 		}
 
@@ -167,7 +146,7 @@ namespace FileExplorerCore.Models
 				{
 					if (!IsFolder)
 					{
-						_extension = GetPath(path => System.IO.Path.GetExtension(path).ToString());
+						_extension = treeItem.GetPath(path => System.IO.Path.GetExtension(path).ToString());
 					}
 
 					_extension = String.Empty;
@@ -181,12 +160,17 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				if (_size == -2)
+				if (_size == -1 && !IsFolder)
 				{
+					//if (OperatingSystem.IsWindows())
+					//{
+					//	_size = treeItem.GetPath(path => DirectoryAlternative.GetFileSize(path));
+					//}
+					//else
+					//{
 					var path = Path;
-					_size = OperatingSystem.IsWindows()
-						? DirectoryAlternative.GetFileSize(path)
-						: File.Exists(path) ? new FileInfo(path).Length : -1;
+					_size = File.Exists(path) ? new FileInfo(path).Length : -1;
+					//}
 				}
 
 				return _size;
@@ -201,7 +185,7 @@ namespace FileExplorerCore.Models
 			{
 				return Task.Run(() =>
 				{
-					var size = GetPath(path =>
+					var size = treeItem.GetPath(path =>
 					{
 						var result = 0L;
 
@@ -265,24 +249,14 @@ namespace FileExplorerCore.Models
 
 						ThreadPool.QueueUserWorkItem(async x =>
 						{
-							foreach (var subject in Concurrent.AsEnumerable(FileImageQueue))
+							while (FileImageQueue.TryTake(out var subject))
 							{
-								if (subject.IsVisible && OperatingSystem.IsWindows())
+								if (subject.IsVisible)
 								{
-									var path = subject.Path;
-									var img = await ThumbnailProvider.GetFileImage(path);
+									var img = await ThumbnailProvider.GetFileImage(subject.treeItem);
 
 									subject.NeedsNewImage = false;
 									await subject.OnPropertyChanged(ref subject._image, img, nameof(Image));
-
-									//if (OperatingSystem.IsWindows())
-									//{
-									//	var img = WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk) ??
-									//										WindowsThumbnailProvider.GetThumbnail(path, ImageSize, ImageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
-
-									//	subject.NeedsNewImage = false;
-									//	subject.OnPropertyChanged(ref subject._image, img, nameof(Image));
-									//}
 								}
 							}
 
@@ -299,61 +273,11 @@ namespace FileExplorerCore.Models
 		public FileModel(FileSystemTreeItem item)
 		{
 			treeItem = item;
-			//isAscii = true;
-
-			//for (var i = 0; i < path.Length; i++)
-			//{
-			//	if (!Char.IsAscii(path[i]))
-			//	{
-			//		isAscii = false;
-			//		break;
-			//	}
-			//}
-
-			//var encoder = GetEncoding();
-			//var byteCount = encoder.GetByteCount(path);
-
-			//_path = new byte[byteCount];
-			//encoder.GetBytes(path, _path);
-
-			//IsFolder = isFolder;
 		}
 
 		public void Dispose()
 		{
 			GC.SuppressFinalize(this);
-		}
-
-		//[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		//private Encoding GetEncoding()
-		//{
-		//	return isAscii ? Encoding.UTF8 : Encoding.Unicode;
-		//}
-
-		private void GetPath(ReadOnlySpanAction<char> action)
-		{
-			var builder = new ValueStringBuilder(stackalloc char[512]);
-
-			foreach (var item in treeItem.EnumerateValuesToRoot())
-			{
-				builder.Insert(0, '/', 1);
-				builder.Insert(0, item);
-			}
-
-			action(builder.AsSpan(0, builder.Length - 1));
-		}
-
-		private T GetPath<T>(ReadOnlySpanFunc<char, T> action)
-		{
-			var builder = new ValueStringBuilder(stackalloc char[512]);
-
-			foreach (var item in treeItem.EnumerateValuesToRoot())
-			{
-				builder.Insert(0, '/', 1);
-				builder.Insert(0, item);
-			}
-
-			return action(builder.AsSpan(0, builder.Length - 1));
 		}
 	}
 }

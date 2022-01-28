@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
@@ -34,7 +35,7 @@ namespace FileExplorerCore.Helpers
 		/// <exception cref="ExternalException">Thrown if the path
 		///     could not be retrieved.</exception>
 		
-		public static string GetPath(KnownFolder knownFolder)
+		public static ReadOnlySpan<char> GetPath(KnownFolder knownFolder)
 		{
 			return GetPath(knownFolder, false);
 		}
@@ -49,19 +50,20 @@ namespace FileExplorerCore.Helpers
 		/// <returns>The default path of the known folder.</returns>
 		/// <exception cref="ExternalException">Thrown if the path
 		///     could not be retrieved.</exception>
-		public static string GetPath(KnownFolder knownFolder, bool defaultUser)
+		public static ReadOnlySpan<char> GetPath(KnownFolder knownFolder, bool defaultUser)
 		{
 			return GetPath(knownFolder, KnownFolderFlags.DontVerify, defaultUser);
 		}
 
-		private static string GetPath(KnownFolder knownFolder, KnownFolderFlags flags,
+		private static ReadOnlySpan<char> GetPath(KnownFolder knownFolder, KnownFolderFlags flags,
 				bool defaultUser)
 		{
 			int result = SHGetKnownFolderPath(new Guid(_knownFolderGuids[(int)knownFolder]),
 					(uint)flags, new IntPtr(defaultUser ? -1 : 0), out IntPtr outPath);
+
 			if (result >= 0)
 			{
-				string path = Marshal.PtrToStringUni(outPath);
+				ReadOnlySpan<char> path = Marshal.PtrToStringUni(outPath);
 				Marshal.FreeCoTaskMem(outPath);
 				return path;
 			}

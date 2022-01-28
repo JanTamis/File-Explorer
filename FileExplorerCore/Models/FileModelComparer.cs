@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 namespace FileExplorerCore.Models
 {
-	public class FileModelComparer : Comparer<FileModel>
+	public struct FileModelComparer : IComparer<FileModel>
 	{
 		private readonly SortEnum sortMember;
 
-		public FileModelComparer(SortEnum sortMember) : base()
+		public FileModelComparer(SortEnum sortMember)
 		{
 			this.sortMember = sortMember;
 		}
 
-		public override int Compare(FileModel x, FileModel y)
+		public int Compare(FileModel? x, FileModel? y)
 		{
 			var result = sortMember switch
 			{

@@ -22,53 +22,82 @@
 					x:Name="fileList">
 		<DataBox.Columns>
 			<DataBoxTemplateColumn CanUserSort="False"
-														CanUserResize="False"
-														CanUserReorder="False">
+														 CanUserResize="False"
+														 CanUserReorder="False">
 				<DataBoxTemplateColumn.CellTemplate>
 					<DataTemplate>
 						<Viewbox Width="{Binding ImageSize}"
-										Height="{Binding ImageSize}"
-										Margin="2.5">
+										 Height="{Binding ImageSize}"
+										 Margin="2.5">
 							<Image Source="{Binding Image}" />
 						</Viewbox>
 					</DataTemplate>
 				</DataBoxTemplateColumn.CellTemplate>
 			</DataBoxTemplateColumn>
 
-			<DataBoxTextColumn Binding="{Binding Name}"
-												Header="Name"
-												CanUserResize="True"
-												CanUserReorder="True"
-												Width="Auto" />
+      <DataBoxTemplateColumn Header="Name"
+														 CanUserResize="True"
+														 CanUserReorder="True"
+														 Width="*">
+        <DataBoxTemplateColumn.CellTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding Name}"
+											 TextTrimming="CharacterEllipsis"
+                       IsHitTestVisible="False"
+											 VerticalAlignment="Center"
+											 Margin="10 0 0 0" />
+          </DataTemplate>
+        </DataBoxTemplateColumn.CellTemplate>
+      </DataBoxTemplateColumn>
 
 			<DataBoxTemplateColumn CanUserSort="True"
-														CanUserReorder="True"
-														Header="Extension"
-														Width="Auto"
-														SortMemberPath="Extension">
+														 CanUserReorder="True"
+														 Header="Extension"
+														 Width="Auto"
+                             MinWidth="100"
+														 SortMemberPath="Extension">
 				<DataBoxTemplateColumn.CellTemplate>
 					<DataTemplate>
 						<TextBlock Text="{Binding, Converter={StaticResource extensionConverter}}"
-											TextTrimming="CharacterEllipsis"
-											VerticalAlignment="Center"
-											Margin="10 0 0 0" />
+											 TextTrimming="CharacterEllipsis"
+                       IsHitTestVisible="False"
+											 VerticalAlignment="Center"
+											 Margin="10 0 0 0" />
 					</DataTemplate>
 				</DataBoxTemplateColumn.CellTemplate>
 			</DataBoxTemplateColumn>
 
-			<DataBoxTextColumn Binding="{Binding EditedOn, Converter={StaticResource dateTimeConverter}}"
-                         SortMemberPath="EditedOn"
-												 Header="Edited On"
-												 CanUserResize="True"
-												 CanUserReorder="True"
-												 Width="Auto" />
+      <DataBoxTemplateColumn SortMemberPath="EditedOn"
+														 Header="Edited On"
+														 CanUserResize="True"
+														 CanUserReorder="True"
+														 Width="Auto" >
+        <DataBoxTemplateColumn.CellTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding EditedOn, Converter={StaticResource dateTimeConverter}}"
+											 TextTrimming="CharacterEllipsis"
+                       IsHitTestVisible="False"
+											 VerticalAlignment="Center"
+											 Margin="10 0 0 0" />
+          </DataTemplate>
+        </DataBoxTemplateColumn.CellTemplate>
+      </DataBoxTemplateColumn>
 
-			<DataBoxTextColumn Binding="{Binding, Converter={StaticResource sizeConverter}}"
-												SortMemberPath="Size"
-												Header="Size"
-												CanUserResize="True"
-												CanUserReorder="True"
-												Width="*" />
+      <DataBoxTemplateColumn SortMemberPath="Size"
+														 Header="Size"
+														 CanUserResize="True"
+														 CanUserReorder="True"
+														 Width="*" >
+        <DataBoxTemplateColumn.CellTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding, Converter={StaticResource sizeConverter}}"
+											 TextTrimming="CharacterEllipsis"
+                       IsHitTestVisible="False"
+											 VerticalAlignment="Center"
+											 Margin="10 0 0 0" />
+          </DataTemplate>
+        </DataBoxTemplateColumn.CellTemplate>
+      </DataBoxTemplateColumn>
 		</DataBox.Columns>
 	</DataBox>
 

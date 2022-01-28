@@ -13,7 +13,7 @@ namespace FileExplorerCore.Converters
 		{
 			if (value is FileModel model)
 			{
-				if (model.Size == -1)
+				if (model.Size < 0)
 				{
 					return String.Empty;
 				}
@@ -22,7 +22,7 @@ namespace FileExplorerCore.Converters
 			}
 			else if (value is long size)
 			{
-				if (size == -1)
+				if (size < 0)
 				{
 					return String.Empty;
 				}
