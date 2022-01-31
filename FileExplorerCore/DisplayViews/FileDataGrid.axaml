@@ -4,6 +4,7 @@
 						xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 						xmlns:converters="using:FileExplorerCore.Converters"
 						xmlns:models="clr-namespace:FileExplorerCore.Models"
+             xmlns:viewmodel="clr-namespace:FileExplorerCore.ViewModels"
 						xmlns:helpers="clr-namespace:FileExplorerCore.Helpers"
 						mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
 						x:Class="FileExplorerCore.DisplayViews.FileDataGrid">
@@ -101,8 +102,7 @@
 	<!-- 	</DataBox.Columns> -->
 	<!-- </DataBox> -->
 
-	  <DataGrid x:Name="fileList"  
-              x:DataType="helpers:ObservableRangeCollection`1"
+	  <DataGrid x:Name="fileList"
 	  					Items="{Binding Files}"  
 	  					CanUserReorderColumns="True"  
 	  					CanUserResizeColumns="True"  
