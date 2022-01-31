@@ -16,12 +16,15 @@
 				<ToggleSwitch OnContent="Default Icons"
 											OffContent="Windows Icons"
 											Cursor="Hand" />
-
-				<ToggleSwitch OnContent="Dark Mode"
-											OffContent="Light Mode"
-											IsChecked="{Binding IsDarkMode}"
-											Cursor="Hand" />
 			</StackPanel>
 		</TabItem>
+    <TabItem Header="Index">
+      <StackPanel>
+        <Button Content="ReIndex"
+                Command="{Binding ReIndex}"
+                Cursor="Hand"
+                Margin="0 0 0 5"/>
+      </StackPanel>
+    </TabItem>
 	</TabControl>
 </UserControl>

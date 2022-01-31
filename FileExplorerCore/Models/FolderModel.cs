@@ -8,6 +8,8 @@ using System.IO.Enumeration;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Media;
+using System.Reactive.Subjects;
+using Avalonia.Svg.Skia;
 
 namespace FileExplorerCore.Models
 {
@@ -29,33 +31,33 @@ namespace FileExplorerCore.Models
 			RecurseSubdirectories = false,
 		};
 
-		public IImage Image
+		public IImage? Image
 		{
 			get
 			{
-				if (_image is null)
-				{
-					FileImageQueue.Add(this);
+//if (_image is null)
+//{
+//	FileImageQueue.Add(this);
 
-					if (imageLoadTask is null or { IsCompleted: true })
-					{
-						imageLoadTask = Task.Run(async () =>
-						{
-							var attempts = 0;
-							
-							while (!FileImageQueue.IsEmpty && (FileImageQueue.TryTake(out var subject) || ++attempts <= 5))
-							{
-								var img = await ThumbnailProvider.GetFileImage(subject._treeItem);
+//	if (imageLoadTask is null or { IsCompleted: true })
+//	{
+//		//imageLoadTask = Task.Run(async () =>
+//		//{
+//		//	var attempts = 0;
 
-								subject.Image = img;
-							}
-						});
-					}
-				}
+//		//	while (!FileImageQueue.IsEmpty && (FileImageQueue.TryTake(out var subject) || ++attempts <= 5))
+//		//	{
+//		//		var img = await ThumbnailProvider.GetFileImage(subject._treeItem);
 
-				return _image;
+//		//		subject.Image = img;
+//		//	}
+//		//});
+//	}
+//}
+
+				return ThumbnailProvider.GetFileImage(_treeItem);
 			}
-			set => this.RaiseAndSetIfChanged(ref _image, value);
+			//set => this.RaiseAndSetIfChanged(ref _image, value);
 		}
 
 		public string Name => _treeItem.Value;

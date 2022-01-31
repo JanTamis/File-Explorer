@@ -139,5 +139,10 @@ namespace FileExplorerCore.Helpers
 
 			return action(builder.AsSpan(0, builder.Length), parameter);
 		}
+
+		public override string ToString()
+		{
+			return Value;
+		}
 	}
 }

@@ -31,9 +31,9 @@ namespace FileExplorerCore.ViewModels
 
 		public static IEnumerable<SortEnum> SortValues => Enum.GetValues<SortEnum>();
 
-		public IEnumerable<FolderModel> Folders { get; set; }
+		public static ObservableRangeCollection<FolderModel> Folders { get; set; }
 
-		public static Tree<FileSystemTreeItem, string>? Tree { get; protected set; }
+		public static Tree<FileSystemTreeItem, string>? Tree { get; set; }
 
 		public ObservableRangeCollection<FileModel> Files => CurrentTab.Files;
 
@@ -64,7 +64,8 @@ namespace FileExplorerCore.ViewModels
 			get => CurrentTab.Path;
 			set
 			{
-				if (value == Path) return;
+				if (value == Path)
+					return;
 
 				CurrentTab.Path = value;
 
@@ -99,35 +100,32 @@ namespace FileExplorerCore.ViewModels
 				}
 			}
 
-			if (OperatingSystem.IsWindows())
+			if (OperatingSystem.IsWindows() && (Tree is null || Tree.Children.Count != DriveInfo.GetDrives().Length))
 			{
-				var drives = Tree.EnumerateChildren(0)
+				Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
+					.GetDrives()
+					.Where(w => w.IsReady)
+					.Select(s => new FileSystemTreeItem(s.RootDirectory.FullName, true)));
+			}
+			else if (OperatingSystem.IsMacOS() && (Tree is null || Tree.Children.Count != 1))
+			{
+				Tree = new Tree<FileSystemTreeItem, string>(new[] { new FileSystemTreeItem("/", true) });
+			}
+
+			if (OperatingSystem.IsWindows() && Tree is not null)
+			{
+				var drives = Tree.Children
 					.Select(s => new FolderModel(s));
 
 				var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
-					select new FolderModel(GetTreeItemInitialized(KnownFolders.GetPath(specialFolder).ToString()));
+													select new FolderModel(GetTreeItemInitialized(KnownFolders.GetPath(specialFolder).ToString()));
 
-				Folders = quickAccess.Concat(drives);
+				Folders = new ObservableRangeCollection<FolderModel>(quickAccess.Concat(drives));
 			}
-			else if (OperatingSystem.IsMacOS())
+			else if (OperatingSystem.IsMacOS() && Tree is not null)
 			{
-				Folders = Tree.EnumerateChildren(0)
-					.Select(s => new FolderModel(s));
-			}
-
-			if (Tree is null or { Children.Count: 0 })
-			{
-				if (OperatingSystem.IsWindows())
-				{
-					Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
-						.GetDrives()
-						.Where(w => w.DriveType == DriveType.Fixed)
-						.Select(s => new FileSystemTreeItem(s.RootDirectory.FullName, true)));
-				}
-				else if (OperatingSystem.IsMacOS())
-				{
-					Tree = new Tree<FileSystemTreeItem, string>(new[] { new FileSystemTreeItem("/", true) });
-				}
+				Folders = new ObservableRangeCollection<FolderModel>(Tree.Children
+					.Select(s => new FolderModel(s)));
 			}
 
 			AddTab();
@@ -197,24 +195,24 @@ namespace FileExplorerCore.ViewModels
 		{
 			// Debug.WriteLine("Deleted: " + e.FullPath);
 
-			var item = GetTreeItem(e.FullPath);
+			//var item = GetTreeItem(e.FullPath);
 
-			if (!item.IsFolder && item.GetPath((path, filePath) => path.SequenceEqual(filePath), e.FullPath))
-			{
-				item.Remove();
-			}
+			//if (!item.IsFolder && item.GetPath((path, filePath) => path.SequenceEqual(filePath), e.FullPath))
+			//{
+			//	item.Remove();
+			//}
 		}
 
 		private void Watcher_Created(object sender, FileSystemEventArgs e)
 		{
 			// Debug.WriteLine("Created: " + e.FullPath);
 
-			var item = GetTreeItem(e.FullPath);
+			//var item = GetTreeItem(e.FullPath);
 
-			if (item.IsFolder && item.GetPath((path, filePath) => System.IO.Path.GetDirectoryName(path).SequenceEqual(filePath), System.IO.Path.GetDirectoryName(e.FullPath)))
-			{
-				item.Children.Add(new FileSystemTreeItem(System.IO.Path.GetFileName(e.FullPath), false, item));
-			}
+			//if (item.IsFolder && item.GetPath((path, filePath) => System.IO.Path.GetDirectoryName(path).SequenceEqual(filePath), System.IO.Path.GetDirectoryName(e.FullPath)))
+			//{
+			//	item.Children.Add(new FileSystemTreeItem(System.IO.Path.GetFileName(e.FullPath), false, item));
+			//}
 		}
 
 		private async ValueTask Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -546,7 +544,7 @@ namespace FileExplorerCore.ViewModels
 			}
 			else if (OperatingSystem.IsWindows())
 			{
-				temp = path.Split('\\', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+				temp = path.Split(new char[] { '\\' }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
 
 				foreach (var child in Tree.EnumerateChildren(0))
 				{
@@ -558,14 +556,17 @@ namespace FileExplorerCore.ViewModels
 				}
 			}
 
-			foreach (var split in temp)
+			if (item is not null)
 			{
-				foreach (FileSystemTreeItem child in item.EnumerateChildrenWithoutInitialize())
+				foreach (var split in temp)
 				{
-					if (child.Value == split)
+					foreach (FileSystemTreeItem child in item.EnumerateChildrenWithoutInitialize())
 					{
-						item = child;
-						break;
+						if (child.Value == split)
+						{
+							item = child;
+							break;
+						}
 					}
 				}
 			}
@@ -579,7 +580,7 @@ namespace FileExplorerCore.ViewModels
 
 			static FileSystemTreeItem GetItem(FileSystemTreeItem item, IReadOnlyList<string> path, int index)
 			{
-				if (index == path.Count)
+				if (index == path.Count || item is null)
 				{
 					return item;
 				}
@@ -596,7 +597,7 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		private FileSystemTreeItem GetTreeItemInitialized(string path)
+		public static FileSystemTreeItem GetTreeItemInitialized(string path)
 		{
 			string[] temp = null;
 			FileSystemTreeItem item = null;
@@ -622,12 +623,15 @@ namespace FileExplorerCore.ViewModels
 
 			foreach (var split in temp)
 			{
-				foreach (FileSystemTreeItem child in item.EnumerateChildren(0))
+				if (item is not null)
 				{
-					if (child.Value == split)
+					foreach (FileSystemTreeItem child in item.EnumerateChildren(0))
 					{
-						item = child;
-						break;
+						if (child.Value == split)
+						{
+							item = child;
+							break;
+						}
 					}
 				}
 			}
@@ -646,11 +650,14 @@ namespace FileExplorerCore.ViewModels
 					return item;
 				}
 
-				foreach (var child in item.EnumerateChildrenWithoutInitialize())
+				if (item is not null)
 				{
-					if (child is FileSystemTreeItem { IsFolder: true } treeItem && treeItem.Value == path[index])
+					foreach (var child in item.EnumerateChildrenWithoutInitialize())
 					{
-						return GetItem(treeItem, path, index + 1);
+						if (child is FileSystemTreeItem { IsFolder: true } treeItem && treeItem.Value == path[index])
+						{
+							return GetItem(treeItem, path, index + 1);
+						}
 					}
 				}
 

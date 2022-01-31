@@ -102,6 +102,7 @@
 	<!-- </DataBox> -->
 
 	  <DataGrid x:Name="fileList"  
+              x:DataType="helpers:ObservableRangeCollection`1"
 	  					Items="{Binding Files}"  
 	  					CanUserReorderColumns="True"  
 	  					CanUserResizeColumns="True"  
@@ -111,21 +112,15 @@
 	  														CanUserResize="False"  
 	  														CanUserReorder="False">  
 	  			<DataGridTemplateColumn.CellTemplate>  
-	  				<DataTemplate>  
-	  					<Viewbox Width="{Binding ImageSize}"  
-	  											 Height="{Binding ImageSize}"  
-	  											 Margin="2.5" >  
-	  						<Image Source="{Binding Image}" />  
-	  					</Viewbox>  
+	  				<DataTemplate>
+	  						<Image Source="{CompiledBinding Image}"
+                       x:DataType="models:FileModel"
+                       Width="32"
+                       Height="32"
+                       Margin="2.5"/>
 	  				</DataTemplate>  
 	  			</DataGridTemplateColumn.CellTemplate>  
-	  		</DataGridTemplateColumn>  
-	  		  
-	  		<!-- <DataGridTextColumn Binding="{Binding Name}"   -->
-	  		<!-- 										Header="Name" -->
-	  		<!-- 										CanUserResize="True"   -->
-	  		<!-- 										CanUserReorder="True"   -->
-	  		<!-- 										Width="Auto"/> -->
+	  		</DataGridTemplateColumn>
 
 	      <DataGridTemplateColumn CanUserSort="False"
 	                              CanUserReorder="True"
@@ -135,7 +130,8 @@
 	                              SortMemberPath="Name">
 		      <DataGridTemplateColumn.CellTemplate>
 			      <DataTemplate>
-				      <TextBlock Text="{Binding Name}"
+				      <TextBlock Text="{CompiledBinding Name}"
+                         x:DataType="models:FileModel"
 				                 TextTrimming="CharacterEllipsis"
 				                 VerticalAlignment="Center"
 				                 Margin="10 0 0 0" />
@@ -149,8 +145,9 @@
 	  														SortMemberPath="Extension">  
 	  			<DataGridTemplateColumn.CellTemplate>  
 	  				<DataTemplate>  
-	  					<TextBlock Text="{Binding, Converter={StaticResource extensionConverter}}"  
+	  					<TextBlock Text="{CompiledBinding, Converter={StaticResource extensionConverter}}"  
 	  										 TextTrimming="CharacterEllipsis"   
+                         x:DataType="models:FileModel"
 	  										 VerticalAlignment="Center"   
 	  										 Margin="10 0 0 0" />  
 	  				</DataTemplate>  
@@ -165,8 +162,9 @@
 		      													 Width="Auto" >
 		             <DataGridTemplateColumn.CellTemplate>
 		               <DataTemplate>
-		                 <TextBlock Text="{Binding EditedOn, Converter={StaticResource dateTimeConverter}}"
+		                 <TextBlock Text="{CompiledBinding EditedOn, Converter={StaticResource dateTimeConverter}}"
 		      										 TextTrimming="CharacterEllipsis"
+                                x:DataType="models:FileModel"
 		                            IsHitTestVisible="False"
 		      										 VerticalAlignment="Center"
 		      										 Margin="10 0 0 0" />
@@ -174,8 +172,9 @@
 		             </DataGridTemplateColumn.CellTemplate>
 		           </DataGridTemplateColumn>
 	   
-	  		<DataGridTextColumn Binding="{Binding, Converter={StaticResource sizeConverter}}"  
+	  		<DataGridTextColumn Binding="{CompiledBinding, Converter={StaticResource sizeConverter}}"  
 	  												SortMemberPath="Size"
+                            x:DataType="models:FileModel"
 	                          CanUserSort="False"
 	  												Header="Size"  
 	  												CanUserResize="True"  

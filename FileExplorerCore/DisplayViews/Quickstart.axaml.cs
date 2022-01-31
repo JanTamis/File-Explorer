@@ -13,8 +13,6 @@ namespace FileExplorerCore.DisplayViews
 		{
 			get
 			{
-				FileModel.ImageSize = 128;
-
 				var path = Environment.GetFolderPath(Environment.SpecialFolder.Recent);
 
 				//return !String.IsNullOrEmpty(path) 
@@ -29,8 +27,6 @@ namespace FileExplorerCore.DisplayViews
 		{
 			get
 			{
-				FileModel.ImageSize = 128;
-
 				//return MainWindowViewModel.Tree.Children
 				//	.Select(s => new FileModel(s));
 

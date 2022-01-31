@@ -3,19 +3,20 @@ using System.Globalization;
 using Avalonia;
 using Avalonia.Data.Converters;
 
-namespace FileExplorerCore.Converters;
-
-public class MainTitleMarginConverter : IValueConverter
+namespace FileExplorerCore.Converters
 {
-	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+	public class MainTitleMarginConverter : IValueConverter
 	{
-		return OperatingSystem.IsMacOS() 
-			? new Thickness(0, 30, 0, 0) 
-			: new Thickness(0);
-	}
+		public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+		{
+			return OperatingSystem.IsMacOS()
+				? new Thickness(0, 30, 0, 0)
+				: new Thickness(0);
+		}
 
-	public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-	{
-		throw new NotImplementedException();
+		public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

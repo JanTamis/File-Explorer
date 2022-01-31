@@ -38,6 +38,12 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
   <ItemGroup>
+    <AvaloniaXaml Remove="bin\**" />
+    <Compile Remove="bin\**" />
+    <EmbeddedResource Remove="bin\**" />
+    <None Remove="bin\**" />
+  </ItemGroup>
+  <ItemGroup>
     <AvaloniaResource Remove="Assets\Code.svg" />
     <AvaloniaResource Remove="Assets\File.svg" />
     <AvaloniaResource Remove="Assets\Folder.svg" />
@@ -207,6 +213,7 @@
     <None Remove="Assets\Video.svg" />
     <None Remove="Assets\Zip.Svg" />
     <None Remove="Files.json" />
+    <None Remove="Index.bin" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Assets\Lookup\3DImage.txt" />

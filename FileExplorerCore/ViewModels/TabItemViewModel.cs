@@ -151,9 +151,12 @@ namespace FileExplorerCore.ViewModels
 
 				if (!IsLoading)
 				{
-					OnPropertyChanged(nameof(LoadTime));
+					//OnPropertyChanged(nameof(LoadTime));
 
 					//TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.NoProgress);
+
+					GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+					GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized, true);
 				}
 				else
 				{
@@ -161,9 +164,6 @@ namespace FileExplorerCore.ViewModels
 
 					//TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.Indeterminate);
 				}
-
-				// GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-				GC.Collect(2, GCCollectionMode.Optimized, false);
 
 				OnPropertyChanged(nameof(SearchFailed));
 			}
@@ -217,7 +217,7 @@ namespace FileExplorerCore.ViewModels
 			get => _path;
 			set
 			{
-				if (value != Path && (Directory.Exists(value) || String.IsNullOrEmpty(value)))
+				if (value != Path && value is not null && (Directory.Exists(value) || String.IsNullOrEmpty(value)))
 				{
 					if (value is "" && DisplayControl is not Quickstart)
 					{
@@ -305,8 +305,6 @@ namespace FileExplorerCore.ViewModels
 
 				if (IsGrid is false)
 				{
-					FileModel.ImageSize = 32;
-
 					// foreach (var item in Files)
 					// {
 					// 	item.NeedsNewImage = true;
@@ -323,8 +321,6 @@ namespace FileExplorerCore.ViewModels
 				}
 				else
 				{
-					FileModel.ImageSize = 100;
-
 					// foreach (var item in Files)
 					// {
 					// 	item.NeedsNewImage = true;
@@ -538,8 +534,6 @@ namespace FileExplorerCore.ViewModels
 		private IEnumerable<FileModel> GetFileSystemEntries(string path, string search, bool recursive)
 		{
 			options.RecurseSubdirectories = recursive;
-
-			path = System.IO.Path.GetFullPath(path);
 
 			var item = GetTreeItem(path);
 

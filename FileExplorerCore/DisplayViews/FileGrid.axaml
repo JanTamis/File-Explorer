@@ -6,33 +6,33 @@
 						 xmlns:converters="using:FileExplorerCore.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FileExplorerCore.DisplayViews.FileGrid">
-	<UserControl.Resources>
-		<converters:PathToImageConverter x:Key="imageConverter" />
-		<converters:EditedOnConverter x:Key="editedOnConverter" />
-		<converters:ExtensionConverter x:Key="extensionConverter" />
-		<converters:SizeConverter x:Key="sizeConverter" />
-		<converters:FileNameConverter x:Key="fileNameConverter" />
-		<converters:ImageTransformConverter x:Key="imageTransformConverter" />
-	</UserControl.Resources>
-	
-	<ScrollViewer>
-		<ItemsRepeater Items="{Binding Files}"
+  <UserControl.Resources>
+    <converters:PathToImageConverter x:Key="imageConverter" />
+    <converters:EditedOnConverter x:Key="editedOnConverter" />
+    <converters:ExtensionConverter x:Key="extensionConverter" />
+    <converters:SizeConverter x:Key="sizeConverter" />
+    <converters:FileNameConverter x:Key="fileNameConverter" />
+    <converters:ImageTransformConverter x:Key="imageTransformConverter" />
+  </UserControl.Resources>
+
+  <ScrollViewer>
+    <ItemsRepeater Items="{Binding Files}"
 									 Margin="0 0 0 5"
 									 x:Name="fileList">
-			<ItemsRepeater.Layout>
-				<UniformGridLayout ItemsStretch="None"
+      <ItemsRepeater.Layout>
+        <UniformGridLayout ItemsStretch="None"
 													 ItemsJustification="Center" />
-			</ItemsRepeater.Layout>
+      </ItemsRepeater.Layout>
 
-			<ItemsRepeater.Styles>
-				<Style Selector="ListBoxItem">
-					<Setter Property="Background" Value="Transparent" />
-					<Setter Property="Template">
-						<ControlTemplate>
-							<Border CornerRadius="10" 
+      <ItemsRepeater.Styles>
+        <Style Selector="ListBoxItem">
+          <Setter Property="Background" Value="Transparent" />
+          <Setter Property="Template">
+            <ControlTemplate>
+              <Border CornerRadius="10"
 											Name="PART_ContentPresenter"
 											Margin="10">
-								<ContentPresenter ClipToBounds="true"
+                <ContentPresenter ClipToBounds="true"
 																	Background="{TemplateBinding Background}"
 																	BorderBrush="{TemplateBinding BorderBrush}"
 																	BorderThickness="{TemplateBinding BorderThickness}"
@@ -41,45 +41,44 @@
 																	Padding="{TemplateBinding Padding}"
 																	VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
 																	HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
-							</Border>
-						</ControlTemplate>
-					</Setter>
-				</Style>
-			</ItemsRepeater.Styles>
+              </Border>
+            </ControlTemplate>
+          </Setter>
+        </Style>
+      </ItemsRepeater.Styles>
 
-			<ItemsRepeater.ItemTemplate>
-				<DataTemplate DataType="models:FileModel">
-					<ListBoxItem Margin="0"
+      <ItemsRepeater.ItemTemplate>
+        <DataTemplate DataType="models:FileModel">
+          <ListBoxItem Margin="0"
 											 MaxWidth="400"
 											 ToolTip.Tip="{Binding Name}"
 											 IsSelected="{Binding IsSelected}"
 											 Cursor="Hand"
 											 VerticalContentAlignment="Stretch"
 											 HorizontalContentAlignment="Stretch">
-						<StackPanel Margin="0 0 0 5"
+            <StackPanel Margin="0 0 0 5"
 												HorizontalAlignment="Center"
 												VerticalAlignment="Center">
-							<Viewbox Width="{Binding ImageSize}"
-											 Height="{Binding ImageSize}"
-											 Margin="4" 
-											 RenderTransform="{Binding ImageTransform}">
-									<Image Source="{Binding Image}" />
-							</Viewbox>
+              <Image Source="{CompiledBinding Image}"
+                     x:DataType="models:FileModel"
+                     Margin="4"
+                     Width="100"
+                     Height="100"/>
 
-							<TextBlock Text="{Binding Name}"
+              <TextBlock Text="{Binding Name}"
 												 TextTrimming="CharacterEllipsis"
 												 HorizontalAlignment="Stretch"
 												 TextAlignment="Center"
 												 Margin="4 2" />
 
-							<TextBlock Text="{Binding Size, Converter={StaticResource sizeConverter}}"
+              <TextBlock Text="{Binding Size, Converter={StaticResource sizeConverter}}"
 												 FontSize="12"
 												 Foreground="{DynamicResource SystemBaseMediumColor}"
 												 HorizontalAlignment="Center" />
-						</StackPanel>
-					</ListBoxItem>
-				</DataTemplate>
-			</ItemsRepeater.ItemTemplate>
-		</ItemsRepeater>
-	</ScrollViewer>
+            </StackPanel>
+          </ListBoxItem>
+        </DataTemplate>
+      </ItemsRepeater.ItemTemplate>
+    </ItemsRepeater>
+  </ScrollViewer>
 </UserControl>

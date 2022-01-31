@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using FileTypeAndIcon;
 using Avalonia.Threading;
 using FileExplorerCore.ViewModels;
+using System.Diagnostics;
 
 namespace FileExplorerCore.Helpers
 {
@@ -18,7 +19,7 @@ namespace FileExplorerCore.Helpers
 	{
 		private static readonly Dictionary<string, string>? fileTypes = OperatingSystem.IsWindows() ? RegisteredFileType.GetFileTypeAndIcon() : new();
 
-		private static readonly Dictionary<string, IImage> Images = new();
+		private static readonly Dictionary<string, SvgImage> Images = new();
 		private static readonly Dictionary<string, string[]> TypeMap = new();
 
 		private static readonly EnumerationOptions enumerationOptions = new()
@@ -51,7 +52,7 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
-		public static async ValueTask<IImage?> GetFileImage(string? path)
+		public static IImage? GetFileImage(string? path)
 		{
 			if (path is null)
 			{
@@ -141,10 +142,10 @@ namespace FileExplorerCore.Helpers
 				}
 			}
 
-			return await GetImage(name);
+			return GetImage(name);
 		}
 
-		public static async ValueTask<IImage?> GetFileImage(FileSystemTreeItem? treeItem)
+		public static IImage? GetFileImage(FileSystemTreeItem? treeItem)
 		{
 			if (treeItem is null)
 			{
@@ -165,31 +166,29 @@ namespace FileExplorerCore.Helpers
 
 			if (treeItem.IsFolder)
 			{
-				//if (OperatingSystem.IsWindows())
-				//{
-				//	foreach (var folder in Enum.GetValues<KnownFolder>())
-				//	{
-				//		var folderText = Enum.GetName(folder);
+				if (OperatingSystem.IsWindows())
+				{
+					foreach (var folder in Enum.GetValues<KnownFolder>())
+					{
+						var folderText = Enum.GetName(folder);
 
-				//		if (folderText is not null && treeItem.GetPath(x => x.SequenceEqual(KnownFolders.GetPath(folder))))
-				//		{
-				//			name = folderText;
-				//		}
-				//	}
-				//}
+						if (folderText is not null && treeItem.GetPath(x => x.SequenceEqual(KnownFolders.GetPath(folder))))
+						{
+							name = folderText;
+						}
+					}
+				}
 
-				//if (name == String.Empty)
-				//{
-				//	var driveInfos = DriveInfo.GetDrives();
 
-				//	foreach (var drive in driveInfos)
-				//	{
-				//		if (drive.IsReady && treeItem.GetPath(path => drive.Name == path))
-				//		{
-				//			name = Enum.GetName(drive.DriveType);
-				//		}
-				//	}
-				//}
+				if (!treeItem.HasParent)
+				{
+					var driveInfo = new DriveInfo(new string(treeItem.Value[0], 1));
+
+					if (driveInfo.IsReady)
+					{
+						name = Enum.GetName(driveInfo.DriveType);
+					}
+				}
 
 				if (name == String.Empty)
 				{
@@ -228,7 +227,7 @@ namespace FileExplorerCore.Helpers
 				}
 			}
 
-			return await GetImage(name);
+			return GetImage(name);
 		}
 
 		private static bool ImageExists(string key)
@@ -238,8 +237,13 @@ namespace FileExplorerCore.Helpers
 			return loader?.Exists(new Uri($"avares://FileExplorerCore/Assets/Icons/{key}.svg")) ?? false;
 		}
 
-		private static async ValueTask<IImage?> GetImage(string key)
+		private static SvgImage? GetImage(string key)
 		{
+			if (key is null or "")
+			{
+				return null;
+			}
+
 			if (!Images.TryGetValue(key, out var image) && image is null)
 			{
 				var source = SvgSource.Load<SvgSource>($"avares://FileExplorerCore/Assets/Icons/{key}.svg", null);
@@ -252,34 +256,16 @@ namespace FileExplorerCore.Helpers
 					{
 						memoryStream.Seek(0, SeekOrigin.Begin);
 
-						if (Dispatcher.UIThread.CheckAccess())
+						image = new SvgImage()
 						{
-							image = new SvgImage()
-							{
-								Source = source,
-							};
+							Source = source,
+						};
 
-							if (!Images.ContainsKey(key))
-							{
-								Images.Add(key, image);
-							}
-						}
-						else
+						if (!Images.ContainsKey(key))
 						{
-							await Dispatcher.UIThread.InvokeAsync(() =>
-							{
-								image = new SvgImage()
-								{
-									Source = source,
-								};
-
-								if (!Images.ContainsKey(key))
-								{
-									Images.Add(key, image);
-								}
-							});
+							Images.Add(key, image);
 						}
-					} 
+					}
 				}
 			}
 

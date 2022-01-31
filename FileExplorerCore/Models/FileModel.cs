@@ -1,7 +1,9 @@
 ﻿using Avalonia.Media;
+using Avalonia.Svg.Skia;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.ViewModels;
 using Humanizer;
+using ReactiveUI;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -29,15 +31,12 @@ namespace FileExplorerCore.Models
 		private DateTime _editedOn;
 
 		private IImage? _image;
-		private Transform _imageTransform;
 		private bool needsTranslation;
 
 		public static event Action<FileModel> SelectionChanged = delegate { };
 
 		private static bool _isNotLoading = true;
 		private bool _isVisible = true;
-
-		public static int ImageSize { get; set; }
 
 		public string? ExtensionName { get; set; }
 
@@ -48,26 +47,20 @@ namespace FileExplorerCore.Models
 			{
 				_isVisible = value;
 
-				if (value)
-				{
-					NeedsNewImage = true;
-					OnPropertyChanged(nameof(Image));
-				}
-				else
-				{
-					NeedsNewImage = false;
+				//if (value)
+				//{
+				//	NeedsNewImage = true;
+				//	OnPropertyChanged(nameof(Image));
+				//}
+				//else
+				//{
+				//	NeedsNewImage = false;
 
-					Image = null;
+				//	Image = null;
 
-					NeedsNewImage = true;
-				}
+				//	NeedsNewImage = true;
+				//}
 			}
-		}
-
-		public Transform ImageTransform
-		{
-			get => _imageTransform;
-			set => OnPropertyChanged(ref _imageTransform, value);
 		}
 
 		public bool IsSelected
@@ -246,39 +239,39 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				if (NeedsNewImage && !HasImage)
-				{
-					ImageTransform = null;
+				//if (!HasImage)
+				//{
+				//	ImageTransform = null;
 
-					FileImageQueue.Add(this);
+				//	FileImageQueue.Add(this);
 
-					if (_isNotLoading)
-					{
-						_isNotLoading = false;
+				//	if (_isNotLoading)
+				//	{
+				//		_isNotLoading = false;
 
-						ThreadPool.QueueUserWorkItem(async x =>
-						{
-							var attempts = 0;
-							
-							while (!FileImageQueue.IsEmpty && (FileImageQueue.TryTake(out var subject) || ++attempts <= 5))
-							{
-								if ( subject is { IsVisible:true })
-								{
-									var img = await ThumbnailProvider.GetFileImage(subject.treeItem);
+				//		ThreadPool.QueueUserWorkItem(async x =>
+				//		{
+				//			var attempts = 0;
 
-									subject.NeedsNewImage = false;
-									await subject.OnPropertyChanged(ref subject._image, img, nameof(Image));
-								}
-							}
+				//			while (!FileImageQueue.IsEmpty && (FileImageQueue.TryTake(out var subject) || ++attempts <= 5))
+				//			{
+				//				//if (subject is { IsVisible:true })
+				//				//{
+				//					var img = await ThumbnailProvider.GetFileImage(subject.treeItem);
 
-							_isNotLoading = true;
-						});
-					}
-				}
+				//					subject.NeedsNewImage = false;
+				//					await subject.OnPropertyChanged(ref subject._image, img, nameof(Image));
+				//				//}
+				//			}
 
-				return _image;
+				//			_isNotLoading = true;
+				//		});
+				//	}
+				//}
+
+				return _image ??= ThumbnailProvider.GetFileImage(treeItem);
 			}
-			set => OnPropertyChanged(ref _image, value);
+			//set => OnPropertyChanged(ref _image, value);
 		}
 
 		public FileModel(FileSystemTreeItem item)
