@@ -154,9 +154,6 @@ namespace FileExplorerCore.ViewModels
 					OnPropertyChanged(nameof(LoadTime));
 
 					//TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.NoProgress);
-
-					GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-					GC.Collect(2, GCCollectionMode.Optimized, false);
 				}
 				else
 				{
@@ -164,6 +161,9 @@ namespace FileExplorerCore.ViewModels
 
 					//TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.Indeterminate);
 				}
+
+				// GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+				GC.Collect(2, GCCollectionMode.Optimized, false);
 
 				OnPropertyChanged(nameof(SearchFailed));
 			}
@@ -244,27 +244,32 @@ namespace FileExplorerCore.ViewModels
 
 						IEnumerable<FolderModel> GetFolders()
 						{
-							var path = Path.Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
-							var names = path.Split(System.IO.Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
+							var separator = OperatingSystem.IsWindows()
+								? '\\'
+								: '/';
+
+							var path = Path;
+							var names = path.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+
+							if (OperatingSystem.IsMacOS())
+							{
+								yield return new FolderModel(MainWindowViewModel.Tree[0]);
+							}
 
 							for (var i = 0; i < names.Length; i++)
 							{
-								var folderPath = String.Join(System.IO.Path.DirectorySeparatorChar,
-									new ArraySegment<string>(names, 0, i + 1));
+								var folderPath = String.Join(separator, new ArraySegment<string>(names, 0, i + 1));
 								var name = names[i];
 
 								if (!String.IsNullOrEmpty(folderPath))
 								{
-									if (i == 0)
+									if (i == 0 && OperatingSystem.IsWindows())
 									{
-										folderPath += System.IO.Path.DirectorySeparatorChar;
-										name = $"{new DriveInfo(name).VolumeLabel} ({name}{System.IO.Path.DirectorySeparatorChar})";
+										folderPath += separator;
+										name = $"{new DriveInfo(name).VolumeLabel} ({name}{separator})";
 									}
 
-									yield return new FolderModel(folderPath, name, new FileSystemEnumerable<FolderModel>(path, (ref FileSystemEntry x) => new FolderModel(x.ToFullPath(), new string(x.FileName)), options)
-									{
-										ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
-									});
+									yield return new FolderModel(GetTreeItem(folderPath));
 								}
 							}
 						}
@@ -302,10 +307,10 @@ namespace FileExplorerCore.ViewModels
 				{
 					FileModel.ImageSize = 32;
 
-					foreach (var item in Files)
-					{
-						item.NeedsNewImage = true;
-					}
+					// foreach (var item in Files)
+					// {
+					// 	item.NeedsNewImage = true;
+					// }
 
 					var list = new FileDataGrid
 					{
@@ -320,10 +325,10 @@ namespace FileExplorerCore.ViewModels
 				{
 					FileModel.ImageSize = 100;
 
-					foreach (var item in Files)
-					{
-						item.NeedsNewImage = true;
-					}
+					// foreach (var item in Files)
+					// {
+					// 	item.NeedsNewImage = true;
+					// }
 
 					var grid = new FileGrid
 					{
@@ -539,8 +544,9 @@ namespace FileExplorerCore.ViewModels
 			var item = GetTreeItem(path);
 
 			return item.EnumerateChildren()
+				.Cast<FileSystemTreeItem>()
 				.Where(w => w is not null && FileSystemName.MatchesSimpleExpression(search, w.Value))
-				.Select(s => new FileModel(s as FileSystemTreeItem));
+				.Select(s => new FileModel(s));
 
 			//if (search is "*" or "*.*" or "" && Sort is SortEnum.None && !recursive)
 			//{
@@ -657,7 +663,10 @@ namespace FileExplorerCore.ViewModels
 				}
 			}
 
-			item = GetItem(item, temp, 1);
+			if (temp.Length > 0)
+			{
+				item = GetItem(item, temp, 1);
+			}
 
 			return item;
 

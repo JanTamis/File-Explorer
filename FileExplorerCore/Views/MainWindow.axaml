@@ -30,6 +30,7 @@
 		<converters:FileNameConverter x:Key="fileNameConverter" />
 		<converters:MinSizeConverter x:Key="minSizeConverter" />
 		<converters:MoreThanConverter x:Key="moreThanConverter" />
+		<converters:MainTitleMarginConverter x:Key="mainTitleMarginConverter" />
 
 		<converters:PathToFoldersConverter x:Key="pathToFoldersConverter" />
 	</Window.Resources>
@@ -108,7 +109,6 @@
 			<Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushDisabled}" />
 			<Setter Property="TextBlock.Foreground" Value="{DynamicResource ButtonForegroundDisabled}" />
 		</Style>
-
 	</Window.Styles>
 
 	<Panel Margin="{Binding #MainWindow.OffScreenMargin}">
@@ -122,6 +122,7 @@
 				<Grid RowDefinitions="Auto, *, Auto"
 							Grid.ColumnSpan="2">
 					<Border VerticalAlignment="Top"
+					        Margin="{Binding, Converter={StaticResource mainTitleMarginConverter}}"
 									Height="30"
 									IsHitTestVisible="False">
 

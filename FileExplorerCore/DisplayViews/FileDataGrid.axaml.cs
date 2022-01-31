@@ -46,37 +46,37 @@ namespace FileExplorerCore.DisplayViews
 		{
 			AvaloniaXamlLoader.Load(this);
 
-			//var grid = this.FindControl<ItemsRepeater>("fileList");
+			var grid = this.FindControl<DataGrid>("fileList");
 
-			//grid.ElementPrepared += Grid_ElementPrepared;
-			//grid.ElementClearing += Grid_ElementClearing;
-
-			//grid.KeyDown += Grid_KeyDown;
-
-			var grid = this.FindControl<DataBox.DataBox>("fileList");
-
-			// grid.LoadingRow += Grid_LoadingRow;
-			// grid.UnloadingRow += Grid_UnloadingRow;
+			// grid.ElementPrepared += Grid_ElementPrepared;
+			// grid.ElementClearing += Grid_ElementClearing;
 			//
-			// grid.SelectionChanged += Grid_SelectionChanged;
+			// grid.KeyDown += Grid_KeyDown;
 
-			DataContextProperty.Changed.Subscribe(s =>
-			{
-				if (s.Sender is DataBoxRow row)
-				{
-					if (s.OldValue.Value is FileModel oldModel)
-					{
-						oldModel.IsVisible = false;
-					}
+			//var grid = this.FindControl<DataBox.DataBox>("fileList");
 
-					if (s.NewValue.Value is FileModel newModel)
-					{
-						newModel.IsVisible = true;
-					}
-				}
-			});
+			grid.LoadingRow += Grid_LoadingRow;
+			grid.UnloadingRow += Grid_UnloadingRow;
+			
+			grid.SelectionChanged += Grid_SelectionChanged;
 
-			grid.DoubleTapped += (sender, args) =>
+			// DataContextProperty.Changed.Subscribe(s =>
+			// {
+			// 	if (s.Sender is DataBoxRow)
+			// 	{
+			// 		if (s.OldValue.Value is FileModel oldModel)
+			// 		{
+			// 			oldModel.IsVisible = false;
+			// 		}
+			//
+			// 		if (s.NewValue.Value is FileModel newModel)
+			// 		{
+			// 			newModel.IsVisible = true;
+			// 		}
+			// 	}
+			// });
+
+			grid.DoubleTapped += (_, args) =>
 			{
 				if (args.Source is { InteractiveParent: DataBoxCell { DataContext: FileModel model } })
 				{
@@ -93,20 +93,20 @@ namespace FileExplorerCore.DisplayViews
 			});
 
 
-			// FileModel.SelectionChanged += (file) =>
-			// {
-			// 	if (grid.Items != null)
-			// 	{
-			// 		if (file.IsSelected)
-			// 		{
-			// 			grid.SelectedItems.Add(file);
-			// 		}
-			// 		else
-			// 		{
-			// 			grid.SelectedItems.Remove(file);
-			// 		}
-			// 	}
-			// };
+			FileModel.SelectionChanged += (file) =>
+			{
+				if (grid.Items != null)
+				{
+					if (file.IsSelected)
+					{
+						grid.SelectedItems.Add(file);
+					}
+					else
+					{
+						grid.SelectedItems.Remove(file);
+					}
+				}
+			};
 		}
 
 		private void Grid_SelectionChanged(object? sender, SelectionChangedEventArgs e)

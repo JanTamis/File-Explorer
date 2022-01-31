@@ -5,6 +5,7 @@ using FileExplorerCore.Models;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using FileExplorerCore.ViewModels;
 
 namespace FileExplorerCore.Converters
 {
@@ -22,25 +23,32 @@ namespace FileExplorerCore.Converters
 
 		public IEnumerable<FolderModel> GetFolders(string path)
 		{
-			path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+			var separator = OperatingSystem.IsWindows()
+				? '\\'
+				: '/';
+			
+			var names = path.Split(separator, StringSplitOptions.RemoveEmptyEntries);
 
-			var names = path.Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries);
-
-			for (int i = 0; i < names.Length; i++)
+			if (OperatingSystem.IsMacOS())
 			{
-				var folderPath = String.Join(Path.DirectorySeparatorChar, new ArraySegment<string>(names, 0, i + 1));
+				yield return new FolderModel(MainWindowViewModel.Tree.Children[0]);
+			}
+
+			for (var i = 0; i < names.Length; i++)
+			{
+				var folderPath = String.Join(separator, new ArraySegment<string>(names, 0, i + 1));
 				var name = names[i];
 
 				if (!String.IsNullOrEmpty(folderPath))
 				{
 					if (i is 0)
 					{
-						folderPath += Path.DirectorySeparatorChar;
-						name += Path.DirectorySeparatorChar;
+						folderPath += separator;
+						name += separator;
 					}
 
-					yield return new FolderModel(folderPath, name, from directory in Directory.EnumerateDirectories(folderPath, "*", new EnumerationOptions())
-																												 select new FolderModel(directory, Path.GetFileName(directory)));
+					// yield return new FolderModel(folderPath, name, from directory in Directory.EnumerateDirectories(folderPath, "*", new EnumerationOptions())
+					// 																							 select new FolderModel(directory, Path.GetFileName(directory)));
 				}
 			}
 		}

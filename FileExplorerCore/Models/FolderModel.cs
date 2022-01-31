@@ -13,15 +13,15 @@ namespace FileExplorerCore.Models
 {
 	public class FolderModel : ReactiveObject
 	{
+		private FileSystemTreeItem _treeItem;
+
 		private IImage _image;
 		static Task imageLoadTask;
 
-		public readonly static ConcurrentStack<FolderModel> FileImageQueue = new();
+		public readonly static ConcurrentBag<FolderModel> FileImageQueue = new();
 		readonly IEnumerable<FolderModel> query = Enumerable.Empty<FolderModel>();
 
 		private ObservableRangeCollection<FolderModel>? _folders;
-
-		public static FolderModel Empty { get; } = new();
 
 		private readonly EnumerationOptions options = new()
 		{
@@ -35,20 +35,19 @@ namespace FileExplorerCore.Models
 			{
 				if (_image is null)
 				{
-					FileImageQueue.Push(this);
+					FileImageQueue.Add(this);
 
 					if (imageLoadTask is null or { IsCompleted: true })
 					{
-						imageLoadTask = Task.Run(() =>
+						imageLoadTask = Task.Run(async () =>
 						{
-							if (OperatingSystem.IsWindows())
+							var attempts = 0;
+							
+							while (!FileImageQueue.IsEmpty && (FileImageQueue.TryTake(out var subject) || ++attempts <= 5))
 							{
-								foreach (var subject in Concurrent.AsEnumerable(FileImageQueue))
-								{
-									var img = ThumbnailProvider.GetFileImage(subject.Path).Result;
+								var img = await ThumbnailProvider.GetFileImage(subject._treeItem);
 
-									subject.Image = img;
-								}
+								subject.Image = img;
 							}
 						});
 					}
@@ -59,38 +58,20 @@ namespace FileExplorerCore.Models
 			set => this.RaiseAndSetIfChanged(ref _image, value);
 		}
 
-		public string Name { get; }
-		public string Path { get; }
+		public string Name => _treeItem.Value;
+		public string Path => _treeItem.GetPath(path => path.ToString());
 
-		public ObservableRangeCollection<FolderModel> SubFolders => _folders ??= new ObservableRangeCollection<FolderModel>(query);
+		public IEnumerable<FolderModel> SubFolders => _treeItem
+			.EnumerateChildren(0)
+			.Cast<FileSystemTreeItem>()
+			.Where(w => w.IsFolder)
+			.Select(s => new FolderModel(s));
 
 		//public Task<IEnumerable<FolderModel>> SubFolders => Task.Run(() => (IEnumerable<FolderModel>)query.ToArray());
 
-		public FolderModel(string path, string? name = null, IEnumerable<FolderModel>? subFolders = null)
+		public FolderModel(FileSystemTreeItem item)
 		{
-			Name = name ?? System.IO.Path.GetFileName(path);
-
-			if (String.IsNullOrEmpty(Name))
-			{
-				Name = path;
-			}
-
-			Path = path;
-
-			query = subFolders ?? new FileSystemEnumerable<FolderModel>(path, (ref FileSystemEntry x) => new FolderModel(x.ToFullPath(), new string(x.FileName)), options)
-			{
-				ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
-			};
-		}
-
-		public FolderModel()
-		{
-			Path = String.Empty;
-		}
-
-		public FolderModel(string name, IEnumerable<FolderModel> subFolders) : this(String.Empty, name, subFolders)
-		{
-
+			_treeItem = item;
 		}
 
 		public override int GetHashCode()

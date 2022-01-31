@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Collections.Pooled;
 
 namespace FileExplorerCore.Helpers
 {
@@ -23,7 +24,7 @@ namespace FileExplorerCore.Helpers
 
 		private readonly List<T> Data = new();
 
-		const int updateTime = 500;
+		const int updateTime = 1000;
 		const int updateCountTime = 50;
 
 		public int Count => Data.Count;
@@ -155,11 +156,11 @@ namespace FileExplorerCore.Helpers
 					{
 						if (Dispatcher.UIThread.CheckAccess())
 						{
-							OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, Data, Math.Min(index - 1, 0)));
+							OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 						}
 						else
 						{
-							await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, Data, Math.Min(index - 1, 0))));
+							await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
 						}
 					}
 					else
@@ -201,15 +202,15 @@ namespace FileExplorerCore.Helpers
 				}, token);
 			}
 
-			if (comparer == null && Data.Count <= index && Data.Count > 0 && index > 0)
+			if (comparer is null && Data.Count <= index && Data.Count > 0 && index > 0)
 			{
 				if (Dispatcher.UIThread.CheckAccess())
 				{
-					OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, Data, Math.Min(index - 1, 0)));
+					OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 				}
 				else
 				{
-					await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, Data, Math.Min(index - 1, 0))));
+					await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
 				}
 			}
 			else
@@ -247,7 +248,7 @@ namespace FileExplorerCore.Helpers
 
 				if (comparer != null && Data.Count > 0)
 				{
-					int i = await BinarySearchAsync(item, 0, Data.Count, comparer);
+					var i = await BinarySearchAsync(item, 0, Data.Count, comparer);
 
 					if (i >= 0)
 						Data.Insert(i, item);
@@ -291,11 +292,11 @@ namespace FileExplorerCore.Helpers
 					{
 						if (Dispatcher.UIThread.CheckAccess())
 						{
-							OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, Data, index));
+							OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 						}
 						else
 						{
-							await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, Data, index)));
+							await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
 						}
 					}
 					else
@@ -341,11 +342,11 @@ namespace FileExplorerCore.Helpers
 			{
 				if (Dispatcher.UIThread.CheckAccess())
 				{
-					OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, Data, index));
+					OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 				}
 				else
 				{
-					await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, Data, index)));
+					await Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
 				}
 			}
 			else
@@ -392,7 +393,7 @@ namespace FileExplorerCore.Helpers
 			return Data.BinarySearch(value, comparer);
 		}
 
-		public async Task<int> BinarySearchAsync(T value, int index, int length, IAsyncComparer<T> comparer)
+		public async ValueTask<int> BinarySearchAsync(T value, int index, int length, IAsyncComparer<T> comparer)
 		{
 			var lo = index;
 			var hi = index + length - 1;
@@ -444,7 +445,7 @@ namespace FileExplorerCore.Helpers
 			Dispatcher.UIThread.Post(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset)));
 		}
 
-		public new IEnumerator<T> GetEnumerator()
+		public IEnumerator<T> GetEnumerator()
 		{
 			var max = Data.Count;
 
@@ -477,10 +478,7 @@ namespace FileExplorerCore.Helpers
 
 				if (i <= j)
 				{
-					var temp = array[i];
-
-					array[i] = array[j];
-					array[j] = temp;
+					(array[i], array[j]) = (array[j], array[i]);
 
 					i++;
 					j--;
@@ -551,12 +549,12 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
-		public new int IndexOf(T item)
+		public int IndexOf(T item)
 		{
 			return Data.IndexOf(item);
 		}
 
-		public new void Insert(int index, T item)
+		public void Insert(int index, T item)
 		{
 			Data.Insert(index, item);
 
@@ -570,7 +568,7 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
-		public new void RemoveAt(int index)
+		public void RemoveAt(int index)
 		{
 			Data.RemoveAt(index);
 
@@ -584,7 +582,7 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
-		public new void Add(T item)
+		public void Add(T item)
 		{
 			Data.Add(item);
 
@@ -598,22 +596,22 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
-		public new void Clear()
+		public void Clear()
 		{
 			Data.Clear();
 		}
 
-		public new bool Contains(T item)
+		public bool Contains(T item)
 		{
 			return Data.Contains(item);
 		}
 
-		public new void CopyTo(T[] array, int arrayIndex)
+		public void CopyTo(T[] array, int arrayIndex)
 		{
 			Data.CopyTo(array, arrayIndex);
 		}
 
-		public new bool Remove(T item)
+		public bool Remove(T item)
 		{
 			var value = Data.Remove(item);
 

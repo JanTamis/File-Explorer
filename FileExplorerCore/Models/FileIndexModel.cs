@@ -11,36 +11,39 @@ namespace FileExplorerCore.Models
 {
 	public class FileIndexModel
 	{
-		static readonly EnumerationOptions options = new()
-		{
-			IgnoreInaccessible = true,
-			AttributesToSkip = FileAttributes.System,
-		};
+		private readonly FileSystemTreeItem _treeItem;
 
-		static readonly EnumerationOptions sizeOptions = new()
+		private static readonly EnumerationOptions sizeOptions = new()
 		{
 			IgnoreInaccessible = true,
 			AttributesToSkip = FileAttributes.Temporary,
 			RecurseSubdirectories = true,
 		};
 
-		Task<long> _taskSize;
-		ObservableRangeCollection<FileIndexModel> _items;
+		private Task<long> _taskSize;
+		private ObservableRangeCollection<FileIndexModel>? _items;
 
-		private readonly IEnumerable<FileIndexModel> query;
-		private readonly IEnumerable<long> sizeQuery;
+		private IEnumerable<FileIndexModel>? query => _treeItem
+			.EnumerateChildren(1)
+			.Cast<FileSystemTreeItem>()
+			.Select(s => new FileIndexModel(s));
 
-		public bool IsFolder { get; init; }
+		private IEnumerable<long> sizeQuery => _treeItem
+			.EnumerateChildren(1)
+			.Cast<FileSystemTreeItem>()
+			.Select(s => s.GetPath((path, isFolder) => !isFolder ? new FileInfo(path.ToString()).Length : 0, IsFolder));
+
+		public bool IsFolder => _treeItem.IsFolder;
 
 		public ObservableRangeCollection<FileIndexModel> Items
 		{
 			get
 			{
-				if (_items == null)
+				if (_items is null)
 				{
 					_items = new ObservableRangeCollection<FileIndexModel>();
 
-					if (query != null)
+					if (query is not null)
 					{
 						var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
 						{
@@ -70,7 +73,7 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				if (sizeQuery is not null && _taskSize is null or { IsCompleted: false } && Size == 0)
+				if (_taskSize is null or { IsCompleted: false } && Size is 0)
 				{
 					return new ValueTask<long>(_taskSize ??= Task.Run(() => Size = sizeQuery.Sum()));
 				}
@@ -79,46 +82,14 @@ namespace FileExplorerCore.Models
 			}
 		}
 
-		public FileIndexModel(ReadOnlySpan<char> name, bool isFolder, long size, FileIndexModel parent = null)
+		public FileIndexModel(FileSystemTreeItem item)
 		{
-			Name = name.ToString();
-			Size = size;
-			Parent = parent;
+			_treeItem = item;
 
-			if (isFolder)
+			if (item.Parent is not null)
 			{
-				var pathBuilder = new ValueStringBuilder(name.Length);
-
-				if (parent != null)
-				{
-					GetPath(this, ref pathBuilder);
-				}
-				else
-				{
-					pathBuilder.Append(name);
-				}
-
-				var path = pathBuilder.ToString();
-
-				var folderQuery = new FileSystemEnumerable<FileIndexModel>(path, (ref FileSystemEntry x) => new FileIndexModel(x.FileName, x.IsDirectory, x.Length, this), options)
-				{
-					ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
-				};
-
-				var fileQuery = new FileSystemEnumerable<FileIndexModel>(path, (ref FileSystemEntry x) => new FileIndexModel(x.FileName, x.IsDirectory, x.Length, this), options)
-				{
-					ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
-				};
-
-				query = folderQuery.Concat(fileQuery);
-
-				if (isFolder)
-				{
-					sizeQuery = new FileSystemEnumerable<long>(path, (ref FileSystemEntry x) => x.Length, sizeOptions);
-				}
+				Parent = new FileIndexModel(item.Parent as FileSystemTreeItem);
 			}
-
-			IsFolder = isFolder;
 		}
 
 		public override string ToString()
@@ -126,7 +97,7 @@ namespace FileExplorerCore.Models
 			return Name;
 		}
 
-		private void GetPath(FileIndexModel model, ref ValueStringBuilder builder)
+		private static void GetPath(FileIndexModel model, ref ValueStringBuilder builder)
 		{
 			builder.Insert(0, Path.DirectorySeparatorChar, 1);
 			builder.Insert(0, model.Name);

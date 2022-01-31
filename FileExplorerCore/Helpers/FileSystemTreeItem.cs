@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text.Json.Serialization;
 using System.Xml.Serialization;
 
@@ -59,22 +60,84 @@ namespace FileExplorerCore.Helpers
 		{
 			var builder = new ValueStringBuilder(stackalloc char[512]);
 
-			foreach (var item in EnumerateValuesToRoot())
+			if (OperatingSystem.IsWindows())
 			{
-				if (!item.EndsWith('\\'))
+				foreach (var item in EnumerateValuesToRoot())
 				{
-					builder.Insert(0, '\\', 1);
+					if (!item.EndsWith('\\'))
+					{
+						builder.Insert(0, '\\', 1);
+					}
+
+					builder.Insert(0, item);
 				}
 
-				builder.Insert(0, item);
+				if (builder[^1] is '\\')
+				{
+					return action(builder.AsSpan(0, builder.Length - 1));
+				}
 			}
-
-			if (builder[^1] is '\\')
+			else
 			{
-				return action(builder.AsSpan(0, builder.Length - 1));
+				foreach (var item in EnumerateValuesToRoot())
+				{
+					if (!item.EndsWith('/'))
+					{
+						builder.Insert(0, '/', 1);
+					}
+
+					builder.Insert(0, item);
+				}
+
+				if (builder[^1] is '/')
+				{
+					return action(builder.AsSpan(0, builder.Length - 1));
+				}
+			}
+			
+			return action(builder.AsSpan(0, builder.Length));
+		}
+
+		public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
+		{
+			var builder = new ValueStringBuilder(stackalloc char[512]);
+
+			if (OperatingSystem.IsWindows())
+			{
+				foreach (var item in EnumerateValuesToRoot())
+				{
+					if (!item.EndsWith('\\'))
+					{
+						builder.Insert(0, '\\', 1);
+					}
+
+					builder.Insert(0, item);
+				}
+
+				if (builder[^1] is '\\')
+				{
+					return action(builder.AsSpan(0, builder.Length - 1), parameter);
+				}
+			}
+			else
+			{
+				foreach (var item in EnumerateValuesToRoot())
+				{
+					if (!item.EndsWith('/'))
+					{
+						builder.Insert(0, '/', 1);
+					}
+
+					builder.Insert(0, item);
+				}
+
+				if (builder[^1] is '/')
+				{
+					return action(builder.AsSpan(0, builder.Length - 1), parameter);
+				}
 			}
 
-			return action(builder.AsSpan(0, builder.Length));
+			return action(builder.AsSpan(0, builder.Length), parameter);
 		}
 	}
 }

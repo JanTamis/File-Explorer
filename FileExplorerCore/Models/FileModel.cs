@@ -7,6 +7,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -222,10 +223,18 @@ namespace FileExplorerCore.Models
 			{
 				if (_editedOn == default)
 				{
-					var path = Path;
-					_editedOn = OperatingSystem.IsWindows()
-						? DirectoryAlternative.GetFileWriteDate(path)
-						: new FileInfo(path).LastWriteTime;
+					if (!IsFolder)
+					{
+						_editedOn = File.GetLastWriteTime(Path);
+					}
+					else
+					{
+						_editedOn = Directory.GetLastWriteTime(Path);
+					}
+					// var path = Path;
+					// _editedOn = OperatingSystem.IsWindows()
+					// 	? DirectoryAlternative.GetFileWriteDate(path)
+					// 	: new FileInfo(path).LastWriteTime;
 				}
 
 				return _editedOn;
@@ -249,9 +258,11 @@ namespace FileExplorerCore.Models
 
 						ThreadPool.QueueUserWorkItem(async x =>
 						{
-							while (FileImageQueue.TryTake(out var subject))
+							var attempts = 0;
+							
+							while (!FileImageQueue.IsEmpty && (FileImageQueue.TryTake(out var subject) || ++attempts <= 5))
 							{
-								if (subject.IsVisible)
+								if ( subject is { IsVisible:true })
 								{
 									var img = await ThumbnailProvider.GetFileImage(subject.treeItem);
 

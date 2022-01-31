@@ -16,9 +16,6 @@ using System.Linq;
 using System.Threading;
 using System.Timers;
 using System.Threading.Tasks;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Xml.Serialization;
-using System.Text.Json;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using ProtoBuf;
@@ -67,8 +64,7 @@ namespace FileExplorerCore.ViewModels
 			get => CurrentTab.Path;
 			set
 			{
-				if (value == Path)
-					return;
+				if (value == Path) return;
 
 				CurrentTab.Path = value;
 
@@ -88,22 +84,6 @@ namespace FileExplorerCore.ViewModels
 
 			Serializer.PrepareSerializer<Tree<FileSystemTreeItem, string>>();
 
-			if (OperatingSystem.IsWindows())
-			{
-				var drives = from drive in DriveInfo.GetDrives()
-										 where drive.IsReady
-										 select new FolderModel(drive.RootDirectory.FullName, $"{drive.VolumeLabel} ({drive.Name})");
-
-				var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
-													select new FolderModel(KnownFolders.GetPath(specialFolder).ToString());
-
-				Folders = quickAccess.Concat(drives);
-			}
-			else if (OperatingSystem.IsMacOS())
-			{
-				Folders = new[] { new FolderModel("/", "root") };
-			}
-
 			var path = System.IO.Path.Combine(Environment.CurrentDirectory, "Index.bin");
 
 			if (File.Exists(path))
@@ -119,29 +99,34 @@ namespace FileExplorerCore.ViewModels
 				}
 			}
 
-			if (Tree is null or { Children: { Count: 0 } })
+			if (OperatingSystem.IsWindows())
+			{
+				var drives = Tree.EnumerateChildren(0)
+					.Select(s => new FolderModel(s));
+
+				var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
+					select new FolderModel(GetTreeItemInitialized(KnownFolders.GetPath(specialFolder).ToString()));
+
+				Folders = quickAccess.Concat(drives);
+			}
+			else if (OperatingSystem.IsMacOS())
+			{
+				Folders = Tree.EnumerateChildren(0)
+					.Select(s => new FolderModel(s));
+			}
+
+			if (Tree is null or { Children.Count: 0 })
 			{
 				if (OperatingSystem.IsWindows())
 				{
 					Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
 						.GetDrives()
+						.Where(w => w.DriveType == DriveType.Fixed)
 						.Select(s => new FileSystemTreeItem(s.RootDirectory.FullName, true)));
 				}
 				else if (OperatingSystem.IsMacOS())
 				{
 					Tree = new Tree<FileSystemTreeItem, string>(new[] { new FileSystemTreeItem("/", true) });
-				}
-			}
-			else if (OperatingSystem.IsWindows())
-			{
-				var drives = DriveInfo.GetDrives();
-
-				foreach (var drive in drives)
-				{
-					if (!Tree.EnumerateChildren(0).Any(a => a.Value == drive.RootDirectory.FullName))
-					{
-						Tree.Children.Add(new FileSystemTreeItem(drive.RootDirectory.FullName, true));
-					}
 				}
 			}
 
@@ -178,7 +163,7 @@ namespace FileExplorerCore.ViewModels
 
 		private void SetParents<T>(TreeItem<T> item)
 		{
-			foreach (var child in item.EnumerateChildrenWitoutInitialize())
+			foreach (var child in item.EnumerateChildrenWithoutInitialize())
 			{
 				child.Parent = item;
 				SetParents(child);
@@ -211,11 +196,25 @@ namespace FileExplorerCore.ViewModels
 		private void Watcher_Deleted(object sender, FileSystemEventArgs e)
 		{
 			// Debug.WriteLine("Deleted: " + e.FullPath);
+
+			var item = GetTreeItem(e.FullPath);
+
+			if (!item.IsFolder && item.GetPath((path, filePath) => path.SequenceEqual(filePath), e.FullPath))
+			{
+				item.Remove();
+			}
 		}
 
 		private void Watcher_Created(object sender, FileSystemEventArgs e)
 		{
 			// Debug.WriteLine("Created: " + e.FullPath);
+
+			var item = GetTreeItem(e.FullPath);
+
+			if (item.IsFolder && item.GetPath((path, filePath) => System.IO.Path.GetDirectoryName(path).SequenceEqual(filePath), System.IO.Path.GetDirectoryName(e.FullPath)))
+			{
+				item.Children.Add(new FileSystemTreeItem(System.IO.Path.GetFileName(e.FullPath), false, item));
+			}
 		}
 
 		private async ValueTask Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -429,7 +428,7 @@ namespace FileExplorerCore.ViewModels
 					Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab && !String.IsNullOrWhiteSpace(x.Path))),
 				};
 
-				selector.TabSelectionChanged += (tab) => { selector.Close(); };
+				selector.TabSelectionChanged += _ => { selector.Close(); };
 
 				CurrentTab.PopupContent = selector;
 			}
@@ -440,12 +439,12 @@ namespace FileExplorerCore.ViewModels
 			var view = new AnalyzerView();
 			CurrentTab.DisplayControl = view;
 
-			var drive = new DriveInfo(Path.Substring(0, 1));
-			var parent = new FileIndexModel(Path, true, 0);
+			var drive = new DriveInfo(Path[..1]);
+			var parent = new FileIndexModel(GetTreeItemInitialized(Path));
 
 			if (drive.Name == Path)
 			{
-				parent = new FileIndexModel(Path, true, drive.TotalSize - drive.TotalFreeSpace);
+				parent = new FileIndexModel(GetTreeItemInitialized(Path));
 			}
 
 			var options = new EnumerationOptions()
@@ -454,12 +453,12 @@ namespace FileExplorerCore.ViewModels
 				AttributesToSkip = FileAttributes.Temporary,
 			};
 
-			var folderQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(x.FileName, x.IsDirectory, x.Length, parent), options)
+			var folderQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(GetTreeItemInitialized(x.ToFullPath())), options)
 			{
 				ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
 			};
 
-			var fileQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(x.FileName, x.IsDirectory, x.Length, parent), options)
+			var fileQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(GetTreeItemInitialized(x.ToFullPath())), options)
 			{
 				ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
 			};
@@ -481,21 +480,13 @@ namespace FileExplorerCore.ViewModels
 
 			ThreadPool.QueueUserWorkItem(async x =>
 			{
-				var options = new EnumerationOptions()
-				{
-					IgnoreInaccessible = true,
-					AttributesToSkip = FileAttributes.System,
-					RecurseSubdirectories = true
-				};
-
 				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = true);
 
-				var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(Path, (ref FileSystemEntry x) => (System.IO.Path.GetExtension(x.FileName).ToString(), x.Length), options)
-				{
-					ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
-				}
-					.Where(w => !String.IsNullOrEmpty(w.Extension))
-					.GroupBy(g => g.Extension);
+				var extensionQuery = GetTreeItemInitialized(Path)
+					.EnumerateChildren()
+					.Cast<FileSystemTreeItem>()
+					.Where(w => !w.IsFolder)
+					.GroupBy(g => System.IO.Path.GetExtension(g.Value));
 
 				var comparer = new ExtensionModelComparer();
 
@@ -506,9 +497,9 @@ namespace FileExplorerCore.ViewModels
 
 					if (!String.IsNullOrEmpty(extension.Key))
 					{
-						var model = new ExtensionModel(extension.Key, extension.Sum(s => s.Size))
+						var model = new ExtensionModel(extension.Key, extension.Sum(s => new FileInfo(s.GetPath(path => path.ToString())).Length))
 						{
-							TotalFiles = extension.Count()
+							TotalFiles = extension.Count(),
 						};
 
 						var index = view.Extensions.BinarySearch(model, comparer);
@@ -541,6 +532,130 @@ namespace FileExplorerCore.ViewModels
 
 			//	CurrentTab.PopupContent = properties;
 			//}
+		}
+
+		private FileSystemTreeItem GetTreeItem(string path)
+		{
+			string[] temp = null;
+			FileSystemTreeItem item = null;
+
+			if (OperatingSystem.IsMacOS())
+			{
+				item = Tree.Children[0];
+				temp = path.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+			}
+			else if (OperatingSystem.IsWindows())
+			{
+				temp = path.Split('\\', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+				foreach (var child in Tree.EnumerateChildren(0))
+				{
+					if (child.Value.StartsWith(path[0]))
+					{
+						item = child;
+						break;
+					}
+				}
+			}
+
+			foreach (var split in temp)
+			{
+				foreach (FileSystemTreeItem child in item.EnumerateChildrenWithoutInitialize())
+				{
+					if (child.Value == split)
+					{
+						item = child;
+						break;
+					}
+				}
+			}
+
+			if (temp.Length > 0)
+			{
+				item = GetItem(item, temp, 1);
+			}
+
+			return item;
+
+			static FileSystemTreeItem GetItem(FileSystemTreeItem item, IReadOnlyList<string> path, int index)
+			{
+				if (index == path.Count)
+				{
+					return item;
+				}
+
+				foreach (var child in item.EnumerateChildrenWithoutInitialize())
+				{
+					if (child is FileSystemTreeItem { IsFolder: true } treeItem && treeItem.Value == path[index])
+					{
+						return GetItem(treeItem, path, index + 1);
+					}
+				}
+
+				return item;
+			}
+		}
+
+		private FileSystemTreeItem GetTreeItemInitialized(string path)
+		{
+			string[] temp = null;
+			FileSystemTreeItem item = null;
+
+			if (OperatingSystem.IsMacOS())
+			{
+				item = Tree.Children[0];
+				temp = path.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+			}
+			else if (OperatingSystem.IsWindows())
+			{
+				temp = path.Split('\\', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+				foreach (var child in Tree.EnumerateChildren(0))
+				{
+					if (child.Value.StartsWith(path[0]))
+					{
+						item = child;
+						break;
+					}
+				}
+			}
+
+			foreach (var split in temp)
+			{
+				foreach (FileSystemTreeItem child in item.EnumerateChildren(0))
+				{
+					if (child.Value == split)
+					{
+						item = child;
+						break;
+					}
+				}
+			}
+
+			if (temp.Length > 0)
+			{
+				item = GetItem(item, temp, 1);
+			}
+
+			return item;
+
+			static FileSystemTreeItem GetItem(FileSystemTreeItem item, IReadOnlyList<string> path, int index)
+			{
+				if (index == path.Count)
+				{
+					return item;
+				}
+
+				foreach (var child in item.EnumerateChildrenWithoutInitialize())
+				{
+					if (child is FileSystemTreeItem { IsFolder: true } treeItem && treeItem.Value == path[index])
+					{
+						return GetItem(treeItem, path, index + 1);
+					}
+				}
+
+				return item;
+			}
 		}
 	}
 }

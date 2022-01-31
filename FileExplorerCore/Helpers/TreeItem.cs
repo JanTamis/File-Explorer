@@ -2,9 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 
 namespace FileExplorerCore.Helpers
 {
@@ -48,7 +46,7 @@ namespace FileExplorerCore.Helpers
 		public T Value { get; set; }
 
 		public bool HasParent => Parent is not null;
-		public bool HasChildren => Children.Count > 0;
+		public bool HasChildren => children is null ? Query.Any() : children.Count > 0;
 
 		public TreeItem<T> this[int index]
 		{
@@ -92,7 +90,7 @@ namespace FileExplorerCore.Helpers
 		{
 			Parent = null;
 
-			foreach (var child in EnumerateChildren(0))
+			foreach (var child in EnumerateChildrenWithoutInitialize())
 			{
 				child.Parent = null;
 				Children.Remove(child);
@@ -145,9 +143,13 @@ namespace FileExplorerCore.Helpers
 			var currentChildren = children ?? await Task.Run(() => Children);
 			var count = currentChildren.Count;
 
-			foreach (var child in currentChildren)
+			var currentChildrenCount = currentChildren.Count;
+			
+			for (var i = 0; i < currentChildrenCount; i++)
 			{
-				count += await child.GetChildrenCount();
+				count += await currentChildren[i].GetChildrenCount();
+
+				currentChildrenCount = currentChildren.Count;
 			}
 
 			return count;
@@ -172,8 +174,6 @@ namespace FileExplorerCore.Helpers
 					{
 						yield return childOfChild;
 					}
-
-					count = Children.Count;
 				}
 			}
 		}
@@ -204,7 +204,7 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
-		public IEnumerable<TreeItem<T>> EnumerateChildrenWitoutInitialize()
+		public IEnumerable<TreeItem<T>> EnumerateChildrenWithoutInitialize()
 		{
 			return children ?? Enumerable.Empty<TreeItem<T>>();
 		}
