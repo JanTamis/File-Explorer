@@ -4,9 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Text.Json.Serialization;
-using System.Xml.Serialization;
 
 namespace FileExplorerCore.Helpers
 {
@@ -17,7 +14,7 @@ namespace FileExplorerCore.Helpers
 		{
 			IgnoreInaccessible = true,
 			RecurseSubdirectories = false,
-			AttributesToSkip = FileAttributes.System,
+			AttributesToSkip = FileAttributes.System | FileAttributes.Hidden,
 		};
 
 		public override IEnumerable<TreeItem<string>> Query

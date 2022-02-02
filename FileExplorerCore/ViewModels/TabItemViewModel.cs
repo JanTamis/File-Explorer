@@ -41,12 +41,6 @@ namespace FileExplorerCore.ViewModels
 
 		private IPopup _popupContent;
 
-		private readonly EnumerationOptions options = new()
-		{
-			IgnoreInaccessible = true,
-			AttributesToSkip = FileAttributes.System | FileAttributes.Hidden,
-		};
-
 		private DateTime startSearchTime;
 
 		private TimeSpan predictedTime;
@@ -217,7 +211,7 @@ namespace FileExplorerCore.ViewModels
 			get => _path;
 			set
 			{
-				if (value != Path && value is not null && (Directory.Exists(value) || String.IsNullOrEmpty(value)))
+				if (value != Path && (Directory.Exists(value) || String.IsNullOrEmpty(value)))
 				{
 					if (value is "" && DisplayControl is not Quickstart)
 					{
@@ -431,8 +425,6 @@ namespace FileExplorerCore.ViewModels
 				TokenSource.Cancel();
 			}
 
-			options.RecurseSubdirectories = recursive;
-
 			TokenSource = new CancellationTokenSource();
 			previousLoadTime = TimeSpan.Zero;
 
@@ -471,9 +463,7 @@ namespace FileExplorerCore.ViewModels
 					{
 						ThreadPool.QueueUserWorkItem(async x =>
 						{
-							options.RecurseSubdirectories = recursive;
-
-							var count = await GetFileSystemEntriesCount(Path, search, options, TokenSource.Token);
+							var count = await GetFileSystemEntriesCount(Path, search, TokenSource.Token);
 
 							if (!TokenSource.IsCancellationRequested)
 							{
@@ -533,8 +523,6 @@ namespace FileExplorerCore.ViewModels
 
 		private IEnumerable<FileModel> GetFileSystemEntries(string path, string search, bool recursive)
 		{
-			options.RecurseSubdirectories = recursive;
-
 			var item = GetTreeItem(path);
 
 			return item.EnumerateChildren()
@@ -555,7 +543,7 @@ namespace FileExplorerCore.ViewModels
 			//};
 		}
 
-		private async Task<int> GetFileSystemEntriesCount(string path, string search, EnumerationOptions options, CancellationToken token)
+		private async Task<int> GetFileSystemEntriesCount(string path, string search, CancellationToken token)
 		{
 			//FileSystemEnumerable<bool> enumerable;
 
