@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace FileExplorerCore.Converters
 {
-	class NativeMethods
+	[SupportedOSPlatform("Windows")]
+	public unsafe class NativeMethods
 	{
 		private const int FILE_ATTRIBUTE_NORMAL = 0x80;
 		private const int SHGFI_TYPENAME = 0x400;
 
 		[DllImport("shell32.dll", CharSet = CharSet.Unicode)]
 		private static extern IntPtr SHGetFileInfo(
-				string pszPath,
+				char* pszPath,
 				int dwFileAttributes,
 				ref SHFILEINFO shinfo,
 				uint cbfileInfo,
@@ -40,14 +42,17 @@ namespace FileExplorerCore.Converters
 		};
 
 
-		public static string GetShellFileType(string fileName)
+		public static string GetShellFileType(ReadOnlySpan<char> fileName)
 		{
 			var shinfo = new SHFILEINFO(true);
 			const int flags = SHGFI_TYPENAME;
 
-			if (SHGetFileInfo(fileName, FILE_ATTRIBUTE_NORMAL, ref shinfo, (uint)Unsafe.SizeOf<SHFILEINFO>(), flags) == IntPtr.Zero)
+			fixed (char* name = &fileName[0])
 			{
-				return "File";
+				if (SHGetFileInfo(name, FILE_ATTRIBUTE_NORMAL, ref shinfo, (uint)Unsafe.SizeOf<SHFILEINFO>(), flags) == IntPtr.Zero)
+				{
+					return "File";
+				}
 			}
 
 			return shinfo.szTypeName;

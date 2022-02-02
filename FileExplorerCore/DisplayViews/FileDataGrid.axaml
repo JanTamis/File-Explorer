@@ -113,7 +113,7 @@
 	  														CanUserReorder="False">  
 	  			<DataGridTemplateColumn.CellTemplate>  
 	  				<DataTemplate>
-	  						<Image Source="{CompiledBinding Image}"
+	  						<Image Source="{CompiledBinding TreeItem, Converter={StaticResource imageConverter}}"
                        x:DataType="models:FileModel"
                        Width="32"
                        Height="32"

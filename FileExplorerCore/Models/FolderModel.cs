@@ -15,7 +15,7 @@ namespace FileExplorerCore.Models
 {
 	public class FolderModel : ReactiveObject
 	{
-		private FileSystemTreeItem _treeItem;
+		public FileSystemTreeItem TreeItem { get; }
 
 		private IImage _image;
 		static Task imageLoadTask;
@@ -23,47 +23,10 @@ namespace FileExplorerCore.Models
 		public readonly static ConcurrentBag<FolderModel> FileImageQueue = new();
 		readonly IEnumerable<FolderModel> query = Enumerable.Empty<FolderModel>();
 
-		private ObservableRangeCollection<FolderModel>? _folders;
+		public string Name => TreeItem.Value;
+		public string Path => TreeItem.GetPath(path => path.ToString());
 
-		private readonly EnumerationOptions options = new()
-		{
-			IgnoreInaccessible = true,
-			RecurseSubdirectories = false,
-		};
-
-		public IImage? Image
-		{
-			get
-			{
-//if (_image is null)
-//{
-//	FileImageQueue.Add(this);
-
-//	if (imageLoadTask is null or { IsCompleted: true })
-//	{
-//		//imageLoadTask = Task.Run(async () =>
-//		//{
-//		//	var attempts = 0;
-
-//		//	while (!FileImageQueue.IsEmpty && (FileImageQueue.TryTake(out var subject) || ++attempts <= 5))
-//		//	{
-//		//		var img = await ThumbnailProvider.GetFileImage(subject._treeItem);
-
-//		//		subject.Image = img;
-//		//	}
-//		//});
-//	}
-//}
-
-				return ThumbnailProvider.GetFileImage(_treeItem);
-			}
-			//set => this.RaiseAndSetIfChanged(ref _image, value);
-		}
-
-		public string Name => _treeItem.Value;
-		public string Path => _treeItem.GetPath(path => path.ToString());
-
-		public IEnumerable<FolderModel> SubFolders => _treeItem
+		public IEnumerable<FolderModel> SubFolders => TreeItem
 			.EnumerateChildren(0)
 			.Cast<FileSystemTreeItem>()
 			.Where(w => w.IsFolder)
@@ -73,7 +36,7 @@ namespace FileExplorerCore.Models
 
 		public FolderModel(FileSystemTreeItem item)
 		{
-			_treeItem = item;
+			TreeItem = item;
 		}
 
 		public override int GetHashCode()

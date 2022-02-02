@@ -13,6 +13,7 @@ using System.Linq;
 using FileExplorerCore.ViewModels;
 using FileExplorerCore.Models;
 using System.Threading.Tasks;
+using System.Runtime;
 
 namespace FileExplorerCore.Popup
 {
@@ -91,6 +92,9 @@ namespace FileExplorerCore.Popup
 				await MainWindowViewModel.Folders.AddRange(MainWindowViewModel.Tree.Children
 					.Select(s => new FolderModel(s)));
 			}
+
+			GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+			GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
 		}
 
 		public void Close()

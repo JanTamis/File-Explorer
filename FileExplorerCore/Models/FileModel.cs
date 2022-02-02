@@ -3,14 +3,13 @@ using Avalonia.Svg.Skia;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.ViewModels;
 using Humanizer;
+using Microsoft.Toolkit.HighPerformance.Helpers;
 using ReactiveUI;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace FileExplorerCore.Models
@@ -19,7 +18,7 @@ namespace FileExplorerCore.Models
 	{
 		public static readonly ConcurrentBag<FileModel> FileImageQueue = new();
 
-		FileSystemTreeItem treeItem;
+		public FileSystemTreeItem TreeItem { get; }
 
 		private bool _isSelected;
 		public bool NeedsNewImage = true;
@@ -88,7 +87,7 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				return treeItem.GetPath(path => path.ToString());
+				return TreeItem.GetPath(path => path.ToString());
 			}
 		}
 
@@ -96,13 +95,13 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				return treeItem.IsFolder
-					? treeItem.Value
-					: System.IO.Path.GetFileNameWithoutExtension(treeItem.Value);
+				return TreeItem.IsFolder
+					? TreeItem.Value
+					: System.IO.Path.GetFileNameWithoutExtension(TreeItem.Value);
 			}
 			set
 			{
-				treeItem.Value = value;
+				TreeItem.Value = value;
 				try
 				{
 					var path = Path;
@@ -140,7 +139,7 @@ namespace FileExplorerCore.Models
 				{
 					if (!IsFolder)
 					{
-						_extension = treeItem.GetPath(path => System.IO.Path.GetExtension(path).ToString());
+						_extension = TreeItem.GetPath(path => System.IO.Path.GetExtension(path).ToString());
 					}
 
 					_extension = String.Empty;
@@ -156,30 +155,29 @@ namespace FileExplorerCore.Models
 			{
 				if (_size == -1 && !IsFolder)
 				{
-					//if (OperatingSystem.IsWindows())
-					//{
-					//	_size = treeItem.GetPath(path => DirectoryAlternative.GetFileSize(path));
-					//}
-					//else
-					//{
-					var path = Path;
-					_size = File.Exists(path) ? new FileInfo(path).Length : -1;
-					//}
+					using (var handle = File.OpenHandle(Path))
+					{
+						if (!handle.IsInvalid)
+						{
+							_size = RandomAccess.GetLength(handle);
+						}
+					}
 				}
 
 				return _size;
 			}
 		}
 
-		public bool IsFolder => treeItem.IsFolder;
+		public bool IsFolder => TreeItem.IsFolder;
 
 		public Task<string> SizeFromTask
 		{
 			get
 			{
+				ParallelHelper.For();
 				return Task.Run(() =>
 				{
-					var size = treeItem.GetPath(path =>
+					var size = TreeItem.GetPath(path =>
 					{
 						var result = 0L;
 
@@ -187,7 +185,7 @@ namespace FileExplorerCore.Models
 						{
 							result = Size;
 						}
-						else if (path[^1] == '\\' && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
+						else if (path[^1] is '\\' && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
 						{
 							result = info.TotalSize - info.TotalFreeSpace;
 						}
@@ -234,49 +232,9 @@ namespace FileExplorerCore.Models
 			}
 		}
 
-
-		public IImage? Image
-		{
-			get
-			{
-				//if (!HasImage)
-				//{
-				//	ImageTransform = null;
-
-				//	FileImageQueue.Add(this);
-
-				//	if (_isNotLoading)
-				//	{
-				//		_isNotLoading = false;
-
-				//		ThreadPool.QueueUserWorkItem(async x =>
-				//		{
-				//			var attempts = 0;
-
-				//			while (!FileImageQueue.IsEmpty && (FileImageQueue.TryTake(out var subject) || ++attempts <= 5))
-				//			{
-				//				//if (subject is { IsVisible:true })
-				//				//{
-				//					var img = await ThumbnailProvider.GetFileImage(subject.treeItem);
-
-				//					subject.NeedsNewImage = false;
-				//					await subject.OnPropertyChanged(ref subject._image, img, nameof(Image));
-				//				//}
-				//			}
-
-				//			_isNotLoading = true;
-				//		});
-				//	}
-				//}
-
-				return _image ??= ThumbnailProvider.GetFileImage(treeItem);
-			}
-			//set => OnPropertyChanged(ref _image, value);
-		}
-
 		public FileModel(FileSystemTreeItem item)
 		{
-			treeItem = item;
+			TreeItem = item;
 		}
 
 		public void Dispose()

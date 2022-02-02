@@ -418,8 +418,6 @@ namespace FileExplorerCore.ViewModels
 
 		public async ValueTask UpdateFiles(bool recursive, string search)
 		{
-			FileModel.FileImageQueue.Clear();
-
 			if (TokenSource is { })
 			{
 				TokenSource.Cancel();
@@ -427,14 +425,6 @@ namespace FileExplorerCore.ViewModels
 
 			TokenSource = new CancellationTokenSource();
 			previousLoadTime = TimeSpan.Zero;
-
-			foreach (var file in Files)
-			{
-				if (file.HasImage)
-				{
-					file.Dispose();
-				}
-			}
 
 			Files.Clear();
 			Files.Trim();

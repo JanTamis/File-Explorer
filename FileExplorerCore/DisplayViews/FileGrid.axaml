@@ -59,7 +59,7 @@
             <StackPanel Margin="0 0 0 5"
 												HorizontalAlignment="Center"
 												VerticalAlignment="Center">
-              <Image Source="{CompiledBinding Image}"
+              <Image Source="{CompiledBinding TreeItem, Converter={StaticResource imageConverter}}"
                      x:DataType="models:FileModel"
                      Margin="4"
                      Width="100"

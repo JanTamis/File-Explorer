@@ -100,7 +100,7 @@ namespace FileExplorerCore.ViewModels
 				}
 			}
 
-			if (OperatingSystem.IsWindows() && (Tree is null || Tree.Children.Count != DriveInfo.GetDrives().Length))
+			if (OperatingSystem.IsWindows() && (Tree is null || Tree.Children.Count != DriveInfo.GetDrives().Count(a => a.IsReady)))
 			{
 				Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
 					.GetDrives()
