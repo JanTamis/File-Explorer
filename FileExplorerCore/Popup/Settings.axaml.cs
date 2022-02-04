@@ -14,6 +14,7 @@ using FileExplorerCore.ViewModels;
 using FileExplorerCore.Models;
 using System.Threading.Tasks;
 using System.Runtime;
+using Avalonia;
 
 namespace FileExplorerCore.Popup
 {
@@ -44,7 +45,7 @@ namespace FileExplorerCore.Popup
 						Mode = IsDarkMode ? FluentThemeMode.Dark : FluentThemeMode.Light,
 					};
 
-					Dispatcher.UIThread.Post(() => App.Current.Styles[0] = fluentTheme);
+					Dispatcher.UIThread.Post(() => Application.Current.Styles[0] = fluentTheme);
 				});
 			}
 		}

@@ -63,7 +63,7 @@ namespace FileExplorerCore.Controls
 
 		private void AddRowToLayout(List<WeightUIElement> row)
 		{
-			base.ComputeTreeMaps(row);
+			ComputeTreeMaps(row);
 		}
 
 		private double Worst(List<WeightUIElement> row, double sideLength)

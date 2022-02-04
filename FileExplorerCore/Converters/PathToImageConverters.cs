@@ -9,16 +9,12 @@ namespace FileExplorerCore.Converters
 	{
 		public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{
-			if (value is FileSystemTreeItem treeItem)
+			return value switch
 			{
-				return ThumbnailProvider.GetFileImage(treeItem);
-			}
-			if (value is string str)
-			{
-				return ThumbnailProvider.GetFileImage(str);
-			}
-			
-			return null;
+				FileSystemTreeItem treeItem => ThumbnailProvider.GetFileImage(treeItem),
+				string str => ThumbnailProvider.GetFileImage(str),
+				_ => null,
+			};
 		}
 
 		public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

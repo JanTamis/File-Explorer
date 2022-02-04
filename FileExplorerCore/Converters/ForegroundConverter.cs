@@ -11,10 +11,10 @@ namespace FileExplorerCore.Converters
 		{
 			if (value is SolidColorBrush brush)
 			{
-				Color color = brush.Color;
-				double Y = 0.2126 * color.R + 0.7152 * color.G + 0.0722 * color.B;
+				var color = brush.Color;
+				var y = 0.2126 * color.R + 0.7152 * color.G + 0.0722 * color.B;
 
-				return Y > (Byte.MaxValue / 2) ? Brushes.Black : Brushes.White;
+				return y > 127 ? Brushes.Black : Brushes.White;
 			}
 
 			return Brushes.Black;

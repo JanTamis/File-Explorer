@@ -8,8 +8,7 @@ namespace FileExplorerCore.Helpers
 	[ProtoContract]
 	public class Tree<TTreeItem, TValue> where TTreeItem : TreeItem<TValue>
 	{
-		[ProtoMember(1)]
-		public List<TTreeItem> Children { get; }
+		[ProtoMember(1)] public List<TTreeItem> Children { get; }
 
 		public bool HasChildren => Children.Count > 0;
 
@@ -74,7 +73,7 @@ namespace FileExplorerCore.Helpers
 		public IEnumerable<TTreeItem> EnumerateChildren(uint layers = UInt32.MaxValue)
 		{
 			var count = Children.Count;
-			
+
 			for (var i = 0; i < count; i++)
 			{
 				yield return Children[i];
@@ -87,6 +86,31 @@ namespace FileExplorerCore.Helpers
 						{
 							yield return item;
 						}
+					}
+				}
+
+				count = Children.Count;
+			}
+		}
+
+		/// <summary>
+		/// Enumerates all the items in the tree
+		/// </summary>
+		/// <remarks>if you want to know how much items are in the tree use the <see cref="GetChildrenCount"/> method</remarks>
+		/// <returns></returns>
+		public IEnumerable<TTreeItem> EnumerateChildrenUnInitialized()
+		{
+			var count = Children.Count;
+
+			for (var i = 0; i < count; i++)
+			{
+				yield return Children[i];
+
+				foreach (var childOfChild in Children[i].EnumerateChildrenWithoutInitialize())
+				{
+					if (childOfChild is TTreeItem item)
+					{
+						yield return item;
 					}
 				}
 

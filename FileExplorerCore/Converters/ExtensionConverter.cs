@@ -14,9 +14,8 @@ namespace FileExplorerCore.Converters
 			return value switch
 			{
 				FileModel model when OperatingSystem.IsWindows() => model.ExtensionName ??= model.TreeItem.GetPath(path => NativeMethods.GetShellFileType(path)),
-				FileModel model => !model.IsFolder ? String.Intern(model.TreeItem.GetPath(path => Path.GetExtension(path).ToString())) : "System Folder",
-				string path when OperatingSystem.IsWindows() => NativeMethods.GetShellFileType(path),
-				_ => String.Empty
+				FileModel model => !model.IsFolder ? Path.GetExtension(model.TreeItem.Value) : "System Folder",
+				_ => String.Empty,
 			};
 		}
 

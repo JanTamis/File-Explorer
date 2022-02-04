@@ -35,7 +35,7 @@ namespace FileExplorerCore
 					Mode = FluentThemeMode.Dark,
 				};
 
-				App.Current.Styles[0] = fluentTheme;
+				Current.Styles[0] = fluentTheme;
 				//	}
 				//}
 

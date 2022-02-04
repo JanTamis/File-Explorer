@@ -210,7 +210,7 @@ namespace FileExplorerCore.Controls
 
 			foreach (Control child in Children)
 			{
-				var element = new WeightUIElement(child, TreeMapsPanel.GetWeight(child));
+				var element = new WeightUIElement(child, GetWeight(child));
 
 				if (IsValidItem(element))
 				{

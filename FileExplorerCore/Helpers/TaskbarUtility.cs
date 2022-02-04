@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using Avalonia;
 
 namespace FileExplorerCore.Helpers
 {
@@ -30,7 +31,7 @@ namespace FileExplorerCore.Helpers
 		{
 			Dispatcher.UIThread.InvokeAsync(new Action(() =>
 			{
-				if (App.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+				if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 				{
 					_taskbarList.SetProgressState(desktop.MainWindow.PlatformImpl.Handle.Handle, state);
 				}
@@ -42,7 +43,7 @@ namespace FileExplorerCore.Helpers
 			// using System.Windows.Interop
 			Dispatcher.UIThread.InvokeAsync(new Action(() =>
 			{
-				if (App.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+				if (Application.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 				{
 					if (currentValue >= (int)UInt64.MinValue)
 					{

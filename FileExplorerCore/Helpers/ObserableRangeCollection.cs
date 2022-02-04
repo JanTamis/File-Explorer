@@ -229,7 +229,7 @@ namespace FileExplorerCore.Helpers
 		/// <summary> 
 		/// Clears the current collection and replaces it with the specified collection. 
 		/// </summary> 
-		public async Task AddRange(IEnumerable<T> collection, IAsyncComparer<T>? comparer, Action<T>? action = null, CancellationToken token = default)
+		public async Task AddRange<TComparer>(IEnumerable<T> collection, TComparer? comparer, Action<T>? action = null, CancellationToken token = default) where TComparer : IAsyncComparer<T>
 		{
 			ArgumentNullException.ThrowIfNull(collection);
 

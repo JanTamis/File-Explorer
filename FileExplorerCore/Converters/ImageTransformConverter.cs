@@ -9,12 +9,9 @@ namespace FileExplorerCore.Converters
 	{
 		public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{
-			if (value is true)
-			{
-				return new ScaleTransform(1, -1);
-			}
-
-			return null;
+			return value is bool and true 
+				? new ScaleTransform(1, -1) 
+				: null;
 		}
 
 		public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

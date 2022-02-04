@@ -13,7 +13,7 @@ namespace FileExplorerCore.DisplayViews
 	public partial class FileGrid : UserControl
 	{
 		private int anchorIndex = 0;
-		public event Action<string> PathChanged = delegate { };
+		public event Action<FileSystemTreeItem> PathChanged = delegate { };
 
 		public ObservableRangeCollection<FileModel> Files
 		{
@@ -99,7 +99,7 @@ namespace FileExplorerCore.DisplayViews
 		{
 			if (sender is ListBoxItem { DataContext: FileModel model })
 			{
-				PathChanged(model.Path);
+				PathChanged(model.TreeItem);
 			}
 		}
 

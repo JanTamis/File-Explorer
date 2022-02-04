@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Enumeration;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
-using System.Diagnostics;
-using System.IO;
-using System.IO.Enumeration;
-using System.Linq;
-using System.Runtime;
-using System.Threading;
-using System.Threading.Tasks;
 using Humanizer;
 
 namespace FileExplorerCore.ViewModels
@@ -30,12 +29,12 @@ namespace FileExplorerCore.ViewModels
 		private bool _isLoading;
 		private bool _isGrid;
 
-		private readonly Stack<string> undoStack = new();
-		private readonly Stack<string> redoStack = new();
+		private readonly Stack<FileSystemTreeItem> undoStack = new();
+		private readonly Stack<FileSystemTreeItem> redoStack = new();
 		readonly ObservableRangeCollection<FolderModel> _folders = new();
 
 		public CancellationTokenSource TokenSource;
-		private Control _displayControl;
+		private Control _displayControl = new Quickstart();
 
 		FileSystemWatcher watcher;
 
@@ -47,6 +46,9 @@ namespace FileExplorerCore.ViewModels
 		private TimeSpan previousLoadTime;
 
 		private SortEnum _sort = SortEnum.None;
+		private FileSystemTreeItem? _treeItem;
+
+		public event Action PathChanged;
 
 		public SortEnum Sort
 		{
@@ -59,17 +61,14 @@ namespace FileExplorerCore.ViewModels
 				{
 					Files.Sort(new FileModelComparer(Sort));
 				}
-				else if (!String.IsNullOrWhiteSpace(Path))
+				else if (TreeItem is not null)
 				{
 					UpdateFiles(false, "*");
 				}
 			}
 		}
 
-		public IEnumerable<FolderModel> Folders
-		{
-			get { return _folders; }
-		}
+		public IEnumerable<FolderModel> Folders => _folders;
 
 		public int Count
 		{
@@ -148,9 +147,6 @@ namespace FileExplorerCore.ViewModels
 					//OnPropertyChanged(nameof(LoadTime));
 
 					//TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.NoProgress);
-
-					GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-					GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized, true);
 				}
 				else
 				{
@@ -204,77 +200,59 @@ namespace FileExplorerCore.ViewModels
 
 		public bool SearchFailed => !IsLoading && Files.Count == 0 && DisplayControl is not Quickstart;
 
-		public ObservableRangeCollection<FileModel> Files { get; set; } = new();
+		public ObservableRangeCollection<FileModel> Files { get; } = new();
 
-		public string Path
+		public FileSystemTreeItem? TreeItem
 		{
-			get => _path;
+			get => _treeItem;
 			set
 			{
-				if (value != Path && (Directory.Exists(value) || String.IsNullOrEmpty(value)))
+				OnPropertyChanged(ref _treeItem, value);
+
+				PathChanged?.Invoke();
+
+				OnPropertyChanged(nameof(FolderName));
+
+				if (value is null && DisplayControl is not Quickstart)
 				{
-					if (value is "" && DisplayControl is not Quickstart)
-					{
-						DisplayControl = new Quickstart();
-					}
-					else
-					{
-						IsGrid = IsGrid;
-					}
-
-					if (isUserEntered)
-					{
-						undoStack.Push(Path);
-						redoStack.Clear();
-					}
-
-					OnPropertyChanged(ref _path, value);
-					OnPropertyChanged(nameof(FolderName));
-
-					ThreadPool.QueueUserWorkItem(async x =>
-					{
-						await _folders.ClearTrim();
-						await _folders.AddRange(GetFolders(), token: TokenSource.Token);
-
-						IEnumerable<FolderModel> GetFolders()
-						{
-							var separator = OperatingSystem.IsWindows()
-								? '\\'
-								: '/';
-
-							var path = Path;
-							var names = path.Split(separator, StringSplitOptions.RemoveEmptyEntries);
-
-							if (OperatingSystem.IsMacOS())
-							{
-								yield return new FolderModel(MainWindowViewModel.Tree[0]);
-							}
-
-							for (var i = 0; i < names.Length; i++)
-							{
-								var folderPath = String.Join(separator, new ArraySegment<string>(names, 0, i + 1));
-								var name = names[i];
-
-								if (!String.IsNullOrEmpty(folderPath))
-								{
-									if (i == 0 && OperatingSystem.IsWindows())
-									{
-										folderPath += separator;
-										name = $"{new DriveInfo(name).VolumeLabel} ({name}{separator})";
-									}
-
-									yield return new FolderModel(GetTreeItem(folderPath));
-								}
-							}
-						}
-					});
-
-					IsSearching = false;
+					DisplayControl = new Quickstart();
 				}
+				else
+				{
+					IsGrid = IsGrid;
+				}
+
+				if (isUserEntered)
+				{
+					undoStack.Push(TreeItem);
+					redoStack.Clear();
+				}
+
+				OnPropertyChanged(nameof(FolderName));
+
+				ThreadPool.QueueUserWorkItem(async x =>
+				{
+					await _folders.ClearTrim();
+
+					if (TreeItem is not null)
+					{
+						await _folders.AddRange(GetFolders(), token: TokenSource.Token);
+					}
+
+					IEnumerable<FolderModel> GetFolders()
+					{
+						return TreeItem.EnumerateToRoot()
+							.Cast<FileSystemTreeItem>()
+							.Select(s => new FolderModel(s))
+							.Reverse();
+					}
+				});
+
+				IsSearching = false;
 			}
 		}
 
-		public string FolderName => System.IO.Path.GetFileName(Path);
+		public string FolderName => TreeItem.Value;
 
 		public string Search
 		{
@@ -297,42 +275,32 @@ namespace FileExplorerCore.ViewModels
 			{
 				OnPropertyChanged(ref _isGrid, value);
 
-				if (IsGrid is false)
+				if (IsGrid == false)
 				{
-					// foreach (var item in Files)
-					// {
-					// 	item.NeedsNewImage = true;
-					// }
-
 					var list = new FileDataGrid
 					{
-						Files = Files
+						Files = Files,
 					};
 
-					list.PathChanged += async (path) => await SetPath(path);
+					list.PathChanged += path => SetPath(path);
 
 					DisplayControl = list;
 				}
 				else
 				{
-					// foreach (var item in Files)
-					// {
-					// 	item.NeedsNewImage = true;
-					// }
-
 					var grid = new FileGrid
 					{
-						Files = Files
+						Files = Files,
 					};
 
-					grid.PathChanged += async (path) => await SetPath(path);
+					grid.PathChanged += path => SetPath(path);
 
 					DisplayControl = grid;
 				}
 			}
 		}
 
-		public IPopup PopupContent
+		public IPopup? PopupContent
 		{
 			get => _popupContent;
 			set
@@ -352,9 +320,9 @@ namespace FileExplorerCore.ViewModels
 
 		public TabItemViewModel()
 		{
-			Files.CountChanged += (count) => { Count = count; };
+			Files.CountChanged += count => { Count = count; };
 
-			Files.OnPropertyChanged += (property) =>
+			Files.OnPropertyChanged += property =>
 			{
 				if (property is "IsSelected")
 				{
@@ -364,9 +332,7 @@ namespace FileExplorerCore.ViewModels
 				}
 			};
 
-			Path = String.Empty;
-
-			FileModel.SelectionChanged += (fileModel) =>
+			FileModel.SelectionChanged += fileModel =>
 			{
 				if (fileModel.IsSelected)
 				{
@@ -383,25 +349,25 @@ namespace FileExplorerCore.ViewModels
 			UpdateFiles(false, "*");
 		}
 
-		public string? Undo()
+		public FileSystemTreeItem? Undo()
 		{
 			if (undoStack.TryPop(out var path))
 			{
 				isUserEntered = false;
 
-				redoStack.Push(Path);
+				redoStack.Push(TreeItem);
 			}
 
 			return path;
 		}
 
-		public string? Redo()
+		public FileSystemTreeItem? Redo()
 		{
 			if (redoStack.TryPop(out var path))
 			{
 				isUserEntered = false;
 
-				undoStack.Push(Path);
+				undoStack.Push(TreeItem);
 			}
 
 			return path;
@@ -418,7 +384,12 @@ namespace FileExplorerCore.ViewModels
 
 		public async ValueTask UpdateFiles(bool recursive, string search)
 		{
-			if (TokenSource is { })
+			if (TreeItem is null)
+			{
+				return;
+			}
+			
+			if (TokenSource is not null)
 			{
 				TokenSource.Cancel();
 			}
@@ -441,19 +412,19 @@ namespace FileExplorerCore.ViewModels
 
 			//timer.Start();
 
-			if (Directory.Exists(Path))
+			if (TreeItem.IsFolder)
 			{
 				await Task.Run(async () =>
 				{
 					var query = Sort is SortEnum.None && !recursive
-						? GetDirectories(Path).Concat(GetFiles(Path))
-						: GetFileSystemEntries(Path, search, recursive);
+						? GetDirectories(TreeItem).Concat(GetFiles(TreeItem))
+						: GetFileSystemEntries(TreeItem, search, recursive);
 
 					if (Sort is not SortEnum.None)
 					{
-						ThreadPool.QueueUserWorkItem(async x =>
+						ThreadPool.QueueUserWorkItem(async _ =>
 						{
-							var count = await GetFileSystemEntriesCount(Path, search, TokenSource.Token);
+							var count = await GetFileSystemEntriesCount(TreeItem, search, TokenSource.Token);
 
 							if (!TokenSource.IsCancellationRequested)
 							{
@@ -480,9 +451,15 @@ namespace FileExplorerCore.ViewModels
 			IsLoading = false;
 		}
 
-		public async ValueTask SetPath(string path)
+		public async ValueTask SetPath(FileSystemTreeItem? path)
 		{
-			if (File.Exists(path))
+			if (path is null)
+			{
+				TreeItem = path;
+				DisplayControl = new Quickstart();
+			}
+			
+			if (!path.IsFolder)
 			{
 				await Task.Run(() =>
 				{
@@ -490,7 +467,7 @@ namespace FileExplorerCore.ViewModels
 					{
 						var info = new ProcessStartInfo
 						{
-							FileName = path,
+							FileName = path.GetPath(x => x.ToString()),
 							UseShellExecute = true,
 						};
 
@@ -501,99 +478,43 @@ namespace FileExplorerCore.ViewModels
 					}
 				});
 			}
-			else if (Directory.Exists(path))
+			else
 			{
-				if (Path != path)
+				if (TreeItem != path)
 				{
-					Path = path;
+					TreeItem = path;
 					await UpdateFiles(IsSearching, "*");
 				}
 			}
 		}
 
-		private IEnumerable<FileModel> GetFileSystemEntries(string path, string search, bool recursive)
+		private IEnumerable<FileModel> GetFileSystemEntries(FileSystemTreeItem path, string search, bool recursive)
 		{
-			var item = GetTreeItem(path);
-
-			return item.EnumerateChildren()
+			return path
+				.EnumerateChildren()
 				.Cast<FileSystemTreeItem>()
 				.Where(w => w is not null && FileSystemName.MatchesSimpleExpression(search, w.Value))
 				.Select(s => new FileModel(s));
-
-			//if (search is "*" or "*.*" or "" && Sort is SortEnum.None && !recursive)
-			//{
-			//	return new FileSystemEnumerable<FileModel>(path, GetFileModel, options);
-			//}
-
-			//var query = FileSearcher.PrepareQuery(search);
-
-			//return new FileSystemEnumerable<FileModel>(path, GetFileModel, options)
-			//{
-			//	ShouldIncludePredicate = (ref FileSystemEntry x) => FileSystemName.MatchesSimpleExpression(search, x.FileName) || FileSearcher.IsValid(x, query)
-			//};
 		}
 
-		private async Task<int> GetFileSystemEntriesCount(string path, string search, CancellationToken token)
+		private async Task<int> GetFileSystemEntriesCount(FileSystemTreeItem path, string search, CancellationToken token)
 		{
-			//FileSystemEnumerable<bool> enumerable;
-
-			//if (search is "*" or "*.*" or "" && Sort is SortEnum.None && !options.RecurseSubdirectories)
-			//{
-			//	enumerable = new(path, null, options);
-			//}
-			//else
-			//{
-			//	var query = FileSearcher.PrepareQuery(search);
-			//	var regex = new Wildcard(search, RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-			//	enumerable = new(path, delegate { return false; }, options)
-			//	{
-			//		ShouldIncludePredicate = (ref FileSystemEntry x) => FileSystemName.MatchesSimpleExpression(search, x.FileName) || FileSearcher.IsValid(x, query)
-			//	};
-			//}
-
-			//var count = 0;
-
-			//foreach (var item in enumerable)
-			//{
-			//	if (token.IsCancellationRequested)
-			//		break;
-
-			//	count++;
-			//}
-
-			//return count;
-			
-			var item = GetTreeItem(path);
-
-			return await item.GetChildrenCount();
+			return await path.GetChildrenCount();
 		}
 
-		public IEnumerable<FileModel> GetDirectories(string path)
+		public IEnumerable<FileModel> GetDirectories(FileSystemTreeItem path)
 		{
-			//return new FileSystemEnumerable<FileModel>(path, GetFileModel, options)
-			//{
-			//	ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
-			//};
-
-			FileSystemTreeItem item  = GetTreeItem(path);
-
-			return item.EnumerateChildren(0)
+			return path
+				.EnumerateChildren(0)
 				.Cast<FileSystemTreeItem>()
 				.Where(w => w.IsFolder)
 				.Select(s => new FileModel(s));
 		}
 
-		public IEnumerable<FileModel> GetFiles(string path)
+		public IEnumerable<FileModel> GetFiles(FileSystemTreeItem path)
 		{
-			//return new FileSystemEnumerable<FileModel>(path, GetFileModel, options)
-			//{
-			//	ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
-			//};
-
-			var item = GetTreeItem(path);
-
-			return item.EnumerateChildren(0)
+			return path
+				.EnumerateChildren(0)
 				.Cast<FileSystemTreeItem>()
 				.Where(w => !w.IsFolder)
 				.Select(s => new FileModel(s));

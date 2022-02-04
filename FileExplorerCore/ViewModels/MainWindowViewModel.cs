@@ -41,11 +41,15 @@ namespace FileExplorerCore.ViewModels
 
 		private FileSystemWatcher watcher;
 
-		public IEnumerable<string> SearchHistory
-		{
-			get => searchHistory;
-			set => OnPropertyChanged(ref searchHistory, value);
-		}
+		public IEnumerable<string> SearchHistory => CurrentTab.TreeItem is not null
+			? CurrentTab.TreeItem.EnumerateChildrenWithoutInitialize()
+				.Cast<FileSystemTreeItem>()
+				.Where(w => !w.IsFolder)
+				.GroupBy(g => Path.GetExtension(g.Value))
+				.Where(w => !String.IsNullOrWhiteSpace(w.Key))
+				.OrderBy(o => o.Key)
+				.Select(s => "*" + s.Key)
+			: Enumerable.Empty<string>();
 
 		public TabItemViewModel CurrentTab
 		{
@@ -59,25 +63,21 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		public string Path
-		{
-			get => CurrentTab.Path;
-			set
-			{
-				if (value == Path)
-					return;
-
-				CurrentTab.Path = value;
-
-				OnPropertyChanged();
-
-				CurrentTab.UpdateFiles(false, "*").AsTask().ContinueWith(x =>
-				{
-					var categories = Enum.GetValues<Categories>().Select(s => s + ":");
-					SearchHistory = categories.Concat(CurrentTab.Files.Select(s => "*" + s.Extension).Distinct());
-				});
-			}
-		}
+		// public string Path
+		// {
+		// 	get => CurrentTab.TreeItem?.GetPath(x => x.ToString());
+		// 	set
+		// 	{
+		// 		if (value == Path)
+		// 			return;
+		//
+		// 		CurrentTab.TreeItem = GetTreeItemInitialized(value);
+		//
+		// 		OnPropertyChanged();
+		//
+		// 		CurrentTab.UpdateFiles(false, "*");
+		// 	}
+		// }
 
 		public MainWindowViewModel(WindowNotificationManager manager)
 		{
@@ -85,7 +85,7 @@ namespace FileExplorerCore.ViewModels
 
 			Serializer.PrepareSerializer<Tree<FileSystemTreeItem, string>>();
 
-			var path = System.IO.Path.Combine(Environment.CurrentDirectory, "Index.bin");
+			var path = Path.Combine(Environment.CurrentDirectory, "Index.bin");
 
 			if (File.Exists(path))
 			{
@@ -118,7 +118,7 @@ namespace FileExplorerCore.ViewModels
 					.Select(s => new FolderModel(s));
 
 				var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
-													select new FolderModel(GetTreeItemInitialized(KnownFolders.GetPath(specialFolder).ToString()));
+					select new FolderModel(GetTreeItemInitialized(KnownFolders.GetPath(specialFolder).ToString()));
 
 				Folders = new ObservableRangeCollection<FolderModel>(quickAccess.Concat(drives));
 			}
@@ -142,7 +142,7 @@ namespace FileExplorerCore.ViewModels
 			{
 				applicationLifetime.Exit += delegate
 				{
-					var path = System.IO.Path.Combine(Environment.CurrentDirectory, "Index.bin");
+					var path = Path.Combine(Environment.CurrentDirectory, "Index.bin");
 
 					if (File.Exists(path))
 					{
@@ -155,8 +155,6 @@ namespace FileExplorerCore.ViewModels
 					}
 				};
 			}
-
-			//Testing();
 		}
 
 		private void SetParents<T>(TreeItem<T> item)
@@ -226,21 +224,18 @@ namespace FileExplorerCore.ViewModels
 
 			Tabs.Add(tab);
 			CurrentTab = tab;
+
+			tab.PathChanged += () => OnPropertyChanged(nameof(SearchHistory));
 		}
 
-		public void GoUp()
+		public async Task GoUp()
 		{
-			if (Path is { Length: > 0 })
-			{
-				var directory = new DirectoryInfo(Path);
-
-				Path = directory.Parent?.FullName ?? String.Empty;
-			}
+			await CurrentTab.SetPath(CurrentTab?.TreeItem?.Parent as FileSystemTreeItem);
 		}
 
 		public async ValueTask StartSearch()
 		{
-			if (CurrentTab.Search is { Length: > 0 } && Path is { Length: > 0 })
+			if (CurrentTab.Search is { Length: > 0 } && CurrentTab.TreeItem is not null)
 			{
 				CurrentTab.IsSearching = true;
 
@@ -250,13 +245,13 @@ namespace FileExplorerCore.ViewModels
 
 		public async ValueTask Undo()
 		{
-			CurrentTab.Path = CurrentTab.Undo();
+			CurrentTab.TreeItem = CurrentTab.Undo();
 			await CurrentTab.UpdateFiles(false, "*");
 		}
 
 		public async ValueTask Redo()
 		{
-			CurrentTab.Path = CurrentTab.Redo();
+			CurrentTab.TreeItem = CurrentTab.Redo();
 			await CurrentTab.UpdateFiles(false, "*");
 		}
 
@@ -265,7 +260,7 @@ namespace FileExplorerCore.ViewModels
 			CurrentTab.CancelUpdateFiles();
 		}
 
-		public async ValueTask SetPath(string path)
+		public async ValueTask SetPath(FileSystemTreeItem path)
 		{
 			if (CurrentTab is not null)
 			{
@@ -275,7 +270,7 @@ namespace FileExplorerCore.ViewModels
 
 		public async ValueTask Refresh()
 		{
-			if (!String.IsNullOrWhiteSpace(Path))
+			if (CurrentTab.TreeItem is not null)
 			{
 				await CurrentTab.UpdateFiles(CurrentTab.IsSearching, CurrentTab.IsSearching ? CurrentTab.Search : "*");
 			}
@@ -359,14 +354,14 @@ namespace FileExplorerCore.ViewModels
 				.Select(s => s.Path)
 				.ToArray());
 
-			await App.Current.Clipboard.SetDataObjectAsync(data);
+			await Application.Current.Clipboard.SetDataObjectAsync(data);
 
 			NotificationManager.Show(new Notification("Copy Files", "Files has been copied"));
 		}
 
 		public async void CopyPath()
 		{
-			await App.Current.Clipboard.SetTextAsync(CurrentTab.Path);
+			await Application.Current.Clipboard.SetTextAsync(CurrentTab.TreeItem.GetPath(x => x.ToString()));
 
 			NotificationManager.Show(new Notification("Copy Path", "The path has been copied"));
 		}
@@ -419,11 +414,11 @@ namespace FileExplorerCore.ViewModels
 
 		public void CopyTo()
 		{
-			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && Tabs.Count(x => !String.IsNullOrWhiteSpace(x.Path)) > 1)
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && Tabs.Count(x => !String.IsNullOrWhiteSpace(x.TreeItem.GetPath(x => x.ToString()))) > 1)
 			{
 				var selector = new TabSelector()
 				{
-					Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab && !String.IsNullOrWhiteSpace(x.Path))),
+					Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab && !String.IsNullOrWhiteSpace(x.TreeItem.GetPath(x => x.ToString())))),
 				};
 
 				selector.TabSelectionChanged += _ => { selector.Close(); };
@@ -432,38 +427,16 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		public void AnalyzeFolder()
+		public async Task AnalyzeFolder()
 		{
 			var view = new AnalyzerView();
 			CurrentTab.DisplayControl = view;
 
-			var drive = new DriveInfo(Path[..1]);
-			var parent = new FileIndexModel(GetTreeItemInitialized(Path));
-
-			if (drive.Name == Path)
+			var rootTask = Task.Run(async () =>
 			{
-				parent = new FileIndexModel(GetTreeItemInitialized(Path));
-			}
-
-			var options = new EnumerationOptions()
-			{
-				IgnoreInaccessible = true,
-				AttributesToSkip = FileAttributes.Temporary,
-			};
-
-			var folderQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(GetTreeItemInitialized(x.ToFullPath())), options)
-			{
-				ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
-			};
-
-			var fileQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(GetTreeItemInitialized(x.ToFullPath())), options)
-			{
-				ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
-			};
-
-			ThreadPool.QueueUserWorkItem(async x =>
-			{
-				var query = folderQuery.Concat(fileQuery);
+				var query = CurrentTab.TreeItem.EnumerateChildren()
+					.Cast<FileSystemTreeItem>()
+					.Select(s => new FileIndexModel(s));
 
 				var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
 				{
@@ -476,15 +449,15 @@ namespace FileExplorerCore.ViewModels
 				await view.Root.AddRange(query, comparer, token: CurrentTab.TokenSource.Token);
 			});
 
-			ThreadPool.QueueUserWorkItem(async x =>
+			var extensionTask = Task.Run(async () =>
 			{
 				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = true);
 
-				var extensionQuery = GetTreeItemInitialized(Path)
+				var extensionQuery = CurrentTab.TreeItem
 					.EnumerateChildren()
 					.Cast<FileSystemTreeItem>()
 					.Where(w => !w.IsFolder)
-					.GroupBy(g => System.IO.Path.GetExtension(g.Value));
+					.GroupBy(g => Path.GetExtension(g.Value));
 
 				var comparer = new ExtensionModelComparer();
 
@@ -515,6 +488,8 @@ namespace FileExplorerCore.ViewModels
 
 				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = false);
 			});
+
+			await Task.WhenAll(rootTask, extensionTask);
 		}
 
 		public void ShowProperties()
@@ -532,8 +507,13 @@ namespace FileExplorerCore.ViewModels
 			//}
 		}
 
-		private FileSystemTreeItem GetTreeItem(string path)
+		private FileSystemTreeItem? GetTreeItem(string? path)
 		{
+			if (path is null)
+			{
+				return null;
+			}
+
 			string[] temp = null;
 			FileSystemTreeItem item = null;
 

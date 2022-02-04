@@ -2,7 +2,7 @@
 
 namespace FileExplorerCore.Interfaces
 {
-	public interface IAsyncComparer<T>
+	public interface IAsyncComparer<in T>
 	{
 		ValueTask<int> CompareAsync(T x, T y);
 	}

@@ -36,7 +36,7 @@ namespace FileExplorerCore.Helpers
 		/// <returns>A regex equivalent of the given wildcard.</returns>
 		public static string WildcardToRegex(string pattern)
 		{
-			return "^" + Regex.Escape(pattern).
+			return "^" + Escape(pattern).
 			 Replace("\\*", ".*").
 			 Replace("\\?", ".") + "$";
 		}

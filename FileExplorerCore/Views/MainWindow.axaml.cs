@@ -64,7 +64,7 @@ namespace FileExplorerCore.Views
 		{
 			if (DataContext is MainWindowViewModel model && sender is Button { DataContext: FolderModel folderModel })
 			{
-				await model.CurrentTab.SetPath(folderModel.Path);
+				await model.CurrentTab.SetPath(folderModel.TreeItem);
 			}
 		}
 
@@ -72,7 +72,7 @@ namespace FileExplorerCore.Views
 		{
 			if (DataContext is MainWindowViewModel model && sender is SelectingItemsControl { SelectedItem: FolderModel folderModel })
 			{
-				await model.CurrentTab.SetPath(folderModel.Path);
+				await model.CurrentTab.SetPath(folderModel.TreeItem);
 			}
 		}
 
@@ -99,7 +99,7 @@ namespace FileExplorerCore.Views
 				{
 					item.Command = ReactiveCommand.Create(() =>
 					{
-						model.Path = folder.Path;
+						model.CurrentTab.TreeItem = folder.TreeItem;
 					});
 
 					item.ContextMenu.ItemContainerGenerator.Materialized += (_, ee) =>
@@ -110,7 +110,7 @@ namespace FileExplorerCore.Views
 							{
 								item.Tapped += delegate
 								{
-									model.CurrentTab.Path = folderModel.Path;
+									model.CurrentTab.TreeItem = folderModel.TreeItem;
 								};
 							}
 						}
@@ -132,9 +132,9 @@ namespace FileExplorerCore.Views
 				{
 					item.DoubleTapped += delegate
 					{
-						if (DataContext is MainWindowViewModel model && item.DataContext is FileModel filemodel)
+						if (DataContext is MainWindowViewModel model && item.DataContext is FileModel fileModel)
 						{
-							model.SetPath(filemodel.Path);
+							model.SetPath(fileModel.TreeItem);
 						}
 					};
 				}
@@ -160,9 +160,9 @@ namespace FileExplorerCore.Views
 
 		private void Tree_SelectionChanged(object? sender, SelectionChangedEventArgs e)
 		{
-			if (DataContext is MainWindowViewModel model && e.AddedItems is { Count: > 0 } && e.AddedItems[0] is FolderModel folderModel && folderModel.Path is not "")
+			if (DataContext is MainWindowViewModel model && e.AddedItems is { Count: > 0 } && e.AddedItems[0] is FolderModel folderModel)
 			{
-				model.SetPath(folderModel.Path);
+				model.SetPath(folderModel.TreeItem);
 			}
 		}
 

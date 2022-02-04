@@ -27,8 +27,8 @@ namespace FileExplorerCore.Helpers
 
 					foreach (var item in EnumerateValuesToRoot())
 					{
-						builder.Insert(0, '/', 1);
 						builder.Insert(0, item);
+						builder.Insert(item.Length, '/');
 					}
 
 					var path = builder.AsSpan(0, builder.Length - 1);

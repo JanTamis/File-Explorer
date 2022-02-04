@@ -16,7 +16,7 @@ namespace FileExplorerCore.DisplayViews
 	{
 		private int anchorIndex;
 
-		public event Action<string> PathChanged = delegate { };
+		public event Action<FileSystemTreeItem> PathChanged = delegate { };
 		public new event PropertyChangedEventHandler PropertyChanged = delegate { };
 
 		private ObservableRangeCollection<FileModel> _files;
@@ -80,7 +80,7 @@ namespace FileExplorerCore.DisplayViews
 			{
 				if (args.Source is { InteractiveParent: DataBoxCell { DataContext: FileModel model } })
 				{
-					PathChanged?.Invoke(model.Path);
+					PathChanged?.Invoke(model.TreeItem);
 				}
 			};
 
@@ -93,7 +93,7 @@ namespace FileExplorerCore.DisplayViews
 			});
 
 
-			FileModel.SelectionChanged += (file) =>
+			FileModel.SelectionChanged += file =>
 			{
 				if (grid.Items != null)
 				{
@@ -241,7 +241,7 @@ namespace FileExplorerCore.DisplayViews
 		{
 			if (sender is DataGridRow { DataContext: FileModel model })
 			{
-				PathChanged(model.Path);
+				PathChanged(model.TreeItem);
 			}
 		}
 

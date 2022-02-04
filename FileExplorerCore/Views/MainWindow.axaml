@@ -254,13 +254,13 @@
                       <Grid ColumnDefinitions="Auto, *, Auto"
 														MaxWidth="350">
                         <Image
-													Source="{Binding Path, Converter={StaticResource imageConverter}}"
+													Source="{Binding TreeItem, Converter={StaticResource imageConverter}}"
 													Height="25"
 													Margin="0 0 4 0"
 													VerticalAlignment="Center" />
 
                         <TextBlock
-													Text="{Binding Path, Converter={StaticResource fileNameConverter}}"
+													Text="{Binding TreeItem, Converter={StaticResource fileNameConverter}}"
 													TextTrimming="CharacterEllipsis"
 													VerticalAlignment="Center"
 													Grid.Column="1"

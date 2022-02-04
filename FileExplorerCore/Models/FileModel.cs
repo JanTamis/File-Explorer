@@ -45,20 +45,6 @@ namespace FileExplorerCore.Models
 			set
 			{
 				_isVisible = value;
-
-				//if (value)
-				//{
-				//	NeedsNewImage = true;
-				//	OnPropertyChanged(nameof(Image));
-				//}
-				//else
-				//{
-				//	NeedsNewImage = false;
-
-				//	Image = null;
-
-				//	NeedsNewImage = true;
-				//}
 			}
 		}
 
@@ -155,12 +141,21 @@ namespace FileExplorerCore.Models
 			{
 				if (_size == -1 && !IsFolder)
 				{
-					using (var handle = File.OpenHandle(Path))
+					// using (var handle = File.OpenHandle(Path))
+					// {
+					// 	if (!handle.IsInvalid)
+					// 	{
+					// 		_size = RandomAccess.GetLength(handle);
+					// 	}
+					// }
+
+					if (OperatingSystem.IsWindows())
 					{
-						if (!handle.IsInvalid)
-						{
-							_size = RandomAccess.GetLength(handle);
-						}
+						_size = TreeItem.GetPath(path => DirectoryAlternative.GetFileSize(path));
+					}
+					else
+					{
+						_size = new FileInfo(Path).Length;
 					}
 				}
 
@@ -174,7 +169,6 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				ParallelHelper.For();
 				return Task.Run(() =>
 				{
 					var size = TreeItem.GetPath(path =>
@@ -222,10 +216,6 @@ namespace FileExplorerCore.Models
 					{
 						_editedOn = Directory.GetLastWriteTime(Path);
 					}
-					// var path = Path;
-					// _editedOn = OperatingSystem.IsWindows()
-					// 	? DirectoryAlternative.GetFileWriteDate(path)
-					// 	: new FileInfo(path).LastWriteTime;
 				}
 
 				return _editedOn;

@@ -3,6 +3,7 @@ using Avalonia.Data.Converters;
 using FileExplorerCore.Models;
 using System.Globalization;
 using System.IO;
+using FileExplorerCore.Helpers;
 
 namespace FileExplorerCore.Converters
 {
@@ -10,29 +11,27 @@ namespace FileExplorerCore.Converters
 	{
 		public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{
-			if (value is string path)
+			switch (value)
 			{
-				if (Directory.Exists(path))
+				case string path when Directory.Exists(path):
 				{
 					var name = Path.GetFileName(path);
 
 					return String.IsNullOrEmpty(name) ? path : Path.GetFileName(path);
 				}
-				else if (path is "")
-				{
+				case "":
 					return "Quick Start";
-				}
-				else
-				{
+				case string path:
 					return Path.GetFileName(path).Split('.')[^2];
-				}
+				case FileModel model:
+					return model.Name;
+				case FileSystemTreeItem treeItem:
+					return treeItem.Value;
+				case null:
+					return "Quick Start";
+				default:
+					return String.Empty;
 			}
-			else if (value is FileModel model)
-			{
-				return model.Name;
-			}
-
-			return String.Empty;
 		}
 
 		public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

@@ -125,6 +125,19 @@ namespace FileExplorerCore.Helpers
 			_pos += count;
 		}
 
+		public void Insert(int index, char value)
+		{
+			if (_pos > _chars.Length - 1)
+			{
+				Grow(1);
+			}
+
+			var remaining = _pos - index;
+			_chars.Slice(index, remaining).CopyTo(_chars[(index + 1)..]);
+			_chars[index] = value;
+			_pos++;
+		}
+
 		public void Insert(int index, string? s)
 		{
 			if (s == null)

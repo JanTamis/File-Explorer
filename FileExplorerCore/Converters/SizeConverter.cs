@@ -4,6 +4,7 @@ using FileExplorerCore.Models;
 using System.Globalization;
 using System.IO;
 using Humanizer;
+using Microsoft.Toolkit.HighPerformance.Helpers;
 
 namespace FileExplorerCore.Converters
 {
@@ -11,32 +12,29 @@ namespace FileExplorerCore.Converters
 	{
 		public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{
-			if (value is FileModel model)
+			switch (value)
 			{
-				if (model.Size < 0)
-				{
+				case FileModel { Size: < 0 }:
 					return String.Empty;
-				}
-
-				return model.Size.Bytes().ToString();
-			}
-			else if (value is long size)
-			{
-				if (size < 0)
-				{
+				
+				case FileModel model:
+					return model.Size.Bytes().ToString();
+				
+				case long and < 0:
 					return String.Empty;
+				
+				case long size:
+					return size.Bytes().ToString();
+				
+				case string path when File.Exists(path):
+				{
+					var fileSize = new FileInfo(path).Length;
+
+					return fileSize.Bytes().ToString();
 				}
-
-				return size.Bytes().ToString();
+				default:
+					return String.Empty;
 			}
-			else if (value is string path && File.Exists(path))
-			{
-				var fileSize = new FileInfo(path).Length;
-
-				return fileSize.Bytes().ToString();
-			}
-
-			return String.Empty;
 		}
 
 		public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
