@@ -1,4 +1,5 @@
-﻿using ProtoBuf;
+﻿using FileExplorerCore.Interfaces;
+using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 namespace FileExplorerCore.Helpers
 {
 	[ProtoContract]
-	public class Tree<TTreeItem, TValue> where TTreeItem : TreeItem<TValue>
+	public class Tree<TTreeItem, TValue> where TTreeItem : ITreeItem<TValue, TTreeItem>
 	{
 		[ProtoMember(1)] public List<TTreeItem> Children { get; }
 
@@ -32,13 +33,13 @@ namespace FileExplorerCore.Helpers
 		/// Get the amount of children recursively
 		/// </summary>
 		/// <returns>the amount of children recursively</returns>
-		public async ValueTask<int> GetChildrenCount()
+		public int GetChildrenCount()
 		{
 			var count = Children.Count;
 
 			foreach (var child in Children)
 			{
-				count += await child.GetChildrenCount();
+				count += child.GetChildrenCount();
 			}
 
 			return count;

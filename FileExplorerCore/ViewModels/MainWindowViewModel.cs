@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using ProtoBuf;
+using FileExplorerCore.Interfaces;
 
 namespace FileExplorerCore.ViewModels
 {
@@ -95,7 +96,7 @@ namespace FileExplorerCore.ViewModels
 
 					foreach (var child in Tree.Children)
 					{
-						SetParents(child);
+						SetParents<FileSystemTreeItem, string>(child);
 					}
 				}
 			}
@@ -157,12 +158,12 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		private void SetParents<T>(TreeItem<T> item)
+		private void SetParents<T, TValue>(T item) where T : ITreeItem<TValue, T>
 		{
 			foreach (var child in item.EnumerateChildrenWithoutInitialize())
 			{
 				child.Parent = item;
-				SetParents(child);
+				SetParents<T, TValue>(child);
 			}
 		}
 
@@ -579,6 +580,7 @@ namespace FileExplorerCore.ViewModels
 
 		public static FileSystemTreeItem GetTreeItemInitialized(string path)
 		{
+			//path = Path.GetFullPath(path);
 			string[] temp = null;
 			FileSystemTreeItem item = null;
 
@@ -590,6 +592,7 @@ namespace FileExplorerCore.ViewModels
 			else if (OperatingSystem.IsWindows())
 			{
 				temp = path.Split('\\', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+				temp[0] += '\\';
 
 				foreach (var child in Tree.EnumerateChildren(0))
 				{
@@ -601,7 +604,7 @@ namespace FileExplorerCore.ViewModels
 				}
 			}
 
-			foreach (var split in temp)
+			foreach (var split in temp.Skip(1))
 			{
 				if (item is not null)
 				{

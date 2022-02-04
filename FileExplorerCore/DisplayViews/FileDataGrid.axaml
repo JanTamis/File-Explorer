@@ -3,6 +3,7 @@
 						xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 						xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 						xmlns:converters="using:FileExplorerCore.Converters"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
 						xmlns:models="clr-namespace:FileExplorerCore.Models"
              xmlns:viewmodel="clr-namespace:FileExplorerCore.ViewModels"
 						xmlns:helpers="clr-namespace:FileExplorerCore.Helpers"
@@ -16,6 +17,8 @@
 		<converters:FileNameConverter x:Key="fileNameConverter" />
 		<converters:ImageTransformConverter x:Key="imageTransformConverter" />
     <converters:DateTimeConverter x:Key="dateTimeConverter" />
+
+    <system:Int32 x:Key="ImageSize">32</system:Int32>
 	</UserControl.Resources>
 	
 	  <DataGrid x:Name="fileList"
@@ -29,8 +32,9 @@
 	  														CanUserReorder="False">  
 	  			<DataGridTemplateColumn.CellTemplate>  
 	  				<DataTemplate>
-	  						<Image Source="{CompiledBinding TreeItem, Converter={StaticResource imageConverter}}"
+	  						<Image DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
                        x:DataType="models:FileModel"
+                       Source="{Binding Result}"
                        Width="32"
                        Height="32"
                        Margin="2.5"/>

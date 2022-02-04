@@ -255,10 +255,6 @@
     <PackageReference Include="AvaloniaUIRibbon" Version="1.1.0-beta" />
     <PackageReference Include="DataBox" Version="0.10.11.1" />
     <PackageReference Include="DiscUtils.FileSystems" Version="0.16.13" />
-    <PackageReference Include="ErrorProne.NET.Structs" Version="0.4.0-beta.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Humanizer" Version="2.14.1" />
     <PackageReference Include="LinqOptimizer.CSharp" Version="0.7.0" />
     <PackageReference Include="MetadataExtractor" Version="2.7.1" />

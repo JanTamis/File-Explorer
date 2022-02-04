@@ -102,7 +102,7 @@ namespace FileExplorerCore.Helpers
 
 	public static unsafe class UnicodeFileInfo
 	{
-		[DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+		[DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
 		public static extern IntPtr FindFirstFile(char* pFileName, ref DirectoryAlternative.WIN32_FIND_DATA pFindFileData);
 	}
 }

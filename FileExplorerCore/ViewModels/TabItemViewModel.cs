@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Runtime;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -154,6 +155,8 @@ namespace FileExplorerCore.ViewModels
 
 					//TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.Indeterminate);
 				}
+
+				GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized, false, true);
 
 				OnPropertyChanged(nameof(SearchFailed));
 			}
@@ -574,7 +577,7 @@ namespace FileExplorerCore.ViewModels
 				{
 					if (child.Value == path[index])
 					{
-						return GetItem(child as FileSystemTreeItem, path, index + 1);
+						return GetItem(child, path, index + 1);
 					}
 				}
 

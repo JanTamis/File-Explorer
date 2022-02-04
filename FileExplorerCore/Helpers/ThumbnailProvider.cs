@@ -12,6 +12,7 @@ using FileTypeAndIcon;
 using Avalonia.Threading;
 using FileExplorerCore.ViewModels;
 using System.Diagnostics;
+using System.Drawing;
 
 namespace FileExplorerCore.Helpers
 {
@@ -52,182 +53,87 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
-		public static IImage? GetFileImage(string? path)
+		public static async Task<IImage?> GetFileImage(FileSystemTreeItem? treeItem, int size)
 		{
-			if (path is null)
+			return await Task.Run<IImage?>(() =>
 			{
-				return null;
-			}
+				var name = String.Empty;
 
-			var name = String.Empty;
+				//if (OperatingSystem.IsWindows())
+				//{
+				//	var image = treeItem.GetPath(path => WindowsThumbnailProvider.GetThumbnail(path, size, size));
 
-			//if (OperatingSystem.IsWindows())
-			//{
-			//	var image = WindowsThumbnailProvider.GetThumbnail(path, 64, 64);
+				//	if (image is not null)
+				//	{
+				//		return image;
+				//	}
+				//}
 
-			//	if (image is not null)
-			//	{
-			//		return image;
-			//	}
-			//}
-
-			if (Directory.Exists(path))
-			{
-				path = Path.GetFullPath(path);
-
-				if (OperatingSystem.IsWindows())
+				if (treeItem.IsFolder)
 				{
-					foreach (var folder in Enum.GetValues<KnownFolder>())
+					if (OperatingSystem.IsWindows())
 					{
-						var folderText = Enum.GetName(folder);
-						path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
-
-						if (folderText is not null && ImageExists(folderText) &&
-								String.Compare(path, KnownFolders.GetPath(folder).ToString(), StringComparison.OrdinalIgnoreCase) == 0)
+						foreach (var folder in Enum.GetValues<KnownFolder>())
 						{
-							name = folderText;
-						}
-					}
-				}
+							var folderText = Enum.GetName(folder);
 
-				if (name == String.Empty)
-				{
-					var driveInfos = DriveInfo.GetDrives();
-
-					foreach (var drive in driveInfos)
-					{
-						if (drive.IsReady && drive.Name == path)
-						{
-							name = Enum.GetName(drive.DriveType);
-						}
-					}
-				}
-
-				if (name == String.Empty)
-				{
-					var item = TabItemViewModel.GetTreeItem(path);
-
-					name = item.HasChildren
-						? "FolderFiles"
-						: "Folder";
-				}
-			}
-			else if (File.Exists(path))
-			{
-				name = "File";
-
-				var extension = Path.GetExtension(path).ToLower();
-
-				if (extension.Length > 1)
-				{
-					extension = extension[1..];
-
-					if (Images.ContainsKey(extension))
-					{
-						name = extension;
-					}
-					else
-					{
-						foreach (var (key, value) in TypeMap)
-						{
-							foreach (var val in value)
+							if (folderText is not null && treeItem.GetPath(x => x.SequenceEqual(KnownFolders.GetPath(folder))))
 							{
-								if (extension == val)
+								name = folderText;
+							}
+						}
+					}
+
+
+					if (!treeItem.HasParent)
+					{
+						var driveInfo = new DriveInfo(new string(treeItem.Value[0], 1));
+
+						if (driveInfo.IsReady)
+						{
+							name = Enum.GetName(driveInfo.DriveType);
+						}
+					}
+
+					if (name == String.Empty)
+					{
+						name = treeItem.HasChildren
+							? "FolderFiles"
+							: "Folder";
+					}
+				}
+				else
+				{
+					name = "File";
+
+					var extension = Path.GetExtension(treeItem.Value).ToLower();
+
+					if (extension.Length > 1)
+					{
+						extension = extension[1..];
+
+						if (Images.ContainsKey(extension))
+						{
+							name = extension;
+						}
+						else
+						{
+							foreach (var (key, value) in TypeMap)
+							{
+								foreach (var val in value)
 								{
-									name = key;
+									if (extension == val)
+									{
+										name = key;
+									}
 								}
 							}
 						}
 					}
 				}
-			}
 
-			return GetImage(name);
-		}
-
-		public static IImage? GetFileImage(FileSystemTreeItem? treeItem)
-		{
-			if (treeItem is null)
-			{
-				return null;
-			}
-
-			var name = String.Empty;
-
-			//if (OperatingSystem.IsWindows())
-			//{
-			//	var image = treeItem.GetPath(path => WindowsThumbnailProvider.GetThumbnail(path, 64, 64));
-
-			//	if (image is not null)
-			//	{
-			//		return image;
-			//	}
-			//}
-
-			if (treeItem.IsFolder)
-			{
-				if (OperatingSystem.IsWindows())
-				{
-					foreach (var folder in Enum.GetValues<KnownFolder>())
-					{
-						var folderText = Enum.GetName(folder);
-
-						if (folderText is not null && treeItem.GetPath(x => x.SequenceEqual(KnownFolders.GetPath(folder))))
-						{
-							name = folderText;
-						}
-					}
-				}
-
-
-				if (!treeItem.HasParent)
-				{
-					var driveInfo = new DriveInfo(new string(treeItem.Value[0], 1));
-
-					if (driveInfo.IsReady)
-					{
-						name = Enum.GetName(driveInfo.DriveType);
-					}
-				}
-
-				if (name == String.Empty)
-				{
-					name = treeItem.HasChildren
-						? "FolderFiles"
-						: "Folder";
-				}
-			}
-			else
-			{
-				name = "File";
-
-				var extension = Path.GetExtension(treeItem.Value).ToLower();
-
-				if (extension.Length > 1)
-				{
-					extension = extension[1..];
-
-					if (Images.ContainsKey(extension))
-					{
-						name = extension;
-					}
-					else
-					{
-						foreach (var (key, value) in TypeMap)
-						{
-							foreach (var val in value)
-							{
-								if (extension == val)
-								{
-									name = key;
-								}
-							}
-						}
-					}
-				}
-			}
-
-			return GetImage(name);
+				return GetImage(name);
+			});
 		}
 
 		private static bool ImageExists(string key)
@@ -256,14 +162,32 @@ namespace FileExplorerCore.Helpers
 					{
 						memoryStream.Seek(0, SeekOrigin.Begin);
 
-						image = new SvgImage()
+						if (Dispatcher.UIThread.CheckAccess())
 						{
-							Source = source,
-						};
+							image = new SvgImage()
+							{
+								Source = source,
+							};
 
-						if (!Images.ContainsKey(key))
+							if (!Images.ContainsKey(key))
+							{
+								Images.Add(key, image);
+							}
+						}
+						else
 						{
-							Images.Add(key, image);
+							Dispatcher.UIThread.InvokeAsync(() =>
+							{
+								image = new SvgImage()
+								{
+									Source = source,
+								};
+
+								if (!Images.ContainsKey(key))
+								{
+									Images.Add(key, image);
+								}
+							}).Wait();
 						}
 					}
 				}

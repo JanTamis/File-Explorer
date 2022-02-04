@@ -43,14 +43,9 @@ namespace FileExplorerCore.Helpers
 
 		private static readonly int bitmapSize = Unsafe.SizeOf<NativeMethods.BITMAP>();
 
-		public static Bitmap? GetThumbnail(Span<char> fileName, int width, int height)
-		{
-			return GetThumbnail(fileName, width, height, ThumbnailOptions.BiggerSizeOk);
-		}
-
 		public static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height)
 		{
-			return GetThumbnail(fileName, width, height, ThumbnailOptions.BiggerSizeOk);
+			return GetThumbnail(fileName, width, height, ThumbnailOptions.IconOnly);
 		}
 
 		public static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height, ThumbnailOptions options)

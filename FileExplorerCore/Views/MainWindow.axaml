@@ -4,6 +4,7 @@
 										xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 										xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 										xmlns:sys="using:System"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib"
 										xmlns:converters="using:FileExplorerCore.Converters"
 										xmlns:controls="using:FileExplorerCore.Controls"
 										xmlns:models="clr-namespace:FileExplorerCore.Models"
@@ -33,6 +34,8 @@
     <converters:MainTitleMarginConverter x:Key="mainTitleMarginConverter" />
 
     <converters:PathToFoldersConverter x:Key="pathToFoldersConverter" />
+
+    <system:Int32 x:Key="ImageSize">25</system:Int32>
   </Window.Resources>
 
   <Window.Styles>
@@ -176,7 +179,8 @@
                 <TreeDataTemplate DataType="{x:Type models:FolderModel}"
 																	ItemsSource="{Binding SubFolders}">
                   <StackPanel Orientation="Horizontal">
-                    <Image Source="{CompiledBinding TreeItem, Converter={StaticResource imageConverter}}"
+                    <Image DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
+                           Source="{Binding Result}"
                            x:DataType="models:FolderModel"
                            Width="25"
                            Height="25"
@@ -254,7 +258,8 @@
                       <Grid ColumnDefinitions="Auto, *, Auto"
 														MaxWidth="350">
                         <Image
-													Source="{Binding TreeItem, Converter={StaticResource imageConverter}}"
+													DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
+                          Source="{Binding Result}"
 													Height="25"
 													Margin="0 0 4 0"
 													VerticalAlignment="Center" />

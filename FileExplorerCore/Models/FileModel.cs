@@ -141,22 +141,22 @@ namespace FileExplorerCore.Models
 			{
 				if (_size == -1 && !IsFolder)
 				{
-					// using (var handle = File.OpenHandle(Path))
-					// {
-					// 	if (!handle.IsInvalid)
-					// 	{
-					// 		_size = RandomAccess.GetLength(handle);
-					// 	}
-					// }
+					//using (var handle = File.OpenHandle(Path, FileMode.Open, FileAccess.Read, FileShare.Read, FileOptions.RandomAccess))
+					//{
+					//	if (!handle.IsInvalid)
+					//	{
+					//		_size = RandomAccess.GetLength(handle);
+					//	}
+					//}
 
-					if (OperatingSystem.IsWindows())
-					{
-						_size = TreeItem.GetPath(path => DirectoryAlternative.GetFileSize(path));
-					}
-					else
-					{
-						_size = new FileInfo(Path).Length;
-					}
+					//if (OperatingSystem.IsWindows())
+					//{
+					//_size = TreeItem.GetPath(path => DirectoryAlternative.GetFileSize(path));
+					//}
+					//else
+					//{
+					_size = new FileInfo(Path).Length;
+					//}
 				}
 
 				return _size;

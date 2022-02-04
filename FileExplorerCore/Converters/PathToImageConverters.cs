@@ -2,6 +2,8 @@
 using Avalonia.Data.Converters;
 using FileExplorerCore.Helpers;
 using System.Globalization;
+using System.Threading.Tasks;
+using Avalonia.Media;
 
 namespace FileExplorerCore.Converters
 {
@@ -9,12 +11,21 @@ namespace FileExplorerCore.Converters
 	{
 		public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{
-			return value switch
+			if (parameter is int size)
 			{
-				FileSystemTreeItem treeItem => ThumbnailProvider.GetFileImage(treeItem),
-				string str => ThumbnailProvider.GetFileImage(str),
-				_ => null,
-			};
+				var task = value switch
+				{
+					FileSystemTreeItem treeItem => ThumbnailProvider.GetFileImage(treeItem, size),
+					_ => null,
+				};
+
+				if (task is not null)
+				{
+					return new TaskCompletionNotifier<IImage?>(task);
+				}
+			}
+
+			return null;
 		}
 
 		public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

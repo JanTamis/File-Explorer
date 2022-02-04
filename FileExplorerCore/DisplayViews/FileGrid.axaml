@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 						 xmlns:models="clr-namespace:FileExplorerCore.Models"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
 						 xmlns:converters="using:FileExplorerCore.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FileExplorerCore.DisplayViews.FileGrid">
@@ -13,6 +14,8 @@
     <converters:SizeConverter x:Key="sizeConverter" />
     <converters:FileNameConverter x:Key="fileNameConverter" />
     <converters:ImageTransformConverter x:Key="imageTransformConverter" />
+
+    <system:Int32 x:Key="ImageSize">100</system:Int32>
   </UserControl.Resources>
 
   <ScrollViewer>
@@ -59,7 +62,8 @@
             <StackPanel Margin="0 0 0 5"
 												HorizontalAlignment="Center"
 												VerticalAlignment="Center">
-              <Image Source="{CompiledBinding TreeItem, Converter={StaticResource imageConverter}}"
+              <Image DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
+                     Source="{Binding Result}"
                      x:DataType="models:FileModel"
                      Margin="4"
                      Width="100"
