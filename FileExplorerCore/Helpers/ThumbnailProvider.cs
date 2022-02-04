@@ -84,7 +84,6 @@ namespace FileExplorerCore.Helpers
 						}
 					}
 
-
 					if (!treeItem.HasParent)
 					{
 						var driveInfo = new DriveInfo(new string(treeItem.Value[0], 1));

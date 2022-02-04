@@ -156,6 +156,7 @@ namespace FileExplorerCore.ViewModels
 					//TaskbarUtility.SetProgressState(TaskbarProgressBarStatus.Indeterminate);
 				}
 
+				GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
 				GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized, false, true);
 
 				OnPropertyChanged(nameof(SearchFailed));
@@ -245,7 +246,6 @@ namespace FileExplorerCore.ViewModels
 					IEnumerable<FolderModel> GetFolders()
 					{
 						return TreeItem.EnumerateToRoot()
-							.Cast<FileSystemTreeItem>()
 							.Select(s => new FolderModel(s))
 							.Reverse();
 					}
@@ -427,7 +427,7 @@ namespace FileExplorerCore.ViewModels
 					{
 						ThreadPool.QueueUserWorkItem(async _ =>
 						{
-							var count = await GetFileSystemEntriesCount(TreeItem, search, TokenSource.Token);
+							var count = GetFileSystemEntriesCount(TreeItem, search, TokenSource.Token);
 
 							if (!TokenSource.IsCancellationRequested)
 							{
@@ -495,21 +495,19 @@ namespace FileExplorerCore.ViewModels
 		{
 			return path
 				.EnumerateChildren()
-				.Cast<FileSystemTreeItem>()
-				.Where(w => w is not null && FileSystemName.MatchesSimpleExpression(search, w.Value))
+				.Where(w => FileSystemName.MatchesSimpleExpression(search, w.Value))
 				.Select(s => new FileModel(s));
 		}
 
-		private async Task<int> GetFileSystemEntriesCount(FileSystemTreeItem path, string search, CancellationToken token)
+		private int GetFileSystemEntriesCount(FileSystemTreeItem path, string search, CancellationToken token)
 		{
-			return await path.GetChildrenCount();
+			return path.GetChildrenCount();
 		}
 
 		public IEnumerable<FileModel> GetDirectories(FileSystemTreeItem path)
 		{
 			return path
-				.EnumerateChildren(0)
-				.Cast<FileSystemTreeItem>()
+				.Children
 				.Where(w => w.IsFolder)
 				.Select(s => new FileModel(s));
 		}
@@ -517,8 +515,7 @@ namespace FileExplorerCore.ViewModels
 		public IEnumerable<FileModel> GetFiles(FileSystemTreeItem path)
 		{
 			return path
-				.EnumerateChildren(0)
-				.Cast<FileSystemTreeItem>()
+				.Children
 				.Where(w => !w.IsFolder)
 				.Select(s => new FileModel(s));
 		}
@@ -549,7 +546,7 @@ namespace FileExplorerCore.ViewModels
 
 			foreach (var split in temp)
 			{
-				foreach (FileSystemTreeItem child in item.EnumerateChildren(0))
+				foreach (var child in item.Children)
 				{
 					if (child is not null && child.Value == split)
 					{

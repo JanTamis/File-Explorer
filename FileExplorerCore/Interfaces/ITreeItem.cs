@@ -5,7 +5,7 @@ namespace FileExplorerCore.Interfaces
 {
 	public interface ITreeItem<TValue, TChildren> where TChildren : ITreeItem<TValue, TChildren>
 	{
-		List<TChildren> Children { get; }
+		IEnumerable<TChildren> Children { get; }
 
 		TChildren Parent { get; set; }
 
@@ -14,10 +14,7 @@ namespace FileExplorerCore.Interfaces
 		bool HasParent { get; }
 		bool HasChildren { get; }
 
-		TChildren this[Index index] { get; set; }
-
 		TChildren GetRoot();
-		void Remove();
 
 		IEnumerable<TChildren> EnumerateToRoot();
 
@@ -38,25 +35,17 @@ namespace FileExplorerCore.Interfaces
 
 		public int GetChildrenCount()
 		{
-			var currentChildren = Children;
-			var count = currentChildren.Count;
+			var count = 0;
 
-			var currentChildrenCount = currentChildren.Count;
-
-			for (var i = 0; i < currentChildrenCount; i++)
+			foreach (var child in Children)
 			{
-				count += currentChildren[i].GetChildrenCount();
-
-				currentChildrenCount = currentChildren.Count;
+				count += child.GetChildrenCount();
+				count++;
 			}
 
 			return count;
 		}
 
 		IEnumerable<TChildren> EnumerateChildren(uint layers = UInt32.MaxValue);
-
-		IAsyncEnumerable<TChildren> EnumerateChildrenAsync(uint layers = UInt32.MaxValue);
-
-		IEnumerable<TChildren> EnumerateChildrenWithoutInitialize();
 	}
 }

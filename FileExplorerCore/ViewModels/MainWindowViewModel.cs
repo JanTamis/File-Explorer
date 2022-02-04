@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input;
@@ -13,6 +14,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Threading;
 using System.Timers;
 using System.Threading.Tasks;
@@ -38,15 +40,14 @@ namespace FileExplorerCore.ViewModels
 
 		public ObservableRangeCollection<FileModel> Files => CurrentTab.Files;
 
-		public ObservableRangeCollection<TabItemViewModel> Tabs { get; set; } = new();
+		public ObservableCollection<TabItemViewModel> Tabs { get; } = new();
 
 		private FileSystemWatcher watcher;
 
 		public IEnumerable<string> SearchHistory => CurrentTab.TreeItem is not null
-			? CurrentTab.TreeItem.EnumerateChildrenWithoutInitialize()
-				.Cast<FileSystemTreeItem>()
+			? Files
 				.Where(w => !w.IsFolder)
-				.GroupBy(g => Path.GetExtension(g.Value))
+				.GroupBy(g => g.Extension)
 				.Where(w => !String.IsNullOrWhiteSpace(w.Key))
 				.OrderBy(o => o.Key)
 				.Select(s => "*" + s.Key)
@@ -64,42 +65,26 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		// public string Path
-		// {
-		// 	get => CurrentTab.TreeItem?.GetPath(x => x.ToString());
-		// 	set
-		// 	{
-		// 		if (value == Path)
-		// 			return;
-		//
-		// 		CurrentTab.TreeItem = GetTreeItemInitialized(value);
-		//
-		// 		OnPropertyChanged();
-		//
-		// 		CurrentTab.UpdateFiles(false, "*");
-		// 	}
-		// }
-
 		public MainWindowViewModel(WindowNotificationManager manager)
 		{
 			NotificationManager = manager;
 
-			Serializer.PrepareSerializer<Tree<FileSystemTreeItem, string>>();
-
-			var path = Path.Combine(Environment.CurrentDirectory, "Index.bin");
-
-			if (File.Exists(path))
-			{
-				using (var stream = File.OpenRead(path))
-				{
-					Tree = Serializer.Deserialize<Tree<FileSystemTreeItem, string>>(stream);
-
-					foreach (var child in Tree.Children)
-					{
-						SetParents<FileSystemTreeItem, string>(child);
-					}
-				}
-			}
+			// Serializer.PrepareSerializer<Tree<FileSystemTreeItem, string>>();
+			//
+			// var path = Path.Combine(Environment.CurrentDirectory, "Index.bin");
+			//
+			// if (File.Exists(path))
+			// {
+			// 	using (var stream = File.OpenRead(path))
+			// 	{
+			// 		Tree = Serializer.Deserialize<Tree<FileSystemTreeItem, string>>(stream);
+			//
+			// 		foreach (var child in Tree.Children)
+			// 		{
+			// 			SetParents<FileSystemTreeItem, string>(child);
+			// 		}
+			// 	}
+			// }
 
 			if (OperatingSystem.IsWindows() && (Tree is null || Tree.Children.Count != DriveInfo.GetDrives().Count(a => a.IsReady)))
 			{
@@ -131,13 +116,13 @@ namespace FileExplorerCore.ViewModels
 
 			AddTab();
 
-			watcher = new FileSystemWatcher("/", "*");
-
-			watcher.Created += Watcher_Created;
-			watcher.Deleted += Watcher_Deleted;
-			watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName;
-			watcher.IncludeSubdirectories = true;
-			watcher.EnableRaisingEvents = true;
+			// watcher = new FileSystemWatcher("/", "*");
+			//
+			// watcher.Created += Watcher_Created;
+			// watcher.Deleted += Watcher_Deleted;
+			// watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName;
+			// watcher.IncludeSubdirectories = true;
+			// watcher.EnableRaisingEvents = true;
 
 			if (Application.Current?.ApplicationLifetime is ClassicDesktopStyleApplicationLifetime applicationLifetime)
 			{
@@ -160,7 +145,7 @@ namespace FileExplorerCore.ViewModels
 
 		private void SetParents<T, TValue>(T item) where T : ITreeItem<TValue, T>
 		{
-			foreach (var child in item.EnumerateChildrenWithoutInitialize())
+			foreach (var child in item.Children)
 			{
 				child.Parent = item;
 				SetParents<T, TValue>(child);
@@ -231,7 +216,7 @@ namespace FileExplorerCore.ViewModels
 
 		public async Task GoUp()
 		{
-			await CurrentTab.SetPath(CurrentTab?.TreeItem?.Parent as FileSystemTreeItem);
+			await CurrentTab.SetPath(CurrentTab?.TreeItem?.Parent);
 		}
 
 		public async ValueTask StartSearch()
@@ -541,7 +526,7 @@ namespace FileExplorerCore.ViewModels
 			{
 				foreach (var split in temp)
 				{
-					foreach (FileSystemTreeItem child in item.EnumerateChildrenWithoutInitialize())
+					foreach (FileSystemTreeItem child in item.Children)
 					{
 						if (child.Value == split)
 						{
@@ -566,7 +551,7 @@ namespace FileExplorerCore.ViewModels
 					return item;
 				}
 
-				foreach (var child in item.EnumerateChildrenWithoutInitialize())
+				foreach (var child in item.Children)
 				{
 					if (child is FileSystemTreeItem { IsFolder: true } treeItem && treeItem.Value == path[index])
 					{
@@ -580,7 +565,6 @@ namespace FileExplorerCore.ViewModels
 
 		public static FileSystemTreeItem GetTreeItemInitialized(string path)
 		{
-			//path = Path.GetFullPath(path);
 			string[] temp = null;
 			FileSystemTreeItem item = null;
 
@@ -633,14 +617,11 @@ namespace FileExplorerCore.ViewModels
 					return item;
 				}
 
-				if (item is not null)
+				foreach (var child in item.Children)
 				{
-					foreach (var child in item.EnumerateChildrenWithoutInitialize())
+					if (child is { IsFolder: true } && child.Value == path[index])
 					{
-						if (child is FileSystemTreeItem { IsFolder: true } treeItem && treeItem.Value == path[index])
-						{
-							return GetItem(treeItem, path, index + 1);
-						}
+						return GetItem(child, path, index + 1);
 					}
 				}
 

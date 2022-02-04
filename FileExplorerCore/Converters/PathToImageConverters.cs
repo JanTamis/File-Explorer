@@ -4,6 +4,7 @@ using FileExplorerCore.Helpers;
 using System.Globalization;
 using System.Threading.Tasks;
 using Avalonia.Media;
+using FileExplorerCore.Models;
 
 namespace FileExplorerCore.Converters
 {
@@ -15,6 +16,7 @@ namespace FileExplorerCore.Converters
 			{
 				var task = value switch
 				{
+					FileModel { IsVisible: true } model => ThumbnailProvider.GetFileImage(model.TreeItem, size),
 					FileSystemTreeItem treeItem => ThumbnailProvider.GetFileImage(treeItem, size),
 					_ => null,
 				};

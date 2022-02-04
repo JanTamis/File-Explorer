@@ -16,46 +16,55 @@ namespace FileExplorerCore.Helpers
 		{
 			IgnoreInaccessible = true,
 			RecurseSubdirectories = false,
-			AttributesToSkip = FileAttributes.System | FileAttributes.Hidden,
+			AttributesToSkip = FileAttributes.System,
 		};
 
 		[ProtoMember(1, DataFormat = DataFormat.Group)]
-		private List<FileSystemTreeItem>? children;
+		private FileSystemTreeItem[] children;
 
-		public List<FileSystemTreeItem> Children
+		// public List<FileSystemTreeItem> Children
+		// {
+		// 	get
+		// 	{
+		// 		if (children is null)
+		// 		{
+		// 			children = new List<FileSystemTreeItem>();
+		//
+		// 			try
+		// 			{
+		// 				foreach (var item in Query)
+		// 				{
+		// 					children.Add(item);
+		// 				}
+		// 			}
+		// 			catch (Exception e)
+		// 			{
+		// 			}
+		// 		}
+		//
+		// 		return children;
+		// 	}
+		// }
+
+		public IEnumerable<FileSystemTreeItem> Children
 		{
 			get
 			{
-				if (children is null)
-				{
-					children = new List<FileSystemTreeItem>();
+				// if (IsFolder)
+				// {
+				// 	if (children is null)
+				// 	{
+				// 		children = GetPath(path => new FileSystemEnumerable<FileSystemTreeItem>(path.ToString(), (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName.ToString(), x.IsDirectory, this), options).ToArray());
+				// 	}
+				//
+				// 	return children;
+				// }
+				//
+				// return Enumerable.Empty<FileSystemTreeItem>();
 
-					try
-					{
-						foreach (var item in Query)
-						{
-							children.Add(item);
-						}
-					}
-					catch (Exception e)
-					{
-					}
-				}
-
-				return children;
-			}
-		}
-
-		public IEnumerable<FileSystemTreeItem> Query
-		{
-			get
-			{
-				if (IsFolder)
-				{
-					return GetPath(path => new FileSystemEnumerable<FileSystemTreeItem>(Path.GetFullPath(path.ToString()), (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName.ToString(), x.IsDirectory, this), options));
-				}
-
-				return Enumerable.Empty<FileSystemTreeItem>();
+				return IsFolder 
+					? GetPath((path, parent) => new FileSystemEnumerable<FileSystemTreeItem>(path.ToString(), (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName.ToString(), x.IsDirectory, parent), options), this) 
+					: Enumerable.Empty<FileSystemTreeItem>();
 			}
 		}
 
@@ -68,13 +77,7 @@ namespace FileExplorerCore.Helpers
 		public string Value { get; set; }
 
 		public bool HasParent => Parent is not null;
-		public bool HasChildren => children is null ? Query.Any() : children.Count > 0;
-
-		public FileSystemTreeItem this[Index index]
-		{
-			get => Children[index];
-			set => Children[index] = value;
-		}
+		public bool HasChildren => Children.Any();
 
 		public FileSystemTreeItem()
 		{
@@ -104,22 +107,7 @@ namespace FileExplorerCore.Helpers
 
 			return parent!;
 		}
-
-		/// <summary>
-		/// removes a item from the tree
-		/// </summary>
-		/// <remarks>this method will remove all the sub items of the item</remarks>
-		public void Remove()
-		{
-			Parent = null;
-
-			foreach (var child in EnumerateChildrenWithoutInitialize())
-			{
-				child.Parent = null;
-				Children.Remove(child);
-			}
-		}
-
+		
 		/// <summary>
 		/// Enumerate all the tree items from the current item to the root of the tree
 		/// </summary>
@@ -161,75 +149,28 @@ namespace FileExplorerCore.Helpers
 		/// Get the amount of children recursively
 		/// </summary>
 		/// <returns>the amount of children recursively</returns>
-		public async ValueTask<int> GetChildrenCount()
+		public int GetChildrenCount()
 		{
-			var currentChildren = children ?? await Task.Run(() => Children);
-			var count = currentChildren.Count;
-
-			var currentChildrenCount = currentChildren.Count;
-
-			for (var i = 0; i < currentChildrenCount; i++)
-			{
-				count += await currentChildren[i].GetChildrenCount();
-
-				currentChildrenCount = currentChildren.Count;
-			}
-
-			return count;
+			return EnumerateChildren().Count();
 		}
 
 		public IEnumerable<FileSystemTreeItem> EnumerateChildren(uint layers = UInt32.MaxValue)
 		{
-			var count = Children.Count;
-
-			for (var i = 0; i < count; i++)
+			foreach (var child in Children)
 			{
-				yield return Children[i];
-
-				count = Children.Count;
+				yield return child;
 			}
 
 			if (layers > 0)
 			{
-				for (var i = 0; i < count; i++)
+				foreach (var child in Children)
 				{
-					foreach (var childOfChild in Children[i].EnumerateChildren(layers - 1))
+					foreach (var childOfChild in child.EnumerateChildren(layers - 1))
 					{
 						yield return childOfChild;
 					}
 				}
 			}
-		}
-
-		public async IAsyncEnumerable<FileSystemTreeItem> EnumerateChildrenAsync(uint layers = UInt32.MaxValue)
-		{
-			var items = children ?? await Task.Run(() => Children);
-			var count = items.Count;
-
-			for (var i = 0; i < count; i++)
-			{
-				yield return items[i];
-
-				count = items.Count;
-			}
-
-			if (layers > 0)
-			{
-				for (var i = 0; i < count; i++)
-				{
-					await foreach (var childOfChild in Children[i].EnumerateChildrenAsync(layers - 1))
-					{
-						yield return childOfChild;
-					}
-
-					count = items.Count;
-				}
-			}
-		}
-
-		public IEnumerable<FileSystemTreeItem> EnumerateChildrenWithoutInitialize()
-		{
-			return children ?? Enumerable.Empty<FileSystemTreeItem>();
 		}
 
 		public T GetPath<T>(ReadOnlySpanFunc<char, T> action)
@@ -309,7 +250,7 @@ namespace FileExplorerCore.Helpers
 
 				if (builder[^1] is '/')
 				{
-					return action(builder.AsSpan(0, builder.Length - 1), parameter);
+					return action(builder.AsSpan(0, builder.Length), parameter);
 				}
 			}
 

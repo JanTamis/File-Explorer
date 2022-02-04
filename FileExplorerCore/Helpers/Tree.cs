@@ -46,27 +46,6 @@ namespace FileExplorerCore.Helpers
 		}
 
 		/// <summary>
-		/// removes a item from the tree
-		/// </summary>
-		/// <remarks>this method will remove all the sub items of the item and set the parent to null</remarks>
-		/// <param name="item"></param>
-		public void Remove(TTreeItem item)
-		{
-			item.Remove();
-			Children.Remove(item);
-		}
-
-		public void Clear()
-		{
-			foreach (var child in Children)
-			{
-				child.Remove();
-			}
-
-			Children.Clear();
-		}
-
-		/// <summary>
 		/// Enumerates all the items in the tree
 		/// </summary>
 		/// <remarks>if you want to know how much items are in the tree use the <see cref="GetChildrenCount"/> method</remarks>
@@ -107,39 +86,11 @@ namespace FileExplorerCore.Helpers
 			{
 				yield return Children[i];
 
-				foreach (var childOfChild in Children[i].EnumerateChildrenWithoutInitialize())
+				foreach (var childOfChild in Children[i].EnumerateChildren())
 				{
 					if (childOfChild is TTreeItem item)
 					{
 						yield return item;
-					}
-				}
-
-				count = Children.Count;
-			}
-		}
-
-		/// <summary>
-		/// Enumerates all the items in the tree
-		/// </summary>
-		/// <remarks>if you want to know how much items are in the tree use the <see cref="GetChildrenCount"/> method</remarks>
-		/// <returns></returns>
-		public async IAsyncEnumerable<TTreeItem> EnumerateChildrenAsync(uint layers = UInt32.MaxValue)
-		{
-			var count = Children.Count;
-
-			for (var i = 0; i < count; i++)
-			{
-				yield return Children[i];
-
-				if (layers > 0)
-				{
-					await foreach (var childOfChild in Children[i].EnumerateChildrenAsync(layers - 1))
-					{
-						if (childOfChild is TTreeItem item)
-						{
-							yield return item;
-						}
 					}
 				}
 

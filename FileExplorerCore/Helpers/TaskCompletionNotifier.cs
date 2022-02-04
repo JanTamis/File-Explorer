@@ -11,47 +11,35 @@ namespace FileExplorerCore.Helpers
 		{
 			Task = task;
 
-			InitializeListener();
-
-			//if (!task.IsCompleted)
-			//{
-			//	var scheduler = (SynchronizationContext.Current is null) ? TaskScheduler.Current : TaskScheduler.FromCurrentSynchronizationContext();
-			//	task.ContinueWith(t =>
-			//	{
-					
-			//	},
-			//	CancellationToken.None,
-			//	TaskContinuationOptions.ExecuteSynchronously,
-			//	scheduler);
-			//}
-		}
-
-		private async Task InitializeListener()
-		{
-			if (!Task.IsCompleted)
+			if (!task.IsCompleted)
 			{
-				await Task;
-			}
-
-			var propertyChanged = PropertyChanged;
-
-			if (propertyChanged is not null)
-			{
-				propertyChanged(this, new PropertyChangedEventArgs(nameof(IsCompleted)));
-
-				if (Task.IsCanceled)
+				var scheduler = (SynchronizationContext.Current is null) ? TaskScheduler.Current : TaskScheduler.FromCurrentSynchronizationContext();
+				task.ContinueWith(t =>
 				{
-					propertyChanged(this, new PropertyChangedEventArgs(nameof(IsCanceled)));
-				}
-				else if (Task.IsFaulted)
-				{
-					propertyChanged(this, new PropertyChangedEventArgs(nameof(IsFaulted)));
-				}
-				else
-				{
-					propertyChanged(this, new PropertyChangedEventArgs(nameof(IsSuccessfullyCompleted)));
-					propertyChanged(this, new PropertyChangedEventArgs(nameof(Result)));
-				}
+					var propertyChanged = PropertyChanged;
+
+					if (propertyChanged is not null)
+					{
+						propertyChanged(this, new PropertyChangedEventArgs(nameof(IsCompleted)));
+
+						if (t.IsCanceled)
+						{
+							propertyChanged(this, new PropertyChangedEventArgs(nameof(IsCanceled)));
+						}
+						else if (t.IsFaulted)
+						{
+							propertyChanged(this, new PropertyChangedEventArgs(nameof(IsFaulted)));
+						}
+						else
+						{
+							propertyChanged(this, new PropertyChangedEventArgs(nameof(IsSuccessfullyCompleted)));
+							propertyChanged(this, new PropertyChangedEventArgs(nameof(Result)));
+						}
+					}
+				},
+				CancellationToken.None,
+				TaskContinuationOptions.ExecuteSynchronously,
+				scheduler);
 			}
 		}
 
@@ -59,7 +47,7 @@ namespace FileExplorerCore.Helpers
 		public Task<TResult> Task { get; private set; }
 
 		// Gets the result of the task. Returns the default value of TResult if the task has not completed successfully.
-		public TResult? Result => (Task.Status is TaskStatus.RanToCompletion) ? Task.Result : default;
+		public TResult? Result => Task.Status is TaskStatus.RanToCompletion ? Task.Result : default;
 
 		// Gets whether the task has completed.
 		public bool IsCompleted => Task.IsCompleted;
