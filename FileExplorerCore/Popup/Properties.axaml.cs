@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media.Imaging;
@@ -77,7 +78,7 @@ namespace FileExplorerCore.Popup
 				OnPropertyChanged(nameof(Size));
 				OnPropertyChanged(nameof(CreatedOn));
 
-				MetaData.AddRange(MetaDataHelper.GetData(path));
+				MetaData.AddRange<Comparer<MetadataExtractor.Directory>>(MetaDataHelper.GetData(path));
 			}
 		}
 

@@ -19,64 +19,49 @@ namespace FileExplorerCore.Helpers
 			AttributesToSkip = FileAttributes.System,
 		};
 
-		[ProtoMember(1, DataFormat = DataFormat.Group)]
-		private FileSystemTreeItem[] children;
+		// [ProtoMember(1, DataFormat = DataFormat.Group)]
+		// private FileSystemTreeItem[] children;
 
-		// public List<FileSystemTreeItem> Children
-		// {
-		// 	get
-		// 	{
-		// 		if (children is null)
-		// 		{
-		// 			children = new List<FileSystemTreeItem>();
-		//
-		// 			try
-		// 			{
-		// 				foreach (var item in Query)
-		// 				{
-		// 					children.Add(item);
-		// 				}
-		// 			}
-		// 			catch (Exception e)
-		// 			{
-		// 			}
-		// 		}
-		//
-		// 		return children;
-		// 	}
-		// }
+		//private WeakReference<FileSystemTreeItem?>? _parent;
+		private FileSystemTreeItem? _parent;
 
 		public IEnumerable<FileSystemTreeItem> Children
 		{
 			get
 			{
-				// if (IsFolder)
-				// {
-				// 	if (children is null)
-				// 	{
-				// 		children = GetPath(path => new FileSystemEnumerable<FileSystemTreeItem>(path.ToString(), (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName.ToString(), x.IsDirectory, this), options).ToArray());
-				// 	}
-				//
-				// 	return children;
-				// }
-				//
-				// return Enumerable.Empty<FileSystemTreeItem>();
-
 				return IsFolder 
-					? GetPath((path, parent) => new FileSystemEnumerable<FileSystemTreeItem>(path.ToString(), (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName.ToString(), x.IsDirectory, parent), options), this) 
+					? GetPath((path, parent) =>
+					{
+						var currentPath = path.ToString();
+
+						return Directory.Exists(currentPath) 
+							? new FileSystemEnumerable<FileSystemTreeItem>(path.ToString(), (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName.ToString(), x.IsDirectory, parent), options) 
+							: Enumerable.Empty<FileSystemTreeItem>();
+					}, this) 
 					: Enumerable.Empty<FileSystemTreeItem>();
 			}
 		}
 
 		[ProtoMember(3)]
-		public bool IsFolder { get; init; }
+		public bool IsFolder { get; }
 
-		public FileSystemTreeItem? Parent { get; set; }
+		public FileSystemTreeItem? Parent
+		{
+			get
+			{
+				// return _parent?.TryGetTarget(out var parent) == true 
+				// 	? parent 
+				// 	: null;
+				return _parent;
+			}
+			// set => _parent = new WeakReference<FileSystemTreeItem?>(value);
+			set => _parent = value;
+		}
 
 		[ProtoMember(2)]
 		public string Value { get; set; }
 
-		public bool HasParent => Parent is not null;
+		public bool HasParent => _parent is not null; // _parent?.TryGetTarget(out var parent) == true && parent is not null;
 		public bool HasChildren => Children.Any();
 
 		public FileSystemTreeItem()
@@ -156,14 +141,18 @@ namespace FileExplorerCore.Helpers
 
 		public IEnumerable<FileSystemTreeItem> EnumerateChildren(uint layers = UInt32.MaxValue)
 		{
+			var children = new List<FileSystemTreeItem>();
+			
 			foreach (var child in Children)
 			{
 				yield return child;
+				
+				children.Add(child);
 			}
 
 			if (layers > 0)
 			{
-				foreach (var child in Children)
+				foreach (var child in children)
 				{
 					foreach (var childOfChild in child.EnumerateChildren(layers - 1))
 					{

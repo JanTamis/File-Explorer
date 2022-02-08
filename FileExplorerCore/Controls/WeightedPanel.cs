@@ -50,7 +50,7 @@ namespace FileExplorerCore.Controls
 
 		protected override Size MeasureOverride(Size availableSize)
 		{
-			foreach (ChildAndRect child in ChildrenTreemapOrder(GetChildren(), availableSize))
+			foreach (var child in ChildrenTreemapOrder(GetChildren(), availableSize))
 				if (!Double.IsNaN(child.Rectangle.Width) && !Double.IsNaN(child.Rectangle.Height))
 					child.Element.Measure(child.Rectangle.Size);
 
@@ -59,7 +59,7 @@ namespace FileExplorerCore.Controls
 
 		protected override Size ArrangeOverride(Size finalSize)
 		{
-			foreach (ChildAndRect child in ChildrenTreemapOrder(GetChildren(), finalSize))
+			foreach (var child in ChildrenTreemapOrder(GetChildren(), finalSize))
 				if (!Double.IsNaN(child.Rectangle.Width) && !Double.IsNaN(child.Rectangle.Height))
 					child.Element.Arrange(child.Rectangle);
 
@@ -86,11 +86,11 @@ namespace FileExplorerCore.Controls
 		/// <returns></returns>
 		private IEnumerable<ChildAndRect> ChildrenTreemapOrder(IEnumerable<IControl> elems, Size containerSize)
 		{
-			double remainingWeight = TotalChildWeight();
-			double totalWeight = remainingWeight;
+			var remainingWeight = TotalChildWeight();
+			var totalWeight = remainingWeight;
 
-			double top = 0.0;
-			double left = 0.0;
+			var top = 0.0;
+			var left = 0.0;
 
 			// Alternate between left edge and top edge
 			bool leftEdge;
@@ -106,9 +106,9 @@ namespace FileExplorerCore.Controls
 
 				Size size;
 
-				double childWeight = GetWeight(child);
+				var childWeight = GetWeight(child);
 
-				double pctArea = childWeight / remainingWeight;
+				var pctArea = childWeight / remainingWeight;
 				remainingWeight -= childWeight;
 
 				// Entire height, proportionate width
@@ -132,7 +132,7 @@ namespace FileExplorerCore.Controls
 		{
 			var count = Children.Count;
 
-			for (int i = 0; i < count; i++)
+			for (var i = 0; i < count; i++)
 			{
 				yield return Children[i];
 				count = Children.Count;

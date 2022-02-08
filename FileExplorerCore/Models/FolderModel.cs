@@ -18,21 +18,15 @@ namespace FileExplorerCore.Models
 		public FileSystemTreeItem TreeItem { get; }
 
 		private IImage _image;
-		static Task imageLoadTask;
-
-		public readonly static ConcurrentBag<FolderModel> FileImageQueue = new();
-		readonly IEnumerable<FolderModel> query = Enumerable.Empty<FolderModel>();
 
 		public string Name => TreeItem.Value;
 		public string Path => TreeItem.GetPath(path => path.ToString());
 
 		public IEnumerable<FolderModel> SubFolders => TreeItem
-			.EnumerateChildren(0)
-			.Cast<FileSystemTreeItem>()
+			.Children
 			.Where(w => w.IsFolder)
+			.OrderBy(o => o.Value)
 			.Select(s => new FolderModel(s));
-
-		//public Task<IEnumerable<FolderModel>> SubFolders => Task.Run(() => (IEnumerable<FolderModel>)query.ToArray());
 
 		public FolderModel(FileSystemTreeItem item)
 		{

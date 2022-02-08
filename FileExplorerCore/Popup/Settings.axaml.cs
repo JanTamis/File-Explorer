@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Themes.Fluent;
@@ -86,11 +87,11 @@ namespace FileExplorerCore.Popup
 				var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
 													select new FolderModel(MainWindowViewModel.GetTreeItemInitialized(KnownFolders.GetPath(specialFolder).ToString()));
 
-				await MainWindowViewModel.Folders.AddRange(quickAccess.Concat(drives));
+				await MainWindowViewModel.Folders.AddRange<Comparer<FolderModel>>(quickAccess.Concat(drives));
 			}
 			else if (OperatingSystem.IsMacOS() && MainWindowViewModel.Tree is not null)
 			{
-				await MainWindowViewModel.Folders.AddRange(MainWindowViewModel.Tree.Children
+				await MainWindowViewModel.Folders.AddRange<Comparer<FolderModel>>(MainWindowViewModel.Tree.Children
 					.Select(s => new FolderModel(s)));
 			}
 

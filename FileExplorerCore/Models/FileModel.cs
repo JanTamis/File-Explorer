@@ -42,10 +42,7 @@ namespace FileExplorerCore.Models
 		public bool IsVisible
 		{
 			get => _isVisible;
-			set
-			{
-				_isVisible = value;
-			}
+			set { _isVisible = value; }
 		}
 
 		public bool IsSelected
@@ -71,10 +68,7 @@ namespace FileExplorerCore.Models
 
 		public string Path
 		{
-			get
-			{
-				return TreeItem.GetPath(path => path.ToString());
-			}
+			get { return TreeItem.GetPath(path => path.ToString()); }
 		}
 
 		public string Name
@@ -139,24 +133,9 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				if (_size == -1 && !IsFolder)
+				if (_size == -1 && !IsFolder && new FileInfo(Path) is { Exists: true } info)
 				{
-					//using (var handle = File.OpenHandle(Path, FileMode.Open, FileAccess.Read, FileShare.Read, FileOptions.RandomAccess))
-					//{
-					//	if (!handle.IsInvalid)
-					//	{
-					//		_size = RandomAccess.GetLength(handle);
-					//	}
-					//}
-
-					//if (OperatingSystem.IsWindows())
-					//{
-					//_size = TreeItem.GetPath(path => DirectoryAlternative.GetFileSize(path));
-					//}
-					//else
-					//{
-					_size = new FileInfo(Path).Length;
-					//}
+					_size = info.Length;
 				}
 
 				return _size;

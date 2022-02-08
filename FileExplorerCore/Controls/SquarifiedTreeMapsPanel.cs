@@ -49,8 +49,8 @@ namespace FileExplorerCore.Controls
 			var items2 = new List<WeightUIElement>(items);
 			items2.RemoveAt(0);
 
-			double worst1 = Worst(row, sideLength);
-			double worst2 = Worst(row2, sideLength);
+			var worst1 = Worst(row, sideLength);
+			var worst2 = Worst(row2, sideLength);
 
 			if (row.Count == 0 || worst1 > worst2)
 				Squarify(items2, row2, sideLength);
@@ -71,9 +71,9 @@ namespace FileExplorerCore.Controls
 			if (row.Count == 0) return 0;
 
 			double maxArea = 0;
-			double minArea = double.MaxValue;
+			var minArea = double.MaxValue;
 			double totalArea = 0;
-			foreach (WeightUIElement item in row)
+			foreach (var item in row)
 			{
 				maxArea = Math.Max(maxArea, item.RealArea);
 				minArea = Math.Min(minArea, item.RealArea);
@@ -81,8 +81,8 @@ namespace FileExplorerCore.Controls
 			}
 			if (minArea == double.MaxValue) minArea = 0;
 
-			double val1 = (sideLength * sideLength * maxArea) / (totalArea * totalArea);
-			double val2 = (totalArea * totalArea) / (sideLength * sideLength * minArea);
+			var val1 = (sideLength * sideLength * maxArea) / (totalArea * totalArea);
+			var val2 = (totalArea * totalArea) / (sideLength * sideLength * minArea);
 			return Math.Max(val1, val2);
 		}
 

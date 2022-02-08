@@ -81,7 +81,7 @@ namespace FileExplorerCore.Controls
 
 		protected override Size ArrangeOverride(Size arrangeSize)
 		{
-			foreach (WeightUIElement child in ManagedItems)
+			foreach (var child in ManagedItems)
 				if (!double.IsNaN(child.ComputedSize.Width) && !double.IsNaN(child.ComputedSize.Height))
 					child.UIElement.Arrange(new Rect(child.ComputedLocation, child.ComputedSize));
 
@@ -96,7 +96,7 @@ namespace FileExplorerCore.Controls
 			var area = EmptyArea.Width * EmptyArea.Height;
 			var count = ManagedItems.Count;
 
-			for (int i = 0; i < count; i++)
+			for (var i = 0; i < count; i++)
 			{
 				var item = ManagedItems[i];
 
@@ -107,7 +107,7 @@ namespace FileExplorerCore.Controls
 
 			ComputeBounds();
 
-			for (int i = 0; i < count; i++)
+			for (var i = 0; i < count; i++)
 			{
 				var child = ManagedItems[i];
 
@@ -155,11 +155,11 @@ namespace FileExplorerCore.Controls
 
 		protected void ComputeTreeMaps(List<WeightUIElement> items)
 		{
-			RowOrientation orientation = GetOrientation();
+			var orientation = GetOrientation();
 
 			double areaSum = 0;
 
-			foreach (WeightUIElement item in items)
+			foreach (var item in items)
 				areaSum += item.RealArea;
 
 			Rect currentRow;
@@ -174,12 +174,12 @@ namespace FileExplorerCore.Controls
 				_emptyArea = new Rect(_emptyArea.X, _emptyArea.Y + currentRow.Height, _emptyArea.Width, Math.Max(0, _emptyArea.Height - currentRow.Height));
 			}
 
-			double prevX = currentRow.X;
-			double prevY = currentRow.Y;
+			var prevX = currentRow.X;
+			var prevY = currentRow.Y;
 
-			foreach (WeightUIElement item in items)
+			foreach (var item in items)
 			{
-				Rect rect = GetRectangle(orientation, item, prevX, prevY, currentRow.Width, currentRow.Height);
+				var rect = GetRectangle(orientation, item, prevX, prevY, currentRow.Width, currentRow.Height);
 
 				item.AspectRatio = rect.Width / rect.Height;
 				item.ComputedSize = rect.Size;

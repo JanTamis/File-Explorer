@@ -76,7 +76,7 @@ namespace FileExplorerCore.Helpers
 
 			static DateTime ConvertDateTime(int high, int low)
 			{
-				long fileTime = CombineHighLowInts((uint)high, (uint)low);
+				var fileTime = CombineHighLowInts((uint)high, (uint)low);
 				return DateTime.FromFileTimeUtc(fileTime).ToLocalTime();
 			}
 		}
@@ -86,7 +86,7 @@ namespace FileExplorerCore.Helpers
 			fixed (char* ptr = path)
 			{
 				var findFileData = new WIN32_FIND_DATA();
-				IntPtr hFindFile = UnicodeFileInfo.FindFirstFile(ptr, ref findFileData);
+				var hFindFile = UnicodeFileInfo.FindFirstFile(ptr, ref findFileData);
 
 				var attributes = (FileAttributes)findFileData.dwFileAttributes;
 

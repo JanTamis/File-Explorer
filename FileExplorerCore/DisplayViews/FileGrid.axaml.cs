@@ -135,21 +135,21 @@ namespace FileExplorerCore.DisplayViews
 			}
 			else if (range)
 			{
-				for (int i = 0; i < files.Count; i++)
+				for (var i = 0; i < files.Count; i++)
 				{
 					files[i].IsSelected = false;
 				}
 
 				if (index > anchorIndex)
 				{
-					for (int i = anchorIndex; i <= index; i++)
+					for (var i = anchorIndex; i <= index; i++)
 					{
 						files[i].IsSelected = true;
 					}
 				}
 				else
 				{
-					for (int i = index; i <= anchorIndex; i++)
+					for (var i = index; i <= anchorIndex; i++)
 					{
 						files[i].IsSelected = true;
 					}
@@ -168,7 +168,7 @@ namespace FileExplorerCore.DisplayViews
 			}
 			else
 			{
-				for (int i = 0; i < files.Count; i++)
+				for (var i = 0; i < files.Count; i++)
 				{
 					files[i].IsSelected = false;
 				}

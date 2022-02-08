@@ -53,7 +53,7 @@ namespace FileExplorerCore.Models
 							return resultY.CompareTo(resultX);
 						});
 
-						ThreadPool.QueueUserWorkItem(async x => await _items.AddRange(query, comparer));
+						ThreadPool.QueueUserWorkItem(async x => await _items.AddRangeAsync(query, comparer));
 					}
 				}
 

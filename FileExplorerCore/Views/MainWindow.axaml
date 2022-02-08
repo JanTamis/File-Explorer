@@ -309,7 +309,7 @@
               </TabStrip>
 
               <Viewbox Margin="5 0 0 0"
-											Grid.Column="2"
+											Grid.Column="1"
 											Padding="2">
                 <Button Cursor="Hand"
 												Padding="0"

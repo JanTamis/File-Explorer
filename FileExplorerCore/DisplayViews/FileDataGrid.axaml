@@ -1,14 +1,14 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-						xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-						xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-						xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-						xmlns:converters="using:FileExplorerCore.Converters"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="using:FileExplorerCore.Converters"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
-						xmlns:models="clr-namespace:FileExplorerCore.Models"
+             xmlns:models="clr-namespace:FileExplorerCore.Models"
              xmlns:viewmodel="clr-namespace:FileExplorerCore.ViewModels"
-						xmlns:helpers="clr-namespace:FileExplorerCore.Helpers"
-						mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-						x:Class="FileExplorerCore.DisplayViews.FileDataGrid">
+             xmlns:helpers="clr-namespace:FileExplorerCore.Helpers"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="FileExplorerCore.DisplayViews.FileDataGrid">
 	<UserControl.Resources>
 		<converters:PathToImageConverter x:Key="imageConverter" />
 		<converters:EditedOnConverter x:Key="editedOnConverter" />
@@ -16,97 +16,74 @@
 		<converters:SizeConverter x:Key="sizeConverter" />
 		<converters:FileNameConverter x:Key="fileNameConverter" />
 		<converters:ImageTransformConverter x:Key="imageTransformConverter" />
-    <converters:DateTimeConverter x:Key="dateTimeConverter" />
+		<converters:DateTimeConverter x:Key="dateTimeConverter" />
 
-    <system:Int32 x:Key="ImageSize">32</system:Int32>
+		<system:Int32 x:Key="ImageSize">32</system:Int32>
 	</UserControl.Resources>
-	
-	  <DataGrid x:Name="fileList"
-	  					Items="{Binding Files}"  
-	  					CanUserReorderColumns="True"  
-	  					CanUserResizeColumns="True"  
-	  					AlternatingRowBackground="{DynamicResource Background}" >  
-	  	<DataGrid.Columns>  
-	  		<DataGridTemplateColumn CanUserSort="False"  
-	  														CanUserResize="False"  
-	  														CanUserReorder="False">  
-	  			<DataGridTemplateColumn.CellTemplate>  
-	  				<DataTemplate>
-	  						<Image DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
-                       x:DataType="models:FileModel"
-                       Source="{Binding Result}"
-                       Width="32"
-                       Height="32"
-                       Margin="2.5"/>
-	  				</DataTemplate>  
-	  			</DataGridTemplateColumn.CellTemplate>  
-	  		</DataGridTemplateColumn>
 
-	      <DataGridTemplateColumn CanUserSort="False"
-	                              CanUserReorder="True"
-	                              Header="Name"
-	                              Width="Auto"
-	                              MinWidth="200"
-	                              SortMemberPath="Name">
-		      <DataGridTemplateColumn.CellTemplate>
-			      <DataTemplate>
-				      <TextBlock Text="{CompiledBinding Name}"
-                         x:DataType="models:FileModel"
-				                 TextTrimming="CharacterEllipsis"
-				                 VerticalAlignment="Center"
-				                 Margin="10 0 0 0" />
-			      </DataTemplate>
-		      </DataGridTemplateColumn.CellTemplate>
-	      </DataGridTemplateColumn> 
-	   
-	  		<DataGridTemplateColumn CanUserSort="False"  
-	  														CanUserReorder="True"  
-	  														Header="Extension"  
-	  														SortMemberPath="Extension">  
-	  			<DataGridTemplateColumn.CellTemplate>  
-	  				<DataTemplate>  
-	  					<TextBlock Text="{CompiledBinding, Converter={StaticResource extensionConverter}}"  
-	  										 TextTrimming="CharacterEllipsis"   
-                         x:DataType="models:FileModel"
-	  										 VerticalAlignment="Center"   
-	  										 Margin="10 0 0 0" />  
-	  				</DataTemplate>  
-	  			</DataGridTemplateColumn.CellTemplate>  
-	  		</DataGridTemplateColumn> 
+	<ScrollViewer>
+		<ItemsRepeater Items="{Binding Files}"
+		               Margin="0 0 0 5"
+		               x:Name="fileList">
+			<ItemsRepeater.Layout>
+				<StackLayout Orientation="Vertical" />
+			</ItemsRepeater.Layout>
 
-	      <DataGridTemplateColumn SortMemberPath="EditedOn"
-		      													 Header="Edited On"
-		      													 CanUserResize="True"
-		      													 CanUserReorder="True"
-		                                 CanUserSort="False"
-		      													 Width="Auto" >
-		             <DataGridTemplateColumn.CellTemplate>
-		               <DataTemplate>
-		                 <TextBlock Text="{CompiledBinding EditedOn, Converter={StaticResource dateTimeConverter}}"
-		      										 TextTrimming="CharacterEllipsis"
-                                x:DataType="models:FileModel"
-		                            IsHitTestVisible="False"
-		      										 VerticalAlignment="Center"
-		      										 Margin="10 0 0 0" />
-		               </DataTemplate>
-		             </DataGridTemplateColumn.CellTemplate>
-		           </DataGridTemplateColumn>
-	   
-	  		<DataGridTextColumn Binding="{CompiledBinding, Converter={StaticResource sizeConverter}}"  
-	  												SortMemberPath="Size"
-                            x:DataType="models:FileModel"
-	                          CanUserSort="False"
-	  												Header="Size"  
-	  												CanUserResize="True"  
-	  												CanUserReorder="True"  
-	  												Width="Auto" />  
-	  	</DataGrid.Columns>  
-	   
-	  	<DataGrid.Styles>  
-	  		<Style Selector="TextBox">  
-	  			<Setter Property="VerticalContentAlignment" Value="Center" />  
-	  			<Setter Property="Background" Value="Transparent" />  
-	  		</Style>  
-	  	</DataGrid.Styles>  
-	  </DataGrid>
+			<ItemsRepeater.Styles>
+				<Style Selector="ListBoxItem">
+					<Setter Property="Background" Value="Transparent" />
+					<Setter Property="Template">
+						<ControlTemplate>
+							<Border Name="PART_ContentPresenter">
+								<ContentPresenter ClipToBounds="true"
+								                  Background="{TemplateBinding Background}"
+								                  BorderBrush="{TemplateBinding BorderBrush}"
+								                  BorderThickness="{TemplateBinding BorderThickness}"
+								                  ContentTemplate="{TemplateBinding ContentTemplate}"
+								                  Content="{TemplateBinding Content}"
+								                  Padding="{TemplateBinding Padding}"
+								                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+								                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
+							</Border>
+						</ControlTemplate>
+					</Setter>
+				</Style>
+			</ItemsRepeater.Styles>
+
+			<ItemsRepeater.ItemTemplate>
+				<DataTemplate DataType="models:FileModel">
+					<ListBoxItem Margin="0"
+					             Padding="4, 6"
+					             IsSelected="{Binding IsSelected}"
+					             Cursor="Hand"
+					             VerticalContentAlignment="Stretch"
+					             HorizontalContentAlignment="Stretch">
+						<StackPanel Margin="0"
+						            Orientation="Horizontal"
+						            HorizontalAlignment="Left"
+						            VerticalAlignment="Center">
+							<Image DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
+										 Source="{Binding Result}"
+										 x:DataType="models:FileModel"
+										 Width="32"
+										 Height="32" />
+							
+							<StackPanel VerticalAlignment="Center"
+							            Margin="2 0 0 0">
+								<TextBlock Text="{Binding Name}"
+								           TextTrimming="CharacterEllipsis"
+								           HorizontalAlignment="Stretch" />
+
+								<TextBlock Text="{Binding Size, Converter={StaticResource sizeConverter}}"
+								           FontSize="11"
+								           Foreground="{DynamicResource SystemBaseMediumColor}" />
+							</StackPanel>
+
+							
+						</StackPanel>
+					</ListBoxItem>
+				</DataTemplate>
+			</ItemsRepeater.ItemTemplate>
+		</ItemsRepeater>
+	</ScrollViewer>
 </UserControl>

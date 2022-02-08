@@ -53,86 +53,81 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
-		public static async Task<IImage?> GetFileImage(FileSystemTreeItem? treeItem, int size)
+		public static Task<IImage?> GetFileImage(FileSystemTreeItem? treeItem, int size)
 		{
-			return await Task.Run<IImage?>(() =>
+			var name = String.Empty;
+
+			if (OperatingSystem.IsWindows())
 			{
-				var name = String.Empty;
-
-				//if (OperatingSystem.IsWindows())
-				//{
-				//	var image = treeItem.GetPath(path => WindowsThumbnailProvider.GetThumbnail(path, size, size));
-
-				//	if (image is not null)
-				//	{
-				//		return image;
-				//	}
-				//}
-
-				if (treeItem.IsFolder)
+				return Task.Run<IImage?>(() =>
 				{
-					if (OperatingSystem.IsWindows())
+					return treeItem?.GetPath((path, imageSize) => WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize), size);
+				});
+			}
+
+			if (treeItem.IsFolder)
+			{
+				if (OperatingSystem.IsWindows())
+				{
+					foreach (var folder in Enum.GetValues<KnownFolder>())
 					{
-						foreach (var folder in Enum.GetValues<KnownFolder>())
+						var folderText = Enum.GetName(folder);
+
+						if (folderText is not null && treeItem.GetPath(x => x.SequenceEqual(KnownFolders.GetPath(folder))))
 						{
-							var folderText = Enum.GetName(folder);
-
-							if (folderText is not null && treeItem.GetPath(x => x.SequenceEqual(KnownFolders.GetPath(folder))))
-							{
-								name = folderText;
-							}
+							name = folderText;
 						}
-					}
-
-					if (!treeItem.HasParent)
-					{
-						var driveInfo = new DriveInfo(new string(treeItem.Value[0], 1));
-
-						if (driveInfo.IsReady)
-						{
-							name = Enum.GetName(driveInfo.DriveType);
-						}
-					}
-
-					if (name == String.Empty)
-					{
-						name = treeItem.HasChildren
-							? "FolderFiles"
-							: "Folder";
 					}
 				}
-				else
+
+				if (!treeItem.HasParent)
 				{
-					name = "File";
+					var driveInfo = new DriveInfo(new string(treeItem.Value[0], 1));
 
-					var extension = Path.GetExtension(treeItem.Value).ToLower();
-
-					if (extension.Length > 1)
+					if (driveInfo.IsReady)
 					{
-						extension = extension[1..];
+						name = Enum.GetName(driveInfo.DriveType);
+					}
+				}
 
-						if (Images.ContainsKey(extension))
+				if (name == String.Empty)
+				{
+					name = treeItem.HasChildren
+						? "FolderFiles"
+						: "Folder";
+				}
+			}
+			else
+			{
+				name = "File";
+
+				var extension = Path.GetExtension(treeItem.Value).ToLower();
+
+				if (extension.Length > 1)
+				{
+					extension = extension[1..];
+
+					if (Images.ContainsKey(extension))
+					{
+						name = extension;
+					}
+					else
+					{
+						foreach (var (key, value) in TypeMap)
 						{
-							name = extension;
-						}
-						else
-						{
-							foreach (var (key, value) in TypeMap)
+							foreach (var val in value)
 							{
-								foreach (var val in value)
+								if (extension == val)
 								{
-									if (extension == val)
-									{
-										name = key;
-									}
+									name = key;
 								}
 							}
 						}
 					}
 				}
+			}
 
-				return GetImage(name);
-			});
+			return Task.FromResult<IImage?>(GetImage(name));
 		}
 
 		private static bool ImageExists(string key)

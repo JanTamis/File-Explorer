@@ -7,38 +7,30 @@ using Avalonia.Markup.Xaml;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using DataBox;
 
 namespace FileExplorerCore.DisplayViews
 {
-	public partial class FileDataGrid : UserControl, INotifyPropertyChanged
+	public partial class FileDataGrid : UserControl
 	{
-		private int anchorIndex;
-
+		private int anchorIndex = 0;
 		public event Action<FileSystemTreeItem> PathChanged = delegate { };
-		public new event PropertyChangedEventHandler PropertyChanged = delegate { };
-
-		private ObservableRangeCollection<FileModel> _files;
 
 		public ObservableRangeCollection<FileModel> Files
 		{
-			get => _files;
 			set
 			{
-				OnPropertyChanged(ref _files, value);
+				var grid = this.FindControl<ItemsRepeater>("fileList");
 
-				//_files.CollectionChanged += delegate
-				//{
-				//	OnPropertyChanged(nameof(View));
+				grid.Items = value;
+			}
+			get
+			{
+				var grid = this.FindControl<ItemsRepeater>("fileList");
 
-				//	var view = View;
-				//	view.GroupDescriptions.Add(new DataGridPathGroupDescription("Extension"));
-
-				//	var grid = this.FindControl<DataGrid>("fileList");
-
-				//	grid.Items = View;
-				//};
+				return grid.Items as ObservableRangeCollection<FileModel>;
 			}
 		}
 
@@ -46,159 +38,24 @@ namespace FileExplorerCore.DisplayViews
 		{
 			AvaloniaXamlLoader.Load(this);
 
-			var grid = this.FindControl<DataGrid>("fileList");
+			var grid = this.FindControl<ItemsRepeater>("fileList");
 
-			// grid.ElementPrepared += Grid_ElementPrepared;
-			// grid.ElementClearing += Grid_ElementClearing;
-			//
-			// grid.KeyDown += Grid_KeyDown;
+			grid.ElementPrepared += Grid_ElementPrepared;
+			grid.ElementClearing += Grid_ElementClearing;
 
-			//var grid = this.FindControl<DataBox.DataBox>("fileList");
-
-			grid.LoadingRow += Grid_LoadingRow;
-			grid.UnloadingRow += Grid_UnloadingRow;
-			
-			grid.SelectionChanged += Grid_SelectionChanged;
-
-			// DataContextProperty.Changed.Subscribe(s =>
-			// {
-			// 	if (s.Sender is DataBoxRow)
-			// 	{
-			// 		if (s.OldValue.Value is FileModel oldModel)
-			// 		{
-			// 			oldModel.IsVisible = false;
-			// 		}
-			//
-			// 		if (s.NewValue.Value is FileModel newModel)
-			// 		{
-			// 			newModel.IsVisible = true;
-			// 		}
-			// 	}
-			// });
-
-			grid.DoubleTapped += (_, args) =>
-			{
-				if (args.Source is { InteractiveParent: DataBoxCell { DataContext: FileModel model } })
-				{
-					PathChanged?.Invoke(model.TreeItem);
-				}
-			};
-
-			ListBoxItem.IsSelectedProperty.Changed.Subscribe(s =>
-			{
-				if (s.Sender is DataBoxRow { DataContext: FileModel model })
-				{
-					model.IsSelected = s.NewValue.Value;
-				}
-			});
-
-
-			FileModel.SelectionChanged += file =>
-			{
-				if (grid.Items != null)
-				{
-					if (file.IsSelected)
-					{
-						grid.SelectedItems.Add(file);
-					}
-					else
-					{
-						grid.SelectedItems.Remove(file);
-					}
-				}
-			};
+			grid.KeyDown += Grid_KeyDown;
 		}
 
-		private void Grid_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+		private void Grid_KeyDown(object? sender, KeyEventArgs e)
 		{
-			foreach (FileModel item in e.AddedItems)
+			if (e.Key is Key.A && e.KeyModifiers is KeyModifiers.Control)
 			{
-				item.IsSelected = true;
-			}
-
-			foreach (FileModel item in e.RemovedItems)
-			{
-				item.IsSelected = false;
+				foreach (var file in Files.Where(x => !x.IsSelected))
+				{
+					file.IsSelected = true;
+				}
 			}
 		}
-
-		private void Grid_UnloadingRow(object? sender, DataGridRowEventArgs e)
-		{
-			e.Row.DoubleTapped -= Item_DoubleTapped;
-
-			if (e.Row.DataContext is FileModel model)
-			{
-				model.IsVisible = false;
-			}
-		}
-
-		private void Grid_LoadingRow(object? sender, DataGridRowEventArgs e)
-		{
-			e.Row.DoubleTapped += Item_DoubleTapped;
-
-			if (e.Row.DataContext is FileModel model)
-			{
-				model.IsVisible = true;
-			}
-		}
-
-		// private void Grid_KeyDown(object? sender, KeyEventArgs e)
-		// {
-		// 	if (sender is ItemsRepeater { Parent: ScrollViewer viewer } repeater)
-		// 	{
-		// 		if (e.Key is Key.A && e.KeyModifiers is KeyModifiers.Control)
-		// 		{
-		// 			foreach (var file in Files.Where(x => !x.IsSelected))
-		// 			{
-		// 				file.IsSelected = true;
-		// 			}
-		// 		}
-		// 		else if (e.Key is Key.Down)
-		// 		{
-		// 			anchorIndex = Math.Min(Files.Count - 1, anchorIndex + 1);
-		//
-		// 			UpdateSelection(anchorIndex);
-		//
-		// 			viewer.Offset = new Vector(0, anchorIndex * elementHeight - viewer.Bounds.Height / 2 + elementHeight / 2);
-		// 		}
-		// 		else if (e.Key is Key.Up)
-		// 		{
-		// 			anchorIndex = Math.Max(0, anchorIndex - 1);
-		//
-		// 			UpdateSelection(anchorIndex);
-		//
-		// 			viewer.Offset = new Vector(0, anchorIndex * elementHeight - viewer.Bounds.Height / 2 + elementHeight / 2);
-		// 		}
-		// 		else if (e.Key.ToString() is { Length: 1 } key)
-		// 		{
-		// 			var index = IndexOf(Char.ToUpper(key[0]));
-		//
-		// 			if (index != -1)
-		// 			{
-		// 				anchorIndex = index;
-		//
-		// 				UpdateSelection(anchorIndex);
-		//
-		// 				viewer.Offset = new Vector(0, anchorIndex * elementHeight - viewer.Bounds.Height / 2 + elementHeight / 2);
-		// 			}
-		// 		}
-		// 	}
-		//
-		// 	int IndexOf(char startChar)
-		// 	{
-		// 		var files = Files;
-		//
-		// 		for (int i = 0; i < files.Count; i++)
-		// 		{
-		// 			if (Char.ToUpper(files[i].Name[0]) == startChar)
-		// 			{
-		// 				return i;
-		// 			}
-		// 		}
-		//
-		// 		return -1;
-		// 	}
-		// }
 
 		private void Grid_ElementClearing(object? sender, ItemsRepeaterElementClearingEventArgs e)
 		{
@@ -206,6 +63,8 @@ namespace FileExplorerCore.DisplayViews
 			{
 				item.DoubleTapped -= Item_DoubleTapped;
 				item.PointerPressed -= Item_PointerPressed;
+
+				model.IsVisible = false;
 			}
 		}
 
@@ -220,10 +79,10 @@ namespace FileExplorerCore.DisplayViews
 					var index = Files.IndexOf(model);
 
 					UpdateSelection(
-						index,
-						true,
-						e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
-						e.KeyModifiers.HasAllFlags(KeyModifiers.Control));
+												index,
+												true,
+												e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
+												e.KeyModifiers.HasAllFlags(KeyModifiers.Control));
 				}
 			}
 		}
@@ -234,20 +93,17 @@ namespace FileExplorerCore.DisplayViews
 			{
 				item.DoubleTapped += Item_DoubleTapped;
 				item.PointerPressed += Item_PointerPressed;
+
+				model.IsVisible = true;
 			}
 		}
 
 		private void Item_DoubleTapped(object? sender, RoutedEventArgs e)
 		{
-			if (sender is DataGridRow { DataContext: FileModel model })
+			if (sender is ListBoxItem { DataContext: FileModel model })
 			{
 				PathChanged(model.TreeItem);
 			}
-		}
-
-		private void Model_SelectionChanged(FileModel obj)
-		{
-			obj.OnPropertyChanged(nameof(obj.IsSelected));
 		}
 
 		/// <summary>
@@ -259,10 +115,10 @@ namespace FileExplorerCore.DisplayViews
 		/// <param name="toggleModifier">Whether the toggle modifier is enabled (i.e. ctrl key).</param>
 		/// <param name="rightButton">Whether the event is a right-click.</param>
 		protected void UpdateSelection(
-			int index,
-			bool select = true,
-			bool rangeModifier = false,
-			bool toggleModifier = false)
+				int index,
+				bool select = true,
+				bool rangeModifier = false,
+				bool toggleModifier = false)
 		{
 			var files = Files;
 
@@ -282,21 +138,21 @@ namespace FileExplorerCore.DisplayViews
 			}
 			else if (range)
 			{
-				for (int i = 0; i < files.Count; i++)
+				for (var i = 0; i < files.Count; i++)
 				{
 					files[i].IsSelected = false;
 				}
 
 				if (index > anchorIndex)
 				{
-					for (int i = anchorIndex; i <= index; i++)
+					for (var i = anchorIndex; i <= index; i++)
 					{
 						files[i].IsSelected = true;
 					}
 				}
 				else
 				{
-					for (int i = index; i <= anchorIndex; i++)
+					for (var i = index; i <= anchorIndex; i++)
 					{
 						files[i].IsSelected = true;
 					}
@@ -304,11 +160,18 @@ namespace FileExplorerCore.DisplayViews
 			}
 			else if (multi && toggle)
 			{
-				files[index].IsSelected ^= true;
+				if (files[index].IsSelected)
+				{
+					files[index].IsSelected = false;
+				}
+				else
+				{
+					files[index].IsSelected = true;
+				}
 			}
 			else
 			{
-				for (int i = 0; i < files.Count; i++)
+				for (var i = 0; i < files.Count; i++)
 				{
 					files[i].IsSelected = false;
 				}
@@ -322,23 +185,6 @@ namespace FileExplorerCore.DisplayViews
 			}
 
 			files.PropertyChanged("IsSelected");
-		}
-
-		protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
-		{
-			property = value;
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-		}
-
-		protected void OnPropertyChanged<T>(T property, T value, [CallerMemberName] string name = null)
-		{
-			property = value;
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-		}
-
-		public void OnPropertyChanged(string name)
-		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 		}
 	}
 }

@@ -58,8 +58,8 @@ namespace FileExplorerCore.Helpers
 		private static ReadOnlySpan<char> GetPath(KnownFolder knownFolder, KnownFolderFlags flags,
 				bool defaultUser)
 		{
-			int result = SHGetKnownFolderPath(new Guid(_knownFolderGuids[(int)knownFolder]),
-					(uint)flags, new IntPtr(defaultUser ? -1 : 0), out IntPtr outPath);
+			var result = SHGetKnownFolderPath(new Guid(_knownFolderGuids[(int)knownFolder]),
+					(uint)flags, new IntPtr(defaultUser ? -1 : 0), out var outPath);
 
 			if (result >= 0)
 			{

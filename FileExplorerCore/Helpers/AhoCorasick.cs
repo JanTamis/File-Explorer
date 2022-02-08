@@ -43,7 +43,7 @@ namespace AhoCorasick
 		/// <param name="strings">The strings to add.</param>
 		public void Add(IEnumerable<string> strings)
 		{
-			foreach (string s in strings)
+			foreach (var s in strings)
 			{
 				Add(s);
 			}
@@ -94,7 +94,7 @@ namespace AhoCorasick
 
 			// build a branch for the word, one letter at a time
 			// if a letter node doesn't exist, add it
-			foreach (T c in word)
+			foreach (var c in word)
 			{
 				var child = node[c];
 
@@ -154,7 +154,7 @@ namespace AhoCorasick
 		{
 			var node = root;
 
-			foreach (T c in text)
+			foreach (var c in text)
 			{
 				while (node[c] == null && node != root)
 					node = node.Fail;
@@ -163,7 +163,7 @@ namespace AhoCorasick
 
 				for (var t = node; t != root; t = t.Fail)
 				{
-					foreach (TValue value in t.Values)
+					foreach (var value in t.Values)
 						yield return value;
 				}
 			}
@@ -178,7 +178,7 @@ namespace AhoCorasick
 		{
 			var node = root;
 
-			foreach (T c in text)
+			foreach (var c in text)
 			{
 				while (node[c] == null && node != root)
 					node = node.Fail;

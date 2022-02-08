@@ -43,43 +43,43 @@ namespace FileTypeAndIcon
 			try
 			{
 				// Create a registry key object to represent the HKEY_CLASSES_ROOT registry section
-				RegistryKey rkRoot = Registry.ClassesRoot;
+				var rkRoot = Registry.ClassesRoot;
 
 				//Gets all sub keys' names.
-				string[] keyNames = rkRoot.GetSubKeyNames();
+				var keyNames = rkRoot.GetSubKeyNames();
 				var iconsInfo = new Dictionary<string, string>();
 
 				//Find the file icon.
-				foreach (string keyName in keyNames)
+				foreach (var keyName in keyNames)
 				{
 					if (String.IsNullOrEmpty(keyName))
 						continue;
-					int indexOfPoint = keyName.IndexOf(".");
+					var indexOfPoint = keyName.IndexOf(".");
 
 					//If this key is not a file exttension(eg, .zip), skip it.
 					if (indexOfPoint != 0)
 						continue;
 
-					RegistryKey rkFileType = rkRoot.OpenSubKey(keyName);
+					var rkFileType = rkRoot.OpenSubKey(keyName);
 					if (rkFileType == null)
 						continue;
 
 					//Gets the default value of this key that contains the information of file type.
-					object defaultValue = rkFileType.GetValue("");
+					var defaultValue = rkFileType.GetValue("");
 					if (defaultValue == null)
 						continue;
 
 					//Go to the key that specifies the default icon associates with this file type.
-					string defaultIcon = defaultValue.ToString() + "\\DefaultIcon";
-					RegistryKey rkFileIcon = rkRoot.OpenSubKey(defaultIcon);
+					var defaultIcon = defaultValue.ToString() + "\\DefaultIcon";
+					var rkFileIcon = rkRoot.OpenSubKey(defaultIcon);
 					if (rkFileIcon != null)
 					{
 						//Get the file contains the icon and the index of the icon in that file.
-						object value = rkFileIcon.GetValue("");
+						var value = rkFileIcon.GetValue("");
 						if (value != null)
 						{
 							//Clear all unecessary " sign in the string to avoid error.
-							string fileParam = value.ToString().Replace("\"", "");
+							var fileParam = value.ToString().Replace("\"", "");
 							iconsInfo.Add(keyName, fileParam);
 						}
 						rkFileIcon.Close();
@@ -105,10 +105,10 @@ namespace FileTypeAndIcon
 		{
 			try
 			{
-				EmbeddedIconInfo embeddedIcon = getEmbeddedIconInfo(fileAndParam);
+				var embeddedIcon = getEmbeddedIconInfo(fileAndParam);
 
 				//Gets the handle of the icon.
-				IntPtr lIcon = ExtractIcon(0, embeddedIcon.FileName, embeddedIcon.IconIndex);
+				var lIcon = ExtractIcon(0, embeddedIcon.FileName, embeddedIcon.IconIndex);
 
 				//Gets the real icon.
 				return Icon.FromHandle(lIcon);
@@ -129,7 +129,7 @@ namespace FileTypeAndIcon
 		{
 			try
 			{
-				EmbeddedIconInfo embeddedIcon = getEmbeddedIconInfo(fileAndParam);
+				var embeddedIcon = getEmbeddedIconInfo(fileAndParam);
 
 				//Gets the handle of the icon.
 				return ExtractIcon(0, embeddedIcon.FileName, embeddedIcon.IconIndex);
@@ -153,12 +153,12 @@ namespace FileTypeAndIcon
 			unsafe
 			{
 				uint readIconCount = 0;
-				IntPtr[] hDummy = new IntPtr[1] { IntPtr.Zero };
-				IntPtr[] hIconEx = new IntPtr[1] { IntPtr.Zero };
+				var hDummy = new IntPtr[1] { IntPtr.Zero };
+				var hIconEx = new IntPtr[1] { IntPtr.Zero };
 
 				try
 				{
-					EmbeddedIconInfo embeddedIcon = getEmbeddedIconInfo(fileAndParam);
+					var embeddedIcon = getEmbeddedIconInfo(fileAndParam);
 
 					if (isLarge)
 						readIconCount = ExtractIconEx(embeddedIcon.FileName, 0, hIconEx, hDummy, 1);
@@ -168,7 +168,7 @@ namespace FileTypeAndIcon
 					if (readIconCount > 0 && hIconEx[0] != IntPtr.Zero)
 					{
 						// Get first icon.
-						Icon extractedIcon = (Icon)Icon.FromHandle(hIconEx[0]).Clone();
+						var extractedIcon = (Icon)Icon.FromHandle(hIconEx[0]).Clone();
 
 						return extractedIcon;
 					}
@@ -183,11 +183,11 @@ namespace FileTypeAndIcon
 				finally
 				{
 					// Release resources.
-					foreach (IntPtr ptr in hIconEx)
+					foreach (var ptr in hIconEx)
 						if (ptr != IntPtr.Zero)
 							DestroyIcon(ptr);
 
-					foreach (IntPtr ptr in hDummy)
+					foreach (var ptr in hDummy)
 						if (ptr != IntPtr.Zero)
 							DestroyIcon(ptr);
 				}
@@ -206,19 +206,19 @@ namespace FileTypeAndIcon
 		/// <returns></returns>
 		protected static EmbeddedIconInfo getEmbeddedIconInfo(string fileAndParam)
 		{
-			EmbeddedIconInfo embeddedIcon = new EmbeddedIconInfo();
+			var embeddedIcon = new EmbeddedIconInfo();
 
 			if (String.IsNullOrEmpty(fileAndParam))
 				return embeddedIcon;
 
 			//Use to store the file contains icon.
-			string fileName = String.Empty;
+			var fileName = String.Empty;
 
 			//The index of the icon in the file.
-			int iconIndex = 0;
-			string iconIndexString = String.Empty;
+			var iconIndex = 0;
+			var iconIndexString = String.Empty;
 
-			int commaIndex = fileAndParam.IndexOf(",");
+			var commaIndex = fileAndParam.IndexOf(",");
 			//if fileAndParam is some thing likes that: "C:\\Program Files\\NetMeeting\\conf.exe,1".
 			if (commaIndex > 0)
 			{

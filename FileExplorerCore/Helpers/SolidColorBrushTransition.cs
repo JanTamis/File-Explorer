@@ -18,16 +18,16 @@ namespace FileExplorerCore.Helpers
 			if (newValue is not ISolidColorBrush newBrush)
 				throw new ArgumentException("Only instances of ISolidColorBrush are supported", nameof(newValue));
 
-			Color oldColor = oldBrush.Color;
-			Color newColor = newBrush.Color;
+			var oldColor = oldBrush.Color;
+			var newColor = newBrush.Color;
 
 			return progress.Select(p =>
 			{
-				double e = Easing.Ease(p);
-				int A = (int)(e * (newColor.A - oldColor.A) + 0.5) + oldColor.A;
-				int R = (int)(e * (newColor.R - oldColor.R) + 0.5) + oldColor.R;
-				int G = (int)(e * (newColor.G - oldColor.G) + 0.5) + oldColor.G;
-				int B = (int)(e * (newColor.B - oldColor.B) + 0.5) + oldColor.B;
+				var e = Easing.Ease(p);
+				var A = (int)(e * (newColor.A - oldColor.A) + 0.5) + oldColor.A;
+				var R = (int)(e * (newColor.R - oldColor.R) + 0.5) + oldColor.R;
+				var G = (int)(e * (newColor.G - oldColor.G) + 0.5) + oldColor.G;
+				var B = (int)(e * (newColor.B - oldColor.B) + 0.5) + oldColor.B;
 
 				return new SolidColorBrush(new Color((byte)A, (byte)R, (byte)G, (byte)B));
 			});
