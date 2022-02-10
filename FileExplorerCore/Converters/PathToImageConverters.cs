@@ -2,7 +2,6 @@
 using Avalonia.Data.Converters;
 using FileExplorerCore.Helpers;
 using System.Globalization;
-using System.Threading.Tasks;
 using Avalonia.Media;
 using FileExplorerCore.Models;
 

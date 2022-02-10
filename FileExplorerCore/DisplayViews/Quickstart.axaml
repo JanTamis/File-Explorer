@@ -5,81 +5,81 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
 						 xmlns:models="clr-namespace:FileExplorerCore.Models"
              x:Class="FileExplorerCore.DisplayViews.Quickstart">
-	<ScrollViewer>
-		<StackPanel>
-			<Expander ExpandDirection="Down"
-								IsExpanded="True"
-								Padding="0"
-								HorizontalAlignment="Stretch"
-								Header="{Binding FileCount, StringFormat=Recent Items ({0})}">
-
-				<ItemsRepeater Items="{Binding RecentFiles}"
-											 Margin="0 0 0 5">
-					<ItemsRepeater.Layout>
-						<UniformGridLayout ItemsStretch="Uniform"
-															 ItemsJustification="Start"
-															 MinItemWidth="150"
-															 MinItemHeight="140"/>
-					</ItemsRepeater.Layout>
-
-					<ItemsRepeater.ItemTemplate>
-						<DataTemplate DataType="models:FileModel">
-							<ListBoxItem Margin="5"
-													 Cursor="Hand"
-													 Height="140">
-								<StackPanel>
-									<Viewbox Width="100"
-													 Height="100"
-													 Margin="4"
-													 RenderTransform="{Binding ImageTransform}" >
-										<Image Source="{Binding Image}" />
-									</Viewbox>
-
-									<TextBlock Text="{Binding Name}"
-														 TextTrimming="CharacterEllipsis"
-														 HorizontalAlignment="Center"
-														 Margin="4 0"/>
-								</StackPanel>
-							</ListBoxItem>
-						</DataTemplate>
-					</ItemsRepeater.ItemTemplate>
-				</ItemsRepeater>
-			</Expander>
-
-			<Expander ExpandDirection="Down"
-								IsExpanded="True"
-								HorizontalAlignment="Stretch"
-								Header="{Binding DriveCount, StringFormat=Drives ({0})}">
-				<ItemsRepeater Items="{Binding Drives}">
-					<ItemsRepeater.Layout>
-						<UniformGridLayout ItemsStretch="Uniform"
-															 ItemsJustification="Start"
-															 MinItemWidth="150"
-															 MinItemHeight="130"/>
-					</ItemsRepeater.Layout>
-
-					<ItemsRepeater.ItemTemplate>
-						<DataTemplate DataType="models:FileModel">
-							<Border CornerRadius="10"
-											Margin="5">
-								<StackPanel>
-									<Viewbox Width="100"
-													 Height="100"
-													 Margin="4"
-													 RenderTransform="{Binding ImageTransform}">
-										<Image Source="{Binding Image}" />
-									</Viewbox>
-
-									<TextBlock Text="{Binding Name}"
-														 TextTrimming="CharacterEllipsis"
-														 HorizontalAlignment="Center"
-														 Margin="4 0"/>
-								</StackPanel>
-							</Border>
-						</DataTemplate>
-					</ItemsRepeater.ItemTemplate>
-				</ItemsRepeater>
-			</Expander>
-		</StackPanel>
-	</ScrollViewer>
+	<!-- <ScrollViewer> -->
+	<!-- 	<StackPanel> -->
+	<!-- 		<Expander ExpandDirection="Down" -->
+	<!-- 							IsExpanded="True" -->
+	<!-- 							Padding="0" -->
+	<!-- 							HorizontalAlignment="Stretch" -->
+	<!-- 							Header="{Binding FileCount, StringFormat=Recent Items ({0})}"> -->
+	<!-- -->
+	<!-- 			<ItemsRepeater Items="{Binding RecentFiles}" -->
+	<!-- 										 Margin="0 0 0 5"> -->
+	<!-- 				<ItemsRepeater.Layout> -->
+	<!-- 					<UniformGridLayout ItemsStretch="Uniform" -->
+	<!-- 														 ItemsJustification="Start" -->
+	<!-- 														 MinItemWidth="150" -->
+	<!-- 														 MinItemHeight="140"/> -->
+	<!-- 				</ItemsRepeater.Layout> -->
+	<!-- -->
+	<!-- 				<ItemsRepeater.ItemTemplate> -->
+	<!-- 					<DataTemplate DataType="models:FileModel"> -->
+	<!-- 						<ListBoxItem Margin="5" -->
+	<!-- 												 Cursor="Hand" -->
+	<!-- 												 Height="140"> -->
+	<!-- 							<StackPanel> -->
+	<!-- 								<Viewbox Width="100" -->
+	<!-- 												 Height="100" -->
+	<!-- 												 Margin="4" -->
+	<!-- 												 RenderTransform="{Binding ImageTransform}" > -->
+	<!-- 									<Image Source="{Binding Image}" /> -->
+	<!-- 								</Viewbox> -->
+	<!-- -->
+	<!-- 								<TextBlock Text="{Binding Name}" -->
+	<!-- 													 TextTrimming="CharacterEllipsis" -->
+	<!-- 													 HorizontalAlignment="Center" -->
+	<!-- 													 Margin="4 0"/> -->
+	<!-- 							</StackPanel> -->
+	<!-- 						</ListBoxItem> -->
+	<!-- 					</DataTemplate> -->
+	<!-- 				</ItemsRepeater.ItemTemplate> -->
+	<!-- 			</ItemsRepeater> -->
+	<!-- 		</Expander> -->
+	<!-- -->
+	<!-- 		<Expander ExpandDirection="Down" -->
+	<!-- 							IsExpanded="True" -->
+	<!-- 							HorizontalAlignment="Stretch" -->
+	<!-- 							Header="{Binding DriveCount, StringFormat=Drives ({0})}"> -->
+	<!-- 			<ItemsRepeater Items="{Binding Drives}"> -->
+	<!-- 				<ItemsRepeater.Layout> -->
+	<!-- 					<UniformGridLayout ItemsStretch="Uniform" -->
+	<!-- 														 ItemsJustification="Start" -->
+	<!-- 														 MinItemWidth="150" -->
+	<!-- 														 MinItemHeight="130"/> -->
+	<!-- 				</ItemsRepeater.Layout> -->
+	<!-- -->
+	<!-- 				<ItemsRepeater.ItemTemplate> -->
+	<!-- 					<DataTemplate DataType="models:FileModel"> -->
+	<!-- 						<Border CornerRadius="10" -->
+	<!-- 										Margin="5"> -->
+	<!-- 							<StackPanel> -->
+	<!-- 								<Viewbox Width="100" -->
+	<!-- 												 Height="100" -->
+	<!-- 												 Margin="4" -->
+	<!-- 												 RenderTransform="{Binding ImageTransform}"> -->
+	<!-- 									<Image Source="{Binding Image}" /> -->
+	<!-- 								</Viewbox> -->
+	<!-- -->
+	<!-- 								<TextBlock Text="{Binding Name}" -->
+	<!-- 													 TextTrimming="CharacterEllipsis" -->
+	<!-- 													 HorizontalAlignment="Center" -->
+	<!-- 													 Margin="4 0"/> -->
+	<!-- 							</StackPanel> -->
+	<!-- 						</Border> -->
+	<!-- 					</DataTemplate> -->
+	<!-- 				</ItemsRepeater.ItemTemplate> -->
+	<!-- 			</ItemsRepeater> -->
+	<!-- 		</Expander> -->
+	<!-- 	</StackPanel> -->
+	<!-- </ScrollViewer> -->
 </UserControl>

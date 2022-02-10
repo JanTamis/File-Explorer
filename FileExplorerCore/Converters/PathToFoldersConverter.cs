@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Avalonia.Data.Converters;
 using FileExplorerCore.Models;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using FileExplorerCore.ViewModels;
 

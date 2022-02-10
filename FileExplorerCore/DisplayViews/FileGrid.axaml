@@ -8,22 +8,17 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FileExplorerCore.DisplayViews.FileGrid">
   <UserControl.Resources>
-    <converters:PathToImageConverter x:Key="imageConverter" />
-    <converters:EditedOnConverter x:Key="editedOnConverter" />
-    <converters:ExtensionConverter x:Key="extensionConverter" />
-    <converters:SizeConverter x:Key="sizeConverter" />
-    <converters:FileNameConverter x:Key="fileNameConverter" />
-    <converters:ImageTransformConverter x:Key="imageTransformConverter" />
-
     <system:Int32 x:Key="ImageSize">100</system:Int32>
   </UserControl.Resources>
 
   <ScrollViewer>
     <ItemsRepeater Items="{Binding Files}"
-									 Margin="0 0 0 5"
+									 Margin="0"
 									 x:Name="fileList">
       <ItemsRepeater.Layout>
-        <UniformGridLayout ItemsStretch="None"
+        <UniformGridLayout ItemsStretch="Fill"
+                           MinColumnSpacing="10"
+                           MinRowSpacing="10"
 													 ItemsJustification="Center" />
       </ItemsRepeater.Layout>
 
@@ -33,8 +28,7 @@
           <Setter Property="Template">
             <ControlTemplate>
               <Border CornerRadius="10"
-											Name="PART_ContentPresenter"
-											Margin="10">
+											Name="PART_ContentPresenter">
                 <ContentPresenter ClipToBounds="true"
 																	Background="{TemplateBinding Background}"
 																	BorderBrush="{TemplateBinding BorderBrush}"
@@ -52,33 +46,31 @@
 
       <ItemsRepeater.ItemTemplate>
         <DataTemplate DataType="models:FileModel">
-          <ListBoxItem Margin="0"
-											 MaxWidth="400"
-											 ToolTip.Tip="{Binding Name}"
-											 IsSelected="{Binding IsSelected}"
-											 Cursor="Hand"
-											 VerticalContentAlignment="Stretch"
-											 HorizontalContentAlignment="Stretch">
-            <StackPanel Margin="0 0 0 5"
-												HorizontalAlignment="Center"
-												VerticalAlignment="Center">
-              <Image DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
-                     Source="{Binding Result}"
-                     x:DataType="models:FileModel"
-                     Margin="4"
-                     Width="100"
-                     Height="100"/>
+	        <ListBoxItem Margin="0"
+	                     Padding="15 10"
+	                     IsSelected="{Binding IsSelected}"
+	                     Cursor="Hand">
+	          <StackPanel Margin="0"
+	                      HorizontalAlignment="Stretch"
+	                      VerticalAlignment="Stretch">
+	            <Image DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
+	                   Source="{Binding Result}"
+	                   x:DataType="models:FileModel"
+	                   Margin="0"
+	                   Width="100"
+	                   Height="100"/>
 
               <TextBlock Text="{Binding Name}"
-												 TextTrimming="CharacterEllipsis"
 												 HorizontalAlignment="Stretch"
+												 TextTrimming="CharacterEllipsis"
 												 TextAlignment="Center"
-												 Margin="4 2" />
+												 Margin="0" />
 
-              <TextBlock Text="{Binding Size, Converter={StaticResource sizeConverter}}"
-												 FontSize="12"
-												 Foreground="{DynamicResource SystemBaseMediumColor}"
-												 HorizontalAlignment="Center" />
+             <!--  <TextBlock Text="{Binding Size, Converter={StaticResource sizeConverter}}" -->
+												 <!-- FontSize="12" -->
+												 <!-- TextAlignment="Center" -->
+												 <!-- Foreground="{DynamicResource SystemBaseMediumColor}" -->
+												 <!-- HorizontalAlignment="Stretch" /> -->
             </StackPanel>
           </ListBoxItem>
         </DataTemplate>

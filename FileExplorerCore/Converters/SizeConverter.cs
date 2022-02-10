@@ -4,7 +4,6 @@ using FileExplorerCore.Models;
 using System.Globalization;
 using System.IO;
 using Humanizer;
-using Microsoft.Toolkit.HighPerformance.Helpers;
 
 namespace FileExplorerCore.Converters
 {

@@ -1,10 +1,7 @@
 ﻿using Avalonia.Media;
-using Avalonia.Svg.Skia;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.ViewModels;
 using Humanizer;
-using Microsoft.Toolkit.HighPerformance.Helpers;
-using ReactiveUI;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -29,21 +26,15 @@ namespace FileExplorerCore.Models
 
 		private DateTime _editedOn;
 
-		private IImage? _image;
-		private bool needsTranslation;
+		private bool _needsTranslation;
 
 		public static event Action<FileModel> SelectionChanged = delegate { };
 
 		private static bool _isNotLoading = true;
-		private bool _isVisible = true;
 
 		public string? ExtensionName { get; set; }
 
-		public bool IsVisible
-		{
-			get => _isVisible;
-			set { _isVisible = value; }
-		}
+		public bool IsVisible { get; set; }
 
 		public bool IsSelected
 		{
@@ -52,18 +43,16 @@ namespace FileExplorerCore.Models
 			{
 				if (_isSelected != value)
 				{
-					OnPropertyChanged(ref _isSelected, value);
+					// OnPropertyChanged(ref _isSelected, value);
 					SelectionChanged?.Invoke(this);
 				}
 			}
 		}
 
-		public bool HasImage => _image is not null;
-
 		public bool NeedsTranslation
 		{
-			get => needsTranslation;
-			set => OnPropertyChanged(ref needsTranslation, value);
+			get => _needsTranslation;
+			set => OnPropertyChanged(ref _needsTranslation, value);
 		}
 
 		public string Path
@@ -73,12 +62,7 @@ namespace FileExplorerCore.Models
 
 		public string Name
 		{
-			get
-			{
-				return TreeItem.IsFolder
-					? TreeItem.Value
-					: System.IO.Path.GetFileNameWithoutExtension(TreeItem.Value);
-			}
+			get => TreeItem.IsFolder ? TreeItem.Value : System.IO.Path.GetFileNameWithoutExtension(TreeItem.Value);
 			set
 			{
 				TreeItem.Value = value;
@@ -141,6 +125,15 @@ namespace FileExplorerCore.Models
 				return _size;
 			}
 		}
+
+		public long TotalSize => IsFolder
+			? TreeItem.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions()
+			{
+				RecurseSubdirectories = true,
+				IgnoreInaccessible = true,
+				AttributesToSkip = FileSystemTreeItem.Options.AttributesToSkip,
+			})).Sum()
+			: Size;
 
 		public bool IsFolder => TreeItem.IsFolder;
 

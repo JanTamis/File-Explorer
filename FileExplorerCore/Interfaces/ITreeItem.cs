@@ -7,7 +7,7 @@ namespace FileExplorerCore.Interfaces
 	{
 		IEnumerable<TChildren> Children { get; }
 
-		TChildren Parent { get; set; }
+		TChildren? Parent { get; set; }
 
 		TValue Value { get; set; }
 

@@ -4,15 +4,11 @@ using Avalonia;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Avalonia.Platform;
 using System.Reflection;
 using System.Threading.Tasks;
 using FileTypeAndIcon;
 using Avalonia.Threading;
-using FileExplorerCore.ViewModels;
-using System.Diagnostics;
-using System.Drawing;
 
 namespace FileExplorerCore.Helpers
 {
@@ -53,17 +49,14 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
-		public static Task<IImage?> GetFileImage(FileSystemTreeItem? treeItem, int size)
+		public static async Task<IImage?> GetFileImage(FileSystemTreeItem? treeItem, int size)
 		{
-			var name = String.Empty;
-
 			if (OperatingSystem.IsWindows())
 			{
-				return Task.Run<IImage?>(() =>
-				{
-					return treeItem?.GetPath((path, imageSize) => WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize), size);
-				});
+				return await Task.Run(() => treeItem?.GetPath((path, imageSize) => WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize), size));
 			}
+
+			var name = String.Empty;
 
 			if (treeItem.IsFolder)
 			{
@@ -127,7 +120,7 @@ namespace FileExplorerCore.Helpers
 				}
 			}
 
-			return Task.FromResult<IImage?>(GetImage(name));
+			return await GetImage(name);
 		}
 
 		private static bool ImageExists(string key)
@@ -137,7 +130,7 @@ namespace FileExplorerCore.Helpers
 			return loader?.Exists(new Uri($"avares://FileExplorerCore/Assets/Icons/{key}.svg")) ?? false;
 		}
 
-		private static SvgImage? GetImage(string key)
+		private static async ValueTask<SvgImage?> GetImage(string key)
 		{
 			if (key is null or "")
 			{
@@ -170,7 +163,7 @@ namespace FileExplorerCore.Helpers
 						}
 						else
 						{
-							Dispatcher.UIThread.InvokeAsync(() =>
+							await Dispatcher.UIThread.InvokeAsync(() =>
 							{
 								image = new SvgImage()
 								{
@@ -181,7 +174,7 @@ namespace FileExplorerCore.Helpers
 								{
 									Images.Add(key, image);
 								}
-							}).Wait();
+							});
 						}
 					}
 				}

@@ -1,15 +1,8 @@
-﻿using System;
-using FileExplorerCore.Helpers;
+﻿using FileExplorerCore.Helpers;
 using ReactiveUI;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Enumeration;
 using System.Linq;
-using System.Threading.Tasks;
 using Avalonia.Media;
-using System.Reactive.Subjects;
-using Avalonia.Svg.Skia;
 
 namespace FileExplorerCore.Models
 {

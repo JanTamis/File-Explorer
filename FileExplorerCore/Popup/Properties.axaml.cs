@@ -7,10 +7,12 @@ using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace FileExplorerCore.Popup
 {
@@ -18,13 +20,13 @@ namespace FileExplorerCore.Popup
 	{
 		public new event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-		private string path;
+		private string _path;
 
-		private Bitmap? icon;
+		private Bitmap? _icon;
 
-		private long size = -1;
+		private long _size = -1;
 
-		private FileModel model;
+		private FileModel _model;
 
 		public bool HasShadow => false;
 		public bool HasToBeCanceled => false;
@@ -33,11 +35,13 @@ namespace FileExplorerCore.Popup
 
 		public event Action OnClose = delegate { };
 
-		public Bitmap? Icon => icon ??= OperatingSystem.IsWindows() 
+		private CancellationTokenSource _source;
+
+		public Bitmap? Icon => _icon ??= OperatingSystem.IsWindows() 
 			? WindowsThumbnailProvider.GetThumbnail(Path, 48, 48)
 			: null;
 
-		ObservableRangeCollection<MetadataExtractor.Directory> MetaData { get; set; } = new();
+		private ObservableRangeCollection<MetadataExtractor.Directory> MetaData { get; } = new();
 
 		public string CreatedOn
 		{
@@ -56,79 +60,68 @@ namespace FileExplorerCore.Popup
 
 		public FileModel Model
 		{
-			get => model;
+			get => _model;
 			set
 			{
-				model = value;
+				_model = value;
 				Path = Model.Path;
-				ItemName = model.Name;
+				ItemName = _model.Name;
+				_size = _model.Size;
+				
 				OnPropertyChanged(nameof(ItemName));
+				OnPropertyChanged(nameof(Size));
+
+				ThreadPool.QueueUserWorkItem(_ =>
+				{
+					var enumerable = _model.TreeItem.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions()
+					{
+						RecurseSubdirectories = true,
+						IgnoreInaccessible = true,
+						AttributesToSkip = FileSystemTreeItem.Options.AttributesToSkip,
+					}));
+
+					var watch = Stopwatch.StartNew();
+
+					_source = new CancellationTokenSource();
+
+					foreach (var child in enumerable)
+					{
+						if (_source.IsCancellationRequested)
+						{
+							OnPropertyChanged(nameof(Size));
+							break;
+						}
+						
+						_size += child;
+					
+						if (watch.ElapsedMilliseconds > 50)
+						{
+							OnPropertyChanged(nameof(Size));
+						
+							watch.Restart();
+						}
+					}
+				});
 			}
 		}
 
 
 		public string Path
 		{
-			get => path;
+			get => _path;
 			set
 			{
-				OnPropertyChanged(ref path, value);
+				OnPropertyChanged(ref _path, value);
 				OnPropertyChanged(nameof(Icon));
 				OnPropertyChanged(nameof(ItemName));
 				OnPropertyChanged(nameof(Size));
 				OnPropertyChanged(nameof(CreatedOn));
 
-				MetaData.AddRange<Comparer<MetadataExtractor.Directory>>(MetaDataHelper.GetData(path));
+				MetaData.AddRange<Comparer<MetadataExtractor.Directory>>(MetaDataHelper.GetData(_path));
 			}
 		}
 
-		public long Size
-		{
-			get
-			{
-				if (size is -1 && !String.IsNullOrWhiteSpace(Path))
-				{
-					if (!model.IsFolder)
-					{
-						size = model.Size;
-					}
-					else if ((Path.EndsWith(System.IO.Path.DirectorySeparatorChar) || Path.EndsWith(System.IO.Path.AltDirectorySeparatorChar)) && new DriveInfo(Path[0].ToString()) is { IsReady: true } drive)
-					{
-						size = drive.TotalSize - drive.AvailableFreeSpace;
-					}
-					else if (Directory.Exists(Path))
-					{
-						var temp = new FileSystemEnumerable<long>(path, (ref FileSystemEntry x) => x.Length, new EnumerationOptions
-						{
-							IgnoreInaccessible = true,
-							RecurseSubdirectories = true
-						});
-
-						size = 0;
-
-						ThreadPool.QueueUserWorkItem(x =>
-						{
-							foreach (var item in temp)
-							{
-								size += item;
-							}
-						});
-
-						ThreadPool.QueueUserWorkItem(async x =>
-						{
-							using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(250));
-
-							while (await timer.WaitForNextTickAsync())
-							{
-								OnPropertyChanged(nameof(Size));
-							}
-						});
-					}
-				}
-
-				return size;
-			}
-		}
+		public long Size => _size;
 
 		public string ItemName { get; set; }
 
@@ -145,12 +138,13 @@ namespace FileExplorerCore.Popup
 
 		public void Close()
 		{
+			_source?.Cancel();
 			OnClose();
 		}
 
 		public void Save()
 		{
-			model.Name = ItemName;
+			_model.Name = ItemName;
 		}
 
 		public void SaveAndQuit()
@@ -160,12 +154,6 @@ namespace FileExplorerCore.Popup
 		}
 
 		protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
-		{
-			property = value;
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-		}
-
-		protected void OnPropertyChanged<T>(T property, T value, [CallerMemberName] string name = null)
 		{
 			property = value;
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

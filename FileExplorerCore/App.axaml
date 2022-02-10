@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="using:FileExplorerCore"
+             xmlns:converters="using:FileExplorerCore.Converters"
              x:Class="FileExplorerCore.App">
 	<Application.DataTemplates>
 		<local:ViewLocator/>
@@ -20,6 +21,19 @@
 		<SolidColorBrush Color="#4C4C4C" x:Key="CardBackground" />
 		<SolidColorBrush Color="#595959" x:Key="CardPointerOverBackground" />
 		<SolidColorBrush Color="#4C4C4C" x:Key="CardHighBackground" />
+
+		<converters:PathToImageConverter x:Key="imageConverter" />
+		<converters:EditedOnConverter x:Key="editedOnConverter" />
+		<converters:ExtensionConverter x:Key="extensionConverter" />
+		<converters:SizeConverter x:Key="sizeConverter" />
+		<converters:FileNameConverter x:Key="fileNameConverter" />
+		<converters:ImageTransformConverter x:Key="imageTransformConverter" />
+		<converters:DateTimeConverter x:Key="dateTimeConverter" />
+		<converters:IsHiddenConverter x:Key="isHiddenConverter" />
+		<converters:PathToFoldersConverter x:Key="pathToFoldersConverter" />
+		<converters:MainTitleMarginConverter x:Key="mainTitleMarginConverter" />
+		<converters:MinSizeConverter x:Key="minSizeConverter" />
+		<converters:MoreThanConverter x:Key="moreThanConverter" />
 	</Application.Resources>
 
 	<Application.Styles>
@@ -29,7 +43,8 @@
 		
 		<Style Selector="ListBoxItem /template/ Border#PART_ContentPresenter">
 			<Setter Property="TextBlock.FontWeight" Value="Normal" />
-			<Setter Property="Background" Value="{DynamicResource CardBackground}" />
+			<Setter Property="MaxHeight" Value="5000"></Setter>
+			<!-- <Setter Property="Background" Value="{DynamicResource CardBackground}" /> -->
 			<Setter Property="TextBlock.FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
 		</Style>
 

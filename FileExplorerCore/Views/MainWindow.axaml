@@ -24,17 +24,6 @@
 										Title="FileExplorerCore">
 
   <Window.Resources>
-    <converters:PathToImageConverter x:Key="imageConverter" />
-    <converters:EditedOnConverter x:Key="editedOnConverter" />
-    <converters:ExtensionConverter x:Key="extensionConverter" />
-    <converters:SizeConverter x:Key="sizeConverter" />
-    <converters:FileNameConverter x:Key="fileNameConverter" />
-    <converters:MinSizeConverter x:Key="minSizeConverter" />
-    <converters:MoreThanConverter x:Key="moreThanConverter" />
-    <converters:MainTitleMarginConverter x:Key="mainTitleMarginConverter" />
-
-    <converters:PathToFoldersConverter x:Key="pathToFoldersConverter" />
-
     <system:Int32 x:Key="ImageSize">25</system:Int32>
   </Window.Resources>
 

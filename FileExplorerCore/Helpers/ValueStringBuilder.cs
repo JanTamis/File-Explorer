@@ -14,8 +14,6 @@ namespace FileExplorerCore.Helpers
 
 		public ValueStringBuilder(Span<char> initialBuffer)
 		{
-			initialBuffer.Clear();
-
 			_arrayToReturnToPool = null;
 			_chars = initialBuffer;
 			_pos = 0;
@@ -66,6 +64,21 @@ namespace FileExplorerCore.Helpers
 		}
 
 		public ref char this[int index] => ref _chars[index];
+
+		public ReadOnlySpan<char> this[Range range]
+		{
+			get
+			{
+				if (_pos != 0)
+				{
+					var (offset, length) = range.GetOffsetAndLength(_pos);
+
+					return AsSpan(offset, length);
+				}
+
+				return ReadOnlySpan<char>.Empty;
+			}
+		}
 
 		public override string ToString()
 		{

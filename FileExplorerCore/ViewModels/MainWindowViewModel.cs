@@ -351,17 +351,20 @@ namespace FileExplorerCore.ViewModels
 
 		public void ShowProperties()
 		{
-			//if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
-			//{
-			//	var model = CurrentTab.Files.FirstOrDefault(x => x.IsSelected) ?? new FileModel(Path, true);
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+			{
+				var model = CurrentTab.Files.FirstOrDefault(x => x.IsSelected);
 
-			//	var properties = new Properties()
-			//	{
-			//		Model = model,
-			//	};
+				if (model is not null)
+				{
+					var properties = new Properties()
+					{
+						Model = model,
+					};
 
-			//	CurrentTab.PopupContent = properties;
-			//}
+					CurrentTab.PopupContent = properties;
+				}
+			}
 		}
 
 		private FileSystemTreeItem? GetTreeItem(string? path)

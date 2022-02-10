@@ -325,16 +325,10 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
-		public void Sort(IComparer<T>? comparer = null)
+		public async Task Sort<TComparer>(TComparer? comparer = default) where TComparer : IComparer<T>
 		{
-			comparer ??= Comparer<T>.Default;
-
-			ThreadPool.QueueUserWorkItem(async _ =>
-			{
-				ParallelQuickSort(Data, 0, Data.Count - 1, comparer);
-
-				await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-			});
+			await ParallelQuickSort<TComparer>(Data, 0, Data.Count - 1, comparer);
+			await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 		}
 
 		public async Task SortAsync(IAsyncComparer<T> comparer)
@@ -360,7 +354,7 @@ namespace FileExplorerCore.Helpers
 			OnPropertyChanged(property);
 		}
 
-		static void ParallelQuickSort(IList<T> array, int left, int right, IComparer<T> comparer)
+		static async ValueTask ParallelQuickSort<TComparer>(IList<T> array, int left, int right, TComparer comparer) where TComparer : IComparer<T>
 		{
 			const int threshold = 250;
 			var i = left;
@@ -390,18 +384,21 @@ namespace FileExplorerCore.Helpers
 
 			if (j - left > threshold && right - i > threshold)
 			{
-				Parallel.Invoke(() => ParallelQuickSort(array, left, j, comparer), () => ParallelQuickSort(array, i, right, comparer));
+				var leftTask = Task.Run(() => ParallelQuickSort(array, left, j, comparer));
+				var rightTask = Task.Run(() => ParallelQuickSort(array, i, right, comparer));
+
+				await Task.WhenAll(leftTask, rightTask);
 			}
 			else
 			{
 				if (j > left)
 				{
-					ParallelQuickSort(array, left, j, comparer);
+					await ParallelQuickSort(array, left, j, comparer);
 				}
 
 				if (i < right)
 				{
-					ParallelQuickSort(array, i, right, comparer);
+					await ParallelQuickSort(array, i, right, comparer);
 				}
 			}
 		}

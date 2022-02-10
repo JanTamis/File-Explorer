@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using FileExplorerCore.Helpers;
-using System.IO.Enumeration;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,13 +22,11 @@ namespace FileExplorerCore.Models
 		private ObservableRangeCollection<FileIndexModel>? _items;
 
 		private IEnumerable<FileIndexModel>? query => _treeItem
-			.EnumerateChildren(1)
-			.Cast<FileSystemTreeItem>()
+			.EnumerateChildren()
 			.Select(s => new FileIndexModel(s));
 
 		private IEnumerable<long> sizeQuery => _treeItem
-			.EnumerateChildren(1)
-			.Cast<FileSystemTreeItem>()
+			.EnumerateChildren()
 			.Select(s => s.GetPath((path, isFolder) => !isFolder ? new FileInfo(path.ToString()).Length : 0, IsFolder));
 
 		public bool IsFolder => _treeItem.IsFolder;
@@ -88,24 +84,13 @@ namespace FileExplorerCore.Models
 
 			if (item.Parent is not null)
 			{
-				Parent = new FileIndexModel(item.Parent as FileSystemTreeItem);
+				Parent = new FileIndexModel(item.Parent);
 			}
 		}
 
 		public override string ToString()
 		{
 			return Name;
-		}
-
-		private static void GetPath(FileIndexModel model, ref ValueStringBuilder builder)
-		{
-			builder.Insert(0, Path.DirectorySeparatorChar, 1);
-			builder.Insert(0, model.Name);
-
-			if (model.Parent != null)
-			{
-				GetPath(model.Parent, ref builder);
-			}
 		}
 	}
 }
