@@ -80,7 +80,7 @@ namespace FileExplorerCore.ViewModels
 				var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
 					select new FolderModel(GetTreeItemInitialized(KnownFolders.GetPath(specialFolder).ToString()));
 
-				Folders = new ObservableRangeCollection<FolderModel>(quickAccess.Concat(drives));
+				Folders = new ObservableRangeCollection<FolderModel>(quickAccess.Concat(drives), true);
 			}
 			else if (OperatingSystem.IsMacOS() && Tree is not null)
 			{

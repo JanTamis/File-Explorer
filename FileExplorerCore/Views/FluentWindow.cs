@@ -32,6 +32,10 @@ namespace FileExplorerCore.Views
 						return new Thickness(75, 0, 0, 0);
 					}
 				}
+				if (OperatingSystem.IsWindows())
+				{
+					return new Thickness(0, 0, 150, 0);
+				}
 
 				return new Thickness(0);
 			}

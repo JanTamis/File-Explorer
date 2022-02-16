@@ -61,10 +61,10 @@ namespace FileExplorerCore.Helpers
 					var bmp = new NativeMethods.BITMAP();
 					NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
 
-					//if ((options.HasFlag(ThumbnailOptions.ThumbnailOnly) && width <= 64) || options.HasFlag(ThumbnailOptions.IconOnly))
-					//{
+					if (((options.HasFlag(ThumbnailOptions.ThumbnailOnly) || options.HasFlag(ThumbnailOptions.None)) && width <= 64) || options.HasFlag(ThumbnailOptions.IconOnly))
+					{
 						RotateHorizontal(bmp);
-					//}
+					}
 
 					bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
 

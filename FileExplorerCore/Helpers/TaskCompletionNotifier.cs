@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 
 namespace FileExplorerCore.Helpers
 {
-	// Watches a task and raises property-changed notifications when the task completes.
+	/// <summary>
+	/// Watches a task and raises property-changed notifications when the task completes.
+	/// </summary>
 	public sealed class TaskCompletionNotifier<TResult> : INotifyPropertyChanged
 	{
 		public TaskCompletionNotifier(Task<TResult> task)
@@ -13,7 +15,10 @@ namespace FileExplorerCore.Helpers
 
 			if (!task.IsCompleted)
 			{
-				var scheduler = (SynchronizationContext.Current is null) ? TaskScheduler.Current : TaskScheduler.FromCurrentSynchronizationContext();
+				var scheduler = (SynchronizationContext.Current is null) 
+					? TaskScheduler.Current 
+					: TaskScheduler.FromCurrentSynchronizationContext();
+
 				task.ContinueWith(t =>
 				{
 					var propertyChanged = PropertyChanged;
@@ -53,7 +58,7 @@ namespace FileExplorerCore.Helpers
 		public bool IsCompleted => Task.IsCompleted;
 
 		// Gets whether the task has completed successfully.
-		public bool IsSuccessfullyCompleted => Task.Status == TaskStatus.RanToCompletion;
+		public bool IsSuccessfullyCompleted => Task.Status is TaskStatus.RanToCompletion;
 
 		// Gets whether the task has been canceled.
 		public bool IsCanceled => Task.IsCanceled;
@@ -61,6 +66,6 @@ namespace FileExplorerCore.Helpers
 		// Gets whether the task has faulted.
 		public bool IsFaulted => Task.IsFaulted;
 
-		public event PropertyChangedEventHandler PropertyChanged = delegate { };
+		public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 	}
 }

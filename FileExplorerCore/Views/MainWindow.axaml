@@ -41,9 +41,8 @@
 			<Grid RowDefinitions="Auto Auto *">
 				<Grid ColumnDefinitions="*, Auto"
 				      HorizontalAlignment="Left"
-				      Margin="0">
+            Margin="{Binding #MainWindow.TitleBarMargin}">
 					<TabStrip Items="{Binding Tabs}"
-					          Margin="{Binding #MainWindow.TitleBarMargin}"
 					          SelectedItem="{Binding CurrentTab}">
 						<TabStrip.ItemsPanel>
 							<ItemsPanelTemplate>
@@ -53,8 +52,7 @@
 						<TabStrip.DataTemplates>
 							<DataTemplate DataType="{x:Type viewmodels:TabItemViewModel}">
 								<Grid ColumnDefinitions="Auto, *, Auto, Auto"
-								      Margin="5"
-								      MaxWidth="350">
+								      Margin="5">
 									<Image
 										Grid.Column="0"
 										DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
@@ -70,6 +68,7 @@
 										TextTrimming="CharacterEllipsis"
 										FontSize="14"
 										VerticalAlignment="Center"
+                    HorizontalAlignment="Stretch"
 										Grid.Column="1"
 										IsVisible="{Binding $self.DesiredSize.Width, Mode=TwoWay, Converter={StaticResource minSizeConverter}, ConverterParameter=100}" />
 									

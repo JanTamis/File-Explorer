@@ -15,7 +15,7 @@ namespace FileExplorerCore.Converters
 			{
 				var task = value switch
 				{
-					FileModel { IsVisible: true } model => ThumbnailProvider.GetFileImage(model.TreeItem, size),
+					FileModel model => ThumbnailProvider.GetFileImage(model.TreeItem, size),
 					FileSystemTreeItem treeItem => ThumbnailProvider.GetFileImage(treeItem, size),
 					_ => null,
 				};

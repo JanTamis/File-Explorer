@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using FileTypeAndIcon;
 using Avalonia.Threading;
+using System.Threading;
 
 namespace FileExplorerCore.Helpers
 {
@@ -24,6 +25,8 @@ namespace FileExplorerCore.Helpers
 			AttributesToSkip = FileAttributes.Hidden,
 		};
 
+		private static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default, Environment.ProcessorCount * 2);
+
 		static ThumbnailProvider()
 		{
 			var assembly = Assembly.GetExecutingAssembly();
@@ -38,7 +41,7 @@ namespace FileExplorerCore.Helpers
 					var name = file.Split('.')[^2];
 					var stream = assembly.GetManifestResourceStream(file);
 
-					if (stream is { })
+					if (stream is not null)
 					{
 						var reader = new StreamReader(stream);
 
@@ -51,9 +54,29 @@ namespace FileExplorerCore.Helpers
 
 		public static async Task<IImage?> GetFileImage(FileSystemTreeItem? treeItem, int size)
 		{
+			if (treeItem is null)
+			{
+				return null;
+			}
+
 			if (OperatingSystem.IsWindows())
 			{
-				return await Task.Run(() => treeItem?.GetPath((path, imageSize) => WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize), size));
+				return await Task.Factory.StartNew(() => treeItem?.GetPath((path, imageSize) =>
+				{
+					IImage image = null;
+
+					if (treeItem.IsFolder && treeItem.HasChildren)
+					{
+						image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly);
+					}
+
+					if (image is null)
+					{
+						image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly);
+					}
+
+					return image;
+				}, size), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
 			}
 
 			var name = String.Empty;
@@ -69,11 +92,12 @@ namespace FileExplorerCore.Helpers
 						if (folderText is not null && treeItem.GetPath(x => x.SequenceEqual(KnownFolders.GetPath(folder))))
 						{
 							name = folderText;
+							break;
 						}
 					}
 				}
 
-				if (!treeItem.HasParent)
+				if (!treeItem.HasParent && name == String.Empty)
 				{
 					var driveInfo = new DriveInfo(new string(treeItem.Value[0], 1));
 
@@ -186,44 +210,44 @@ namespace FileExplorerCore.Helpers
 		private static string GetOfficeName(string extension, string defaultName) => extension switch
 		{
 			"doc" or
-				"docm" or
-				"docx" or
-				"dotm" or
-				"dotx" or
-				"odt" or
-				"wps" => "Word",
-
-			"csv" or
-				"dbf" or
-				"dif" or
-				"ods" or
-				"prn" or
-				"slk" or
-				"xla" or
-				"xla" or
-				"xlam" or
-				"xls" or
-				"xlsb" or
-				"xlsm" or
-				"xlsx" or
-				"xlt" or
-				"xltm" or
-				"xltx" or
-				"xlw" => "Excel",
+			"docm" or
+			"docx" or
+			"dotm" or
+			"dotx" or
+			"odt" or
+			"wps" => "Word",
 
 			"odp" or
-				"pot" or
-				"potm" or
-				"potx" or
-				"ppa" or
-				"ppam" or
-				"pps" or
-				"ppsm" or
-				"ppsx" or
-				"ppt" or
-				"pptm" or
-				"pptx" or
-				"thmx" => "PowerPoint",
+			"pot" or
+			"potm" or
+			"potx" or
+			"ppa" or
+			"ppam" or
+			"pps" or
+			"ppsm" or
+			"ppsx" or
+			"ppt" or
+			"pptm" or
+			"pptx" or
+			"thmx" => "PowerPoint",
+
+			"csv" or
+			"dbf" or
+			"dif" or
+			"ods" or
+			"prn" or
+			"slk" or
+			"xla" or
+			"xla" or
+			"xlam" or
+			"xls" or
+			"xlsb" or
+			"xlsm" or
+			"xlsx" or
+			"xlt" or
+			"xltm" or
+			"xltx" or
+			"xlw" => "Excel",
 			_ => defaultName
 		};
 	}

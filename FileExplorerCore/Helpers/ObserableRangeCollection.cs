@@ -55,12 +55,13 @@ namespace FileExplorerCore.Helpers
 
 		public ObservableRangeCollection()
 		{
-			CollectionChanged += delegate { CountChanged(Count); };
+			CollectionChanged += delegate
+			{ CountChanged(Count); };
 		}
 
-		public ObservableRangeCollection(IEnumerable<T> items) : this()
+		public ObservableRangeCollection(IEnumerable<T> items, bool needsReset = false) : this()
 		{
-			ThreadPool.QueueUserWorkItem(async x => { await AddRange<Comparer<T>>(items); });
+			ThreadPool.QueueUserWorkItem(async x => { await AddRange<Comparer<T>>(items, needsReset: needsReset); });
 		}
 
 		/// <summary> 
@@ -79,7 +80,7 @@ namespace FileExplorerCore.Helpers
 		/// <summary> 
 		/// Clears the current collection and replaces it with the specified collection. 
 		/// </summary> 
-		public async Task AddRange<TComparer>(IEnumerable<T> collection, TComparer comparer = default, Action<T>? action = null, CancellationToken token = default) where TComparer : IComparer<T>
+		public async Task AddRange<TComparer>(IEnumerable<T> collection, TComparer comparer = default, bool needsReset = false, Action<T>? action = null, CancellationToken token = default) where TComparer : IComparer<T>
 		{
 			ArgumentNullException.ThrowIfNull(collection);
 
@@ -137,7 +138,15 @@ namespace FileExplorerCore.Helpers
 						}, token);
 					}
 
-					await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, Data, index));
+					if (!needsReset)
+					{
+						await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, Data, index));
+					}
+					else
+					{
+						await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+					}
+
 					index = Data.Count;
 
 					watch.Restart();
@@ -165,7 +174,14 @@ namespace FileExplorerCore.Helpers
 				}, token);
 			}
 
-			await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, Data, index));
+			if (!needsReset)
+			{
+				await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, Data, index));
+			}
+			else
+			{
+				await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+			}
 		}
 
 		/// <summary> 

@@ -1,15 +1,16 @@
 using System;
 
-namespace FileExplorerCore.Helpers;
-
-public static class PathHelper
+namespace FileExplorerCore.Helpers
 {
-	public static char DirectorySeparator { get; }
-
-	static PathHelper()
+	public static class PathHelper
 	{
-		DirectorySeparator = OperatingSystem.IsWindows()
-			? '\\'
-			: '/';
+		public static char DirectorySeparator { get; }
+
+		static PathHelper()
+		{
+			DirectorySeparator = OperatingSystem.IsWindows()
+				? '\\'
+				: '/';
+		}
 	}
 }

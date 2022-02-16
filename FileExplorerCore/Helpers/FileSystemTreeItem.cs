@@ -262,20 +262,20 @@ namespace FileExplorerCore.Helpers
 		{
 			var builder = new ValueStringBuilder(stackalloc char[512]);
 
-			foreach (var item in EnumerateValuesToRoot())
+			foreach (var item in EnumerateValuesToRoot().Reverse())
 			{
-				builder.Insert(0, item);
+				builder.Append(item);
 
-				if (builder[0] != PathHelper.DirectorySeparator)
+				if (builder[^1] != PathHelper.DirectorySeparator)
 				{
-					builder.Insert(0, PathHelper.DirectorySeparator);
+					builder.Append(PathHelper.DirectorySeparator);
 				}
 			}
 
-			if (OperatingSystem.IsWindows())
-			{
-				return action(builder[1..], parameter);
-			}
+			//if (OperatingSystem.IsWindows())
+			//{
+			//	return action(builder[1..], parameter);
+			//}
 
 			return action(builder.AsSpan(), parameter);
 		}
