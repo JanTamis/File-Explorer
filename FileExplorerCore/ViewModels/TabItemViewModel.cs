@@ -27,13 +27,13 @@ namespace FileExplorerCore.ViewModels
 		private bool _isLoading;
 		private bool _isGrid;
 
-		private readonly Stack<FileSystemTreeItem> _undoStack = new();
-		private readonly Stack<FileSystemTreeItem> _redoStack = new();
+		private readonly Stack<FileSystemTreeItem?> _undoStack = new();
+		private readonly Stack<FileSystemTreeItem?> _redoStack = new();
 
 		public CancellationTokenSource? TokenSource;
 		private Control _displayControl = new Quickstart();
 
-		private IPopup _popupContent;
+		private IPopup? _popupContent;
 
 		private DateTime _startSearchTime;
 
@@ -85,11 +85,8 @@ namespace FileExplorerCore.ViewModels
 			{
 				OnPropertyChanged(ref _fileCount, value);
 
-				if (Sort is SortEnum.None)
-				{
-					OnPropertyChanged(nameof(IsIndeterminate));
-					OnPropertyChanged(nameof(SearchProgression));
-				}
+				OnPropertyChanged(nameof(IsIndeterminate));
+				OnPropertyChanged(nameof(SearchProgression));
 				//OnPropertyChanged(nameof(SearchText));
 			}
 		}
@@ -105,18 +102,24 @@ namespace FileExplorerCore.ViewModels
 			get
 			{
 				var result = String.Empty;
-				var selectedFiles = Files.Where(x => x.IsSelected);
 
 				if (SelectionCount > 0)
 				{
 					result = $"{SelectionCount:N0} items selected";
+					var selectedFiles = Files.Where(w => !w.IsFolder && w.IsSelected);
 
-					if (!selectedFiles.Any(x => x.IsFolder))
+					var fileSize = -1L;
+
+					foreach (var file in selectedFiles)
 					{
-						var fileSize = selectedFiles
-							.Where(x => !x.IsFolder)
-							.Sum(s => s.Size);
-
+						if (!file.IsFolder)
+						{
+							fileSize = file.Size;
+						}
+					}
+					
+					if (fileSize is not -1)
+					{
 						result += $", {fileSize.Bytes()}";
 					}
 				}
@@ -142,19 +145,19 @@ namespace FileExplorerCore.ViewModels
 
 				if (IsLoading)
 				{
-					FileCount = Int32.MaxValue;
+					FileCount = -1;
 				}
 				else
 				{
 					// GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-					GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+					// GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
 				}
 
 				OnPropertyChanged(nameof(SearchFailed));
 			}
 		}
 
-		public bool IsIndeterminate => FileCount == Int32.MaxValue;
+		public bool IsIndeterminate => FileCount == -1;
 
 		public double SearchProgression => Count / (double)FileCount;
 
@@ -186,7 +189,7 @@ namespace FileExplorerCore.ViewModels
 					_foundItems = Count;
 				}
 
-				return $"Remaining Time: {_predictedTime:hh\\:mm\\:ss}";
+				return $"Remaining Time: {_predictedTime.Humanize()}";
 			}
 		}
 
@@ -231,7 +234,7 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		public string FolderName => TreeItem.Value;
+		public string FolderName => TreeItem?.Value ?? String.Empty;
 
 		public string Search
 		{
@@ -395,7 +398,7 @@ namespace FileExplorerCore.ViewModels
 
 					if (Sort is not SortEnum.None)
 					{
-						ThreadPool.QueueUserWorkItem(async _ =>
+						ThreadPool.QueueUserWorkItem( _ =>
 						{
 							var count = GetFileSystemEntriesCount(TreeItem, search, TokenSource.Token);
 
@@ -430,6 +433,8 @@ namespace FileExplorerCore.ViewModels
 			{
 				TreeItem = path;
 				DisplayControl = new Quickstart();
+				
+				return;
 			}
 
 			if (!path.IsFolder)
@@ -459,7 +464,7 @@ namespace FileExplorerCore.ViewModels
 				{
 					item = new FileSystemTreeItem(parent.Value, true, item);
 				}
-				
+
 				TreeItem = item;
 				await UpdateFiles(false, "*");
 			}
@@ -470,7 +475,7 @@ namespace FileExplorerCore.ViewModels
 			return path
 				// .EnumerateChildren((ref FileSystemEntry file) => !file.IsHidden && FileSystemName.MatchesSimpleExpression(search, file.FileName)) //|| (!file.IsDirectory && File.ReadLines(file.ToSpecifiedFullPath()).Any(a => a.Contains(search))))
 				.EnumerateChildren()
-				.Where(w => FileSystemName.MatchesSimpleExpression(search, w.Value)) 
+				.Where(w => FileSystemName.MatchesSimpleExpression(search, w.Value))
 				.Select(s => new FileModel(s));
 		}
 

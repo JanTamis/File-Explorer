@@ -30,7 +30,7 @@ namespace FileExplorerCore.Views
 			var grid = this.FindControl<ListBox>("fileGrid");
 			var tree = this.FindControl<TreeView>("FolderTree");
 			var pathFolders = this.FindControl<Menu>("pathFolders");
-			var searchBar = this.FindControl<AutoCompleteBox>("searchBar");
+			var searchBar = this.FindControl<TextBox>("searchBar");
 
 			if (grid is { })
 			{
@@ -47,7 +47,7 @@ namespace FileExplorerCore.Views
 				pathFolders.ItemContainerGenerator.Materialized += ItemContainerGenerator_Materialized1;
 			}
 
-			searchBar.KeyUp += SearchBar_KeyUp;
+			// searchBar.KeyUp += SearchBar_KeyUp;
 
 			PointerPressed += MainWindow_PointerPressed;
 		}

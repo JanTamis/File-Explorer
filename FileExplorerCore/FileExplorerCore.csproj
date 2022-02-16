@@ -257,6 +257,8 @@
     <PackageReference Include="DiscUtils.FileSystems" Version="0.16.13" />
     <PackageReference Include="Humanizer" Version="2.14.1" />
     <PackageReference Include="LinqOptimizer.CSharp" Version="0.7.0" />
+    <PackageReference Include="Material.Avalonia" Version="2.5.0.73-nightly" />
+    <PackageReference Include="Material.Icons.Avalonia" Version="1.0.2" />
     <PackageReference Include="MetadataExtractor" Version="2.7.1" />
     <PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.1.2" />
     <PackageReference Include="Microsoft.Win32.Registry" Version="6.0.0-preview.5.21301.5" />

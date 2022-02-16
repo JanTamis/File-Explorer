@@ -121,7 +121,7 @@ namespace FileExplorerCore.ViewModels
 
 		public async ValueTask Undo()
 		{
-			CurrentTab.SetPath(CurrentTab.Undo());
+			await CurrentTab.SetPath(CurrentTab.Undo());
 		}
 
 		public async ValueTask Redo()

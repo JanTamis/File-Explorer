@@ -1,1076 +1,500 @@
 <views:FluentWindow xmlns="https://github.com/avaloniaui"
-										xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-										xmlns:vm="using:FileExplorerCore.ViewModels"
-										xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-										xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-										xmlns:sys="using:System"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="using:FileExplorerCore.ViewModels"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:sys="using:System"
                     xmlns:system="clr-namespace:System;assembly=mscorlib"
-										xmlns:converters="using:FileExplorerCore.Converters"
-										xmlns:controls="using:FileExplorerCore.Controls"
-										xmlns:models="clr-namespace:FileExplorerCore.Models"
-										xmlns:viewmodels="clr-namespace:FileExplorerCore.ViewModels"
-										xmlns:views="clr-namespace:FileExplorerCore.Views"
-										mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-										x:Class="FileExplorerCore.Views.MainWindow"
-										x:Name="MainWindow"
-										Icon="/Assets/Icon.ico"
-										MinWidth="1000"
-										MinHeight="400"
-										Width="1000"
-										Background="Transparent"
-										Height="600"
-										BorderThickness="0"
-										WindowStartupLocation="CenterScreen"
-										Title="FileExplorerCore">
-
-  <Window.Resources>
-    <system:Int32 x:Key="ImageSize">25</system:Int32>
-  </Window.Resources>
-
-  <Window.Styles>
-    <Style Selector="DataGrid:focus DataGridCell:current /template/ Grid#FocusVisual">
-      <Setter Property="IsVisible" Value="False" />
-    </Style>
-
-    <Style Selector="DataGrid /template/ Rectangle#PART_ColumnHeadersAndRowsSeparator">
-      <Setter Property="Fill" Value="Transparent" />
-    </Style>
-
-    <Style Selector="ToolTip">
-      <Setter Property="FontSize" Value="15" />
-      <Setter Property="Foreground" Value="{DynamicResource SystemBaseHighColor}" />
-      <Setter Property="MaxWidth" Value="1000" />
-      <Setter Property="FontWeight" Value="Normal" />
-    </Style>
-
-    <Style Selector="TabStripItem">
-      <Setter Property="FontSize" Value="{DynamicResource TabItemHeaderFontSize}" />
-      <Setter Property="FontWeight" Value="{DynamicResource TabItemHeaderThemeFontWeight}" />
-      <Setter Property="Foreground" Value="{DynamicResource TabItemHeaderForegroundUnselected}" />
-      <Setter Property="Padding" Value="{DynamicResource TabItemHeaderMargin}" />
-      <Setter Property="Margin" Value="0" />
-      <Setter Property="MinHeight" Value="{DynamicResource TabStripItemMinHeight}" />
-      <Setter Property="VerticalContentAlignment" Value="Center" />
-      <Setter Property="Template">
-        <ControlTemplate>
-          <Border Name="PART_LayoutRoot"
-									BorderBrush="{TemplateBinding BorderBrush}"
-									BorderThickness="{TemplateBinding BorderThickness}"
-									Padding="{TemplateBinding Padding}">
-            <Panel>
-              <ContentPresenter Name="PART_ContentPresenter"
-																ContentTemplate="{TemplateBinding ContentTemplate}"
-																Content="{TemplateBinding Content}"
-																HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-																VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-																TextBlock.FontFamily="{TemplateBinding FontFamily}"
-																TextBlock.FontSize="{TemplateBinding FontSize}"
-																TextBlock.FontWeight="{TemplateBinding FontWeight}" />
-            </Panel>
-          </Border>
-        </ControlTemplate>
-      </Setter>
-    </Style>
-
-    <Style Selector="TabStripItem:selected /template/ Border#PART_LayoutRoot">
-      <Setter Property="Background" Value="{DynamicResource MenuBackground}" />
-      <Setter Property="CornerRadius" Value="7.5 7.5 0 0" />
-      <Setter Property="Opacity" Value="1" />
-    </Style>
-
-    <Style Selector="TabStripItem /template/ Border#PART_LayoutRoot">
-      <Setter Property="Opacity" Value="0.6" />
-      <Setter Property="CornerRadius" Value="7.5 7.5 0 0" />
-      <Setter Property="Background" Value="{DynamicResource MenuBackground}" />
-    </Style>
-
-    <Style Selector="TabStripItem:pointerover /template/ Border#PART_LayoutRoot">
-      <Setter Property="Opacity" Value="0.8" />
-      <Setter Property="CornerRadius" Value="7.5 7.5 0 0" />
-      <Setter Property="Background" Value="{DynamicResource MenuBackground}" />
-    </Style>
-
-    <Style Selector="TabStripItem:pointerover:selected /template/ Border#PART_LayoutRoot">
-      <Setter Property="Opacity" Value="0.8" />
-      <Setter Property="CornerRadius" Value="7.5 7.5 0 0" />
-      <Setter Property="Background" Value="{DynamicResource MenuBackground}" />
-    </Style>
-
-    <Style Selector="Button:disabled /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushDisabled}" />
-      <Setter Property="TextBlock.Foreground" Value="{DynamicResource ButtonForegroundDisabled}" />
-    </Style>
-  </Window.Styles>
-
-  <Panel Margin="{Binding #MainWindow.OffScreenMargin}">
-
-    <Panel IsHitTestVisible="False"
-					Background="{DynamicResource Background}"
-					Opacity="0.8" />
-
-    <Border IsHitTestVisible="True">
-      <Grid ColumnDefinitions="200, 5, *">
-        <Grid RowDefinitions="Auto, *, Auto"
-							Grid.ColumnSpan="2">
-          <Border VerticalAlignment="Top"
-					        Margin="{Binding, Converter={StaticResource mainTitleMarginConverter}}"
-									Height="30"
-									IsHitTestVisible="False">
-
-            <StackPanel Orientation="Horizontal"
-												Margin="0"
-												IsHitTestVisible="False">
-              <Viewbox Margin="10 0 5 0"
-											IsHitTestVisible="False"
-											Width="20">
-                <Image Source="{SvgImage /Assets/UIIcons/FileExplorer.svg}" />
-              </Viewbox>
-
-              <Viewbox IsHitTestVisible="False">
-                <TextBlock Text="File Explorer"
-													FontWeight="Bold"
-													VerticalAlignment="Center"
-													Margin="0 2.5"
-													FontSize="18" />
-              </Viewbox>
-            </StackPanel>
-
-          </Border>
-
-          <ScrollViewer Grid.ColumnSpan="2"
-												Grid.Row="1"
-												ClipToBounds="True">
-            <TreeView Items="{Binding Folders}"
-											x:Name="FolderTree"
-											ClipToBounds="True">
-              <TreeView.Styles>
-                <Style
-									Selector="TreeView[IsPointerOver=true] TreeViewItem /template/ ToggleButton#PART_ExpandCollapseChevron">
-                  <Setter Property="Opacity" Value="1" />
-                </Style>
-
-                <Style
-									Selector="TreeView[IsPointerOver=false] TreeViewItem /template/ ToggleButton#PART_ExpandCollapseChevron">
-                  <Setter Property="Opacity" Value="0" />
-                </Style>
-
-                <Style Selector="TreeViewItem /template/ ToggleButton#PART_ExpandCollapseChevron">
-                  <Setter Property="Transitions">
-                    <Transitions>
-                      <DoubleTransition Property="Opacity" Duration="0:0:0.15" />
-                    </Transitions>
-                  </Setter>
-                </Style>
-              </TreeView.Styles>
-
-              <TreeView.DataTemplates>
-                <TreeDataTemplate DataType="{x:Type models:FolderModel}"
-																	ItemsSource="{Binding SubFolders}">
-                  <StackPanel Orientation="Horizontal">
-                    <Image DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
-                           Source="{Binding Result}"
-                           x:DataType="models:FolderModel"
-                           Width="25"
-                           Height="25"
-                           Margin="0 0 3 0"/>
-
-                    <TextBlock Text="{Binding Name}"
-															VerticalAlignment="Center"
-															TextTrimming="CharacterEllipsis" />
-                  </StackPanel>
-                </TreeDataTemplate>
-              </TreeView.DataTemplates>
-
-              <TreeView.ItemsPanel>
-                <ItemsPanelTemplate>
-                  <VirtualizingStackPanel Orientation="Vertical" />
-                </ItemsPanelTemplate>
-              </TreeView.ItemsPanel>
-            </TreeView>
-          </ScrollViewer>
-
-          <Border Grid.Row="2"
-									Grid.ColumnSpan="2"
-									Background="{DynamicResource CardHighBackground}"
-									ClipToBounds="True">
-            <Grid RowDefinitions="Auto, *">
-              <StackPanel Margin="15 10">
-                <StackPanel Orientation="Horizontal">
-                  <Viewbox Width="25">
-                    <Image Source="{SvgImage /Assets/UIIcons/OneDrive.svg}" />
-                  </Viewbox>
-
-                  <TextBlock Text="OneDrive Usage"
-														TextTrimming="CharacterEllipsis"
-														Margin="5 0 0 0"
-														FontWeight="Bold"
-														VerticalAlignment="Center" />
-                </StackPanel>
-
-                <ProgressBar Maximum="5"
-														Value="2.1"
-														Margin="0 5"
-														MinWidth="0" />
-
-                <TextBlock Text="2.1 GB used of 5 GB"
-													Margin="0 0 0 15" />
-              </StackPanel>
-            </Grid>
-          </Border>
-        </Grid>
-
-        <GridSplitter ResizeDirection="Columns"
-											ShowsPreview="False"
-											Background="Transparent"
-											Grid.Column="1" />
-
-        <Border CornerRadius="0 0 0 0"
-								Grid.Column="2">
-          <Grid RowDefinitions="Auto, *"
-								Grid.Column="2">
-
-            <Grid ColumnDefinitions="*, Auto"
-									IsHitTestVisible="True"
-									HorizontalAlignment="Left"
-									Margin="0 0 200 0">
-              <TabStrip Items="{Binding Tabs}"
-												SelectedItem="{Binding CurrentTab}">
-                <TabStrip.ItemsPanel>
-                  <ItemsPanelTemplate>
-                    <UniformGrid Rows="1" />
-                  </ItemsPanelTemplate>
-                </TabStrip.ItemsPanel>
-                <TabStrip.DataTemplates>
-                  <DataTemplate DataType="{x:Type viewmodels:TabItemViewModel}">
-                    <StackPanel>
-                      <Grid ColumnDefinitions="Auto, *, Auto"
-														MaxWidth="350">
-                        <Image
-													DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
-                          Source="{Binding Result}"
-													Height="25"
-													Margin="0 0 4 0"
-													VerticalAlignment="Center" />
-
-                        <TextBlock
-													Text="{Binding TreeItem, Converter={StaticResource fileNameConverter}}"
-													TextTrimming="CharacterEllipsis"
-													VerticalAlignment="Center"
-													Grid.Column="1"
-													IsVisible="{Binding $self.DesiredSize.Width, Mode=TwoWay, Converter={StaticResource minSizeConverter}, ConverterParameter=100}" />
-
-                        <Button Background="Transparent"
-																Height="25"
-																Margin="0"
-																Padding="3"
-																HorizontalAlignment="Right"
-																Grid.Column="2"
-																Click="OnTabCloseClick"
-																IsVisible="{Binding $parent[Window].DataContext.Tabs.Count, Converter={StaticResource moreThanConverter}, ConverterParameter=1}">
-                          <Viewbox>
-                            <Image Source="{SvgImage /Assets/UIIcons/Close.svg}" />
-                          </Viewbox>
-                        </Button>
-                      </Grid>
-
-                      <!--<ProgressBar MinWidth="0"
-																			 Grid.ColumnSpan="3"
-																			 VerticalAlignment="Top"
-																			 Value="{Binding Count}"
-																			 IsIndeterminate="{Binding IsIndeterminate}"
-																		   Maximum="{Binding FileCount}"
-																			 IsVisible="{Binding IsLoading}"
-																			 HorizontalAlignment="Stretch"
-																			 Orientation="Horizontal" />-->
-                    </StackPanel>
-                  </DataTemplate>
-                </TabStrip.DataTemplates>
-
-                <TabStrip.Styles>
-                  <Style Selector="TabStripItem">
-                    <Setter Property="Padding" Value="10 0" />
-                    <Setter Property="MinHeight" Value="25" />
-                    <Setter Property="Cursor" Value="Hand" />
-                    <Setter Property="ToolTip.Tip" Value="{Binding Path}" />
-                  </Style>
-                </TabStrip.Styles>
-              </TabStrip>
-
-              <Viewbox Margin="5 0 0 0"
-											Grid.Column="1"
-											Padding="2">
-                <Button Cursor="Hand"
-												Padding="0"
-												Command="{Binding AddTab}"
-												Background="Transparent"
-												Margin="0 0 5 0">
-                  <Viewbox Height="30">
-                    <Image Source="{SvgImage /Assets/UIIcons/AddTab.svg}" />
-                  </Viewbox>
-                </Button>
-              </Viewbox>
-            </Grid>
-
-            <DockPanel ClipToBounds="True"
-											Background="{DynamicResource MenuBackground}"
-											Grid.Row="1">
-              <StackPanel DockPanel.Dock="Top">
-                <Grid ColumnDefinitions="Auto, * Auto">
-                  <StackPanel Orientation="Horizontal"
-															Height="70"
-															Margin="2 2 0 0">
-                    <Grid RowDefinitions="* Auto">
-                      <StackPanel Orientation="Horizontal">
-                        <Button Cursor="Hand"
-																IsEnabled="{Binding CurrentTab.SelectionCount, Converter={StaticResource moreThanConverter}, ConverterParameter=0}"
-																VerticalAlignment="Stretch"
-																Background="Transparent"
-																Command="{Binding CopyFiles}">
-                          <StackPanel Orientation="Vertical"
-																			VerticalAlignment="Center">
-                            <Viewbox Height="30">
-                              <Image Source="{SvgImage /Assets/UIIcons/Copy.svg}" />
-                            </Viewbox>
-                            <TextBlock Text="Copy"
-																			FontSize="12" />
-                          </StackPanel>
-                        </Button>
-                        <Button Cursor="Hand"
-																VerticalAlignment="Stretch"
-																Background="Transparent">
-                          <StackPanel Orientation="Vertical"
-																			VerticalAlignment="Center">
-                            <Viewbox Height="30">
-                              <Image Source="{SvgImage /Assets/UIIcons/Paste.svg}" />
-                            </Viewbox>
-                            <TextBlock Text="Paste"
-																			FontSize="12" />
-                          </StackPanel>
-                        </Button>
-
-                        <Grid RowDefinitions="*, *">
-                          <Button Cursor="Hand"
-																	IsEnabled="{Binding CurrentTab.SelectionCount, Converter={StaticResource moreThanConverter}, ConverterParameter=0}"
-																	Background="Transparent"
-																	HorizontalAlignment="Stretch"
-																	Padding="4">
-                            <StackPanel Orientation="Horizontal">
-                              <Viewbox>
-                                <Image Source="{SvgImage /Assets/UIIcons/Cut.svg}" />
-                              </Viewbox>
-                              <TextBlock Text="Cut"
-																				FontSize="12"
-																				VerticalAlignment="Center"
-																				Margin="2 0 0 0" />
-                            </StackPanel>
-                          </Button>
-                          <Button Cursor="Hand"
-																	Background="Transparent"
-																	Padding="4"
-																	Command="{Binding CopyPath}"
-																	Grid.Row="1">
-                            <StackPanel Orientation="Horizontal">
-                              <Viewbox>
-                                <Image Source="{SvgImage /Assets/UIIcons/Link.svg}" />
-                              </Viewbox>
-                              <TextBlock Text="Copy Path"
-																				FontSize="12"
-																				VerticalAlignment="Center"
-																				Margin="2 0 0 0" />
-                            </StackPanel>
-                          </Button>
-                        </Grid>
-                      </StackPanel>
-
-                      <TextBlock Text="Clipboard"
-																Grid.Row="1"
-																HorizontalAlignment="Center"
-																Foreground="{DynamicResource SystemChromeDisabledLowColor}"
-																FontSize="12" />
-                    </Grid>
-
-                    <Border Width="1"
-														Background="{DynamicResource Background}"
-														Margin="4" />
-
-                    <Grid RowDefinitions="* Auto"
-													IsEnabled="{Binding CurrentTab.SelectionCount, Converter={StaticResource moreThanConverter}, ConverterParameter=0}">
-                      <StackPanel Orientation="Horizontal">
-                        <Button Cursor="Hand"
-																Background="Transparent">
-                          <StackPanel Orientation="Vertical">
-                            <Viewbox Height="30">
-                              <Image Source="{SvgImage /Assets/UIIcons/MoveFile.svg}" />
-                            </Viewbox>
-                            <TextBlock Text="Move To"
-																			FontSize="12" />
-                          </StackPanel>
-                        </Button>
-                        <Button Cursor="Hand"
-																Background="Transparent"
-																Command="{Binding CopyTo}">
-                          <StackPanel Orientation="Vertical">
-                            <Viewbox Height="30">
-                              <Image Source="{SvgImage /Assets/UIIcons/Paste.svg}" />
-                            </Viewbox>
-                            <TextBlock Text="Copy To"
-																			FontSize="12" />
-                          </StackPanel>
-                        </Button>
-                      </StackPanel>
-
-                      <TextBlock Text="Organize"
-																Grid.Row="1"
-																HorizontalAlignment="Center"
-																Foreground="{DynamicResource SystemChromeDisabledLowColor}"
-																FontSize="12" />
-                    </Grid>
-
-                    <Border Width="1"
-														Background="{DynamicResource Background}"
-														Margin="4" />
-
-                    <Grid RowDefinitions="* Auto"
-													IsEnabled="{Binding CurrentTab.SelectionCount, Converter={StaticResource moreThanConverter}, ConverterParameter=0}">
-                      <StackPanel Orientation="Horizontal">
-                        <Button Cursor="Hand"
-																Command="{Binding DeleteFiles}"
-																Background="Transparent">
-                          <StackPanel Orientation="Vertical">
-                            <Viewbox Height="30">
-                              <Image Source="{SvgImage /Assets/UIIcons/Remove.svg}" />
-                            </Viewbox>
-                            <TextBlock Text="Delete"
-																			FontSize="12" />
-                          </StackPanel>
-                        </Button>
-                        <Button Cursor="Hand"
-																Command="{Binding Rename}"
-																Background="Transparent">
-                          <StackPanel Orientation="Vertical">
-                            <Viewbox Height="30">
-                              <Image Source="{SvgImage /Assets/UIIcons/Rename.svg}" />
-                            </Viewbox>
-                            <TextBlock Text="Rename"
-																			FontSize="12" />
-                          </StackPanel>
-                        </Button>
-                      </StackPanel>
-
-                      <TextBlock Text="Edit"
-																Grid.Row="1"
-																HorizontalAlignment="Center"
-																Foreground="{DynamicResource SystemChromeDisabledLowColor}"
-																FontSize="12" />
-                    </Grid>
-
-                    <Border Width="1"
-														Background="{DynamicResource Background}"
-														Margin="4" />
-
-                    <Grid RowDefinitions="* Auto">
-                      <StackPanel Orientation="Horizontal">
-                        <Grid RowDefinitions="*, *, *">
-                          <Button Cursor="Hand"
-																	Background="Transparent"
-																	Command="{Binding SelectAll}"
-																	HorizontalAlignment="Stretch"
-																	Padding="2">
-                            <StackPanel Orientation="Horizontal">
-                              <Viewbox>
-                                <Image
-																	Source="{SvgImage /Assets/UIIcons/SelectAll.svg}" />
-                              </Viewbox>
-                              <TextBlock Text="Select All"
-																				FontSize="12"
-																				VerticalAlignment="Center"
-																				Margin="2 0 0 0" />
-                            </StackPanel>
-                          </Button>
-                          <Button Cursor="Hand"
-																	Background="Transparent"
-																	HorizontalAlignment="Stretch"
-																	Padding="2"
-																	Command="{Binding SelectNone}"
-																	Grid.Row="1">
-                            <StackPanel Orientation="Horizontal">
-                              <Viewbox>
-                                <Image
-																	Source="{SvgImage /Assets/UIIcons/SelectNone.svg}" />
-                              </Viewbox>
-                              <TextBlock Text="Select None"
-																				FontSize="12"
-																				VerticalAlignment="Center"
-																				Margin="2 0 0 0" />
-                            </StackPanel>
-                          </Button>
-                          <Button Cursor="Hand"
-																	Background="Transparent"
-																	Command="{Binding SelectInvert}"
-																	Padding="2"
-																	Grid.Row="2">
-                            <StackPanel Orientation="Horizontal">
-                              <Viewbox>
-                                <Image
-																	Source="{SvgImage /Assets/UIIcons/SelectInvert.svg}" />
-                              </Viewbox>
-                              <TextBlock Text="Invert Selection"
-																				FontSize="12"
-																				VerticalAlignment="Center"
-																				Margin="2 0 0 0" />
-                            </StackPanel>
-                          </Button>
-                        </Grid>
-                      </StackPanel>
-
-                      <TextBlock Text="Selection"
-																Grid.Row="1"
-																HorizontalAlignment="Center"
-																Foreground="{DynamicResource SystemChromeDisabledLowColor}"
-																FontSize="12" />
-                    </Grid>
-
-                    <Border Width="1"
-														Background="{DynamicResource Background}"
-														Margin="4" />
-
-                    <Button Cursor="Hand"
-														Command="{Binding AnalyzeFolder}"
-														VerticalAlignment="Stretch"
-														Background="Transparent">
-                      <StackPanel Orientation="Vertical"
-																	VerticalAlignment="Center">
-                        <Viewbox Height="30">
-                          <Image Source="{SvgImage /Assets/UIIcons/AnalyzeFiles.svg}" />
-                        </Viewbox>
-                        <TextBlock Text="Analyze"
-																	FontSize="12" />
-                      </StackPanel>
-                    </Button>
-
-                    <Border Width="1"
-														Background="{DynamicResource Background}"
-														Margin="4" />
-
-                    <Button Cursor="Hand"
-														Command="{Binding ShowProperties}"
-														VerticalAlignment="Stretch"
-														Background="Transparent">
-                      <StackPanel Orientation="Vertical"
-																	VerticalAlignment="Center">
-                        <Viewbox Height="30">
-                          <Image Source="{SvgImage /Assets/UIIcons/Properties.svg}" />
-                        </Viewbox>
-                        <TextBlock Text="Properties"
-																	FontSize="12" />
-                      </StackPanel>
-                    </Button>
-                  </StackPanel>
-
-                  <StackPanel Grid.Column="2">
-                    <Button Background="Transparent"
-														Command="{Binding ShowSettings}"
-														Width="50"
-														Padding="5"
-														Cursor="Hand"
-														Height="50">
-                      <Viewbox>
-                        <Image Source="{SvgImage /Assets/UIIcons/Settings.svg}" />
-                      </Viewbox>
-                    </Button>
-                  </StackPanel>
-                </Grid>
-
-                <Grid ColumnDefinitions="Auto, *, Auto"
-											Height="50">
-                  <StackPanel Orientation="Horizontal"
-															VerticalAlignment="Top"
-															Margin="0 3"
-															Cursor="Hand">
-                    <Button Background="Transparent"
-														Command="{Binding Undo}"
-														Width="50"
-														Height="40"
-														Padding="10 5">
-                      <Viewbox>
-                        <Image Source="{SvgImage /Assets/UIIcons/LeftArrow.svg}" />
-                      </Viewbox>
-                    </Button>
-                    <Button Background="Transparent"
-														Command="{Binding Redo}"
-														Width="50"
-														Height="40"
-														Padding="10 5">
-                      <Viewbox>
-                        <Image Source="{SvgImage /Assets/UIIcons/RightArrow.svg}" />
-                      </Viewbox>
-                    </Button>
-                    <Button Command="{Binding GoUp}"
-														Background="Transparent"
-														Width="50"
-														Height="40"
-														Padding="10 5">
-                      <Viewbox>
-                        <Image Source="{SvgImage /Assets/UIIcons/UpArrow.svg}" />
-                      </Viewbox>
-                    </Button>
-                  </StackPanel>
-
-                  <Border Grid.Column="1"
-													CornerRadius="10"
-													VerticalAlignment="Top"
-													Height="40"
-													Background="{DynamicResource ContentBackground}"
-													Margin="5 3">
-                    <Grid ColumnDefinitions="*, Auto">
-
-                      <ProgressBar VerticalAlignment="Center"
-																	Grid.ColumnSpan="2"
-																	Height="40"
-																	ShowProgressText="True"
-																	Background="Transparent"
-																	IsVisible="{Binding CurrentTab.IsLoading}"
-																	Value="{Binding CurrentTab.Count}"
-																	IsIndeterminate="{Binding CurrentTab.IsIndeterminate}"
-																	Maximum="{Binding CurrentTab.FileCount}">
-                        <ProgressBar.Styles>
-                          <Style Selector="ProgressBar">
-                            <Setter Property="Foreground"
-																		Value="{DynamicResource SystemControlHighlightAccentBrush}" />
-                            <Setter Property="Background"
-																		Value="{DynamicResource SystemControlBackgroundBaseLowBrush}" />
-                            <Setter Property="BorderThickness"
-																		Value="{DynamicResource ProgressBarBorderThemeThickness}" />
-                            <Setter Property="BorderBrush"
-																		Value="{DynamicResource SystemControlHighlightTransparentBrush}" />
-                            <Setter Property="MinHeight"
-																		Value="{DynamicResource ProgressBarThemeMinHeight}" />
-                            <Setter Property="VerticalAlignment" Value="Center" />
-                            <Setter Property="Template">
-                              <ControlTemplate>
-                                <Border x:Name="ProgressBarRoot" ClipToBounds="True"
-																				Background="{TemplateBinding Background}"
-																				BorderBrush="{TemplateBinding BorderBrush}"
-																				BorderThickness="{TemplateBinding BorderThickness}"
-																				CornerRadius="10">
-                                  <Panel>
-                                    <Panel x:Name="DeterminateRoot">
-                                      <Border
-																				CornerRadius="{DynamicResource ControlCornerRadius}"
-																				x:Name="PART_Indicator"
-																				Margin="{TemplateBinding Padding}"
-																				Background="{TemplateBinding Foreground}" />
-                                    </Panel>
-                                    <Panel x:Name="IndeterminateRoot">
-                                      <Border
-																				x:Name="IndeterminateProgressBarIndicator"
-																				CornerRadius="{DynamicResource ControlCornerRadius}"
-																				Margin="{TemplateBinding Padding}"
-																				Background="{TemplateBinding Foreground}" />
-                                      <Border
-																				x:Name="IndeterminateProgressBarIndicator2"
-																				CornerRadius="{DynamicResource ControlCornerRadius}"
-																				Margin="{TemplateBinding Padding}"
-																				Background="{TemplateBinding Foreground}" />
-                                    </Panel>
-                                  </Panel>
-                                </Border>
-                              </ControlTemplate>
-                            </Setter>
-                          </Style>
-                        </ProgressBar.Styles>
-                      </ProgressBar>
-
-                      <!--<TextBox Background="Transparent"
-															 Text="{Binding CurrentTab.Path}"
-															 CornerRadius="10"
-															 VerticalContentAlignment="Center"
-															 BorderBrush="{x:Null}"
-															 x:Name="pathBox"
-															 Watermark="Path" />-->
-
-                      <ScrollViewer HorizontalScrollBarVisibility="Auto"
-																		CornerRadius="10">
-                        <ItemsRepeater Items="{Binding CurrentTab.Folders}"
-																			Background="Transparent"
-																			IsVisible="{Binding ElementName=pathBox, Path=!IsFocused}">
-                          <ItemsRepeater.Styles>
-                            <Style
-															Selector="Button /template/ ContentPresenter#PART_ContentPresenter">
-                              <Setter Property="CornerRadius" Value="10" />
-                            </Style>
-                          </ItemsRepeater.Styles>
-                          <ItemsRepeater.Layout>
-                            <StackLayout Orientation="Horizontal" />
-                          </ItemsRepeater.Layout>
-
-                          <ItemsRepeater.ItemTemplate>
-                            <DataTemplate>
-                              <Panel>
-                                <ComboBox PlaceholderText="{Binding Name}"
-																					HorizontalAlignment="Stretch"
-																					Padding="10 5 5 5"
-																					CornerRadius="10"
-																					Background="Transparent"
-																					BorderBrush="Transparent"
-																					VerticalAlignment="Stretch"
-																					SelectionChanged="OnComboBoxChanged"
-																					Items="{Binding SubFolders}">
-                                  <ComboBox.Styles>
-                                    <Style
-																			Selector="ComboBox:pointerover /template/ Border#Background">
-                                      <Setter Property="Background"
-																							Value="{DynamicResource MenuBackground}" />
-                                      <Setter Property="BorderBrush"
-																							Value="Transparent" />
-                                      <Setter Property="Cursor" Value="Hand" />
-                                    </Style>
-                                  </ComboBox.Styles>
-                                </ComboBox>
-
-                                <Button Background="Transparent"
-																				BorderBrush="Transparent"
-																				VerticalAlignment="Stretch"
-																				HorizontalAlignment="Stretch"
-																				CornerRadius="10"
-																				Margin="0 0 30 0"
-																				Tapped="OnButtonClick"
-																				Cursor="Hand" />
-                              </Panel>
-                            </DataTemplate>
-                          </ItemsRepeater.ItemTemplate>
-                        </ItemsRepeater>
-                      </ScrollViewer>
-
-                      <!--<ComboBox PlaceholderText="Path"
-															BorderBrush="{x:Null}"
-															HorizontalAlignment="Stretch"
-															IsTextSearchEnabled="True" />-->
-
-                      <Button Cursor="Hand"
-															Command="{Binding Refresh}"
-															Grid.Column="1"
-															IsVisible="{Binding !CurrentTab.IsLoading}"
-															Background="Transparent"
-															CornerRadius="10"
-															Width="40"
-															Height="40"
-															Padding="5">
-                        <Button.Styles>
-                          <Style
-														Selector="Button /template/ ContentPresenter#PART_ContentPresenter">
-                            <Setter Property="CornerRadius" Value="10" />
-                          </Style>
-                        </Button.Styles>
-
-                        <Viewbox>
-                          <Image Source="{SvgImage /Assets/UIIcons/Refresh.svg}" />
-                        </Viewbox>
-                      </Button>
-
-                      <Button Cursor="Hand"
-															Command="{Binding CancelUpdateFiles}"
-															Grid.Column="1"
-															CornerRadius="10"
-															IsVisible="{Binding CurrentTab.IsLoading}"
-															Background="Transparent"
-															Width="40"
-															Height="40"
-															Padding="5">
-                        <Button.Styles>
-                          <Style
-														Selector="Button /template/ ContentPresenter#PART_ContentPresenter">
-                            <Setter Property="CornerRadius" Value="10" />
-                          </Style>
-                        </Button.Styles>
-
-                        <Viewbox>
-                          <Image Source="{SvgImage /Assets/UIIcons/Close.svg}" />
-                        </Viewbox>
-                      </Button>
-                    </Grid>
-                  </Border>
-
-                  <Border Grid.Column="2"
-													CornerRadius="10"
-													VerticalAlignment="Top"
-													Height="40"
-													Background="{DynamicResource ContentBackground}"
-													Margin="5 3">
-                    <Grid ColumnDefinitions="* Auto">
-                      <AutoCompleteBox Background="{x:Null}"
-																			BorderBrush="{x:Null}"
-																			Text="{Binding CurrentTab.Search}"
-																			x:Name="searchBar"
-																			VerticalAlignment="Center"
-																			Items="{Binding SearchHistory}"
-																			IsTextCompletionEnabled="True"
-																			MinimumPrefixLength="0"
-																			MinWidth="100"
-																			Watermark="Search">
-                        <AutoCompleteBox.Styles>
-                          <Style
-														Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
-                            <Setter Property="BorderBrush" Value="{x:Null}" />
-                            <Setter Property="Background" Value="Transparent" />
-                            <Setter Property="BorderThickness" Value="0" />
-                          </Style>
-
-                          <Style Selector="TextBox /template/ Border#PART_BorderElement">
-                            <Setter Property="CornerRadius" Value="10" />
-                          </Style>
-
-                          <Style
-														Selector="TextBox:focus /template/ TextBlock#PART_Watermark, TextBox:focus /template/ TextBlock#PART_FloatingWatermark">
-                            <Setter Property="Foreground"
-																		Value="{DynamicResource TextControlForeground}" />
-                          </Style>
-
-                          <Style
-														Selector="TextBox:pointerover /template/ TextBlock#PART_Watermark, TextBox:pointerover /template/ TextBlock#PART_FloatingWatermark">
-                            <Setter Property="Foreground"
-																		Value="{DynamicResource TextControlForeground}" />
-                          </Style>
-
-                          <Style
-														Selector="TextBox:focus /template/ Border#PART_BorderElement">
-                            <Setter Property="Background" Value="Transparent" />
-                            <Setter Property="BorderBrush"
-																		Value="{DynamicResource TextControlBorderBrushFocused}" />
-                            <Setter Property="BorderThickness" Value="0" />
-                          </Style>
-                        </AutoCompleteBox.Styles>
-                      </AutoCompleteBox>
-                      <Button Cursor="Hand"
-															Command="{Binding StartSearch}"
-															Grid.Column="1"
-															CornerRadius="10"
-															Background="Transparent"
-															Width="40"
-															Height="40"
-															Padding="5">
-                        <Button.Styles>
-                          <Style
-														Selector="Button /template/ ContentPresenter#PART_ContentPresenter">
-                            <Setter Property="CornerRadius" Value="10" />
-                          </Style>
-                        </Button.Styles>
-
-                        <Viewbox>
-                          <Image Source="{SvgImage /Assets/UIIcons/Search.svg}" />
-                        </Viewbox>
-                      </Button>
-                    </Grid>
-                  </Border>
-                </Grid>
-              </StackPanel>
-
-              <Border Background="{DynamicResource ContentBackground}">
-                <Grid RowDefinitions="*, Auto">
-
-                  <ContentControl Content="{Binding CurrentTab.DisplayControl}" />
-
-                  <!-- Failed Search -->
-                  <Border VerticalAlignment="Center"
-													HorizontalAlignment="Center"
-													IsVisible="{Binding CurrentTab.SearchFailed}"
-													Padding="10 5 10 10">
-                    <Viewbox MaxWidth="300"
-														MaxHeight="300">
-                      <StackPanel>
-                        <Image Source="{SvgImage /Assets/UIIcons/FailedSearch.svg}"
-															Width="200"
-															Height="200" />
-
-                        <TextBlock Text="No Files or Directories found..."
-																	FontWeight="SemiBold"
-																	FontSize="21" />
-                      </StackPanel>
-                    </Viewbox>
-                  </Border>
-
-                  <Border Background="{DynamicResource MenuBackground}"
-													Grid.Row="1">
-                    <Grid ColumnDefinitions="Auto, *, Auto">
-
-                      <StackPanel Orientation="Horizontal">
-                        <Label Content="{Binding CurrentTab.FileCountText}"
-															Margin="5 0 0 0"
-															FontSize="14"
-															VerticalAlignment="Center" />
-
-                        <Border Width="1"
-																Background="{DynamicResource Background}"
-																Margin="4 8" />
-
-                        <Label Content="{Binding CurrentTab.SelectionText}"
-															Margin="0"
-															FontSize="14"
-															VerticalAlignment="Center" />
-
-                        <Label Content="{Binding CurrentTab.SearchText}"
-															Margin="0"
-															FontSize="14"
-															VerticalAlignment="Center" />
-                      </StackPanel>
-
-                      <StackPanel Grid.Column="2"
-																	Orientation="Horizontal">
-                        <StackPanel Orientation="Horizontal">
-
-                          <Viewbox Width="25"
-																	Margin="2 0 0 0">
-                            <Image Source="{SvgImage /Assets/UIIcons/Filter.svg}" />
-                          </Viewbox>
-
-                          <ComboBox BorderThickness="0"
-																		Cursor="Hand"
-																		Padding="0 1 2 1"
-																		Margin="0"
-																		Background="Transparent"
-																		VerticalAlignment="Stretch"
-																		SelectedItem="{Binding CurrentTab.Sort}"
-																		Items="{Binding SortValues}">
-                            <ComboBox.Styles>
-                              <Style
-																Selector="ComboBox:pointerover /template/ Border#Background">
-                                <Setter Property="Background" Value="Transparent" />
-                                <Setter Property="BorderBrush"
-																				Value="{DynamicResource ComboBoxBorderBrushPointerOver}" />
-                              </Style>
-                            </ComboBox.Styles>
-                          </ComboBox>
-                        </StackPanel>
-
-                        <Border Width="1"
-																Background="{DynamicResource Background}"
-																Margin="4 8" />
-
-                        <ListBox HorizontalAlignment="Right"
-																Background="Transparent">
-                          <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                              <StackPanel Orientation="Horizontal" />
-                            </ItemsPanelTemplate>
-                          </ListBox.ItemsPanel>
-                          <ListBoxItem Cursor="Hand"
-																			Padding="7.5"
-																			Background="Transparent"
-																			IsSelected="{Binding !CurrentTab.IsGrid, Mode=TwoWay}">
-                            <Image Source="{SvgImage /Assets/UIIcons/List.svg}"
-																	Width="25" />
-
-                          </ListBoxItem>
-                          <ListBoxItem Cursor="Hand"
-																			Padding="7.5"
-																			Background="Transparent"
-																			IsSelected="{Binding CurrentTab.IsGrid, Mode=TwoWay}">
-                            <Image Source="{SvgImage /Assets/UIIcons/Grid.svg}"
-																	Width="25" />
-                          </ListBoxItem>
-                        </ListBox>
-                      </StackPanel>
-
-                      <!--<Label Content="{Binding CurrentTab.LoadTime, StringFormat=Load Time: {0:mm\\:ss\\.fff}}"
-														 Margin="5"
-														 Grid.Column="1" />-->
-                    </Grid>
-                  </Border>
-
-                  <!-- Search Progress -->
-                  <!--<Border VerticalAlignment="Center"
-													HorizontalAlignment="Center"
-													IsVisible="{Binding CurrentTab.IsLoading}"
-													Background="{DynamicResource MenuBackground}"
-													Padding="10 5 10 10"
-													CornerRadius="10"
-													BoxShadow="0 0 30 -5 Black" >
-										<StackPanel>
-											<Grid ColumnDefinitions="*, Auto">
-												<TextBlock Text="{Binding CurrentTab.SearchText}"
-																	 HorizontalAlignment="Center"
-																	 VerticalAlignment="Center"
-																	 Margin="0 5 0 5" />
-
-												<Button Background="Transparent"
-																ToolTip.Tip="Cancel"
-																Command="{Binding CancelUpdateFiles}"
-																HorizontalAlignment="Right"
-																VerticalAlignment="Top"
-																Cursor="Hand"
-																Grid.Column="1"
-																Padding="0"
-																Margin="5 0 0 0">
-													<Viewbox Width="25">
-														<Image Source="{SvgImage /Assets/UIIcons/StopSearch.svg}" />
-													</Viewbox>
-												</Button>
-											</Grid>
-											<Grid>
-												<ProgressBar VerticalAlignment="Center"
-																		 Height="15"
-																		 Value="{Binding CurrentTab.Count}"
-																		 IsIndeterminate="{Binding CurrentTab.IsIndeterminate}"
-																		 Maximum="{Binding CurrentTab.FileCount}" />
-											</Grid>
-										</StackPanel>
-									</Border>-->
-                </Grid>
-              </Border>
-            </DockPanel>
-          </Grid>
-        </Border>
-      </Grid>
-    </Border>
-
-    <!--<Border Background="#55000000" 
-						IsVisible="{Binding PopupContent.HasShadow}"
-						PointerPressed="CloseSettings" />-->
-
-    <!-- popup -->
-    <Border VerticalAlignment="Center"
-						HorizontalAlignment="Center"
-						Background="{DynamicResource MenuBackground}"
-						Padding="0"
-						MinWidth="300"
-						CornerRadius="10"
-						IsVisible="{Binding CurrentTab.PopupVisible}"
-						x:Name="settingsPanel"
-						BoxShadow="0 0 30 -5 Black">
-      <Grid RowDefinitions="Auto, *">
-
-        <Border Background="{DynamicResource ContentBackground}"
-								CornerRadius="10 10 0 0">
-          <Grid Margin="4"
-								ColumnDefinitions="* Auto">
-            <Label Content="{Binding CurrentTab.PopupContent.Title}"
-									FontSize="21"
-									Margin="10 0"
-									FontWeight="Bold"
-									VerticalAlignment="Center"
-									HorizontalAlignment="Center" />
-
-            <Button Width="30"
-										Height="30"
+                    xmlns:converters="using:FileExplorerCore.Converters"
+                    xmlns:controls="using:FileExplorerCore.Controls"
+                    xmlns:styles="clr-namespace:Material.Styles;assembly=Material.Styles"
+                    xmlns:models="clr-namespace:FileExplorerCore.Models"
+                    xmlns:viewmodels="clr-namespace:FileExplorerCore.ViewModels"
+                    xmlns:views="clr-namespace:FileExplorerCore.Views"
+                    xmlns:assist="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+                    xmlns:material="using:Material.Icons.Avalonia"
+                    mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                    x:Class="FileExplorerCore.Views.MainWindow"
+                    x:Name="MainWindow"
+                    Icon="/Assets/Icon.ico"
+                    MinWidth="1000"
+                    MinHeight="400"
+                    Width="1000"
+                    Background="Transparent"
+                    Height="600"
+                    BorderThickness="0"
+                    WindowStartupLocation="CenterScreen"
+                    Title="FileExplorerCore">
+
+	<Window.Resources>
+		<system:Int32 x:Key="ImageSize">24</system:Int32>
+	</Window.Resources>
+
+	<Panel Margin="{Binding #MainWindow.OffScreenMargin}"
+	       Background="{DynamicResource MaterialDesignPaper}">
+
+		<Panel IsHitTestVisible="False"
+		       Background="#EFF4F8" />
+
+		<Border IsHitTestVisible="True">
+
+			<Grid RowDefinitions="Auto Auto *">
+				<Grid ColumnDefinitions="*, Auto"
+				      HorizontalAlignment="Left"
+				      Margin="0">
+					<TabStrip Items="{Binding Tabs}"
+					          Margin="{Binding #MainWindow.TitleBarMargin}"
+					          SelectedItem="{Binding CurrentTab}">
+						<TabStrip.ItemsPanel>
+							<ItemsPanelTemplate>
+								<UniformGrid Rows="1" />
+							</ItemsPanelTemplate>
+						</TabStrip.ItemsPanel>
+						<TabStrip.DataTemplates>
+							<DataTemplate DataType="{x:Type viewmodels:TabItemViewModel}">
+								<Grid ColumnDefinitions="Auto, *, Auto, Auto"
+								      Margin="5"
+								      MaxWidth="350">
+									<Image
+										Grid.Column="0"
+										DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
+										Source="{Binding Result}"
+										Height="24"
+										Margin="0 0 4 0"
+										VerticalAlignment="Center" />
+
+									<TextBlock
+										Text="{Binding TreeItem, Converter={StaticResource fileNameConverter}}"
+										Foreground="{DynamicResource MaterialDesignBody}"
+										FontWeight="SemiBold"
+										TextTrimming="CharacterEllipsis"
+										FontSize="14"
+										VerticalAlignment="Center"
 										Grid.Column="1"
-										IsDefault="True"
-										Command="{Binding CurrentTab.PopupContent.Close}"
-										VerticalAlignment="Top"
-										HorizontalAlignment="Right"
-										Background="Transparent"
-										Cursor="Hand"
-										Padding="0">
-              <Viewbox Margin="2.5">
-                <Image Source="{SvgImage /Assets/UIIcons/Close.svg}" />
-              </Viewbox>
-            </Button>
-          </Grid>
-        </Border>
+										IsVisible="{Binding $self.DesiredSize.Width, Mode=TwoWay, Converter={StaticResource minSizeConverter}, ConverterParameter=100}" />
+									
+									<ProgressBar Classes="Circle"
+									             Grid.Column="2"
+									             Margin="5 0"
+									             IsIndeterminate="{Binding IsIndeterminate}"
+									             Value="{Binding Count}"
+									             Maximum="{Binding FileCount}"
+									             Foreground="{DynamicResource PrimaryHueMidBrush}"
+									             IsVisible="{Binding IsLoading}" />
 
-        <ContentControl Content="{Binding CurrentTab.PopupContent}"
-												Grid.Row="1" />
-      </Grid>
-    </Border>
-  </Panel>
+									<Button Background="Transparent"
+									        Width="20"
+									        Height="20"
+									        Margin="0"
+									        Padding="0"
+									        assist:ShadowAssist.ShadowDepth="Depth0"
+									        Grid.Column="3"
+									        Click="OnTabCloseClick"
+									        IsVisible="{Binding $parent[Window].DataContext.Tabs.Count, Converter={StaticResource moreThanConverter}, ConverterParameter=1}">
+										<material:MaterialIcon Kind="Close"
+										                       Height="15"
+										                       Width="15"
+										                       Foreground="{DynamicResource MaterialDesignBody}" />
+									</Button>
+								</Grid>
+							</DataTemplate>
+						</TabStrip.DataTemplates>
+
+						<TabStrip.Styles>
+							<Style Selector="TabStripItem">
+								<Setter Property="Padding" Value="10 0" />
+								<Setter Property="MinHeight" Value="25" />
+								<Setter Property="Cursor" Value="Hand" />
+								<Setter Property="ToolTip.Tip" Value="{Binding Path}" />
+							</Style>
+						</TabStrip.Styles>
+					</TabStrip>
+
+					<Viewbox Margin="0"
+					         Grid.Column="1"
+					         Padding="2">
+						<Button Cursor="Hand"
+						        assist:ShadowAssist.ShadowDepth="Depth0"
+						        Padding="0"
+						        Command="{Binding AddTab}"
+						        Background="Transparent"
+						        Margin="0 0 5 0">
+							<material:MaterialIcon Kind="Add"
+							                       Height="25"
+							                       Width="25"
+							                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
+						</Button>
+					</Viewbox>
+				</Grid>
+
+				<Grid Grid.Row="1"
+				      ColumnDefinitions="Auto * Auto Auto"
+				      Margin="5 0 5 5">
+					<StackPanel Orientation="Horizontal"
+					            Grid.Column="0">
+						<Button Classes="Flat"
+						        Command="{Binding Undo}"
+						        Padding="5">
+							<material:MaterialIcon Kind="ArrowBack"
+							                       Height="25"
+							                       Width="25"
+							                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
+						</Button>
+						<Button Classes="Flat"
+						        Command="{Binding Redo}"
+						        Padding="5">
+							<material:MaterialIcon Kind="ArrowForward"
+							                       Height="25"
+							                       Width="25"
+							                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
+						</Button>
+
+						<Button Classes="Flat"
+						        Command="{Binding GoUp}"
+						        Padding="5">
+							<material:MaterialIcon Kind="ArrowUp"
+							                       Height="25"
+							                       Width="25"
+							                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
+						</Button>
+						
+						<Panel>
+							<Button Classes="Flat"
+							        IsVisible="{Binding !CurrentTab.IsLoading}"
+							        Command="{Binding Refresh}"
+							        Padding="5">
+								<material:MaterialIcon Kind="Refresh"
+								                       Height="25"
+								                       Width="25"
+								                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
+							</Button>
+
+							<Button Classes="Flat"
+							        IsVisible="{Binding CurrentTab.IsLoading}"
+							        Command="{Binding CancelUpdateFiles}"
+							        Padding="5">
+								<material:MaterialIcon Kind="SquareOutline"
+								                       Height="25"
+								                       Width="25"
+								                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
+							</Button>
+						</Panel>
+					</StackPanel>
+
+					<styles:Card assist:ShadowAssist.ShadowDepth="Depth1"
+					             Padding="0"
+					             Height="30"
+					             Margin="5 0"
+					             Grid.Column="1">
+						<ItemsRepeater Items="{Binding CurrentTab.Folders}">
+							<ItemsRepeater.Layout>
+								<StackLayout Orientation="Horizontal" />
+							</ItemsRepeater.Layout>
+							<ItemsRepeater.ItemTemplate>
+								<DataTemplate DataType="models:FolderModel">
+									<StackPanel Orientation="Horizontal">
+										<Button Classes="Flat"
+										        Command="{Binding $parent[Window].DataContext.SetPath}"
+										        CommandParameter="{Binding TreeItem}"
+										        VerticalAlignment="Stretch"
+										        Padding="10 0">
+											<Button.ContextMenu>
+												<ContextMenu Foreground="{DynamicResource MaterialDesignBody}"
+												             MaxHeight="500"
+												             Items="{Binding SubFolders}">
+													<ContextMenu.Styles>
+														<Style Selector="MenuItem">
+															<Setter Property="Command" Value="{Binding $parent[Window].DataContext.SetPath}" />
+															<Setter Property="CommandParameter" Value="{Binding TreeItem}" />
+														</Style>
+													</ContextMenu.Styles>
+													<ContextMenu.ItemTemplate>
+														<DataTemplate>
+															<TextBlock Text="{Binding Name}"
+															           FontWeight="Normal"
+															           TextTrimming="CharacterEllipsis"
+															           HorizontalAlignment="Stretch" />
+														</DataTemplate>
+													</ContextMenu.ItemTemplate>
+												</ContextMenu>
+											</Button.ContextMenu>
+											<TextBlock Text="{Binding Name}"
+											           FontWeight="Normal"
+											           Foreground="{DynamicResource MaterialDesignBody}"
+											           HorizontalAlignment="Stretch" />
+										</Button>
+									</StackPanel>
+									
+									
+								</DataTemplate>
+							</ItemsRepeater.ItemTemplate>
+						</ItemsRepeater>
+					</styles:Card>
+
+					<styles:Card assist:ShadowAssist.ShadowDepth="Depth1"
+					             MinWidth="150"
+					             Height="30"
+					             Padding="0"
+					             Margin="5 0"
+					             Grid.Column="2">
+							<TextBox Watermark="Search"
+							         x:Name="searchBar"
+							         Text="{Binding CurrentTab.Search}"
+							         VerticalAlignment="Stretch"
+							         Padding="0"
+							         Foreground="{DynamicResource MaterialDesignBody}"
+							         FontWeight="Normal"
+							         Margin="0"
+							         VerticalContentAlignment="Center">
+								<TextBox.InnerLeftContent>
+										<Button Classes="Flat"
+										        Margin="0 0 2.5 0"
+										        Command="{Binding StartSearch}"
+										        Padding="5">
+											<material:MaterialIcon Kind="Search"
+											                       Height="20"
+											                       Width="20"
+											                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
+										</Button>
+									
+								</TextBox.InnerLeftContent>
+							</TextBox>
+					</styles:Card>
+
+					<StackPanel Grid.Column="3"
+					            Orientation="Horizontal">
+						<Button Classes="Flat"
+						        Command="{Binding ShowSettings}"
+						        Padding="5">
+							<material:MaterialIcon Kind="Settings"
+							                       Height="25"
+							                       Width="25"
+							                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
+						</Button>
+					</StackPanel>
+				</Grid>
+
+				<Border Grid.Row="2"
+				        BorderThickness="0 1 0 0"
+				        Background="#EAECF0"
+				        BorderBrush="#DCDFE2">
+					<Grid ColumnDefinitions="200, 5, *">
+
+						<Grid RowDefinitions="Auto, *, Auto"
+						      Grid.ColumnSpan="2">
+
+							<Border Grid.ColumnSpan="2"
+							        Background="{DynamicResource MaterialDesignCardBackground}"
+							        Grid.Row="1">
+
+								<ScrollViewer HorizontalAlignment="Stretch"
+								              ClipToBounds="True">
+									<TreeView Items="{Binding Folders}"
+									          x:Name="FolderTree"
+									          ClipToBounds="True">
+										<TreeView.DataTemplates>
+											<TreeDataTemplate DataType="{x:Type models:FolderModel}"
+											                  ItemsSource="{Binding SubFolders}">
+												<StackPanel Orientation="Horizontal">
+													<Image
+														DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
+														Source="{Binding Result}"
+														x:DataType="models:FolderModel"
+														Width="25"
+														Height="25"
+														Margin="0 0 3 0" />
+
+													<TextBlock Text="{Binding Name}"
+													           Foreground="{DynamicResource MaterialDesignBody}"
+													           VerticalAlignment="Center"
+													           TextTrimming="CharacterEllipsis" />
+												</StackPanel>
+											</TreeDataTemplate>
+										</TreeView.DataTemplates>
+
+										<TreeView.ItemsPanel>
+											<ItemsPanelTemplate>
+												<VirtualizingStackPanel Orientation="Vertical" />
+											</ItemsPanelTemplate>
+										</TreeView.ItemsPanel>
+									</TreeView>
+								</ScrollViewer>
+							</Border>
+						</Grid>
+
+						<GridSplitter ResizeDirection="Columns"
+						              ShowsPreview="False"
+						              Background="Transparent"
+						              Grid.Column="1" />
+
+						<Border CornerRadius="0 0 0 0"
+						        Margin="2 0 0 0"
+						        Grid.Column="2">
+							<Grid RowDefinitions="Auto, *">
+
+
+								<DockPanel ClipToBounds="True"
+								           Grid.Row="1">
+
+									<Border>
+										<Grid RowDefinitions="*, Auto">
+
+											<ContentControl Content="{Binding CurrentTab.DisplayControl}"
+											                Background="{DynamicResource MaterialDesignCardBackground}" />
+
+											<!-- Failed Search -->
+											<Border Grid.Row="0"
+											        VerticalAlignment="Center"
+											        HorizontalAlignment="Center"
+											        Background="{DynamicResource MaterialDesignCardBackground}"
+											        IsVisible="{Binding CurrentTab.SearchFailed}"
+											        Padding="10 5 10 10">
+												<Viewbox MaxWidth="300"
+												         MaxHeight="300">
+													<StackPanel>
+														<Image Source="{SvgImage /Assets/UIIcons/FailedSearch.svg}"
+														       Width="200"
+														       Height="200" />
+
+														<TextBlock Text="No Files or Directories found..."
+														           FontWeight="SemiBold"
+														           FontSize="21" />
+													</StackPanel>
+												</Viewbox>
+											</Border>
+
+											<Border Grid.Row="1"
+											        Margin="0 2 0 0"
+											        Background="{DynamicResource MaterialDesignCardBackground}">
+												<Grid ColumnDefinitions="Auto, *, Auto">
+
+													<StackPanel Orientation="Horizontal"
+													            Margin="5 0 0 0">
+														<Label Content="{Binding CurrentTab.FileCountText}"
+														       FontWeight="Normal"
+														       FontSize="14"
+														       Foreground="{DynamicResource MaterialDesignBodyLight}"
+														       VerticalAlignment="Center" />
+
+														<Border Width="1"
+														        Margin="4 8" />
+
+														<Label Content="{Binding CurrentTab.SelectionText}"
+														       FontWeight="Normal"
+														       Margin="0"
+														       FontSize="14"
+														       Foreground="{DynamicResource MaterialDesignBodyLight}"
+														       VerticalAlignment="Center" />
+
+														<Label Content="{Binding CurrentTab.SearchText}"
+														       FontWeight="Normal"
+														       Margin="0"
+														       FontSize="14"
+														       Foreground="{DynamicResource MaterialDesignBodyLight}"
+														       VerticalAlignment="Center" />
+													</StackPanel>
+
+													<StackPanel Grid.Column="2"
+													            Orientation="Horizontal">
+														<StackPanel Orientation="Horizontal">
+
+															<Viewbox Width="25"
+															         Margin="2 0 0 0">
+																<Image Source="{SvgImage /Assets/UIIcons/Filter.svg}" />
+															</Viewbox>
+
+															<ComboBox BorderThickness="0"
+															          Cursor="Hand"
+															          Padding="0 1 2 1"
+															          Margin="0"
+															          Background="Transparent"
+															          VerticalAlignment="Stretch"
+															          SelectedItem="{Binding CurrentTab.Sort}"
+															          Items="{Binding SortValues}">
+															</ComboBox>
+														</StackPanel>
+
+														<Border Width="1"
+														        Margin="4 8" />
+
+														<ListBox HorizontalAlignment="Right"
+														         Background="Transparent">
+															<ListBox.ItemsPanel>
+																<ItemsPanelTemplate>
+																	<StackPanel Orientation="Horizontal" />
+																</ItemsPanelTemplate>
+															</ListBox.ItemsPanel>
+															<ListBoxItem Cursor="Hand"
+															             Padding="7.5"
+															             Background="Transparent"
+															             IsSelected="{Binding !CurrentTab.IsGrid, Mode=TwoWay}">
+																<Image Source="{SvgImage /Assets/UIIcons/List.svg}"
+																       Width="25" />
+
+															</ListBoxItem>
+															<ListBoxItem Cursor="Hand"
+															             Padding="7.5"
+															             Background="Transparent"
+															             IsSelected="{Binding CurrentTab.IsGrid, Mode=TwoWay}">
+																<Image Source="{SvgImage /Assets/UIIcons/Grid.svg}"
+																       Width="25" />
+															</ListBoxItem>
+														</ListBox>
+													</StackPanel>
+												</Grid>
+											</Border>
+										</Grid>
+									</Border>
+								</DockPanel>
+							</Grid>
+						</Border>
+					</Grid>
+				</Border>
+
+			</Grid>
+		</Border>
+
+		<!-- popup -->
+		<styles:Card VerticalAlignment="Center"
+		             HorizontalAlignment="Center"
+		             assist:ShadowAssist.ShadowDepth="CenterDepth5"
+		             Padding="0"
+		             MinWidth="300"
+		             CornerRadius="10"
+		             IsVisible="{Binding CurrentTab.PopupVisible}"
+		             x:Name="settingsPanel">
+			<Grid RowDefinitions="Auto, *">
+
+				<Border CornerRadius="10 10 0 0">
+					<Grid Margin="4"
+					      ColumnDefinitions="* Auto">
+						<Label Content="{Binding CurrentTab.PopupContent.Title}"
+						       FontSize="21"
+						       Margin="10 0"
+						       FontWeight="Bold"
+						       VerticalAlignment="Center"
+						       HorizontalAlignment="Center" />
+
+						<Button Width="30"
+						        Height="30"
+						        Grid.Column="1"
+						        IsDefault="True"
+						        Command="{Binding CurrentTab.PopupContent.Close}"
+						        VerticalAlignment="Top"
+						        HorizontalAlignment="Right"
+						        Background="Transparent"
+						        Cursor="Hand"
+						        Padding="0">
+							<Viewbox Margin="2.5">
+								<Image Source="{SvgImage /Assets/UIIcons/Close.svg}" />
+							</Viewbox>
+						</Button>
+					</Grid>
+				</Border>
+
+				<ContentControl Content="{Binding CurrentTab.PopupContent}"
+				                Grid.Row="1" />
+			</Grid>
+		</styles:Card>
+	</Panel>
 </views:FluentWindow>

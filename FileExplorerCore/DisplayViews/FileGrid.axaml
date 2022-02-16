@@ -22,28 +22,6 @@
 													 ItemsJustification="Center" />
       </ItemsRepeater.Layout>
 
-      <ItemsRepeater.Styles>
-        <Style Selector="ListBoxItem">
-          <Setter Property="Background" Value="Transparent" />
-          <Setter Property="Template">
-            <ControlTemplate>
-              <Border CornerRadius="10"
-											Name="PART_ContentPresenter">
-                <ContentPresenter ClipToBounds="true"
-																	Background="{TemplateBinding Background}"
-																	BorderBrush="{TemplateBinding BorderBrush}"
-																	BorderThickness="{TemplateBinding BorderThickness}"
-																	ContentTemplate="{TemplateBinding ContentTemplate}"
-																	Content="{TemplateBinding Content}"
-																	Padding="{TemplateBinding Padding}"
-																	VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-																	HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
-              </Border>
-            </ControlTemplate>
-          </Setter>
-        </Style>
-      </ItemsRepeater.Styles>
-
       <ItemsRepeater.ItemTemplate>
         <DataTemplate DataType="models:FileModel">
 	        <ListBoxItem Margin="0"
@@ -61,16 +39,11 @@
 	                   Height="100"/>
 
               <TextBlock Text="{Binding Name}"
+                         Foreground="{DynamicResource MaterialDesignBody}"
 												 HorizontalAlignment="Stretch"
 												 TextTrimming="CharacterEllipsis"
 												 TextAlignment="Center"
 												 Margin="0" />
-
-             <!--  <TextBlock Text="{Binding Size, Converter={StaticResource sizeConverter}}" -->
-												 <!-- FontSize="12" -->
-												 <!-- TextAlignment="Center" -->
-												 <!-- Foreground="{DynamicResource SystemBaseMediumColor}" -->
-												 <!-- HorizontalAlignment="Stretch" /> -->
             </StackPanel>
           </ListBoxItem>
         </DataTemplate>
