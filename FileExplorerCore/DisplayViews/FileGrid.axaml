@@ -55,7 +55,7 @@
             <StackPanel Margin="0 0 0 5"
 												HorizontalAlignment="Center"
 												VerticalAlignment="Center">
-              <Image DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
+              <Image DataContext="{Binding, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
                      x:DataType="models:FileModel"
                      Source="{Binding Result}"
                      Margin="4"

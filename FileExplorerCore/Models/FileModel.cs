@@ -34,7 +34,7 @@ namespace FileExplorerCore.Models
 
 		public string? ExtensionName { get; set; }
 
-		public bool IsVisible { get; set; }
+		public bool IsVisible { get; set; } = true;
 
 		public bool IsSelected
 		{

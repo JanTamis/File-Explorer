@@ -32,7 +32,7 @@
 						            Orientation="Horizontal"
 						            HorizontalAlignment="Left"
 						            VerticalAlignment="Center">
-							<Image DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
+							<Image DataContext="{Binding, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
 										 Source="{Binding Result}"
 										 x:DataType="models:FileModel"
 										 Width="32"

@@ -25,7 +25,7 @@ namespace FileExplorerCore.Helpers
 			AttributesToSkip = FileAttributes.Hidden,
 		};
 
-		private static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default, Environment.ProcessorCount * 2);
+		private static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default);
 
 		static ThumbnailProvider()
 		{
@@ -52,9 +52,9 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
-		public static async Task<IImage?> GetFileImage(FileSystemTreeItem? treeItem, int size)
+		public static async Task<IImage?> GetFileImage(FileSystemTreeItem? treeItem, int size, Func<bool>? shouldReturnImage = null)
 		{
-			if (treeItem is null)
+			if (treeItem is null || (shouldReturnImage is not null && !shouldReturnImage()))
 			{
 				return null;
 			}
@@ -65,14 +65,17 @@ namespace FileExplorerCore.Helpers
 				{
 					IImage image = null;
 
-					if (treeItem.IsFolder && treeItem.HasChildren)
+					if (shouldReturnImage is null || shouldReturnImage?.Invoke() == true)
 					{
-						image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly);
-					}
+						if (treeItem.IsFolder && treeItem.HasChildren)
+						{
+							image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly);
+						}
 
-					if (image is null)
-					{
-						image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly);
+						if (image is null)
+						{
+							image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly);
+						}
 					}
 
 					return image;

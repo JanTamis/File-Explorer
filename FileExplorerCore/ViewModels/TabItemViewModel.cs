@@ -369,6 +369,11 @@ namespace FileExplorerCore.ViewModels
 				return;
 			}
 
+			foreach (var file in Files)
+			{
+				file.IsVisible = false;
+			}
+
 			TokenSource?.Cancel();
 
 			TokenSource = new CancellationTokenSource();

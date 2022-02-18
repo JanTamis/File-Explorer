@@ -61,7 +61,7 @@ namespace FileExplorerCore.DisplayViews
 				item.DoubleTapped -= Item_DoubleTapped;
 				item.PointerPressed -= Item_PointerPressed;
 
-				model.IsVisible = false;
+				//model.IsVisible = false;
 			}
 		}
 
@@ -91,7 +91,7 @@ namespace FileExplorerCore.DisplayViews
 				item.DoubleTapped += Item_DoubleTapped;
 				item.PointerPressed += Item_PointerPressed;
 
-				model.IsVisible = true;
+				//model.IsVisible = true;
 			}
 		}
 
