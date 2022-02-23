@@ -372,6 +372,7 @@ namespace FileExplorerCore.ViewModels
 			foreach (var file in Files)
 			{
 				file.IsVisible = false;
+				file.Dispose();
 			}
 
 			TokenSource?.Cancel();

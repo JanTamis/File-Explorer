@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using FileTypeAndIcon;
 using Avalonia.Threading;
 using System.Threading;
+using FileExplorerCore.Models;
 
 namespace FileExplorerCore.Helpers
 {
@@ -19,11 +20,6 @@ namespace FileExplorerCore.Helpers
 
 		private static readonly Dictionary<string, SvgImage> Images = new();
 		private static readonly Dictionary<string, string[]> TypeMap = new();
-
-		private static readonly EnumerationOptions enumerationOptions = new()
-		{
-			AttributesToSkip = FileAttributes.Hidden,
-		};
 
 		private static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default);
 
@@ -63,7 +59,7 @@ namespace FileExplorerCore.Helpers
 			{
 				return await Task.Factory.StartNew(() => treeItem?.GetPath((path, imageSize) =>
 				{
-					IImage image = null;
+					IImage? image = null;
 
 					if (shouldReturnImage is null || shouldReturnImage?.Invoke() == true)
 					{
@@ -82,72 +78,76 @@ namespace FileExplorerCore.Helpers
 				}, size), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
 			}
 
-			var name = String.Empty;
-
-			if (treeItem.IsFolder)
+			return await await Task.Factory.StartNew(() => treeItem?.GetPath((path, imageSize) =>
 			{
-				if (OperatingSystem.IsWindows())
-				{
-					foreach (var folder in Enum.GetValues<KnownFolder>())
-					{
-						var folderText = Enum.GetName(folder);
+				var name = String.Empty;
 
-						if (folderText is not null && treeItem.GetPath(x => x.SequenceEqual(KnownFolders.GetPath(folder))))
+				if (treeItem.IsFolder)
+				{
+					if (OperatingSystem.IsWindows())
+					{
+						foreach (var folder in Enum.GetValues<KnownFolder>())
 						{
-							name = folderText;
-							break;
+							var folderText = Enum.GetName(folder);
+
+							if (folderText is not null && treeItem.GetPath(x => x.SequenceEqual(KnownFolders.GetPath(folder))))
+							{
+								name = folderText;
+								break;
+							}
 						}
 					}
-				}
 
-				if (!treeItem.HasParent && name == String.Empty)
-				{
-					var driveInfo = new DriveInfo(new string(treeItem.Value[0], 1));
-
-					if (driveInfo.IsReady)
+					if (!treeItem.HasParent && name == String.Empty)
 					{
-						name = Enum.GetName(driveInfo.DriveType);
-					}
-				}
+						var driveInfo = new DriveInfo(new string(treeItem.Value[0], 1));
 
-				if (name == String.Empty)
-				{
-					name = treeItem.HasChildren
-						? "FolderFiles"
-						: "Folder";
-				}
-			}
-			else
-			{
-				name = "File";
-
-				var extension = Path.GetExtension(treeItem.Value).ToLower();
-
-				if (extension.Length > 1)
-				{
-					extension = extension[1..];
-
-					if (Images.ContainsKey(extension))
-					{
-						name = extension;
-					}
-					else
-					{
-						foreach (var (key, value) in TypeMap)
+						if (driveInfo.IsReady)
 						{
-							foreach (var val in value)
+							name = Enum.GetName(driveInfo.DriveType);
+						}
+					}
+
+					if (name == String.Empty)
+					{
+						name = treeItem.HasChildren
+							? "FolderFiles"
+							: "Folder";
+					}
+				}
+				else
+				{
+					name = "File";
+
+					var extension = Path.GetExtension(treeItem.Value).ToLower();
+
+					if (extension.Length > 1)
+					{
+						extension = extension[1..];
+
+						if (Images.ContainsKey(extension))
+						{
+							name = extension;
+						}
+						else
+						{
+							foreach (var (key, value) in TypeMap)
 							{
-								if (extension == val)
+								foreach (var val in value)
 								{
-									name = key;
+									if (extension == val)
+									{
+										name = key;
+									}
 								}
 							}
 						}
 					}
 				}
-			}
 
-			return await GetImage(name);
+				return GetImage(name);
+			}, size), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
+
 		}
 
 		private static bool ImageExists(string key)
@@ -157,7 +157,7 @@ namespace FileExplorerCore.Helpers
 			return loader?.Exists(new Uri($"avares://FileExplorerCore/Assets/Icons/{key}.svg")) ?? false;
 		}
 
-		private static async ValueTask<SvgImage?> GetImage(string key)
+		private static async Task<SvgImage?> GetImage(string key)
 		{
 			if (key is null or "")
 			{

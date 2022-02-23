@@ -276,7 +276,7 @@ namespace FileExplorerCore.Helpers
 			await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, Data, index));
 		}
 
-		private async ValueTask OnCollectionChanged(NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+		public async ValueTask OnCollectionChanged(NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
 		{
 			if (Dispatcher.UIThread.CheckAccess())
 			{

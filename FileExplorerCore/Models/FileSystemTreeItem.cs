@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
-using MetadataExtractor.Formats.Exif;
 using Microsoft.Toolkit.HighPerformance;
 using Microsoft.Toolkit.HighPerformance.Helpers;
 using ProtoBuf;

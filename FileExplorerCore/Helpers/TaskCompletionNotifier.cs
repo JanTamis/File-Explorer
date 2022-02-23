@@ -43,31 +43,31 @@ namespace FileExplorerCore.Helpers
 					: TaskScheduler.FromCurrentSynchronizationContext();
 
 				task.ContinueWith(t =>
+				{
+					var propertyChanged = PropertyChanged;
+
+					if (propertyChanged is not null)
 					{
-						var propertyChanged = PropertyChanged;
+						propertyChanged(this, new PropertyChangedEventArgs(nameof(IsCompleted)));
 
-						if (propertyChanged is not null)
+						if (t.IsCanceled)
 						{
-							propertyChanged(this, new PropertyChangedEventArgs(nameof(IsCompleted)));
-
-							if (t.IsCanceled)
-							{
-								propertyChanged(this, new PropertyChangedEventArgs(nameof(IsCanceled)));
-							}
-							else if (t.IsFaulted)
-							{
-								propertyChanged(this, new PropertyChangedEventArgs(nameof(IsFaulted)));
-							}
-							else
-							{
-								propertyChanged(this, new PropertyChangedEventArgs(nameof(IsSuccessfullyCompleted)));
-								propertyChanged(this, new PropertyChangedEventArgs(nameof(Result)));
-							}
+							propertyChanged(this, new PropertyChangedEventArgs(nameof(IsCanceled)));
 						}
-					},
-					CancellationToken.None,
-					TaskContinuationOptions.ExecuteSynchronously,
-					scheduler);
+						else if (t.IsFaulted)
+						{
+							propertyChanged(this, new PropertyChangedEventArgs(nameof(IsFaulted)));
+						}
+						else
+						{
+							propertyChanged(this, new PropertyChangedEventArgs(nameof(IsSuccessfullyCompleted)));
+							propertyChanged(this, new PropertyChangedEventArgs(nameof(Result)));
+						}
+					}
+				},
+				CancellationToken.None,
+				TaskContinuationOptions.ExecuteSynchronously,
+				scheduler);
 			}
 		}
 	}

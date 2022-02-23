@@ -46,7 +46,7 @@
 	<Application.Styles>
 		<StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml" />
 		<StyleInclude Source="avares://Material.Avalonia/Material.Avalonia.Templates.xaml" />
-		<StyleInclude Source="avares://Material.Icons.Avalonia/App.xaml"></StyleInclude>
+		<StyleInclude Source="avares://Material.Icons.Avalonia/App.xaml" />
 
 		<Style Selector="TabStrip > TabStripItem">
 			<Setter Property="Background" Value="Transparent" />
@@ -257,6 +257,10 @@
 		<Style Selector="ComboBoxItem">
 			<Setter Property="Foreground" Value="{DynamicResource MaterialDesignBodyLight}" />
 		</Style>
+
+    <Style Selector="TitleBar">
+      <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+    </Style>
 		
 		<Style Selector="ComboBoxItem:pointerover">
 			<Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />

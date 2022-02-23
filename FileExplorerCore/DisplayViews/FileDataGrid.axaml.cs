@@ -7,6 +7,7 @@ using Avalonia.Markup.Xaml;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using System.Linq;
+using System.Collections.Specialized;
 
 namespace FileExplorerCore.DisplayViews
 {
@@ -61,7 +62,7 @@ namespace FileExplorerCore.DisplayViews
 				item.DoubleTapped -= Item_DoubleTapped;
 				item.PointerPressed -= Item_PointerPressed;
 
-				//model.IsVisible = false;
+				model.IsVisible = false;
 			}
 		}
 
@@ -91,7 +92,7 @@ namespace FileExplorerCore.DisplayViews
 				item.DoubleTapped += Item_DoubleTapped;
 				item.PointerPressed += Item_PointerPressed;
 
-				//model.IsVisible = true;
+				model.IsVisible = true;
 			}
 		}
 

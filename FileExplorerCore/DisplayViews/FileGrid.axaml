@@ -47,6 +47,7 @@
         <DataTemplate DataType="models:FileModel">
           <ListBoxItem Margin="0"
 											 MaxWidth="400"
+                       x:Name="container"
 											 ToolTip.Tip="{Binding Name}"
 											 IsSelected="{Binding IsSelected}"
 											 Cursor="Hand"
@@ -55,12 +56,12 @@
             <StackPanel Margin="0 0 0 5"
 												HorizontalAlignment="Center"
 												VerticalAlignment="Center">
-              <Image DataContext="{Binding, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
-                     x:DataType="models:FileModel"
-                     Source="{Binding Result}"
+              <Image x:DataType="models:FileModel"
+                     Source="{Binding Image^}"
                      Margin="4"
                      Width="100"
-                     Height="100"/>
+                     Height="100">
+              </Image>
 
               <TextBlock Text="{Binding Name}"
 												 TextTrimming="CharacterEllipsis"

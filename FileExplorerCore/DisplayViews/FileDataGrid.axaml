@@ -32,8 +32,7 @@
 						            Orientation="Horizontal"
 						            HorizontalAlignment="Left"
 						            VerticalAlignment="Center">
-							<Image DataContext="{Binding, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
-										 Source="{Binding Result}"
+							<Image Source="{Binding Image^}"
 										 x:DataType="models:FileModel"
 										 Width="32"
 										 Height="32" />
@@ -47,7 +46,6 @@
 								           HorizontalAlignment="Stretch" />
 							</StackPanel>
 
-							
 						</StackPanel>
 					</ListBoxItem>
 				</DataTemplate>

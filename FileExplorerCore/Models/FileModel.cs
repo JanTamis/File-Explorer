@@ -1,4 +1,6 @@
-﻿using FileExplorerCore.Helpers;
+﻿using Avalonia.Media;
+using Avalonia.Media.Imaging;
+using FileExplorerCore.Helpers;
 using FileExplorerCore.ViewModels;
 using Humanizer;
 using System;
@@ -30,10 +32,25 @@ namespace FileExplorerCore.Models
 		public static event Action<FileModel> SelectionChanged = delegate { };
 
 		private static bool _isNotLoading = true;
+		private bool isVisible = true;
 
 		public string? ExtensionName { get; set; }
 
-		public bool IsVisible { get; set; } = true;
+		public bool IsVisible
+		{
+			get => isVisible;
+			set
+			{
+				OnPropertyChanged(ref isVisible, value);
+
+				if (IsVisible)
+				{
+					OnPropertyChanged(nameof(Image));
+				}
+			}
+		}
+
+		public Task<IImage?> Image => ThumbnailProvider.GetFileImage(TreeItem, 32, () => IsVisible);
 
 		public bool IsSelected
 		{
@@ -42,7 +59,7 @@ namespace FileExplorerCore.Models
 			{
 				if (_isSelected != value)
 				{
-					// OnPropertyChanged(ref _isSelected, value);
+					OnPropertyChanged(ref _isSelected, value);
 					SelectionChanged?.Invoke(this);
 				}
 			}
@@ -54,10 +71,7 @@ namespace FileExplorerCore.Models
 			set => OnPropertyChanged(ref _needsTranslation, value);
 		}
 
-		public string Path
-		{
-			get { return TreeItem.GetPath(path => path.ToString()); }
-		}
+		public string Path => TreeItem.GetPath(path => path.ToString());
 
 		public string Name
 		{
