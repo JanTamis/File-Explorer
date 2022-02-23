@@ -52,6 +52,8 @@ namespace FileExplorerCore.DisplayViews
 				{
 					file.IsSelected = true;
 				}
+
+				FileModel.RaiseSelectionChanged();
 			}
 		}
 
@@ -183,6 +185,8 @@ namespace FileExplorerCore.DisplayViews
 			}
 
 			files.PropertyChanged("IsSelected");
+
+			FileModel.RaiseSelectionChanged();
 		}
 	}
 }

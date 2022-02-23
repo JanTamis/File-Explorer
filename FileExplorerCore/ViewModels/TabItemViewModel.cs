@@ -97,34 +97,42 @@ namespace FileExplorerCore.ViewModels
 			_ => $"{Count:N0} items",
 		};
 
-		public string SelectionText
+		public Task<string> SelectionText
 		{
 			get
 			{
-				var result = String.Empty;
-
-				if (SelectionCount > 0)
+				return Task.Run(() =>
 				{
-					result = $"{SelectionCount:N0} items selected";
-					var selectedFiles = Files.Where(w => !w.IsFolder && w.IsSelected);
-
+					var result = String.Empty;
 					var fileSize = -1L;
 
-					foreach (var file in selectedFiles)
+					_selectionCount = 0;
+
+					foreach (var file in Files)
 					{
-						if (!file.IsFolder)
+						if (file.IsSelected)
 						{
-							fileSize = file.Size;
+							_selectionCount++;
+
+							if (!file.IsFolder)
+							{
+								fileSize += file.Size;
+							}
 						}
 					}
-					
-					if (fileSize is not -1)
-					{
-						result += $", {fileSize.Bytes()}";
-					}
-				}
 
-				return result;
+					if (SelectionCount > 0)
+					{
+						result = $"{SelectionCount:N0} items selected";
+
+						if (fileSize is not -1)
+						{
+							result += $", {fileSize.Bytes()}";
+						}
+					}
+
+					return result;
+				});				
 			}
 		}
 
@@ -304,27 +312,18 @@ namespace FileExplorerCore.ViewModels
 		{
 			Files.CountChanged += count => { Count = count; };
 
-			Files.OnPropertyChanged += property =>
+			//Files.OnPropertyChanged += property =>
+			//{
+			//	if (property is "IsSelected")
+			//	{
+			//		SelectionCount = Files.Count(x => x.IsSelected);
+
+			//		OnPropertyChanged(nameof(SelectionText));
+			//	}
+			//};
+
+			FileModel.SelectionChanged += () =>
 			{
-				if (property is "IsSelected")
-				{
-					SelectionCount = Files.Count(x => x.IsSelected);
-
-					OnPropertyChanged(nameof(SelectionText));
-				}
-			};
-
-			FileModel.SelectionChanged += fileModel =>
-			{
-				if (fileModel.IsSelected)
-				{
-					SelectionCount++;
-				}
-				else
-				{
-					SelectionCount--;
-				}
-
 				OnPropertyChanged(nameof(SelectionText));
 			};
 		}
@@ -404,15 +403,15 @@ namespace FileExplorerCore.ViewModels
 
 					if (Sort is not SortEnum.None)
 					{
-						ThreadPool.QueueUserWorkItem( _ =>
-						{
-							var count = GetFileSystemEntriesCount(TreeItem, search, TokenSource.Token);
+						ThreadPool.QueueUserWorkItem(_ =>
+					 {
+						 var count = GetFileSystemEntriesCount(TreeItem, search, TokenSource.Token);
 
-							if (!TokenSource.IsCancellationRequested)
-							{
-								FileCount = count;
-							}
-						});
+						 if (!TokenSource.IsCancellationRequested)
+						 {
+							 FileCount = count;
+						 }
+					 });
 					}
 
 					if (recursive)
@@ -448,7 +447,7 @@ namespace FileExplorerCore.ViewModels
 			{
 				TreeItem = path;
 				DisplayControl = new Quickstart();
-				
+
 				return;
 			}
 

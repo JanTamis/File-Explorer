@@ -20,12 +20,11 @@
                     MinWidth="1000"
                     MinHeight="400"
                     Width="1000"
-                    Background="Transparent"
+                    Background="{DynamicResource MaterialDesignPaper}"
                     Height="600"
                     BorderThickness="0"
                     WindowStartupLocation="CenterScreen"
                     Title="FileExplorerCore">
-
   <Window.Resources>
     <system:Int32 x:Key="ImageSize">24</system:Int32>
   </Window.Resources>
@@ -455,7 +454,7 @@
                             <Border Width="1"
 														        Margin="4 8" />
 
-                            <Label Content="{Binding CurrentTab.SelectionText}"
+                            <Label Content="{Binding CurrentTab.SelectionText^, FallbackValue='Loading...'}"
 														       FontWeight="Normal"
 														       Margin="0"
 														       FontSize="14"

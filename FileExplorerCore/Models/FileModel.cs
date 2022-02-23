@@ -3,6 +3,7 @@ using Avalonia.Media.Imaging;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.ViewModels;
 using Humanizer;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -29,7 +30,7 @@ namespace FileExplorerCore.Models
 
 		private bool _needsTranslation;
 
-		public static event Action<FileModel> SelectionChanged = delegate { };
+		public static event Action SelectionChanged = delegate { };
 
 		private static bool _isNotLoading = true;
 		private bool isVisible = true;
@@ -60,7 +61,6 @@ namespace FileExplorerCore.Models
 				if (_isSelected != value)
 				{
 					OnPropertyChanged(ref _isSelected, value);
-					SelectionChanged?.Invoke(this);
 				}
 			}
 		}
@@ -210,6 +210,11 @@ namespace FileExplorerCore.Models
 		public FileModel(FileSystemTreeItem item)
 		{
 			TreeItem = item;
+		}
+
+		public static void RaiseSelectionChanged()
+		{
+			SelectionChanged?.Invoke();
 		}
 
 		public void Dispose()
