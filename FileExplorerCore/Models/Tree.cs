@@ -2,11 +2,12 @@
 using ProtoBuf;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FileExplorerCore.Helpers
 {
 	[ProtoContract]
-	public class Tree<TTreeItem, TValue> where TTreeItem : ITreeItem<TValue, TTreeItem>
+	public class Tree<TTreeItem, TValue> where TTreeItem : class, ITreeItem<TValue, TTreeItem>
 	{
 		[ProtoMember(1)] public List<TTreeItem> Children { get; }
 
@@ -34,14 +35,7 @@ namespace FileExplorerCore.Helpers
 		/// <returns>the amount of children recursively</returns>
 		public int GetChildrenCount()
 		{
-			var count = Children.Count;
-
-			foreach (var child in Children)
-			{
-				count += child.GetChildrenCount();
-			}
-
-			return count;
+			return Children.Count + Children.Sum(child => child.GetChildrenCount());
 		}
 
 		/// <summary>
@@ -61,10 +55,7 @@ namespace FileExplorerCore.Helpers
 				{
 					foreach (var childOfChild in Children[i].EnumerateChildren(layers - 1))
 					{
-						if (childOfChild is TTreeItem item)
-						{
-							yield return item;
-						}
+						yield return childOfChild;
 					}
 				}
 
@@ -87,10 +78,7 @@ namespace FileExplorerCore.Helpers
 
 				foreach (var childOfChild in Children[i].EnumerateChildren())
 				{
-					if (childOfChild is TTreeItem item)
-					{
-						yield return item;
-					}
+					yield return childOfChild;
 				}
 
 				count = Children.Count;

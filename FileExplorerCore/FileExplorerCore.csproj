@@ -1,275 +1,284 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <!--<PropertyGroup>
-    <ServerGarbageCollection>true</ServerGarbageCollection>
-  </PropertyGroup>-->
+    <!--<PropertyGroup>
+      <ServerGarbageCollection>true</ServerGarbageCollection>
+    </PropertyGroup>-->
 
-  <PropertyGroup>
-    
-  </PropertyGroup>
-  
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <Platforms>AnyCPU;x64</Platforms>
-		<LangVersion>preview</LangVersion>
-		<EnablePreviewFeatures>true</EnablePreviewFeatures>
-    <StartupObject>FileExplorerCore.Program</StartupObject>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TieredCompilation>true</TieredCompilation>
-    <ApplicationIcon>Icon.ico</ApplicationIcon>
-    <!--<AnalysisLevel>preview</AnalysisLevel>-->
-    <SignAssembly>true</SignAssembly>
-    <DelaySign>false</DelaySign>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <AvaloniaXaml Remove="bin\**" />
-    <Compile Remove="bin\**" />
-    <EmbeddedResource Remove="bin\**" />
-    <None Remove="bin\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <AvaloniaResource Remove="Assets\Code.svg" />
-    <AvaloniaResource Remove="Assets\File.svg" />
-    <AvaloniaResource Remove="Assets\Folder.svg" />
-    <AvaloniaResource Remove="Assets\Image.svg" />
-    <AvaloniaResource Remove="Assets\Lookup\3DImage.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Audio.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Backup.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\CAD.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Compressed.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Data.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Database.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Developer.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Disk.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\eBook.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Encoded.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Executable.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Font.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Game.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\GIS.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Misc.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\PageLayout.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Plugin.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\RasterImage.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\RawImage.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Settings.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Spreadsheet.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\System.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Text.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\VectorImage.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Video.txt" />
-    <AvaloniaResource Remove="Assets\Lookup\Web.txt" />
-    <AvaloniaResource Remove="Assets\Video.svg" />
-    <AvaloniaResource Remove="Assets\Zip.Svg" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Assets\Code.svg" />
-    <None Remove="Assets\File.svg" />
-    <None Remove="Assets\Folder.svg" />
-    <None Remove="Assets\Icon.ico" />
-    <None Remove="Assets\Icons\3DImage.svg" />
-    <None Remove="Assets\Icons\Audio.svg" />
-    <None Remove="Assets\Icons\axaml.svg" />
-    <None Remove="Assets\Icons\Backup.svg" />
-    <None Remove="Assets\Icons\bak.svg" />
-    <None Remove="Assets\Icons\bin.svg" />
-    <None Remove="Assets\Icons\c.svg" />
-    <None Remove="Assets\Icons\CAD.svg" />
-    <None Remove="Assets\Icons\ccreative.svg" />
-    <None Remove="Assets\Icons\CDRom.svg" />
-    <None Remove="Assets\Icons\cfg.svg" />
-    <None Remove="Assets\Icons\cl.svg" />
-    <None Remove="Assets\Icons\Compressed.svg" />
-    <None Remove="Assets\Icons\conf.svg" />
-    <None Remove="Assets\Icons\config.svg" />
-    <None Remove="Assets\Icons\Contacts.svg" />
-    <None Remove="Assets\Icons\cpp.svg" />
-    <None Remove="Assets\Icons\cs.svg" />
-    <None Remove="Assets\Icons\csproj.svg" />
-    <None Remove="Assets\Icons\css.svg" />
-    <None Remove="Assets\Icons\Data.svg" />
-    <None Remove="Assets\Icons\Database.svg" />
-    <None Remove="Assets\Icons\Desktop.svg" />
-    <None Remove="Assets\Icons\Developer.svg" />
-    <None Remove="Assets\Icons\Disk.svg" />
-    <None Remove="Assets\Icons\DLL.svg" />
-    <None Remove="Assets\Icons\dmp.svg" />
-    <None Remove="Assets\Icons\Documents.svg" />
-    <None Remove="Assets\Icons\Downloads.svg" />
-    <None Remove="Assets\Icons\eBook.svg" />
-    <None Remove="Assets\Icons\Encoded.svg" />
-    <None Remove="Assets\Icons\Excel.svg" />
-    <None Remove="Assets\Icons\Executable.svg" />
-    <None Remove="Assets\Icons\Favorites.svg" />
-    <None Remove="Assets\Icons\Fixed.svg" />
-    <None Remove="Assets\Icons\FolderFiles.svg" />
-    <None Remove="Assets\Icons\font.svg" />
-    <None Remove="Assets\Icons\Game.svg" />
-    <None Remove="Assets\Icons\GIS.svg" />
-    <None Remove="Assets\Icons\hlp.svg" />
-    <None Remove="Assets\Icons\htm.svg" />
-    <None Remove="Assets\Icons\html.svg" />
-    <None Remove="Assets\Icons\ini.svg" />
-    <None Remove="Assets\Icons\js.svg" />
-    <None Remove="Assets\Icons\json.svg" />
-    <None Remove="Assets\Icons\Links.svg" />
-    <None Remove="Assets\Icons\lnk.svg" />
-    <None Remove="Assets\Icons\log.svg" />
-    <None Remove="Assets\Icons\map.svg" />
-    <None Remove="Assets\Icons\Misc.svg" />
-    <None Remove="Assets\Icons\msi.svg" />
-    <None Remove="Assets\Icons\Music.svg" />
-    <None Remove="Assets\Icons\Network.svg" />
-    <None Remove="Assets\Icons\nls.svg" />
-    <None Remove="Assets\Icons\PageLayout.svg" />
-    <None Remove="Assets\Icons\pdb.svg" />
-    <None Remove="Assets\Icons\pdf.svg" />
-    <None Remove="Assets\Icons\Pictures.svg" />
-    <None Remove="Assets\Icons\Plugin.svg" />
-    <None Remove="Assets\Icons\PowerPoint.svg" />
-    <None Remove="Assets\Icons\rar.svg" />
-    <None Remove="Assets\Icons\RawImage.svg" />
-    <None Remove="Assets\Icons\Removable.svg" />
-    <None Remove="Assets\Icons\resx.svg" />
-    <None Remove="Assets\Icons\SavedGames.svg" />
-    <None Remove="Assets\Icons\SavedSearches.svg" />
-    <None Remove="Assets\Icons\Settings.svg" />
-    <None Remove="Assets\Icons\sln.svg" />
-    <None Remove="Assets\Icons\Spreadsheet.svg" />
-    <None Remove="Assets\Icons\sql.svg" />
-    <None Remove="Assets\Icons\System.svg" />
-    <None Remove="Assets\Icons\Text.svg" />
-    <None Remove="Assets\Icons\url.svg" />
-    <None Remove="Assets\Icons\user.svg" />
-    <None Remove="Assets\Icons\VectorImage.svg" />
-    <None Remove="Assets\Icons\Videos.svg" />
-    <None Remove="Assets\Icons\Web.svg" />
-    <None Remove="Assets\Icons\word.svg" />
-    <None Remove="Assets\Icons\xaml.svg" />
-    <None Remove="Assets\Icons\xml.svg" />
-    <None Remove="Assets\Icons\xmp.svg" />
-    <None Remove="Assets\Image.svg" />
-    <None Remove="Assets\Lookup\Backup.txt" />
-    <None Remove="Assets\Lookup\Compressed.txt" />
-    <None Remove="Assets\Lookup\Developer.txt" />
-    <None Remove="Assets\Lookup\Disk.txt" />
-    <None Remove="Assets\Lookup\Encoded.txt" />
-    <None Remove="Assets\Lookup\Font.txt" />
-    <None Remove="Assets\Lookup\Misc.txt" />
-    <None Remove="Assets\Lookup\Plugin.txt" />
-    <None Remove="Assets\Lookup\Settings.txt" />
-    <None Remove="Assets\Lookup\System.txt" />
-    <None Remove="Assets\UIIcons\AddTab.svg" />
-    <None Remove="Assets\UIIcons\AnalyzeFiles.svg" />
-    <None Remove="Assets\UIIcons\Close.svg" />
-    <None Remove="Assets\UIIcons\Copy.svg" />
-    <None Remove="Assets\UIIcons\Cut.svg" />
-    <None Remove="Assets\UIIcons\Details.svg" />
-    <None Remove="Assets\UIIcons\DownSmallArrow.svg" />
-    <None Remove="Assets\UIIcons\FailedSearch.svg" />
-    <None Remove="Assets\UIIcons\Filter.svg" />
-    <None Remove="Assets\UIIcons\Grid.svg" />
-    <None Remove="Assets\UIIcons\LeftArrow.svg" />
-    <None Remove="Assets\UIIcons\Length.svg" />
-    <None Remove="Assets\UIIcons\Link.svg" />
-    <None Remove="Assets\UIIcons\List.svg" />
-    <None Remove="Assets\UIIcons\MoveFile.svg" />
-    <None Remove="Assets\UIIcons\Name.svg" />
-    <None Remove="Assets\UIIcons\Next.svg" />
-    <None Remove="Assets\UIIcons\OneDrive.svg" />
-    <None Remove="Assets\UIIcons\OpenFile.svg" />
-    <None Remove="Assets\UIIcons\Paste.svg" />
-    <None Remove="Assets\UIIcons\Previous.svg" />
-    <None Remove="Assets\UIIcons\Properties.svg" />
-    <None Remove="Assets\UIIcons\Refresh.svg" />
-    <None Remove="Assets\UIIcons\Remove.svg" />
-    <None Remove="Assets\UIIcons\Rename.svg" />
-    <None Remove="Assets\UIIcons\RightArrow.svg" />
-    <None Remove="Assets\UIIcons\RightSmallArrow.svg" />
-    <None Remove="Assets\UIIcons\Search.svg" />
-    <None Remove="Assets\UIIcons\SelectAll.svg" />
-    <None Remove="Assets\UIIcons\SelectInvert.svg" />
-    <None Remove="Assets\UIIcons\SelectNone.svg" />
-    <None Remove="Assets\UIIcons\Settings.svg" />
-    <None Remove="Assets\UIIcons\StopSearch.svg" />
-    <None Remove="Assets\UIIcons\UpArrow.svg" />
-    <None Remove="Assets\UIIcons\WriteTime.svg" />
-    <None Remove="Assets\Video.svg" />
-    <None Remove="Assets\Zip.Svg" />
-    <None Remove="Files.json" />
-    <None Remove="Index.bin" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Assets\Lookup\3DImage.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Audio.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Backup.txt" />
-    <EmbeddedResource Include="Assets\Lookup\CAD.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Compressed.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Data.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Database.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Developer.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Disk.txt" />
-    <EmbeddedResource Include="Assets\Lookup\eBook.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Encoded.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Executable.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Font.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Game.txt" />
-    <EmbeddedResource Include="Assets\Lookup\GIS.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Misc.txt" />
-    <EmbeddedResource Include="Assets\Lookup\PageLayout.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Plugin.txt" />
-    <EmbeddedResource Include="Assets\Lookup\RasterImage.txt" />
-    <EmbeddedResource Include="Assets\Lookup\RawImage.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Settings.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Spreadsheet.txt" />
-    <EmbeddedResource Include="Assets\Lookup\System.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Text.txt" />
-    <EmbeddedResource Include="Assets\Lookup\VectorImage.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Video.txt" />
-    <EmbeddedResource Include="Assets\Lookup\Web.txt" />
-    <Resource Include="Assets\UIIcons\FileExplorer.svg" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Avalonia" Version="0.10.12" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.12" />
-    <PackageReference Include="Avalonia.Desktop" Version="0.10.12" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="0.10.12" />
-    <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.12" />
-    <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.12" />
-    <PackageReference Include="AvaloniaUIRibbon" Version="1.1.0-beta" />
-    <PackageReference Include="DataBox" Version="0.10.11.1" />
-    <PackageReference Include="DiscUtils.FileSystems" Version="0.16.13" />
-    <PackageReference Include="Humanizer" Version="2.14.1" />
-    <PackageReference Include="LinqOptimizer.CSharp" Version="0.7.0" />
-    <PackageReference Include="Material.Avalonia" Version="2.5.0.73-nightly" />
-    <PackageReference Include="Material.Icons.Avalonia" Version="1.0.2" />
-    <PackageReference Include="MetadataExtractor" Version="2.7.1" />
-    <PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.1.2" />
-    <PackageReference Include="Microsoft.Win32.Registry" Version="6.0.0-preview.5.21301.5" />
-    <PackageReference Include="protobuf-net" Version="3.0.101" />
-    <PackageReference Include="Svg.Skia" Version="0.5.12" />
-    <PackageReference Include="System.Linq.Async" Version="6.0.1" />
-    <PackageReference Include="System.Runtime.Experimental" Version="6.0.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <AvaloniaResource Update="Assets\avalonia-logo.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </AvaloniaResource>
-  </ItemGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net7.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <Platforms>AnyCPU;x64</Platforms>
+        <LangVersion>preview</LangVersion>
+        <EnablePreviewFeatures>true</EnablePreviewFeatures>
+        <StartupObject>FileExplorerCore.Program</StartupObject>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <TieredCompilation>true</TieredCompilation>
+        <ApplicationIcon>Icon.ico</ApplicationIcon>
+
+        <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>
+        <IsOSX Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::OSX)))' == 'true'">true</IsOSX>
+        <IsLinux Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Linux)))' == 'true'">true</IsLinux>
+        <!--<AnalysisLevel>preview</AnalysisLevel>-->
+        <SignAssembly>true</SignAssembly>
+        <DelaySign>false</DelaySign>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(IsWindows)'=='true'">
+        <DefineConstants>Windows</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(IsOSX)'=='true'">
+        <DefineConstants>macOS</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(IsLinux)'=='true'">
+        <DefineConstants>Linux</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**"/>
+    </ItemGroup>
+    <ItemGroup>
+        <AvaloniaXaml Remove="bin\**"/>
+        <Compile Remove="bin\**"/>
+        <EmbeddedResource Remove="bin\**"/>
+        <None Remove="bin\**"/>
+    </ItemGroup>
+    <ItemGroup>
+        <AvaloniaResource Remove="Assets\Code.svg"/>
+        <AvaloniaResource Remove="Assets\File.svg"/>
+        <AvaloniaResource Remove="Assets\Folder.svg"/>
+        <AvaloniaResource Remove="Assets\Image.svg"/>
+        <AvaloniaResource Remove="Assets\Lookup\3DImage.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Audio.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Backup.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\CAD.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Compressed.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Data.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Database.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Developer.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Disk.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\eBook.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Encoded.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Executable.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Font.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Game.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\GIS.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Misc.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\PageLayout.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Plugin.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\RasterImage.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\RawImage.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Settings.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Spreadsheet.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\System.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Text.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\VectorImage.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Video.txt"/>
+        <AvaloniaResource Remove="Assets\Lookup\Web.txt"/>
+        <AvaloniaResource Remove="Assets\Video.svg"/>
+        <AvaloniaResource Remove="Assets\Zip.Svg"/>
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="Assets\Code.svg"/>
+        <None Remove="Assets\File.svg"/>
+        <None Remove="Assets\Folder.svg"/>
+        <None Remove="Assets\Icon.ico"/>
+        <None Remove="Assets\Icons\3DImage.svg"/>
+        <None Remove="Assets\Icons\Audio.svg"/>
+        <None Remove="Assets\Icons\axaml.svg"/>
+        <None Remove="Assets\Icons\Backup.svg"/>
+        <None Remove="Assets\Icons\bak.svg"/>
+        <None Remove="Assets\Icons\bin.svg"/>
+        <None Remove="Assets\Icons\c.svg"/>
+        <None Remove="Assets\Icons\CAD.svg"/>
+        <None Remove="Assets\Icons\ccreative.svg"/>
+        <None Remove="Assets\Icons\CDRom.svg"/>
+        <None Remove="Assets\Icons\cfg.svg"/>
+        <None Remove="Assets\Icons\cl.svg"/>
+        <None Remove="Assets\Icons\Compressed.svg"/>
+        <None Remove="Assets\Icons\conf.svg"/>
+        <None Remove="Assets\Icons\config.svg"/>
+        <None Remove="Assets\Icons\Contacts.svg"/>
+        <None Remove="Assets\Icons\cpp.svg"/>
+        <None Remove="Assets\Icons\cs.svg"/>
+        <None Remove="Assets\Icons\csproj.svg"/>
+        <None Remove="Assets\Icons\css.svg"/>
+        <None Remove="Assets\Icons\Data.svg"/>
+        <None Remove="Assets\Icons\Database.svg"/>
+        <None Remove="Assets\Icons\Desktop.svg"/>
+        <None Remove="Assets\Icons\Developer.svg"/>
+        <None Remove="Assets\Icons\Disk.svg"/>
+        <None Remove="Assets\Icons\DLL.svg"/>
+        <None Remove="Assets\Icons\dmp.svg"/>
+        <None Remove="Assets\Icons\Documents.svg"/>
+        <None Remove="Assets\Icons\Downloads.svg"/>
+        <None Remove="Assets\Icons\eBook.svg"/>
+        <None Remove="Assets\Icons\Encoded.svg"/>
+        <None Remove="Assets\Icons\Excel.svg"/>
+        <None Remove="Assets\Icons\Executable.svg"/>
+        <None Remove="Assets\Icons\Favorites.svg"/>
+        <None Remove="Assets\Icons\Fixed.svg"/>
+        <None Remove="Assets\Icons\FolderFiles.svg"/>
+        <None Remove="Assets\Icons\font.svg"/>
+        <None Remove="Assets\Icons\Game.svg"/>
+        <None Remove="Assets\Icons\GIS.svg"/>
+        <None Remove="Assets\Icons\hlp.svg"/>
+        <None Remove="Assets\Icons\htm.svg"/>
+        <None Remove="Assets\Icons\html.svg"/>
+        <None Remove="Assets\Icons\ini.svg"/>
+        <None Remove="Assets\Icons\js.svg"/>
+        <None Remove="Assets\Icons\json.svg"/>
+        <None Remove="Assets\Icons\Links.svg"/>
+        <None Remove="Assets\Icons\lnk.svg"/>
+        <None Remove="Assets\Icons\log.svg"/>
+        <None Remove="Assets\Icons\map.svg"/>
+        <None Remove="Assets\Icons\Misc.svg"/>
+        <None Remove="Assets\Icons\msi.svg"/>
+        <None Remove="Assets\Icons\Music.svg"/>
+        <None Remove="Assets\Icons\Network.svg"/>
+        <None Remove="Assets\Icons\nls.svg"/>
+        <None Remove="Assets\Icons\PageLayout.svg"/>
+        <None Remove="Assets\Icons\pdb.svg"/>
+        <None Remove="Assets\Icons\pdf.svg"/>
+        <None Remove="Assets\Icons\Pictures.svg"/>
+        <None Remove="Assets\Icons\Plugin.svg"/>
+        <None Remove="Assets\Icons\PowerPoint.svg"/>
+        <None Remove="Assets\Icons\rar.svg"/>
+        <None Remove="Assets\Icons\RawImage.svg"/>
+        <None Remove="Assets\Icons\Removable.svg"/>
+        <None Remove="Assets\Icons\resx.svg"/>
+        <None Remove="Assets\Icons\SavedGames.svg"/>
+        <None Remove="Assets\Icons\SavedSearches.svg"/>
+        <None Remove="Assets\Icons\Settings.svg"/>
+        <None Remove="Assets\Icons\sln.svg"/>
+        <None Remove="Assets\Icons\Spreadsheet.svg"/>
+        <None Remove="Assets\Icons\sql.svg"/>
+        <None Remove="Assets\Icons\System.svg"/>
+        <None Remove="Assets\Icons\Text.svg"/>
+        <None Remove="Assets\Icons\url.svg"/>
+        <None Remove="Assets\Icons\user.svg"/>
+        <None Remove="Assets\Icons\VectorImage.svg"/>
+        <None Remove="Assets\Icons\Videos.svg"/>
+        <None Remove="Assets\Icons\Web.svg"/>
+        <None Remove="Assets\Icons\word.svg"/>
+        <None Remove="Assets\Icons\xaml.svg"/>
+        <None Remove="Assets\Icons\xml.svg"/>
+        <None Remove="Assets\Icons\xmp.svg"/>
+        <None Remove="Assets\Image.svg"/>
+        <None Remove="Assets\Lookup\Backup.txt"/>
+        <None Remove="Assets\Lookup\Compressed.txt"/>
+        <None Remove="Assets\Lookup\Developer.txt"/>
+        <None Remove="Assets\Lookup\Disk.txt"/>
+        <None Remove="Assets\Lookup\Encoded.txt"/>
+        <None Remove="Assets\Lookup\Font.txt"/>
+        <None Remove="Assets\Lookup\Misc.txt"/>
+        <None Remove="Assets\Lookup\Plugin.txt"/>
+        <None Remove="Assets\Lookup\Settings.txt"/>
+        <None Remove="Assets\Lookup\System.txt"/>
+        <None Remove="Assets\UIIcons\AddTab.svg"/>
+        <None Remove="Assets\UIIcons\AnalyzeFiles.svg"/>
+        <None Remove="Assets\UIIcons\Close.svg"/>
+        <None Remove="Assets\UIIcons\Copy.svg"/>
+        <None Remove="Assets\UIIcons\Cut.svg"/>
+        <None Remove="Assets\UIIcons\Details.svg"/>
+        <None Remove="Assets\UIIcons\DownSmallArrow.svg"/>
+        <None Remove="Assets\UIIcons\FailedSearch.svg"/>
+        <None Remove="Assets\UIIcons\Filter.svg"/>
+        <None Remove="Assets\UIIcons\Grid.svg"/>
+        <None Remove="Assets\UIIcons\LeftArrow.svg"/>
+        <None Remove="Assets\UIIcons\Length.svg"/>
+        <None Remove="Assets\UIIcons\Link.svg"/>
+        <None Remove="Assets\UIIcons\List.svg"/>
+        <None Remove="Assets\UIIcons\MoveFile.svg"/>
+        <None Remove="Assets\UIIcons\Name.svg"/>
+        <None Remove="Assets\UIIcons\Next.svg"/>
+        <None Remove="Assets\UIIcons\OneDrive.svg"/>
+        <None Remove="Assets\UIIcons\OpenFile.svg"/>
+        <None Remove="Assets\UIIcons\Paste.svg"/>
+        <None Remove="Assets\UIIcons\Previous.svg"/>
+        <None Remove="Assets\UIIcons\Properties.svg"/>
+        <None Remove="Assets\UIIcons\Refresh.svg"/>
+        <None Remove="Assets\UIIcons\Remove.svg"/>
+        <None Remove="Assets\UIIcons\Rename.svg"/>
+        <None Remove="Assets\UIIcons\RightArrow.svg"/>
+        <None Remove="Assets\UIIcons\RightSmallArrow.svg"/>
+        <None Remove="Assets\UIIcons\Search.svg"/>
+        <None Remove="Assets\UIIcons\SelectAll.svg"/>
+        <None Remove="Assets\UIIcons\SelectInvert.svg"/>
+        <None Remove="Assets\UIIcons\SelectNone.svg"/>
+        <None Remove="Assets\UIIcons\Settings.svg"/>
+        <None Remove="Assets\UIIcons\StopSearch.svg"/>
+        <None Remove="Assets\UIIcons\UpArrow.svg"/>
+        <None Remove="Assets\UIIcons\WriteTime.svg"/>
+        <None Remove="Assets\Video.svg"/>
+        <None Remove="Assets\Zip.Svg"/>
+        <None Remove="Files.json"/>
+        <None Remove="Index.bin"/>
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Assets\Lookup\3DImage.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Audio.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Backup.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\CAD.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Compressed.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Data.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Database.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Developer.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Disk.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\eBook.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Encoded.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Executable.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Font.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Game.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\GIS.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Misc.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\PageLayout.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Plugin.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\RasterImage.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\RawImage.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Settings.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Spreadsheet.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\System.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Text.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\VectorImage.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Video.txt"/>
+        <EmbeddedResource Include="Assets\Lookup\Web.txt"/>
+        <Resource Include="Assets\UIIcons\FileExplorer.svg"/>
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia" Version="0.10.12"/>
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.12"/>
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.12"/>
+        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.12"/>
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.12"/>
+        <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.12"/>
+        <PackageReference Include="AvaloniaUIRibbon" Version="1.1.0-beta"/>
+        <PackageReference Include="DataBox" Version="0.10.11.1"/>
+        <PackageReference Include="DiscUtils.FileSystems" Version="0.16.13"/>
+        <PackageReference Include="Humanizer" Version="2.14.1"/>
+        <PackageReference Include="LinqOptimizer.CSharp" Version="0.7.0"/>
+        <PackageReference Include="Material.Avalonia" Version="2.5.0.73-nightly"/>
+        <PackageReference Include="Material.Icons.Avalonia" Version="1.0.2"/>
+        <PackageReference Include="MetadataExtractor" Version="2.7.1"/>
+        <PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.1.2"/>
+        <PackageReference Include="Microsoft.Win32.Registry" Version="6.0.0-preview.5.21301.5"/>
+        <PackageReference Include="protobuf-net" Version="3.0.101"/>
+        <PackageReference Include="Svg.Skia" Version="0.5.12"/>
+        <PackageReference Include="System.Linq.Async" Version="6.0.1"/>
+        <PackageReference Include="System.Runtime.Experimental" Version="6.0.0"/>
+    </ItemGroup>
+    <ItemGroup>
+        <AvaloniaResource Update="Assets\avalonia-logo.ico">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </AvaloniaResource>
+    </ItemGroup>
 </Project>

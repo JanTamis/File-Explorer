@@ -4,7 +4,6 @@ using ReactiveUI;
 using System.Collections.Generic;
 using System.IO.Enumeration;
 using System.Linq;
-using Avalonia.Media;
 using Microsoft.Toolkit.HighPerformance;
 
 namespace FileExplorerCore.Models

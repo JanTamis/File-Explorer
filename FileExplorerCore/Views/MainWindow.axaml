@@ -41,7 +41,7 @@
 			<Grid RowDefinitions="Auto Auto *">
 				<Grid ColumnDefinitions="*, Auto"
 				      HorizontalAlignment="Left"
-            Margin="{Binding #MainWindow.TitleBarMargin}">
+				      Margin="{Binding #MainWindow.TitleBarMargin}">
 					<TabStrip Items="{Binding Tabs}"
 					          SelectedItem="{Binding CurrentTab}">
 						<TabStrip.ItemsPanel>
@@ -68,10 +68,10 @@
 										TextTrimming="CharacterEllipsis"
 										FontSize="14"
 										VerticalAlignment="Center"
-                    HorizontalAlignment="Stretch"
+										HorizontalAlignment="Stretch"
 										Grid.Column="1"
 										IsVisible="{Binding $self.DesiredSize.Width, Mode=TwoWay, Converter={StaticResource minSizeConverter}, ConverterParameter=100}" />
-									
+
 									<ProgressBar Classes="Circle"
 									             Grid.Column="2"
 									             Margin="5 0"
@@ -156,7 +156,7 @@
 							                       Width="25"
 							                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
 						</Button>
-						
+
 						<Panel>
 							<Button Classes="Flat"
 							        IsVisible="{Binding !CurrentTab.IsLoading}"
@@ -223,8 +223,8 @@
 											           HorizontalAlignment="Stretch" />
 										</Button>
 									</StackPanel>
-									
-									
+
+
 								</DataTemplate>
 							</ItemsRepeater.ItemTemplate>
 						</ItemsRepeater>
@@ -236,28 +236,28 @@
 					             Padding="0"
 					             Margin="5 0"
 					             Grid.Column="2">
-							<TextBox Watermark="Search"
-							         x:Name="searchBar"
-							         Text="{Binding CurrentTab.Search}"
-							         VerticalAlignment="Stretch"
-							         Padding="0"
-							         Foreground="{DynamicResource MaterialDesignBody}"
-							         FontWeight="Normal"
-							         Margin="0"
-							         VerticalContentAlignment="Center">
-								<TextBox.InnerLeftContent>
-										<Button Classes="Flat"
-										        Margin="0 0 2.5 0"
-										        Command="{Binding StartSearch}"
-										        Padding="5">
-											<material:MaterialIcon Kind="Search"
-											                       Height="20"
-											                       Width="20"
-											                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
-										</Button>
-									
-								</TextBox.InnerLeftContent>
-							</TextBox>
+						<TextBox Watermark="Search"
+						         x:Name="searchBar"
+						         Text="{Binding CurrentTab.Search}"
+						         VerticalAlignment="Stretch"
+						         Padding="0"
+						         Foreground="{DynamicResource MaterialDesignBody}"
+						         FontWeight="Normal"
+						         Margin="0"
+						         VerticalContentAlignment="Center">
+							<TextBox.InnerLeftContent>
+								<Button Classes="Flat"
+								        Margin="0 0 2.5 0"
+								        Command="{Binding StartSearch}"
+								        Padding="5">
+									<material:MaterialIcon Kind="Search"
+									                       Height="20"
+									                       Width="20"
+									                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
+								</Button>
+
+							</TextBox.InnerLeftContent>
+						</TextBox>
 					</styles:Card>
 
 					<StackPanel Grid.Column="3"
@@ -330,19 +330,103 @@
 						        Margin="2 0 0 0"
 						        Grid.Column="2">
 							<Grid RowDefinitions="Auto, *">
-
-
 								<DockPanel ClipToBounds="True"
 								           Grid.Row="1">
-
 									<Border>
-										<Grid RowDefinitions="*, Auto">
+										<Grid RowDefinitions="Auto, *, Auto">
+
+											<Border Margin="0 0 0 2"
+											        Grid.Row="0"
+											        Background="{DynamicResource MaterialDesignCardBackground}">
+												<Grid ColumnDefinitions="Auto, *">
+													<StackPanel Orientation="Horizontal">
+														<Button Width="40"
+														        Height="40"
+														        Classes="Flat">
+															<Image Source="{SvgImage /Assets/UIIcons/Cut.svg}"
+															       Width="30"
+															       Height="30" />
+														</Button>
+														<Button Width="40"
+														        Height="40"
+														        Classes="Flat">
+															<Image Source="{SvgImage /Assets/UIIcons/Copy.svg}"
+															       Width="30"
+															       Height="30" />
+														</Button>
+														<Button Width="40"
+														        Height="40"
+														        Classes="Flat">
+															<Image Source="{SvgImage /Assets/UIIcons/Paste.svg}"
+															       Width="30"
+															       Height="30" />
+														</Button>
+
+														<Border Width="1"
+														        Margin="4 8"
+														        Background="{DynamicResource MaterialDesignBodyLight}" />
+													</StackPanel>
+
+													<StackPanel Orientation="Horizontal"
+													            Grid.Column="1"
+													            HorizontalAlignment="Right">
+														<material:MaterialIcon Kind="FilterVariant"
+														                       Height="25"
+														                       Width="25"
+														                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
+														
+														<ComboBox BorderThickness="0"
+														          Cursor="Hand"
+														          Padding="0 0 6 0"
+														          Margin="0"
+														          Background="Transparent"
+														          Foreground="{DynamicResource MaterialDesignBody}"
+														          VerticalAlignment="Stretch"
+														          PlaceholderForeground="red"
+														          SelectedItem="{Binding CurrentTab.Sort}"
+														          Items="{Binding SortValues}" />
+														
+														<Border Width="1"
+														        Margin="4 8"
+														        Background="{DynamicResource MaterialDesignBodyLight}" />
+
+														<ListBox HorizontalAlignment="Right"
+														         Background="Transparent">
+															<ListBox.ItemsPanel>
+																<ItemsPanelTemplate>
+																	<StackPanel Orientation="Horizontal" />
+																</ItemsPanelTemplate>
+															</ListBox.ItemsPanel>
+															<ListBoxItem Cursor="Hand"
+															             Padding="7.5"
+															             Background="Transparent"
+															             IsSelected="{Binding !CurrentTab.IsGrid, Mode=TwoWay}">
+																<material:MaterialIcon Kind="FormatListText"
+																                       Height="25"
+																                       Width="25"
+																                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
+
+															</ListBoxItem>
+															<ListBoxItem Cursor="Hand"
+															             Padding="7.5"
+															             Background="Transparent"
+															             IsSelected="{Binding CurrentTab.IsGrid, Mode=TwoWay}">
+																<material:MaterialIcon Kind="Grid"
+																                       Height="25"
+																                       Width="25"
+																                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
+															</ListBoxItem>
+														</ListBox>
+													</StackPanel>
+												</Grid>
+											</Border>
 
 											<ContentControl Content="{Binding CurrentTab.DisplayControl}"
+											                Grid.Row="1"
 											                Background="{DynamicResource MaterialDesignCardBackground}" />
 
 											<!-- Failed Search -->
-											<Border Grid.Row="0"
+											<Border Grid.Row="1"
 											        VerticalAlignment="Center"
 											        HorizontalAlignment="Center"
 											        Background="{DynamicResource MaterialDesignCardBackground}"
@@ -362,11 +446,11 @@
 												</Viewbox>
 											</Border>
 
-											<Border Grid.Row="1"
+											<Border Grid.Row="2"
 											        Margin="0 2 0 0"
-											        Background="{DynamicResource MaterialDesignCardBackground}">
-												<Grid ColumnDefinitions="Auto, *, Auto">
-
+											        Background="{DynamicResource MaterialDesignCardBackground}"
+											        Height="35">
+												<Grid ColumnDefinitions="*, Auto">
 													<StackPanel Orientation="Horizontal"
 													            Margin="5 0 0 0">
 														<Label Content="{Binding CurrentTab.FileCountText}"
@@ -392,54 +476,6 @@
 														       Foreground="{DynamicResource MaterialDesignBodyLight}"
 														       VerticalAlignment="Center" />
 													</StackPanel>
-
-													<StackPanel Grid.Column="2"
-													            Orientation="Horizontal">
-														<StackPanel Orientation="Horizontal">
-
-															<Viewbox Width="25"
-															         Margin="2 0 0 0">
-																<Image Source="{SvgImage /Assets/UIIcons/Filter.svg}" />
-															</Viewbox>
-
-															<ComboBox BorderThickness="0"
-															          Cursor="Hand"
-															          Padding="0 1 2 1"
-															          Margin="0"
-															          Background="Transparent"
-															          VerticalAlignment="Stretch"
-															          SelectedItem="{Binding CurrentTab.Sort}"
-															          Items="{Binding SortValues}">
-															</ComboBox>
-														</StackPanel>
-
-														<Border Width="1"
-														        Margin="4 8" />
-
-														<ListBox HorizontalAlignment="Right"
-														         Background="Transparent">
-															<ListBox.ItemsPanel>
-																<ItemsPanelTemplate>
-																	<StackPanel Orientation="Horizontal" />
-																</ItemsPanelTemplate>
-															</ListBox.ItemsPanel>
-															<ListBoxItem Cursor="Hand"
-															             Padding="7.5"
-															             Background="Transparent"
-															             IsSelected="{Binding !CurrentTab.IsGrid, Mode=TwoWay}">
-																<Image Source="{SvgImage /Assets/UIIcons/List.svg}"
-																       Width="25" />
-
-															</ListBoxItem>
-															<ListBoxItem Cursor="Hand"
-															             Padding="7.5"
-															             Background="Transparent"
-															             IsSelected="{Binding CurrentTab.IsGrid, Mode=TwoWay}">
-																<Image Source="{SvgImage /Assets/UIIcons/Grid.svg}"
-																       Width="25" />
-															</ListBoxItem>
-														</ListBox>
-													</StackPanel>
 												</Grid>
 											</Border>
 										</Grid>
@@ -449,7 +485,6 @@
 						</Border>
 					</Grid>
 				</Border>
-
 			</Grid>
 		</Border>
 

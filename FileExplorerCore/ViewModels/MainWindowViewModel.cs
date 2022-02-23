@@ -275,7 +275,7 @@ namespace FileExplorerCore.ViewModels
 		{
 			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && Tabs.Count(x => !String.IsNullOrWhiteSpace(x.TreeItem.GetPath(x => x.ToString()))) > 1)
 			{
-				var selector = new TabSelector()
+				var selector = new TabSelector
 				{
 					Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab && !String.IsNullOrWhiteSpace(x.TreeItem.GetPath(x => x.ToString())))),
 				};
@@ -357,7 +357,7 @@ namespace FileExplorerCore.ViewModels
 
 				if (model is not null)
 				{
-					var properties = new Properties()
+					var properties = new Properties
 					{
 						Model = model,
 					};

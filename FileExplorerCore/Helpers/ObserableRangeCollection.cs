@@ -39,7 +39,7 @@ namespace FileExplorerCore.Helpers
 		object? IList.this[int index]
 		{
 			get => Data[index];
-			set => Data[index] = value is null ? Data[index] : (T)value;
+			set => Data[index] = (T)value;
 		}
 
 		public T this[int index]
@@ -55,8 +55,7 @@ namespace FileExplorerCore.Helpers
 
 		public ObservableRangeCollection()
 		{
-			CollectionChanged += delegate
-			{ CountChanged(Count); };
+			CollectionChanged += delegate { CountChanged(Count); };
 		}
 
 		public ObservableRangeCollection(IEnumerable<T> items, bool needsReset = false) : this()

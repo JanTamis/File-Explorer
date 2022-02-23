@@ -1,5 +1,4 @@
-﻿using Avalonia.Media;
-using FileExplorerCore.Helpers;
+﻿using FileExplorerCore.Helpers;
 using FileExplorerCore.ViewModels;
 using Humanizer;
 using System;
@@ -127,7 +126,7 @@ namespace FileExplorerCore.Models
 		}
 
 		public long TotalSize => IsFolder
-			? TreeItem.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions()
+			? TreeItem.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions
 			{
 				RecurseSubdirectories = true,
 				IgnoreInaccessible = true,
@@ -158,7 +157,7 @@ namespace FileExplorerCore.Models
 						else if (IsFolder)
 						{
 							var query = new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length,
-								new EnumerationOptions() { RecurseSubdirectories = true })
+								new EnumerationOptions { RecurseSubdirectories = true })
 							{
 								ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
 							};

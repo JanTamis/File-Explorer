@@ -10,23 +10,23 @@ namespace FileExplorerCore.Helpers
 	{
 		private char[]? _arrayToReturnToPool;
 		private Span<char> _chars;
-		private int _pos;
+		public int Position;
 
 		public ValueStringBuilder(Span<char> initialBuffer)
 		{
 			_arrayToReturnToPool = null;
 			_chars = initialBuffer;
-			_pos = 0;
+			Position = 0;
 		}
 
 		public ValueStringBuilder(int initialCapacity)
 		{
 			_arrayToReturnToPool = ArrayPool<char>.Shared.Rent(initialCapacity);
 			_chars = _arrayToReturnToPool;
-			_pos = 0;
+			Position = 0;
 		}
 
-		public int Length => _pos;
+		public int Length => Position;
 
 		public int Capacity => _chars.Length;
 
@@ -34,7 +34,7 @@ namespace FileExplorerCore.Helpers
 		{
 			// If the caller has a bug and calls this with negative capacity, make sure to call Grow to throw an exception.
 			if ((uint)capacity > (uint)_chars.Length)
-				Grow(capacity - _pos);
+				Grow(capacity - Position);
 		}
 
 		/// <summary>
@@ -69,9 +69,9 @@ namespace FileExplorerCore.Helpers
 		{
 			get
 			{
-				if (_pos != 0)
+				if (Position != 0)
 				{
-					var (offset, length) = range.GetOffsetAndLength(_pos);
+					var (offset, length) = range.GetOffsetAndLength(Position);
 
 					return AsSpan(offset, length);
 				}
@@ -80,12 +80,12 @@ namespace FileExplorerCore.Helpers
 			}
 		}
 
-		public override string ToString()
-		{
-			var s = _chars[.._pos].ToString();
-			Dispose();
-			return s;
-		}
+		// public override string ToString()
+		// {
+		// 	var s = _chars[..Position].ToString();
+		// 	Dispose();
+		// 	return s;
+		// }
 
 		/// <summary>Returns the underlying storage of the builder.</summary>
 		public Span<char> RawChars => _chars;
@@ -102,53 +102,51 @@ namespace FileExplorerCore.Helpers
 				_chars[Length] = '\0';
 			}
 
-			return _chars[.._pos];
+			return _chars[..Position];
 		}
 
-		public ReadOnlySpan<char> AsSpan() => _chars[.._pos];
-		public ReadOnlySpan<char> AsSpan(int start) => _chars[start.._pos];
+		public ReadOnlySpan<char> AsSpan() => _chars[..Position];
+		public ReadOnlySpan<char> AsSpan(int start) => _chars[start..Position];
 		public ReadOnlySpan<char> AsSpan(int start, int length) => _chars.Slice(start, length);
 
 		public bool TryCopyTo(Span<char> destination, out int charsWritten)
 		{
-			if (_chars[.._pos].TryCopyTo(destination))
+			if (_chars[..Position].TryCopyTo(destination))
 			{
-				charsWritten = _pos;
+				charsWritten = Position;
 				Dispose();
 				return true;
 			}
-			else
-			{
-				charsWritten = 0;
-				Dispose();
-				return false;
-			}
+
+			charsWritten = 0;
+			Dispose();
+			return false;
 		}
 
 		public void Insert(int index, char value, int count)
 		{
-			if (_pos > _chars.Length - count)
+			if (Position > _chars.Length - count)
 			{
 				Grow(count);
 			}
 
-			var remaining = _pos - index;
+			var remaining = Position - index;
 			_chars.Slice(index, remaining).CopyTo(_chars[(index + count)..]);
 			_chars.Slice(index, count).Fill(value);
-			_pos += count;
+			Position += count;
 		}
 
 		public void Insert(int index, char value)
 		{
-			if (_pos > _chars.Length - 1)
+			if (Position > _chars.Length - 1)
 			{
 				Grow(1);
 			}
 
-			var remaining = _pos - index;
+			var remaining = Position - index;
 			_chars.Slice(index, remaining).CopyTo(_chars[(index + 1)..]);
 			_chars[index] = value;
-			_pos++;
+			Position++;
 		}
 
 		public void Insert(int index, string? s)
@@ -160,44 +158,49 @@ namespace FileExplorerCore.Helpers
 
 			var count = s.Length;
 
-			if (_pos > (_chars.Length - count))
+			if (Position > (_chars.Length - count))
 			{
 				Grow(count);
 			}
 
-			var remaining = _pos - index;
+			var remaining = Position - index;
 			_chars.Slice(index, remaining).CopyTo(_chars[(index + count)..]);
 			s
 #if !NET6_0_OR_GREATER
                 .AsSpan()
 #endif
 				.CopyTo(_chars[index..]);
-			_pos += count;
+			Position += count;
 		}
 
 		public void Insert(int index, ReadOnlySpan<char> s)
 		{
 			var count = s.Length;
 
-			if (_pos > (_chars.Length - count))
+			if (Position > _chars.Length - count)
 			{
 				Grow(count);
 			}
 
-			var remaining = _pos - index;
+			var remaining = Position - index;
 			_chars.Slice(index, remaining).CopyTo(_chars[(index + count)..]);
 			s.CopyTo(_chars[index..]);
-			_pos += count;
+			Position += count;
+		}
+
+		public void SetPosition(int position)
+		{
+			Position = position;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Append(char c)
 		{
-			var pos = _pos;
+			var pos = Position;
 			if ((uint)pos < (uint)_chars.Length)
 			{
 				_chars[pos] = c;
-				_pos = pos + 1;
+				Position = pos + 1;
 			}
 			else
 			{
@@ -213,13 +216,13 @@ namespace FileExplorerCore.Helpers
 				return;
 			}
 
-			var pos = _pos;
+			var pos = Position;
 			if (s.Length == 1 &&
 			    (uint)pos < (uint)_chars
 				    .Length) // very common case, e.g. appending strings from NumberFormatInfo like separators, percent symbols, etc.
 			{
 				_chars[pos] = s[0];
-				_pos = pos + 1;
+				Position = pos + 1;
 			}
 			else
 			{
@@ -229,7 +232,7 @@ namespace FileExplorerCore.Helpers
 
 		private void AppendSlow(string s)
 		{
-			var pos = _pos;
+			var pos = Position;
 			if (pos > _chars.Length - s.Length)
 			{
 				Grow(s.Length);
@@ -240,64 +243,64 @@ namespace FileExplorerCore.Helpers
                 .AsSpan()
 #endif
 				.CopyTo(_chars[pos..]);
-			_pos += s.Length;
+			Position += s.Length;
 		}
 
 		public void Append(char c, int count)
 		{
-			if (_pos > _chars.Length - count)
+			if (Position > _chars.Length - count)
 			{
 				Grow(count);
 			}
 
-			var dst = _chars.Slice(_pos, count);
+			var dst = _chars.Slice(Position, count);
 			for (var i = 0; i < dst.Length; i++)
 			{
 				dst[i] = c;
 			}
 
-			_pos += count;
+			Position += count;
 		}
 
 		public unsafe void Append(char* value, int length)
 		{
-			var pos = _pos;
+			var pos = Position;
 			if (pos > _chars.Length - length)
 			{
 				Grow(length);
 			}
 
-			var dst = _chars.Slice(_pos, length);
+			var dst = _chars.Slice(Position, length);
 			for (var i = 0; i < dst.Length; i++)
 			{
 				dst[i] = *value++;
 			}
 
-			_pos += length;
+			Position += length;
 		}
 
 		public void Append(ReadOnlySpan<char> value)
 		{
-			var pos = _pos;
+			var pos = Position;
 			if (pos > _chars.Length - value.Length)
 			{
 				Grow(value.Length);
 			}
 
-			value.CopyTo(_chars[_pos..]);
-			_pos += value.Length;
+			value.CopyTo(_chars[Position..]);
+			Position += value.Length;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public Span<char> AppendSpan(int length)
 		{
-			var origPos = _pos;
+			var origPos = Position;
 			if (origPos > _chars.Length - length)
 			{
 				Grow(length);
 			}
 
-			_pos = origPos + length;
+			Position = origPos + length;
 			return _chars.Slice(origPos, length);
 		}
 
@@ -311,7 +314,7 @@ namespace FileExplorerCore.Helpers
 		/// <summary>
 		/// Resize the internal buffer either by doubling current buffer size or
 		/// by adding <paramref name="additionalCapacityBeyondPos"/> to
-		/// <see cref="_pos"/> whichever is greater.
+		/// <see cref="Position"/> whichever is greater.
 		/// </summary>
 		/// <param name="additionalCapacityBeyondPos">
 		/// Number of chars requested beyond current position.
@@ -320,9 +323,9 @@ namespace FileExplorerCore.Helpers
 		private void Grow(int additionalCapacityBeyondPos)
 		{
 			// Make sure to let Rent throw an exception if the caller has a bug and the desired capacity is negative
-			var poolArray = ArrayPool<char>.Shared.Rent((int)Math.Max((uint)(_pos + additionalCapacityBeyondPos), (uint)_chars.Length * 2));
+			var poolArray = ArrayPool<char>.Shared.Rent((int)Math.Max((uint)(Position + additionalCapacityBeyondPos), (uint)_chars.Length * 2));
 
-			_chars[.._pos].CopyTo(poolArray);
+			_chars[..Position].CopyTo(poolArray);
 
 			var toReturn = _arrayToReturnToPool;
 			_chars = _arrayToReturnToPool = poolArray;

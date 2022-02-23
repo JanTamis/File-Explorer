@@ -1,12 +1,17 @@
-﻿using FileExplorerCore.Interfaces;
-using ProtoBuf;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Text;
+using FileExplorerCore.Helpers;
+using FileExplorerCore.Interfaces;
+using MetadataExtractor.Formats.Exif;
+using Microsoft.Toolkit.HighPerformance;
+using Microsoft.Toolkit.HighPerformance.Helpers;
+using ProtoBuf;
 
-namespace FileExplorerCore.Helpers
+namespace FileExplorerCore.Models
 {
 	[ProtoContract]
 	public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
@@ -15,61 +20,28 @@ namespace FileExplorerCore.Helpers
 		{
 			IgnoreInaccessible = true,
 			RecurseSubdirectories = false,
-			AttributesToSkip = FileAttributes.System,
+			AttributesToSkip = FileAttributes.System | FileAttributes.Hidden,
 		};
+
+		private bool _isLatin1;
+		private byte[] _value;
 
 		public IEnumerable<FileSystemTreeItem> Children
 		{
 			get
 			{
-				return IsFolder
-					? GetPath((path, parent) =>
-					{
-						var currentPath = path.ToString();
-
-						return Directory.Exists(currentPath)
-							? new FileSystemEnumerable<FileSystemTreeItem>(currentPath, (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName.ToString(), x.IsDirectory, parent), Options)
-							: Enumerable.Empty<FileSystemTreeItem>();
-					}, this)
-					: Enumerable.Empty<FileSystemTreeItem>();
-			}
-		}
-
-		public IEnumerable<FileSystemTreeItem> Files
-		{
-			get
-			{
-				if (!IsFolder)
+				if (IsFolder)
 				{
-					return Enumerable.Empty<FileSystemTreeItem>();
+					var path = GetPath(x => x.ToString());
+
+					if (Directory.Exists(path))
+					{
+						return new FileSystemEnumerable<FileSystemTreeItem>(path, (ref FileSystemEntry x)
+							=> new FileSystemTreeItem(x.FileName, x.IsDirectory, this), Options);
+					}
 				}
 
-				return GetPath((path, parent) =>
-				{
-					return new FileSystemEnumerable<FileSystemTreeItem>(path.ToString(), (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName.ToString(), x.IsDirectory, parent), Options)
-					{
-						ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
-					};
-				}, this);
-			}
-		}
-
-		public IEnumerable<FileSystemTreeItem> Folders
-		{
-			get
-			{
-				if (!IsFolder)
-				{
-					return Enumerable.Empty<FileSystemTreeItem>();
-				}
-
-				return GetPath((path, parent) =>
-				{
-					return new FileSystemEnumerable<FileSystemTreeItem>(path.ToString(), (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName.ToString(), x.IsDirectory, parent), Options)
-					{
-						ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
-					};
-				}, this);
+				return Enumerable.Empty<FileSystemTreeItem>();
 			}
 		}
 
@@ -77,16 +49,62 @@ namespace FileExplorerCore.Helpers
 
 		public FileSystemTreeItem? Parent { get; set; }
 
-		public string Value { get; set; }
+		public string Value
+		{
+			get
+			{
+				return new string(_isLatin1
+					? Encoding.Latin1.GetChars(_value)
+					: _value.AsSpan().Cast<byte, char>());
+			}
+			set
+			{
+				_isLatin1 = true;
+
+				for (var i = 0; i < value.Length; i++)
+				{
+					if ((uint)value[i] > Byte.MaxValue)
+					{
+						_isLatin1 = false;
+						break;
+					}
+				}
+
+				_value = _isLatin1
+					? Encoding.Latin1.GetBytes(value)
+					: value.AsSpan().AsBytes().ToArray();
+			}
+		}
 
 		public bool HasParent => Parent is not null;
 		public bool HasChildren => Children.Any();
 
-		public FileSystemTreeItem(string name, bool isFolder, FileSystemTreeItem? parent = null)
+		public FileSystemTreeItem(ReadOnlySpan<char> name, bool isFolder, FileSystemTreeItem? parent = null)
 		{
 			IsFolder = isFolder;
-			Value = name;
 			Parent = parent;
+
+			_isLatin1 = true;
+
+			for (var i = 0; i < name.Length; i++)
+			{
+				if ((uint)name[i] > Byte.MaxValue)
+				{
+					_isLatin1 = false;
+					break;
+				}
+			}
+
+			if (_isLatin1)
+			{
+				_value = new byte[name.Length];
+
+				Encoding.Latin1.GetBytes(name, _value);
+			}
+			else
+			{
+				_value = name.AsBytes().ToArray();
+			}
 		}
 
 		/// <summary>
@@ -148,7 +166,25 @@ namespace FileExplorerCore.Helpers
 		/// <returns>the amount of children recursively</returns>
 		public int GetChildrenCount()
 		{
-			return EnumerateChildren().Count();
+			var options = new EnumerationOptions
+			{
+				IgnoreInaccessible = Options.IgnoreInaccessible,
+				AttributesToSkip = Options.AttributesToSkip,
+				RecurseSubdirectories = true,
+			};
+
+			var query = IsFolder
+				? GetPath((path, fileOptions) =>
+				{
+					var currentPath = path.ToString();
+
+					return Directory.Exists(currentPath)
+						? new FileSystemEnumerable<bool>(currentPath, (ref FileSystemEntry _) => false, fileOptions)
+						: Enumerable.Empty<bool>();
+				}, options)
+				: Enumerable.Empty<bool>();
+
+			return query.Count();
 		}
 
 		public IEnumerable<FileSystemTreeItem> EnumerateChildren(uint layers = UInt32.MaxValue)
@@ -197,13 +233,17 @@ namespace FileExplorerCore.Helpers
 			}
 
 			var currentPath = GetPath(path => path.ToString());
-			
-			var enumerable = Directory.Exists(currentPath)
-					? new FileSystemEnumerable<FileSystemTreeItem>(currentPath, (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName.ToString(), x.IsDirectory, this), Options)
-					{
-						ShouldIncludePredicate = findPredicate,
-					}
-					: Enumerable.Empty<FileSystemTreeItem>();
+
+			if (!Directory.Exists(currentPath))
+			{
+				yield break;
+			}
+
+			// var enumerable = new FileSystemEnumerable<FileSystemTreeItem>(currentPath, (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName, x.IsDirectory, this), Options)
+			// {
+			// 	ShouldIncludePredicate = findPredicate,
+			// };
+			var enumerable = Children;
 
 			if (layers == 0)
 			{
@@ -214,7 +254,7 @@ namespace FileExplorerCore.Helpers
 
 				yield break;
 			}
-			
+
 			var children = new List<FileSystemTreeItem>();
 
 			foreach (var child in enumerable)
@@ -240,31 +280,33 @@ namespace FileExplorerCore.Helpers
 		{
 			using var builder = new ValueStringBuilder(stackalloc char[512]);
 
-			foreach (var item in EnumerateValuesToRoot())
-			{
-				builder.Insert(0, item);
+			var count = GetPath(builder);
 
-				if (builder[0] != PathHelper.DirectorySeparator)
-				{
-					builder.Insert(0, PathHelper.DirectorySeparator);
-				}
-			}
-
-			if (OperatingSystem.IsWindows())
-			{
-				return action(builder[1..]);
-			}
-
-			return action(builder.AsSpan());
+			return action(builder.RawChars[0..count]);
 		}
 
 		public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
 		{
-			var builder = new ValueStringBuilder(stackalloc char[512]);
+			using var builder = new ValueStringBuilder(stackalloc char[512]);
 
-			foreach (var item in EnumerateValuesToRoot().Reverse())
+			var count = GetPath(builder);
+
+			return action(builder.RawChars[0..count], parameter);
+		}
+
+		private int GetPath(ValueStringBuilder builder)
+		{
+			foreach (var item in EnumerateToRoot().Reverse())
 			{
-				builder.Append(item);
+				if (item._isLatin1)
+				{
+					var span = builder.AppendSpan(item._value.Length);
+					Encoding.Latin1.GetChars(item._value, span);
+				}
+				else
+				{
+					builder.Append(item._value.AsSpan().Cast<byte, char>());
+				}
 
 				if (builder[^1] != PathHelper.DirectorySeparator)
 				{
@@ -272,17 +314,22 @@ namespace FileExplorerCore.Helpers
 				}
 			}
 
-			//if (OperatingSystem.IsWindows())
-			//{
-			//	return action(builder[1..], parameter);
-			//}
+			if (builder.Length > 0 && builder[^1] != PathHelper.DirectorySeparator)
+			{
+				builder.Append(PathHelper.DirectorySeparator);
+			}
 
-			return action(builder.AsSpan(), parameter);
+			return builder.Length;
 		}
 
 		public override string ToString()
 		{
 			return Value;
+		}
+
+		public override int GetHashCode()
+		{
+			return GetPath(HashCode<char>.Combine);
 		}
 	}
 }

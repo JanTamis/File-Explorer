@@ -12,7 +12,6 @@ using System.IO;
 using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace FileExplorerCore.Popup
 {
@@ -73,7 +72,7 @@ namespace FileExplorerCore.Popup
 
 				ThreadPool.QueueUserWorkItem(_ =>
 				{
-					var enumerable = _model.TreeItem.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions()
+					var enumerable = _model.TreeItem.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions
 					{
 						RecurseSubdirectories = true,
 						IgnoreInaccessible = true,

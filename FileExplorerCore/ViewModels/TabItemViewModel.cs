@@ -397,9 +397,9 @@ namespace FileExplorerCore.ViewModels
 			{
 				await Task.Run(async () =>
 				{
-					var query = Sort is SortEnum.None && !recursive
-						? GetFileSystemEntries(TreeItem)
-						: GetFileSystemEntriesRecursive(TreeItem, search);
+					var query = recursive
+						? GetFileSystemEntriesRecursive(TreeItem, search)
+						: GetFileSystemEntries(TreeItem);
 
 					if (Sort is not SortEnum.None)
 					{
@@ -414,15 +414,24 @@ namespace FileExplorerCore.ViewModels
 						});
 					}
 
-					if (!recursive || recursive && Sort is not SortEnum.None)
+					if (recursive)
+					{
+						if (Sort is SortEnum.None)
+						{
+							await Files.AddRange<Comparer<FileModel>>(query, token: TokenSource.Token);
+						}
+						else
+						{
+							var comparer = new FileModelComparer(Sort);
+
+							await Files.AddRange(query, comparer, token: TokenSource.Token);
+						}
+					}
+					else
 					{
 						var comparer = new FileModelComparer(Sort);
 
 						await Files.AddRange(query, comparer, token: TokenSource.Token);
-					}
-					else
-					{
-						await Files.AddRange<Comparer<FileModel>>(query, token: TokenSource.Token);
 					}
 				});
 			}
