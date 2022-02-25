@@ -147,14 +147,6 @@ namespace FileExplorerCore.Helpers
 
 				return GetImage(name);
 			}, size), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
-
-		}
-
-		private static bool ImageExists(string key)
-		{
-			var loader = AvaloniaLocator.Current.GetService<IAssetLoader>();
-
-			return loader?.Exists(new Uri($"avares://FileExplorerCore/Assets/Icons/{key}.svg")) ?? false;
 		}
 
 		private static async Task<SvgImage?> GetImage(string key)

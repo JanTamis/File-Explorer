@@ -28,7 +28,7 @@
   <Window.Resources>
     <system:Int32 x:Key="ImageSize">24</system:Int32>
   </Window.Resources>
-
+	
   <Panel Margin="{Binding #MainWindow.OffScreenMargin}"
 	       Background="{DynamicResource MaterialDesignPaper}">
 
@@ -454,7 +454,8 @@
                             <Border Width="1"
 														        Margin="4 8" />
 
-                            <Label Content="{Binding CurrentTab.SelectionText^, FallbackValue='Loading...'}"
+                            <Label Content="{Binding CurrentTab.SelectionText^}"
+                                   DataContext=""
 														       FontWeight="Normal"
 														       Margin="0"
 														       FontSize="14"

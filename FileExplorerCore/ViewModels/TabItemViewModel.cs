@@ -97,44 +97,38 @@ namespace FileExplorerCore.ViewModels
 			_ => $"{Count:N0} items",
 		};
 
-		public Task<string> SelectionText
+		public Task<string> SelectionText => Task.Run(() =>
 		{
-			get
+			var result = String.Empty;
+			var fileSize = -1L;
+
+			_selectionCount = 0;
+
+			foreach (var file in Files)
 			{
-				return Task.Run(() =>
+				if (file.IsSelected)
 				{
-					var result = String.Empty;
-					var fileSize = -1L;
+					_selectionCount++;
 
-					_selectionCount = 0;
-
-					foreach (var file in Files)
+					if (!file.IsFolder)
 					{
-						if (file.IsSelected)
-						{
-							_selectionCount++;
-
-							if (!file.IsFolder)
-							{
-								fileSize += file.Size;
-							}
-						}
+						fileSize += file.Size;
 					}
-
-					if (SelectionCount > 0)
-					{
-						result = $"{SelectionCount:N0} items selected";
-
-						if (fileSize is not -1)
-						{
-							result += $", {fileSize.Bytes()}";
-						}
-					}
-
-					return result;
-				});				
+				}
 			}
-		}
+
+			if (SelectionCount > 0)
+			{
+				result = $"{SelectionCount:N0} items selected";
+
+				if (fileSize is not -1)
+				{
+					result += $", {fileSize.Bytes()}";
+				}
+			}
+
+			return result;
+		});
 
 		public int SelectionCount
 		{
@@ -154,11 +148,6 @@ namespace FileExplorerCore.ViewModels
 				if (IsLoading)
 				{
 					FileCount = -1;
-				}
-				else
-				{
-					// GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-					// GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
 				}
 
 				OnPropertyChanged(nameof(SearchFailed));
@@ -322,10 +311,7 @@ namespace FileExplorerCore.ViewModels
 			//	}
 			//};
 
-			FileModel.SelectionChanged += () =>
-			{
-				OnPropertyChanged(nameof(SelectionText));
-			};
+			FileModel.SelectionChanged += () => { OnPropertyChanged(nameof(SelectionText)); };
 		}
 
 		public FileSystemTreeItem? Undo()
@@ -386,13 +372,6 @@ namespace FileExplorerCore.ViewModels
 
 			IsLoading = true;
 
-			//var timer = new System.Timers.Timer(1000);
-			//timer.Elapsed += async delegate { await OnPropertyChanged(nameof(SearchText)); };
-
-			//startSearchTime = DateTime.Now;
-
-			//timer.Start();
-
 			if (TreeItem.IsFolder)
 			{
 				await Task.Run(async () =>
@@ -404,14 +383,14 @@ namespace FileExplorerCore.ViewModels
 					if (Sort is not SortEnum.None)
 					{
 						ThreadPool.QueueUserWorkItem(_ =>
-					 {
-						 var count = GetFileSystemEntriesCount(TreeItem, search, TokenSource.Token);
+						{
+							var count = GetFileSystemEntriesCount(TreeItem, search, TokenSource.Token);
 
-						 if (!TokenSource.IsCancellationRequested)
-						 {
-							 FileCount = count;
-						 }
-					 });
+							if (!TokenSource.IsCancellationRequested)
+							{
+								FileCount = count;
+							}
+						});
 					}
 
 					if (recursive)

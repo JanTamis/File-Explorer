@@ -47,14 +47,14 @@ namespace FileExplorerCore.Views
 				pathFolders.ItemContainerGenerator.Materialized += ItemContainerGenerator_Materialized1;
 			}
 
-			// searchBar.KeyUp += SearchBar_KeyUp;
+			searchBar.KeyUp += SearchBar_KeyUp;
 
 			PointerPressed += MainWindow_PointerPressed;
 		}
 
 		private void SearchBar_KeyUp(object? sender, KeyEventArgs e)
 		{
-			if (sender is AutoCompleteBox { IsDropDownOpen: false } && e.Key is Key.Enter && DataContext is MainWindowViewModel model)
+			if (sender is TextBox && e.Key is Key.Enter && DataContext is MainWindowViewModel model)
 			{
 				model.StartSearch();
 			}
