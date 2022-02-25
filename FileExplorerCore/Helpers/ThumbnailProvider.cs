@@ -66,18 +66,15 @@ namespace FileExplorerCore.Helpers
 				{
 					Bitmap? image = null!;
 
-					if (shouldReturnImage is null || shouldReturnImage?.Invoke() == true)
-					{
-						if (treeItem.IsFolder && treeItem.HasChildren)
+						if (treeItem.IsFolder && treeItem.HasChildren && shouldReturnImage is null || shouldReturnImage?.Invoke() == true)
 						{
 							image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk, () => size <= 64);
 						}
 
-						if (image is null)
+						if (image is null && shouldReturnImage is null || shouldReturnImage?.Invoke() == true)
 						{
 							image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk, () => true);
 						}
-					}
 
 					Interlocked.Decrement(ref taskCount);
 
