@@ -278,13 +278,16 @@ namespace FileExplorerCore.Helpers
 
 		public async ValueTask OnCollectionChanged(NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
 		{
-			if (Dispatcher.UIThread.CheckAccess())
+			if (CollectionChanged is not null)
 			{
-				CollectionChanged(this, notifyCollectionChangedEventArgs);
-			}
-			else
-			{
-				await Dispatcher.UIThread.InvokeAsync(() => CollectionChanged(this, notifyCollectionChangedEventArgs));
+				if (Dispatcher.UIThread.CheckAccess())
+				{
+					CollectionChanged(this, notifyCollectionChangedEventArgs);
+				}
+				else
+				{
+					await Dispatcher.UIThread.InvokeAsync(() => CollectionChanged(this, notifyCollectionChangedEventArgs));
+				}
 			}
 		}
 
@@ -307,7 +310,7 @@ namespace FileExplorerCore.Helpers
 			return Data.BinarySearch(value, comparer);
 		}
 
-		public async ValueTask<int> BinarySearchAsync(T value, int index, int length, IAsyncComparer<T> comparer)
+		public async ValueTask<int> BinarySearchAsync<TComparer>(T value, int index, int length, TComparer comparer) where TComparer : IAsyncComparer<T>
 		{
 			var lo = index;
 			var hi = index + length - 1;
@@ -315,7 +318,7 @@ namespace FileExplorerCore.Helpers
 			while (lo <= hi)
 			{
 				// i might overflow if lo and hi are both large positive numbers.
-				var i = GetMedian(lo, hi);
+				var i = lo + ((hi - lo) >> 1);
 				var c = await comparer.CompareAsync(Data[i], value);
 
 				switch (c)
@@ -332,15 +335,9 @@ namespace FileExplorerCore.Helpers
 			}
 
 			return ~lo;
-
-			static int GetMedian(int low, int hi)
-			{
-				// Note both may be negative, if we are dealing with arrays w/ negative lower bounds.
-				return low + ((hi - low) >> 1);
-			}
 		}
 
-		public async Task Sort<TComparer>(TComparer? comparer = default) where TComparer : IComparer<T>
+		public async Task Sort<TComparer>(TComparer comparer = default!) where TComparer : IComparer<T>
 		{
 			await ParallelQuickSort<TComparer>(Data, 0, Data.Count - 1, comparer);
 			await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
@@ -358,9 +355,9 @@ namespace FileExplorerCore.Helpers
 
 			for (var i = 0; i < max; i++)
 			{
-				max = Data.Count;
-
 				yield return Data[i];
+
+				max = Data.Count;
 			}
 		}
 

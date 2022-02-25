@@ -22,8 +22,7 @@ namespace FileExplorerCore.Models
 			AttributesToSkip = FileAttributes.System | FileAttributes.Hidden,
 		};
 
-		private bool _isLatin1;
-		private byte[] _value;
+		private Utf8String _value;
 
 		public IEnumerable<FileSystemTreeItem> Children
 		{
@@ -52,26 +51,11 @@ namespace FileExplorerCore.Models
 		{
 			get
 			{
-				return new string(_isLatin1
-					? Encoding.Latin1.GetChars(_value)
-					: _value.AsSpan().Cast<byte, char>());
+				return _value.ToString();
 			}
 			set
 			{
-				_isLatin1 = true;
-
-				for (var i = 0; i < value.Length; i++)
-				{
-					if ((uint)value[i] > Byte.MaxValue)
-					{
-						_isLatin1 = false;
-						break;
-					}
-				}
-
-				_value = _isLatin1
-					? Encoding.Latin1.GetBytes(value)
-					: value.AsSpan().AsBytes().ToArray();
+				_value = new Utf8String(value);
 			}
 		}
 
@@ -83,27 +67,7 @@ namespace FileExplorerCore.Models
 			IsFolder = isFolder;
 			Parent = parent;
 
-			_isLatin1 = true;
-
-			for (var i = 0; i < name.Length; i++)
-			{
-				if ((uint)name[i] > Byte.MaxValue)
-				{
-					_isLatin1 = false;
-					break;
-				}
-			}
-
-			if (_isLatin1)
-			{
-				_value = new byte[name.Length];
-
-				Encoding.Latin1.GetBytes(name, _value);
-			}
-			else
-			{
-				_value = name.AsBytes().ToArray();
-			}
+			_value = new Utf8String(name);
 		}
 
 		/// <summary>
@@ -297,15 +261,16 @@ namespace FileExplorerCore.Models
 		{
 			foreach (var item in EnumerateToRoot().Reverse())
 			{
-				if (item._isLatin1)
-				{
-					var span = builder.AppendSpan(item._value.Length);
-					Encoding.Latin1.GetChars(item._value, span);
-				}
-				else
-				{
-					builder.Append(item._value.AsSpan().Cast<byte, char>());
-				}
+				item._value.CopyToSpan(builder.AppendSpan(item.Value.Length));
+				//if (item._isLatin1)
+				//{
+				//	var span = builder.AppendSpan(item._value.Length);
+				//	Encoding.Latin1.GetChars(item._value, span);
+				//}
+				//else
+				//{
+				//	builder.Append(item._value.AsSpan().Cast<byte, char>());
+				//}
 
 				if (builder[^1] != PathHelper.DirectorySeparator)
 				{

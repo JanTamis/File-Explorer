@@ -1,9 +1,12 @@
 ﻿using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Threading;
+using ReactiveUI;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using System.Threading.Tasks;
 
 namespace FileExplorerCore.Helpers
 {
@@ -43,7 +46,7 @@ namespace FileExplorerCore.Helpers
 
 		private static readonly int bitmapSize = Unsafe.SizeOf<NativeMethods.BITMAP>();
 
-		public static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height)
+		public static Bitmap GetThumbnail(ReadOnlySpan<char> fileName, int width, int height)
 		{
 			return GetThumbnail(fileName, width, height, ThumbnailOptions.IconOnly);
 		}
@@ -51,7 +54,7 @@ namespace FileExplorerCore.Helpers
 		public static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height, ThumbnailOptions options)
 		{
 			Bitmap? bitmap = null;
-			
+
 			if (!fileName.IsEmpty)
 			{
 				var hBitmap = GetHBitmap(fileName, width, height, options);
@@ -88,7 +91,7 @@ namespace FileExplorerCore.Helpers
 				var x = i % w;
 				var y = i / w;
 				var yOffset = h - (y + 1);
-				
+
 				if (yOffset < 0 && yOffset >= h)
 					yOffset = 0;
 
@@ -116,13 +119,27 @@ namespace FileExplorerCore.Helpers
 					Height = height
 				};
 
-				var hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out var hBitmap);
+				//if (Dispatcher.UIThread.CheckAccess())
+				//{
+					var hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out var hBitmap);
 
-				Marshal.ReleaseComObject(nativeShellItem);
+					Marshal.ReleaseComObject(nativeShellItem);
 
-				return hr == HResult.Ok 
-					? hBitmap
-					: IntPtr.Zero;
+					return hr == HResult.Ok
+						? hBitmap
+						: IntPtr.Zero;
+				//}
+
+				//return Dispatcher.UIThread.InvokeAsync(() =>
+				//{
+				//	var hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out var hBitmap);
+
+				//	Marshal.ReleaseComObject(nativeShellItem);
+
+				//	return hr == HResult.Ok
+				//		? hBitmap
+				//		: IntPtr.Zero;
+				//}, DispatcherPriority.MinValue).Result;
 			}
 		}
 

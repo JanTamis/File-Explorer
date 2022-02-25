@@ -5,7 +5,7 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <Platforms>AnyCPU;x64</Platforms>
         <LangVersion>preview</LangVersion>
@@ -252,6 +252,7 @@
         <EmbeddedResource Include="Assets\Lookup\VectorImage.txt" />
         <EmbeddedResource Include="Assets\Lookup\Video.txt" />
         <EmbeddedResource Include="Assets\Lookup\Web.txt" />
+        <None Include="..\.editorconfig" Link=".editorconfig" />
         <Resource Include="Assets\UIIcons\FileExplorer.svg" />
     </ItemGroup>
     <ItemGroup>

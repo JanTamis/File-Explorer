@@ -12,6 +12,8 @@ using System.IO;
 using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
+using Avalonia.Media;
 
 namespace FileExplorerCore.Popup
 {
@@ -36,9 +38,7 @@ namespace FileExplorerCore.Popup
 
 		private CancellationTokenSource _source;
 
-		public Bitmap? Icon => _icon ??= OperatingSystem.IsWindows() 
-			? WindowsThumbnailProvider.GetThumbnail(Path, 48, 48)
-			: null;
+		public Task<IImage?> Icon => ThumbnailProvider.GetFileImage(_model.TreeItem, 32);
 
 		private ObservableRangeCollection<MetadataExtractor.Directory> MetaData { get; } = new();
 

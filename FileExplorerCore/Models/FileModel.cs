@@ -1,9 +1,8 @@
-﻿using Avalonia.Media;
-using Avalonia.Media.Imaging;
+﻿using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Media;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.ViewModels;
 using Humanizer;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Concurrent;
 using System.IO;
@@ -51,7 +50,18 @@ namespace FileExplorerCore.Models
 			}
 		}
 
-		public Task<IImage?> Image => ThumbnailProvider.GetFileImage(TreeItem, 32, () => IsVisible);
+		public Task<IImage?> Image
+		{
+			get
+			{
+				if (App.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { DataContext: MainWindowViewModel context } })
+				{
+					return ThumbnailProvider.GetFileImage(TreeItem, context.CurrentTab.IsGrid ? 100 : 32, () => IsVisible);
+				}
+
+				return null;
+			}
+		}
 
 		public bool IsSelected
 		{

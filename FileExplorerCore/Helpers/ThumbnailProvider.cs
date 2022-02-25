@@ -11,6 +11,8 @@ using FileTypeAndIcon;
 using Avalonia.Threading;
 using System.Threading;
 using FileExplorerCore.Models;
+using System.Numerics;
+using Avalonia.Media.Imaging;
 
 namespace FileExplorerCore.Helpers
 {
@@ -21,7 +23,7 @@ namespace FileExplorerCore.Helpers
 		private static readonly Dictionary<string, SvgImage> Images = new();
 		private static readonly Dictionary<string, string[]> TypeMap = new();
 
-		private static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default);
+		private static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default, BitOperations.Log2((uint)Environment.ProcessorCount));
 
 		static ThumbnailProvider()
 		{
@@ -59,23 +61,23 @@ namespace FileExplorerCore.Helpers
 			{
 				return await Task.Factory.StartNew(() => treeItem?.GetPath((path, imageSize) =>
 				{
-					IImage? image = null;
+					Bitmap? image = null!;
 
 					if (shouldReturnImage is null || shouldReturnImage?.Invoke() == true)
 					{
 						if (treeItem.IsFolder && treeItem.HasChildren)
 						{
-							image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly);
+							image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk);
 						}
 
 						if (image is null)
 						{
-							image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly);
+							image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
 						}
 					}
 
 					return image;
-				}, size), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
+				}, size), CancellationToken.None, TaskCreationOptions.DenyChildAttach, concurrentExclusiveScheduler.ConcurrentScheduler).ConfigureAwait(false);
 			}
 
 			return await await Task.Factory.StartNew(() => treeItem?.GetPath((path, imageSize) =>
@@ -146,7 +148,7 @@ namespace FileExplorerCore.Helpers
 				}
 
 				return GetImage(name);
-			}, size), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
+			}, size) ?? Task.FromResult<SvgImage?>(null), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ConcurrentScheduler).ConfigureAwait(false);
 		}
 
 		private static async Task<SvgImage?> GetImage(string key)

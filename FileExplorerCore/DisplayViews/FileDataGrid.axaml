@@ -25,7 +25,6 @@
 					<ListBoxItem Margin="0"
 					             Padding="4, 6"
 					             IsSelected="{Binding IsSelected}"
-					             Cursor="Hand"
 					             VerticalContentAlignment="Stretch"
 					             HorizontalContentAlignment="Stretch">
 						<StackPanel Margin="0"
