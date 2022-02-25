@@ -48,10 +48,10 @@ namespace FileExplorerCore.Helpers
 
 		public static Bitmap GetThumbnail(ReadOnlySpan<char> fileName, int width, int height)
 		{
-			return GetThumbnail(fileName, width, height, ThumbnailOptions.IconOnly);
+			return GetThumbnail(fileName, width, height, ThumbnailOptions.IconOnly, () => true);
 		}
 
-		public static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height, ThumbnailOptions options)
+		public static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height, ThumbnailOptions options, Func<bool> shouldRotate)
 		{
 			Bitmap? bitmap = null;
 
@@ -64,7 +64,7 @@ namespace FileExplorerCore.Helpers
 					var bmp = new NativeMethods.BITMAP();
 					NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
 
-					if (((options.HasFlag(ThumbnailOptions.ThumbnailOnly) || options.HasFlag(ThumbnailOptions.None)) && width <= 64) || options.HasFlag(ThumbnailOptions.IconOnly))
+					if (shouldRotate())
 					{
 						RotateHorizontal(bmp);
 					}

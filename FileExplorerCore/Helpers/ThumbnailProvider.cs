@@ -24,6 +24,7 @@ namespace FileExplorerCore.Helpers
 		private static readonly Dictionary<string, string[]> TypeMap = new();
 
 		private static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default, BitOperations.Log2((uint)Environment.ProcessorCount));
+		private static int taskCount;
 
 		static ThumbnailProvider()
 		{
@@ -59,6 +60,8 @@ namespace FileExplorerCore.Helpers
 
 			if (OperatingSystem.IsWindows())
 			{
+				Interlocked.Increment(ref taskCount);
+
 				return await Task.Factory.StartNew(() => treeItem?.GetPath((path, imageSize) =>
 				{
 					Bitmap? image = null!;
@@ -67,14 +70,16 @@ namespace FileExplorerCore.Helpers
 					{
 						if (treeItem.IsFolder && treeItem.HasChildren)
 						{
-							image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk);
+							image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk, () => size <= 64);
 						}
 
 						if (image is null)
 						{
-							image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk);
+							image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk, () => true);
 						}
 					}
+
+					Interlocked.Decrement(ref taskCount);
 
 					return image;
 				}, size), CancellationToken.None, TaskCreationOptions.DenyChildAttach, concurrentExclusiveScheduler.ConcurrentScheduler).ConfigureAwait(false);
