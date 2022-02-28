@@ -1,5 +1,4 @@
 using System;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
 using Avalonia.Controls.Primitives;
@@ -32,17 +31,17 @@ namespace FileExplorerCore.Views
 			var pathFolders = this.FindControl<Menu>("pathFolders");
 			var searchBar = this.FindControl<TextBox>("searchBar");
 
-			if (grid is { })
+			if (grid is not null)
 			{
 				grid.ItemContainerGenerator.Materialized += ItemContainerGenerator_Materialized;
 			}
 
-			if (tree is { })
+			if (tree is not null)
 			{
 				tree.SelectionChanged += Tree_SelectionChanged;
 			}
 
-			if (pathFolders is { })
+			if (pathFolders is not null)
 			{
 				pathFolders.ItemContainerGenerator.Materialized += ItemContainerGenerator_Materialized1;
 			}
@@ -52,27 +51,11 @@ namespace FileExplorerCore.Views
 			PointerPressed += MainWindow_PointerPressed;
 		}
 
-		private void SearchBar_KeyUp(object? sender, KeyEventArgs e)
+		private async void SearchBar_KeyUp(object? sender, KeyEventArgs e)
 		{
 			if (sender is TextBox && e.Key is Key.Enter && DataContext is MainWindowViewModel model)
 			{
-				model.StartSearch();
-			}
-		}
-
-		private async void OnButtonClick(object sender, RoutedEventArgs e)
-		{
-			if (DataContext is MainWindowViewModel model && sender is Button { DataContext: FolderModel folderModel })
-			{
-				await model.CurrentTab.SetPath(folderModel.TreeItem);
-			}
-		}
-
-		private async void OnComboBoxChanged(object sender, SelectionChangedEventArgs e)
-		{
-			if (DataContext is MainWindowViewModel model && sender is SelectingItemsControl { SelectedItem: FolderModel folderModel })
-			{
-				await model.CurrentTab.SetPath(folderModel.TreeItem);
+				await model.StartSearch();
 			}
 		}
 
@@ -106,9 +89,9 @@ namespace FileExplorerCore.Views
 					{
 						foreach (var info in ee.Containers)
 						{
-							if (info.ContainerControl is MenuItem item && info.Item is FolderModel folderModel)
+							if (info.ContainerControl is MenuItem menuItem && info.Item is FolderModel folderModel)
 							{
-								item.Tapped += delegate
+								menuItem.Tapped += delegate
 								{
 									model.CurrentTab.TreeItem = folderModel.TreeItem;
 								};
@@ -119,29 +102,24 @@ namespace FileExplorerCore.Views
 			}
 		}
 
-		private void Item_SelectionChanged(object? sender, SelectionChangedEventArgs e)
-		{
-			throw new NotImplementedException();
-		}
-
 		private void ItemContainerGenerator_Materialized(object? sender, ItemContainerEventArgs e)
 		{
-			for (var i = 0; i < e.Containers.Count; i++)
+			foreach (var container in e.Containers)
 			{
-				if (e.Containers[i].ContainerControl is ListBoxItem item)
+				if (container.ContainerControl is ListBoxItem item)
 				{
-					item.DoubleTapped += delegate
+					item.DoubleTapped += async delegate
 					{
 						if (DataContext is MainWindowViewModel model && item.DataContext is FileModel fileModel)
 						{
-							model.SetPath(fileModel.TreeItem);
+							await model.SetPath(fileModel.TreeItem);
 						}
 					};
 				}
 			}
 		}
 
-		private void MainWindow_PointerPressed(object? sender, PointerPressedEventArgs e)
+		private async void MainWindow_PointerPressed(object? sender, PointerPressedEventArgs e)
 		{
 			if (DataContext is MainWindowViewModel model && e.Pointer.Type is PointerType.Mouse)
 			{
@@ -149,20 +127,20 @@ namespace FileExplorerCore.Views
 
 				if (properties.IsXButton1Pressed)
 				{
-					model.Undo();
+					await model.Undo();
 				}
 				else if (properties.IsXButton2Pressed)
 				{
-					model.Redo();
+					await model.Redo();
 				}
 			}
 		}
 
-		private void Tree_SelectionChanged(object? sender, SelectionChangedEventArgs e)
+		private async void Tree_SelectionChanged(object? sender, SelectionChangedEventArgs e)
 		{
 			if (DataContext is MainWindowViewModel model && e.AddedItems is { Count: > 0 } && e.AddedItems[0] is FolderModel folderModel)
 			{
-				model.SetPath(folderModel.TreeItem);
+				await model.SetPath(folderModel.TreeItem);
 			}
 		}
 

@@ -7,7 +7,6 @@ using Avalonia.Markup.Xaml;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using System.Linq;
-using System.Collections.Specialized;
 
 namespace FileExplorerCore.DisplayViews
 {

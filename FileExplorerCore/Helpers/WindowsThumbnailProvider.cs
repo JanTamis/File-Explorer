@@ -1,12 +1,9 @@
 ﻿using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using Avalonia.Threading;
-using ReactiveUI;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using System.Threading.Tasks;
 
 namespace FileExplorerCore.Helpers
 {

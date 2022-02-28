@@ -4,8 +4,6 @@ using FileExplorerCore.Helpers;
 using System.Globalization;
 using Avalonia.Media;
 using FileExplorerCore.Models;
-using System.Collections.Generic;
-using Newtonsoft.Json.Linq;
 
 namespace FileExplorerCore.Converters
 {

@@ -1,5 +1,4 @@
 ﻿using System;
-using FileExplorerCore.Helpers;
 using ReactiveUI;
 using System.Collections.Generic;
 using System.IO.Enumeration;

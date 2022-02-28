@@ -3,7 +3,6 @@ using Avalonia.Data.Converters;
 using FileExplorerCore.Models;
 using System.Globalization;
 using System.IO;
-using FileExplorerCore.Helpers;
 
 namespace FileExplorerCore.Converters
 {

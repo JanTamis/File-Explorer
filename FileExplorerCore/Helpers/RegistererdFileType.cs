@@ -61,16 +61,14 @@ namespace FileTypeAndIcon
 						continue;
 
 					var rkFileType = rkRoot.OpenSubKey(keyName);
-					if (rkFileType == null)
-						continue;
 
 					//Gets the default value of this key that contains the information of file type.
-					var defaultValue = rkFileType.GetValue("");
+					var defaultValue = rkFileType?.GetValue("");
 					if (defaultValue == null)
 						continue;
 
 					//Go to the key that specifies the default icon associates with this file type.
-					var defaultIcon = defaultValue.ToString() + "\\DefaultIcon";
+					var defaultIcon = defaultValue + "\\DefaultIcon";
 					var rkFileIcon = rkRoot.OpenSubKey(defaultIcon);
 					if (rkFileIcon != null)
 					{

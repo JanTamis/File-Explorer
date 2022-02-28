@@ -1,10 +1,8 @@
 ﻿using Avalonia.Media;
 using Avalonia.Svg.Skia;
-using Avalonia;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Avalonia.Platform;
 using System.Reflection;
 using System.Threading.Tasks;
 using FileTypeAndIcon;
@@ -16,9 +14,11 @@ using Avalonia.Media.Imaging;
 
 namespace FileExplorerCore.Helpers
 {
+#pragma warning disable CA1416
+
 	public static class ThumbnailProvider
 	{
-		private static readonly Dictionary<string, string>? fileTypes = OperatingSystem.IsWindows() ? RegisteredFileType.GetFileTypeAndIcon() : new();
+		// private static readonly Dictionary<string, string>? fileTypes = OperatingSystem.IsWindows() ? RegisteredFileType.GetFileTypeAndIcon() : new();
 
 		private static readonly Dictionary<string, SvgImage> Images = new();
 		private static readonly Dictionary<string, string[]> TypeMap = new();
@@ -53,7 +53,7 @@ namespace FileExplorerCore.Helpers
 
 		public static async Task<IImage?> GetFileImage(FileSystemTreeItem? treeItem, int size, Func<bool>? shouldReturnImage = null)
 		{
-			if (treeItem is null || (shouldReturnImage is not null && !shouldReturnImage()))
+			if (treeItem is null || shouldReturnImage is not null && !shouldReturnImage())
 			{
 				return null;
 			}
@@ -71,10 +71,7 @@ namespace FileExplorerCore.Helpers
 						image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk, () => size <= 64);
 					}
 
-					if (image is null && (shouldReturnImage is null || shouldReturnImage?.Invoke() == true))
-					{
-						image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk, () => true);
-					}
+					image ??= WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk, () => true);
 
 					Interlocked.Decrement(ref taskCount);
 
@@ -94,7 +91,9 @@ namespace FileExplorerCore.Helpers
 						{
 							var folderText = Enum.GetName(folder);
 
-							if (folderText is not null && treeItem.GetPath(x => x.SequenceEqual(KnownFolders.GetPath(folder))))
+
+							if (folderText is not null && treeItem.GetPath((path, knownFolder) => path.SequenceEqual(KnownFolders.GetPath(knownFolder)), folder))
+
 							{
 								name = folderText;
 								break;
@@ -150,7 +149,7 @@ namespace FileExplorerCore.Helpers
 				}
 
 				return GetImage(name);
-			}, size) ?? Task.FromResult<SvgImage?>(null), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ConcurrentScheduler).ConfigureAwait(false);
+			}, size) ?? Task.FromResult<SvgImage?>(null), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
 		}
 
 		private static async Task<SvgImage?> GetImage(string key)
@@ -205,49 +204,6 @@ namespace FileExplorerCore.Helpers
 
 			return image;
 		}
-
-		private static string GetOfficeName(string extension, string defaultName) => extension switch
-		{
-			"doc" or
-			"docm" or
-			"docx" or
-			"dotm" or
-			"dotx" or
-			"odt" or
-			"wps" => "Word",
-
-			"odp" or
-			"pot" or
-			"potm" or
-			"potx" or
-			"ppa" or
-			"ppam" or
-			"pps" or
-			"ppsm" or
-			"ppsx" or
-			"ppt" or
-			"pptm" or
-			"pptx" or
-			"thmx" => "PowerPoint",
-
-			"csv" or
-			"dbf" or
-			"dif" or
-			"ods" or
-			"prn" or
-			"slk" or
-			"xla" or
-			"xla" or
-			"xlam" or
-			"xls" or
-			"xlsb" or
-			"xlsm" or
-			"xlsx" or
-			"xlt" or
-			"xltm" or
-			"xltx" or
-			"xlw" => "Excel",
-			_ => defaultName
-		};
 	}
+#pragma warning restore CA1416
 }

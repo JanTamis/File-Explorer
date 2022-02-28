@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
-using System.Text;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
-using Microsoft.Toolkit.HighPerformance;
 using Microsoft.Toolkit.HighPerformance.Helpers;
 using ProtoBuf;
 
