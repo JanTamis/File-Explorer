@@ -266,6 +266,14 @@
       <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
     </Style>
 
+    <Style Selector="Button">
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+
+    <Style Selector="ListBoxItem">
+      <Setter Property="Cursor" Value="Arrow" />
+    </Style>
+
     <Style Selector="SplitButton">
       <Setter Property="Background" Value="{DynamicResource SplitButtonBackground}" />
       <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBodyLight}" />
@@ -290,7 +298,6 @@
               </Grid.ColumnDefinitions>
 
               <Button x:Name="PART_PrimaryButton"
-                      Classes="Flat"
                       Grid.Column="0"
                       MinWidth="0"
                       Foreground="{TemplateBinding Foreground}"
@@ -321,13 +328,13 @@
 
               <Button x:Name="PART_SecondaryButton"
                       Grid.Column="2"
-                      Classes="Flat"
+                      Width="20"
+                      Padding="0"
                       MinWidth="20"
                       BorderBrush="{TemplateBinding BorderBrush}"
                       Foreground="{TemplateBinding Foreground}"
                       Background="{TemplateBinding Background}"
                       BorderThickness="{TemplateBinding BorderThickness, Converter={StaticResource SecondaryButtonBorderMultiplier}}"
-                      Padding="0"
                       HorizontalContentAlignment="Center"
                       VerticalContentAlignment="Center"
                       HorizontalAlignment="Stretch"
