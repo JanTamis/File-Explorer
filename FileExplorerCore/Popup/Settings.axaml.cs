@@ -65,38 +65,7 @@ namespace FileExplorerCore.Popup
 
 		public async Task ReIndex()
 		{
-			if (OperatingSystem.IsWindows())
-			{
-				MainWindowViewModel.Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
-					.GetDrives()
-					.Where(w => w.IsReady)
-					.Select(s => new FileSystemTreeItem(s.RootDirectory.FullName, true)));
-			}
-			else if (OperatingSystem.IsMacOS())
-			{
-				MainWindowViewModel.Tree = new Tree<FileSystemTreeItem, string>(new[] { new FileSystemTreeItem("/", true) });
-			}
 
-			MainWindowViewModel.Folders.Clear();
-
-			if (OperatingSystem.IsWindows())
-			{
-				var drives = MainWindowViewModel.Tree!.Children
-					.Select(s => new FolderModel(s));
-
-				var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
-													select new FolderModel(MainWindowViewModel.GetTreeItemInitialized(KnownFolders.GetPath(specialFolder).ToString()));
-
-				await MainWindowViewModel.Folders.AddRange<Comparer<FolderModel>>(quickAccess.Concat(drives));
-			}
-			else if (OperatingSystem.IsMacOS() && MainWindowViewModel.Tree is not null)
-			{
-				await MainWindowViewModel.Folders.AddRange<Comparer<FolderModel>>(MainWindowViewModel.Tree.Children
-					.Select(s => new FolderModel(s)));
-			}
-
-			GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-			GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, true, true);
 		}
 
 		public void Close()

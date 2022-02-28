@@ -15,6 +15,7 @@ using System.Linq;
 using System.Timers;
 using System.Threading.Tasks;
 using Avalonia;
+using static FileExplorerCore.Helpers.SpanSplitExtensions;
 
 namespace FileExplorerCore.ViewModels
 {
@@ -23,13 +24,12 @@ namespace FileExplorerCore.ViewModels
 		public readonly WindowNotificationManager NotificationManager;
 
 		private TabItemViewModel _currentTab;
-		private IEnumerable<string> searchHistory;
 
 		public static IEnumerable<SortEnum> SortValues => Enum.GetValues<SortEnum>();
 
 		public static ObservableRangeCollection<FolderModel> Folders { get; set; }
 
-		public static Tree<FileSystemTreeItem, string>? Tree { get; set; }
+		//public static Tree<FileSystemTreeItem, string>? Tree { get; set; }
 
 		public ObservableRangeCollection<FileModel> Files => CurrentTab.Files;
 
@@ -60,32 +60,36 @@ namespace FileExplorerCore.ViewModels
 		{
 			NotificationManager = manager;
 			
-			if (OperatingSystem.IsWindows() && (Tree is null || Tree.Children.Count != DriveInfo.GetDrives().Count(a => a.IsReady)))
+			//if (OperatingSystem.IsWindows() && (Tree is null || Tree.Children.Count != DriveInfo.GetDrives().Count(a => a.IsReady)))
+			//{
+			//	Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
+			//		.GetDrives()
+			//		.Where(w => w.IsReady)
+			//		.Select(s => new FileSystemTreeItem(s.RootDirectory.FullName, true)));
+			//}
+			//else if (OperatingSystem.IsMacOS() && (Tree is null || Tree.Children.Count != 1))
+			//{
+			//	Tree = new Tree<FileSystemTreeItem, string>(new[] { new FileSystemTreeItem("/", true) });
+			//}
+
+			if (OperatingSystem.IsWindows())
 			{
-				Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
+				var drives = DriveInfo
 					.GetDrives()
 					.Where(w => w.IsReady)
-					.Select(s => new FileSystemTreeItem(s.RootDirectory.FullName, true)));
-			}
-			else if (OperatingSystem.IsMacOS() && (Tree is null || Tree.Children.Count != 1))
-			{
-				Tree = new Tree<FileSystemTreeItem, string>(new[] { new FileSystemTreeItem("/", true) });
-			}
-
-			if (OperatingSystem.IsWindows() && Tree is not null)
-			{
-				var drives = Tree.Children
-					.Select(s => new FolderModel(s));
+					.Select(s => new FolderModel(new FileSystemTreeItem(s.Name, true)));
 
 				var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
-					select new FolderModel(GetTreeItemInitialized(KnownFolders.GetPath(specialFolder).ToString()));
+													select new FolderModel(GetTreeItem(KnownFolders.GetPath(specialFolder)));
 
 				Folders = new ObservableRangeCollection<FolderModel>(quickAccess.Concat(drives), true);
 			}
-			else if (OperatingSystem.IsMacOS() && Tree is not null)
+			else
 			{
-				Folders = new ObservableRangeCollection<FolderModel>(Tree.Children
-					.Select(s => new FolderModel(s)));
+				Folders = new ObservableRangeCollection<FolderModel>(new[] 
+				{ 
+					new FolderModel(new FileSystemTreeItem(new string(PathHelper.DirectorySeparator, 1), true)) 
+				});
 			}
 
 			AddTab();
@@ -187,9 +191,9 @@ namespace FileExplorerCore.ViewModels
 
 		public void Rename()
 		{
-			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && CurrentTab.SelectionCount > 0)
 			{
-				var fileIndex = CurrentTab.Files.IndexOf(CurrentTab.Files.FirstOrDefault(x => x.IsSelected));
+				var fileIndex = CurrentTab.Files.IndexOf(CurrentTab.Files.FirstOrDefault(x => x.IsSelected)!);
 
 				if (fileIndex is not -1)
 				{
@@ -213,14 +217,14 @@ namespace FileExplorerCore.ViewModels
 				.Select(s => s.Path)
 				.ToArray());
 
-			await Application.Current.Clipboard.SetDataObjectAsync(data);
+			await Application.Current!.Clipboard!.SetDataObjectAsync(data);
 
 			NotificationManager.Show(new Notification("Copy Files", "Files has been copied"));
 		}
 
 		public async void CopyPath()
 		{
-			await Application.Current.Clipboard.SetTextAsync(CurrentTab.TreeItem.GetPath(x => x.ToString()));
+			await Application.Current!.Clipboard!.SetTextAsync(CurrentTab.TreeItem.GetPath(x => x.ToString()));
 
 			NotificationManager.Show(new Notification("Copy Path", "The path has been copied"));
 		}
@@ -291,6 +295,9 @@ namespace FileExplorerCore.ViewModels
 			var view = new AnalyzerView();
 			CurrentTab.DisplayControl = view;
 
+			CurrentTab.TokenSource?.Cancel();
+			CurrentTab.TokenSource = new System.Threading.CancellationTokenSource();
+
 			var rootTask = Task.Run(async () =>
 			{
 				var query = CurrentTab.TreeItem.EnumerateChildren()
@@ -305,7 +312,7 @@ namespace FileExplorerCore.ViewModels
 				});
 
 				await view.Root.AddRangeAsync(query, comparer, token: CurrentTab.TokenSource.Token);
-			});
+			}, CurrentTab.TokenSource.Token);
 
 			var extensionTask = Task.Run(async () =>
 			{
@@ -367,140 +374,30 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		private FileSystemTreeItem? GetTreeItem(string? path)
+		public static FileSystemTreeItem GetTreeItem(ReadOnlySpan<char> path)
 		{
-			if (path is null)
-			{
-				return null;
-			}
-
-			string[] temp = null;
-			FileSystemTreeItem item = null;
+			FileSystemTreeItem item = null!;
+			Enumerable1<char> enumerable = new();
 
 			if (OperatingSystem.IsMacOS())
 			{
-				item = Tree.Children[0];
-				temp = path.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+				item = new FileSystemTreeItem(path.Slice(0, 1), true);
+				enumerable = new Enumerable1<char>(path[1..], PathHelper.DirectorySeparator);
 			}
 			else if (OperatingSystem.IsWindows())
 			{
-				temp = path.Split(new char[] { '\\' }, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-				foreach (var child in Tree.EnumerateChildren(0))
-				{
-					if (child.Value.StartsWith(path[0]))
-					{
-						item = child;
-						break;
-					}
-				}
+				item = new FileSystemTreeItem(path.Slice(0, 3), true);
+				enumerable = new Enumerable1<char>(path[3..], PathHelper.DirectorySeparator);
 			}
 
-			if (item is not null)
-			{
-				foreach (var split in temp)
-				{
-					foreach (var child in item.Children)
-					{
-						if (child.Value == split)
-						{
-							item = child;
-							break;
-						}
-					}
-				}
-			}
+			var enumerator = enumerable.GetEnumerator();
 
-			if (temp.Length > 0)
+			while (enumerator.MoveNext())
 			{
-				item = GetItem(item, temp, 1);
+				item = new FileSystemTreeItem(enumerator.Current, true, item);
 			}
 
 			return item;
-
-			static FileSystemTreeItem GetItem(FileSystemTreeItem item, IReadOnlyList<string> path, int index)
-			{
-				if (index == path.Count)
-				{
-					return item;
-				}
-
-				foreach (var child in item.Children)
-				{
-					if (child.Value == path[index])
-					{
-						return GetItem(child, path, index + 1);
-					}
-				}
-
-				return item;
-			}
-		}
-
-		public static FileSystemTreeItem GetTreeItemInitialized(string path)
-		{
-			string[] temp = null;
-			FileSystemTreeItem item = null;
-
-			if (OperatingSystem.IsMacOS())
-			{
-				item = Tree.Children[0];
-				temp = path.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-			}
-			else if (OperatingSystem.IsWindows())
-			{
-				temp = path.Split('\\', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-				temp[0] += '\\';
-
-				foreach (var child in Tree.EnumerateChildren(0))
-				{
-					if (child.Value.StartsWith(path[0]))
-					{
-						item = child;
-						break;
-					}
-				}
-			}
-
-			foreach (var split in temp.Skip(1))
-			{
-				if (item is not null)
-				{
-					foreach (var child in item.EnumerateChildren(0))
-					{
-						if (child.Value == split)
-						{
-							item = child;
-							break;
-						}
-					}
-				}
-			}
-
-			if (temp.Length > 0)
-			{
-				item = GetItem(item, temp, 1);
-			}
-
-			return item;
-
-			static FileSystemTreeItem GetItem(FileSystemTreeItem item, IReadOnlyList<string> path, int index)
-			{
-				if (index == path.Count)
-				{
-					return item;
-				}
-
-				foreach (var child in item.Children)
-				{
-					if (child is { IsFolder: true } && child.Value == path[index])
-					{
-						return GetItem(child, path, index + 1);
-					}
-				}
-
-				return item;
-			}
 		}
 	}
 }

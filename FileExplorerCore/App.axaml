@@ -6,7 +6,9 @@
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:styles="clr-namespace:Material.Styles;assembly=Material.Styles"
              xmlns:ripple="clr-namespace:Material.Ripple;assembly=Material.Ripple"
+             xmlns:controls="clr-namespace:FileExplorerCore.Controls;assembly=FileExplorerCore"
              xmlns:sys="clr-namespace:System;assembly=netstandard"
+             xmlns:avaloniaConverters="using:Avalonia.Controls.Converters"
              x:Class="FileExplorerCore.App">
 	<Application.DataTemplates>
 		<local:ViewLocator />
@@ -88,12 +90,10 @@
 
 		<Style Selector="MenuItem">
 			<Setter Property="Height" Value="30" />
-			<Setter Property="Cursor" Value="Hand" />
 		</Style>
 
 		<Style Selector="TreeViewItem">
 			<Setter Property="Background" Value="Transparent" />
-			<Setter Property="Cursor" Value="Hand" />
 			<Setter Property="BorderThickness" Value="0" />
 			<Setter Property="Padding" Value="8" />
 			<Setter Property="Foreground" Value="{Binding $parent[TreeView].Foreground}" />
@@ -104,7 +104,6 @@
 							<Rectangle Opacity="0" Fill="Red"
 							           Grid.RowSpan="3" Grid.ColumnSpan="3" />
 							<ToggleButton Grid.Row="0" Grid.Column="0" Name="Expander" ClickMode="Press"
-							              Cursor="Hand"
 							              IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"
 							              Classes="MaterialDesignExpandCollapseToggleStyle"
 							              Foreground="{TemplateBinding Foreground}"
@@ -265,6 +264,5 @@
 		<Style Selector="ComboBoxItem:pointerover">
 			<Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
 		</Style>
-		
 	</Application.Styles>
 </Application>

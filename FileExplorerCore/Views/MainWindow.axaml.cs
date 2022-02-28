@@ -9,6 +9,7 @@ using FileExplorerCore.Models;
 using FileExplorerCore.ViewModels;
 using ReactiveUI;
 using System.Runtime;
+using Avalonia;
 
 namespace FileExplorerCore.Views
 {

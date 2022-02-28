@@ -41,7 +41,7 @@ namespace FileExplorerCore.ViewModels
 		private TimeSpan _previousLoadTime;
 
 		private SortEnum _sort = SortEnum.None;
-		private FileSystemTreeItem? _treeItem;
+		private FileSystemTreeItem _treeItem;
 
 		public event Action PathChanged;
 
@@ -194,7 +194,7 @@ namespace FileExplorerCore.ViewModels
 
 		public ObservableRangeCollection<FileModel> Files { get; } = new();
 
-		public FileSystemTreeItem? TreeItem
+		public FileSystemTreeItem TreeItem
 		{
 			get => _treeItem;
 			set

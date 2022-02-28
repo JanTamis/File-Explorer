@@ -58,17 +58,24 @@ namespace FileExplorerCore.Helpers
 
 				if (hBitmap != IntPtr.Zero)
 				{
-					var bmp = new NativeMethods.BITMAP();
-					NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
-
-					if (shouldRotate())
+					try
 					{
-						RotateHorizontal(bmp);
+						var bmp = new NativeMethods.BITMAP();
+						NativeMethods.GetObjectBitmap(hBitmap, bitmapSize, ref bmp);
+
+						if (shouldRotate())
+						{
+							RotateHorizontal(bmp);
+						}
+
+						bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
+
 					}
-
-					bitmap = new Bitmap(PixelFormat.Bgra8888, AlphaFormat.Unpremul, bmp.bmBits, new Avalonia.PixelSize(bmp.bmWidth, bmp.bmHeight), new Avalonia.Vector(96, 96), bmp.bmWidthBytes);
-
-					DeleteObject(hBitmap);
+					finally
+					{
+						DeleteObject(hBitmap);
+					}
+					
 				}
 			}
 

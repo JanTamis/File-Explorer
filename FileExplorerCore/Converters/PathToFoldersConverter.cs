@@ -4,7 +4,8 @@ using Avalonia.Data.Converters;
 using FileExplorerCore.Models;
 using System.Globalization;
 using System.Linq;
-using FileExplorerCore.ViewModels;
+using FileExplorerCore.Helpers;
+using static FileExplorerCore.Helpers.SpanSplitExtensions;
 
 namespace FileExplorerCore.Converters
 {
@@ -22,33 +23,32 @@ namespace FileExplorerCore.Converters
 
 		public IEnumerable<FolderModel> GetFolders(string path)
 		{
-			var separator = OperatingSystem.IsWindows()
-				? '\\'
-				: '/';
-			
-			var names = path.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+			if (OperatingSystem.IsMacOS())
+			{
+				yield return new FolderModel(new FileSystemTreeItem(PathHelper.DirectorySeparator.ToString(), true));
+			}
+
+			FileSystemTreeItem item = null!;
+			Enumerable1<char> enumerable = new();
 
 			if (OperatingSystem.IsMacOS())
 			{
-				yield return new FolderModel(MainWindowViewModel.Tree.Children[0]);
+				item = new FileSystemTreeItem(path.AsSpan().Slice(0, 1), true);
+				enumerable = new Enumerable1<char>(path.AsSpan(1), PathHelper.DirectorySeparator);
+			}
+			else if (OperatingSystem.IsWindows())
+			{
+				item = new FileSystemTreeItem(path.AsSpan().Slice(0, 3), true);
+				enumerable = new Enumerable1<char>(path.AsSpan(3), PathHelper.DirectorySeparator);
 			}
 
-			for (var i = 0; i < names.Length; i++)
+			yield return new FolderModel(item);
+
+			foreach (var subPath in path[(OperatingSystem.IsWindows() ? 3 : 1)..].Split(PathHelper.DirectorySeparator))
 			{
-				var folderPath = String.Join(separator, new ArraySegment<string>(names, 0, i + 1));
-				var name = names[i];
+				item = new FileSystemTreeItem(subPath, true, item);
 
-				if (!String.IsNullOrEmpty(folderPath))
-				{
-					if (i is 0)
-					{
-						folderPath += separator;
-						name += separator;
-					}
-
-					// yield return new FolderModel(folderPath, name, from directory in Directory.EnumerateDirectories(folderPath, "*", new EnumerationOptions())
-					// 																							 select new FolderModel(directory, Path.GetFileName(directory)));
-				}
+				yield return new FolderModel(item);
 			}
 		}
 

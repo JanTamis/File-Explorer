@@ -23,7 +23,7 @@ namespace FileExplorerCore.Helpers
 		private static readonly Dictionary<string, SvgImage> Images = new();
 		private static readonly Dictionary<string, string[]> TypeMap = new();
 
-		private static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default, BitOperations.Log2((uint)Environment.ProcessorCount));
+		private static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default, Environment.ProcessorCount / 2); // BitOperations.Log2((uint)Environment.ProcessorCount));
 		private static int taskCount;
 
 		static ThumbnailProvider()
@@ -60,20 +60,18 @@ namespace FileExplorerCore.Helpers
 
 			if (OperatingSystem.IsWindows())
 			{
-				Interlocked.Increment(ref taskCount);
-
 				return await Task.Factory.StartNew(() => treeItem?.GetPath((path, imageSize) =>
 				{
 					Bitmap? image = null!;
 
-					if (treeItem.IsFolder && treeItem.HasChildren && (shouldReturnImage is null || shouldReturnImage?.Invoke() == true))
+					if (shouldReturnImage is null || shouldReturnImage?.Invoke() == true)
 					{
-						image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly | ThumbnailOptions.BiggerSizeOk, () => size <= 64);
+						image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly, () => size is < 64 and >= 32);
 					}
-
-					image ??= WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly | ThumbnailOptions.BiggerSizeOk, () => true);
-
-					Interlocked.Decrement(ref taskCount);
+					if (image is null && (shouldReturnImage is null || shouldReturnImage?.Invoke() == true))
+					{
+						image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly, () => true);
+					}
 
 					return image;
 				}, size), CancellationToken.None, TaskCreationOptions.DenyChildAttach, concurrentExclusiveScheduler.ConcurrentScheduler).ConfigureAwait(false);

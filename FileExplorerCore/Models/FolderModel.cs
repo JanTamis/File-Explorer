@@ -1,9 +1,6 @@
-﻿using System;
-using ReactiveUI;
+﻿using ReactiveUI;
 using System.Collections.Generic;
-using System.IO.Enumeration;
 using System.Linq;
-using Microsoft.Toolkit.HighPerformance;
 
 namespace FileExplorerCore.Models
 {
@@ -14,7 +11,8 @@ namespace FileExplorerCore.Models
 		public string Name => TreeItem.Value;
 
 		public IEnumerable<FolderModel> SubFolders => TreeItem
-			.EnumerateChildren((ref FileSystemEntry entry) => entry.IsDirectory && !entry.IsHidden, 0)
+			.EnumerateChildren(0)
+			.Where(w => w.IsFolder)
 			.OrderBy(o => o.Value)
 			.Select(s => new FolderModel(s));
 
@@ -25,14 +23,7 @@ namespace FileExplorerCore.Models
 
 		public override int GetHashCode()
 		{
-			return TreeItem.GetPath(path =>
-			{
-				var code = new HashCode();
-
-				code.AddBytes(path.AsBytes());
-
-				return code.ToHashCode();
-			});
+			return TreeItem.GetHashCode();
 		}
 
 		public override string ToString()

@@ -260,15 +260,6 @@ namespace FileExplorerCore.Models
 			foreach (var item in EnumerateToRoot().Reverse())
 			{
 				item._value.CopyToSpan(builder.AppendSpan(item.Value.Length));
-				//if (item._isLatin1)
-				//{
-				//	var span = builder.AppendSpan(item._value.Length);
-				//	Encoding.Latin1.GetChars(item._value, span);
-				//}
-				//else
-				//{
-				//	builder.Append(item._value.AsSpan().Cast<byte, char>());
-				//}
 
 				if (builder[^1] != PathHelper.DirectorySeparator)
 				{
