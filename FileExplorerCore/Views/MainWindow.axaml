@@ -28,7 +28,7 @@
   <Window.Resources>
     <system:Int32 x:Key="ImageSize">24</system:Int32>
   </Window.Resources>
-	
+
   <Panel Margin="{Binding #MainWindow.OffScreenMargin}"
 	       Background="{DynamicResource MaterialDesignPaper}">
 
@@ -188,13 +188,31 @@
               <ItemsRepeater.ItemTemplate>
                 <DataTemplate DataType="models:FolderModel">
                   <StackPanel Orientation="Horizontal">
-                    <Button Classes="Flat"
-										        Command="{Binding $parent[Window].DataContext.SetPath}"
-										        CommandParameter="{Binding TreeItem}"
-										        VerticalAlignment="Stretch"
-										        Padding="10 0">
-                      <Button.ContextMenu>
-                        <ContextMenu Foreground="{DynamicResource MaterialDesignBody}"
+                    <SplitButton Classes="Flat"
+										             Command="{Binding $parent[Window].DataContext.SetPath}"
+										             CommandParameter="{Binding TreeItem}"
+										             VerticalAlignment="Stretch">
+                      <SplitButton.Styles>
+                        <Style Selector="MenuItem">
+                          <Setter Property="Command" Value="{Binding $parent[Window].DataContext.SetPath}" />
+                          <Setter Property="CommandParameter" Value="{Binding TreeItem}" />
+                        </Style>
+                      </SplitButton.Styles>
+                      <SplitButton.Flyout>
+                        <MenuFlyout Placement="BottomEdgeAlignedLeft"
+                                    Items="{Binding SubFolders}"
+                                    ShowMode="TransientWithDismissOnPointerMoveAway">
+                          <MenuFlyout.ItemTemplate>
+                            <DataTemplate>
+                              <TextBlock Text="{Binding Name}"
+                                         FontWeight="Normal"
+                                         Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                         TextTrimming="CharacterEllipsis"
+                                         HorizontalAlignment="Stretch" />
+                            </DataTemplate>
+                          </MenuFlyout.ItemTemplate>
+                        </MenuFlyout>
+                        <!--<ContextMenu Foreground="{DynamicResource MaterialDesignBody}"
 												             MaxHeight="500"
 												             Items="{Binding SubFolders}">
                           <ContextMenu.Styles>
@@ -211,13 +229,13 @@
 															           HorizontalAlignment="Stretch" />
                             </DataTemplate>
                           </ContextMenu.ItemTemplate>
-                        </ContextMenu>
-                      </Button.ContextMenu>
+                        </ContextMenu>-->
+                      </SplitButton.Flyout>
                       <TextBlock Text="{Binding Name}"
 											           FontWeight="Normal"
 											           Foreground="{DynamicResource MaterialDesignBody}"
 											           HorizontalAlignment="Stretch" />
-                    </Button>
+                    </SplitButton>
                   </StackPanel>
 
 
@@ -281,35 +299,35 @@
               <Border Grid.ColumnSpan="2"
 							        Background="{DynamicResource MaterialDesignCardBackground}"
 							        Grid.Row="1">
-                    <TreeView Items="{Binding Folders}"
-									          x:Name="FolderTree"
-									          ClipToBounds="True">
-                      <TreeView.DataTemplates>
-                        <TreeDataTemplate DataType="{x:Type models:FolderModel}"
-                                          ItemsSource="{Binding SubFolders}">
-                          <StackPanel Orientation="Horizontal">
-                            <Image
-                              DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
-                              Source="{Binding Result}"
-                              x:DataType="models:FolderModel"
-                              Width="25"
-                              Height="25"
-                              Margin="0 0 3 0" />
+                <TreeView Items="{Binding Folders}"
+                        x:Name="FolderTree"
+                        ClipToBounds="True">
+                  <TreeView.DataTemplates>
+                    <TreeDataTemplate DataType="{x:Type models:FolderModel}"
+                                      ItemsSource="{Binding SubFolders}">
+                      <StackPanel Orientation="Horizontal">
+                        <Image
+                          DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
+                          Source="{Binding Result}"
+                          x:DataType="models:FolderModel"
+                          Width="25"
+                          Height="25"
+                          Margin="0 0 3 0" />
 
-                            <TextBlock Text="{Binding Name}"
-                                       Foreground="{DynamicResource MaterialDesignBody}"
-                                       VerticalAlignment="Center"
-                                       TextTrimming="CharacterEllipsis" />
-                          </StackPanel>
-                        </TreeDataTemplate>
-                      </TreeView.DataTemplates>
+                        <TextBlock Text="{Binding Name}"
+                                   Foreground="{DynamicResource MaterialDesignBody}"
+                                   VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis" />
+                      </StackPanel>
+                    </TreeDataTemplate>
+                  </TreeView.DataTemplates>
 
-                      <TreeView.ItemsPanel>
-                        <ItemsPanelTemplate>
-                          <VirtualizingStackPanel Orientation="Vertical" />
-                        </ItemsPanelTemplate>
-                      </TreeView.ItemsPanel>
-                    </TreeView>
+                  <TreeView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <VirtualizingStackPanel Orientation="Vertical" />
+                    </ItemsPanelTemplate>
+                  </TreeView.ItemsPanel>
+                </TreeView>
               </Border>
             </Grid>
 
