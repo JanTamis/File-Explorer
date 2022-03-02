@@ -1,12 +1,16 @@
-﻿using Microsoft.Toolkit.HighPerformance;
+﻿using Avalonia.Controls.Documents;
+using Microsoft.Toolkit.HighPerformance;
 using Microsoft.Toolkit.HighPerformance.Helpers;
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace FileExplorerCore.Helpers
 {
-	public readonly struct Utf8String
+	public readonly struct Utf8String : IEnumerable<char>
 	{
-		private readonly Utf8Char[] _data;
+		private readonly byte[] _data;
 
 		public int Length => _data.Length;
 
@@ -14,20 +18,20 @@ namespace FileExplorerCore.Helpers
 
 		public Utf8String(ReadOnlySpan<char> data)
 		{
-			_data = new Utf8Char[data.Length];
+			_data = new byte[data.Length];
 
 			for (int i = 0; i < data.Length; i++)
 			{
-				_data[i] = new Utf8Char((byte)data[i]);
+				_data[i] = (byte)data[i];
 			}
 		}
 
 		public Utf8String(ReadOnlySpan<byte> data)
 		{
-			_data = data.Cast<byte, Utf8Char>().ToArray();
+			_data = data.ToArray();
 		}
 
-		public Utf8Char this[int index] => _data[index];
+		public char this[int index] => (char)_data[index];
 
 
 		public bool IsEmpty()
@@ -44,7 +48,7 @@ namespace FileExplorerCore.Helpers
 
 			for (int i = 0; i < _data.Length; i++)
 			{
-				if (_data[i].IsWhitespace())
+				if (Char.IsWhiteSpace(this[i]))
 				{
 					return true;
 				}
@@ -57,21 +61,31 @@ namespace FileExplorerCore.Helpers
 		{
 			for (int i = 0; i < span.Length; i++)
 			{
-				span[i] = _data[i];
+				span[i] = this[i];
 			}
 		}
 
 		public override string ToString()
 		{
-			return String.Create(Length, this, (span, data) =>
-			{
-				data.CopyToSpan(span);
-			});
+			return String.Create(Length, this, (span, data) => data.CopyToSpan(span));
 		}
 
 		public override int GetHashCode()
 		{
-			return HashCode<Utf8Char>.Combine(_data);
+			return HashCode<byte>.Combine(_data);
+		}
+
+		public IEnumerator<char> GetEnumerator()
+		{
+			for (int i = 0; i < _data.Length; i++)
+			{
+				yield return (char)_data[i];
+			}
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
 		}
 	}
 }
