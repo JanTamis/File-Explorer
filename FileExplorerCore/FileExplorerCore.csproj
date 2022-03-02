@@ -256,11 +256,11 @@
         <Resource Include="Assets\UIIcons\FileExplorer.svg" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.999-cibuild0018930-beta" />
-        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.999-cibuild0018930-beta" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.999-cibuild0018930-beta" />
-        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.999-cibuild0018930-beta" />
-        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.999-cibuild0018930-beta" />
+        <PackageReference Include="Avalonia" Version="0.10.12" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="0.10.12" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.12" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="0.10.12" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="0.10.12" />
         <PackageReference Include="Avalonia.Svg.Skia" Version="0.10.12" />
         <PackageReference Include="DataBox" Version="0.10.11.1" />
         <PackageReference Include="DiscUtils.FileSystems" Version="0.16.13" />

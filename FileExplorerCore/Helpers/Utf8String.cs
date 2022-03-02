@@ -1,10 +1,7 @@
-﻿using Avalonia.Controls.Documents;
-using Microsoft.Toolkit.HighPerformance;
-using Microsoft.Toolkit.HighPerformance.Helpers;
+﻿using Microsoft.Toolkit.HighPerformance.Helpers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace FileExplorerCore.Helpers
 {

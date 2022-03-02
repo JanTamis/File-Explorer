@@ -189,38 +189,36 @@
               <ItemsRepeater.ItemTemplate>
                 <DataTemplate DataType="models:FolderModel">
                   <StackPanel Orientation="Horizontal">
-                    <SplitButton Classes="Flat"
-                                 VerticalContentAlignment="Center"
-                                 Padding="7.5 0"
-										             Command="{Binding $parent[Window].DataContext.SetPath}"
-										             CommandParameter="{Binding TreeItem}"
-										             VerticalAlignment="Stretch">
-                      <SplitButton.Styles>
-                        <Style Selector="MenuItem">
-                          <Setter Property="Command" Value="{Binding $parent[Window].DataContext.SetPath}" />
-                          <Setter Property="CommandParameter" Value="{Binding TreeItem}" />
-                        </Style>
-                      </SplitButton.Styles>
-                      <SplitButton.Flyout>
-                        <MenuFlyout Placement="BottomEdgeAlignedLeft"
-                                    Items="{Binding SubFolders}"
-                                    ShowMode="TransientWithDismissOnPointerMoveAway">
-                          <MenuFlyout.ItemTemplate>
+                    <Button Classes="Flat"
+										        Command="{Binding $parent[Window].DataContext.SetPath}"
+										        CommandParameter="{Binding TreeItem}"
+										        VerticalAlignment="Stretch"
+										        Padding="10 0">
+                      <Button.ContextMenu>
+                        <ContextMenu Foreground="{DynamicResource MaterialDesignBody}"
+												             MaxHeight="500"
+												             Items="{Binding SubFolders}">
+                          <ContextMenu.Styles>
+                            <Style Selector="MenuItem">
+                              <Setter Property="Command" Value="{Binding $parent[Window].DataContext.SetPath}" />
+                              <Setter Property="CommandParameter" Value="{Binding TreeItem}" />
+                            </Style>
+                          </ContextMenu.Styles>
+                          <ContextMenu.ItemTemplate>
                             <DataTemplate>
                               <TextBlock Text="{Binding Name}"
-                                         FontWeight="Normal"
-                                         Foreground="{DynamicResource MaterialDesignBodyLight}"
-                                         TextTrimming="CharacterEllipsis"
-                                         HorizontalAlignment="Left" />
+															           FontWeight="Normal"
+															           TextTrimming="CharacterEllipsis"
+															           HorizontalAlignment="Stretch" />
                             </DataTemplate>
-                          </MenuFlyout.ItemTemplate>
-                        </MenuFlyout>
-                      </SplitButton.Flyout>
+                          </ContextMenu.ItemTemplate>
+                        </ContextMenu>
+                      </Button.ContextMenu>
                       <TextBlock Text="{Binding Name}"
 											           FontWeight="Normal"
 											           Foreground="{DynamicResource MaterialDesignBody}"
 											           HorizontalAlignment="Stretch" />
-                    </SplitButton>
+                    </Button>
                   </StackPanel>
 
 
