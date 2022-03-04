@@ -41,6 +41,27 @@ namespace FileExplorerCore.Models
 			}
 		}
 
+		public bool HasFolders
+		{
+			get
+			{
+				if (IsFolder)
+				{
+					var path = GetPath(x => x.ToString());
+
+					if (Directory.Exists(path))
+					{
+						return new FileSystemEnumerable<byte>(path, (ref FileSystemEntry x) => 0, Options)
+						{
+							ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
+						}.Any();
+					}
+				}
+
+				return false;
+			}
+		}
+
 		public bool IsFolder { get; }
 
 		public FileSystemTreeItem? Parent { get; set; }
@@ -136,13 +157,13 @@ namespace FileExplorerCore.Models
 
 			var query = IsFolder
 				? GetPath((path, fileOptions) =>
-				{
-					var currentPath = path.ToString();
+					{
+						var currentPath = path.ToString();
 
-					return Directory.Exists(currentPath)
-						? new FileSystemEnumerable<bool>(currentPath, (ref FileSystemEntry _) => false, fileOptions)
-						: Enumerable.Empty<bool>();
-				}, options)
+						return Directory.Exists(currentPath)
+							? new FileSystemEnumerable<bool>(currentPath, (ref FileSystemEntry _) => false, fileOptions)
+							: Enumerable.Empty<bool>();
+					}, options)
 				: Enumerable.Empty<bool>();
 
 			return query.Count();
@@ -193,17 +214,6 @@ namespace FileExplorerCore.Models
 				yield break;
 			}
 
-			var currentPath = GetPath(path => path.ToString());
-
-			if (!Directory.Exists(currentPath))
-			{
-				yield break;
-			}
-
-			// var enumerable = new FileSystemEnumerable<FileSystemTreeItem>(currentPath, (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName, x.IsDirectory, this), Options)
-			// {
-			// 	ShouldIncludePredicate = findPredicate,
-			// };
 			var enumerable = Children;
 
 			if (layers == 0)
@@ -261,7 +271,7 @@ namespace FileExplorerCore.Models
 			{
 				item._value.CopyToSpan(builder.AppendSpan(item.Value.Length));
 
-				if (builder[^1] != PathHelper.DirectorySeparator)
+				if (builder.Length > 0 && builder[^1] != PathHelper.DirectorySeparator)
 				{
 					builder.Append(PathHelper.DirectorySeparator);
 				}

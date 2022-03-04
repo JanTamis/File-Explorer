@@ -7,6 +7,7 @@
              xmlns:styles="clr-namespace:Material.Styles;assembly=Material.Styles"
              xmlns:ripple="clr-namespace:Material.Ripple;assembly=Material.Ripple"
              xmlns:controls="clr-namespace:FileExplorerCore.Controls;assembly=FileExplorerCore"
+             xmlns:assist="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:sys="clr-namespace:System;assembly=netstandard"
              xmlns:avaloniaConverters="using:Avalonia.Controls.Converters"
              x:Class="FileExplorerCore.App">
@@ -276,6 +277,29 @@
 
     <Style Selector="TextBlock">
 	    <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <Style Selector="ToolTip">
+      <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+      <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
+      <Setter Property="Padding" Value="5" />
+      <Setter Property="Template">
+        <ControlTemplate>
+          <styles:Card Name="PART_LayoutRoot"
+                       Margin="2.5"
+                       assists:ShadowAssist.ShadowDepth="CenterDepth1"
+                       BorderThickness="{TemplateBinding BorderThickness}"
+                       Background="{TemplateBinding Background}"
+                       BorderBrush="{TemplateBinding BorderBrush}"
+                       Padding="{TemplateBinding Padding}"
+                       CornerRadius="{TemplateBinding CornerRadius}">
+            <ContentPresenter Name="PART_ContentPresenter"
+                              MaxWidth="{TemplateBinding MaxWidth}"
+                              Content="{TemplateBinding Content}"
+                              ContentTemplate="{TemplateBinding ContentTemplate}" />
+          </styles:Card>
+        </ControlTemplate>
+      </Setter>
     </Style>
 
     <!-- <Style Selector="SplitButton"> -->

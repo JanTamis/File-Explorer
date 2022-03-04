@@ -1,7 +1,6 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
-using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
@@ -9,17 +8,20 @@ using FileExplorerCore.Models;
 using FileExplorerCore.ViewModels;
 using ReactiveUI;
 using System.Runtime;
-using Avalonia;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace FileExplorerCore.Views
 {
 	public class MainWindow : FluentWindow
 	{
+		private readonly FolderModel[] defaultFolders = new[] { new FolderModel(new FileSystemTreeItem("Loading...", false)) };
+
 		public MainWindow()
 		{
 			InitializeComponent();
 #if DEBUG
-			this.AttachDevTools();
+			// this.AttachDevTools();
 #endif
 		}
 
@@ -40,6 +42,24 @@ namespace FileExplorerCore.Views
 			if (tree is not null)
 			{
 				tree.SelectionChanged += Tree_SelectionChanged;
+
+				DataContextChanged += delegate
+				{
+					if (DataContext is MainWindowViewModel viewModel)
+					{
+						tree.Items = viewModel.Folders;
+					}
+				};
+
+				tree.ItemContainerGenerator.Materialized += TreeItemGenerated;
+
+				TreeViewItem.IsExpandedProperty.Changed.Subscribe(async x =>
+				{
+					if (x.Sender is TreeViewItem { DataContext: FolderModel folderModel } treeItem && treeItem.Items == defaultFolders)
+					{
+						treeItem.Items = await Task.Run(() => folderModel.SubFolders.ToArray());
+					}
+				});
 			}
 
 			if (pathFolders is not null)
@@ -50,6 +70,18 @@ namespace FileExplorerCore.Views
 			searchBar.KeyUp += SearchBar_KeyUp;
 
 			PointerPressed += MainWindow_PointerPressed;
+		}
+
+		private void TreeItemGenerated(object? sender, ItemContainerEventArgs e)
+		{
+			for (int i = 0; i < e.Containers.Count; i++)
+			{
+				if (e.Containers[i] is { ContainerControl: TreeViewItem { DataContext: FolderModel { TreeItem: { HasFolders: true } } folderModel } treeItem })
+				{
+					treeItem.ItemContainerGenerator.Materialized += TreeItemGenerated;
+					treeItem.Items = defaultFolders;
+				}
+			}
 		}
 
 		private async void SearchBar_KeyUp(object? sender, KeyEventArgs e)

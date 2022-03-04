@@ -27,7 +27,7 @@ namespace FileExplorerCore.ViewModels
 
 		public static IEnumerable<SortEnum> SortValues => Enum.GetValues<SortEnum>();
 
-		public static ObservableRangeCollection<FolderModel> Folders { get; set; }
+		public ObservableRangeCollection<FolderModel> Folders { get; set; }
 
 		//public static Tree<FileSystemTreeItem, string>? Tree { get; set; }
 

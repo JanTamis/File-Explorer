@@ -282,20 +282,22 @@
               <Border Grid.ColumnSpan="2"
 							        Background="{DynamicResource MaterialDesignCardBackground}"
 							        Grid.Row="1">
-                <TreeView Items="{Binding Folders}"
-                        x:Name="FolderTree"
-                        ClipToBounds="True">
+                <TreeView x:Name="FolderTree"
+                          ClipToBounds="True">
+                  <TreeView.Styles>
+                    <Style Selector="TreeViewItem">
+                      <Setter Property="Padding" Value="4" />
+                      <Setter Property="FocusAdorner" Value="{x:Null}" />
+                    </Style>
+                  </TreeView.Styles>
                   <TreeView.DataTemplates>
-                    <TreeDataTemplate DataType="{x:Type models:FolderModel}"
-                                      ItemsSource="{Binding SubFolders}">
+                    <TreeDataTemplate DataType="{x:Type models:FolderModel}">
                       <StackPanel Orientation="Horizontal">
-                        <Image
-                          DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
-                          Source="{Binding Result}"
-                          x:DataType="models:FolderModel"
-                          Width="25"
-                          Height="25"
-                          Margin="0 0 3 0" />
+                        <Image Source="{Binding Image^}"
+                               x:DataType="models:FolderModel"
+                               Width="24"
+                               Height="24"
+                               Margin="0 0 3 0" />
 
                         <TextBlock Text="{Binding Name}"
                                    Foreground="{DynamicResource MaterialDesignBody}"

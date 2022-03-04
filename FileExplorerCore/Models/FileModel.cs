@@ -56,7 +56,7 @@ namespace FileExplorerCore.Models
 			{
 				if (App.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { DataContext: MainWindowViewModel context } })
 				{
-					return ThumbnailProvider.GetFileImage(TreeItem, context.CurrentTab.IsGrid ? 100 : 32, () => IsVisible);
+					return ThumbnailProvider.GetFileImage(TreeItem, context.CurrentTab.IsGrid ? 100 : 24, () => IsVisible);
 				}
 
 				return null;

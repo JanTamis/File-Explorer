@@ -2,6 +2,7 @@
 using Avalonia.Data.Converters;
 using FileExplorerCore.Models;
 using System.Globalization;
+using Humanizer;
 
 namespace FileExplorerCore.Converters
 {
@@ -11,7 +12,7 @@ namespace FileExplorerCore.Converters
 		{
 			if (value is FileModel model)
 			{
-				return model.EditedOn.ToString();
+				return model.EditedOn.Humanize();
 			}
 
 			return String.Empty;

@@ -5,11 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
-using FileTypeAndIcon;
 using Avalonia.Threading;
 using System.Threading;
 using FileExplorerCore.Models;
-using System.Numerics;
 using Avalonia.Media.Imaging;
 
 namespace FileExplorerCore.Helpers
@@ -146,7 +144,7 @@ namespace FileExplorerCore.Helpers
 					}
 				}
 
-				return GetImage(name);
+				return GetImage(name!);
 			}, size) ?? Task.FromResult<SvgImage?>(null), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
 		}
 
