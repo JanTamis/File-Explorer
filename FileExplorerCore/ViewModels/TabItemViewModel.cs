@@ -221,11 +221,7 @@ namespace FileExplorerCore.ViewModels
 				}
 
 				OnPropertyChanged(nameof(FolderName));
-
-				if (TreeItem is not null)
-				{
-					OnPropertyChanged(nameof(Folders));
-				}
+				OnPropertyChanged(nameof(Folders));
 
 				IsSearching = false;
 			}
@@ -261,7 +257,7 @@ namespace FileExplorerCore.ViewModels
 						Files = Files,
 					};
 
-					list.PathChanged += path => SetPath(path);
+					list.PathChanged += async path => await SetPath(path);
 
 					DisplayControl = list;
 				}
@@ -272,7 +268,7 @@ namespace FileExplorerCore.ViewModels
 						Files = Files,
 					};
 
-					grid.PathChanged += path => SetPath(path);
+					grid.PathChanged += async path => await SetPath(path);
 
 					DisplayControl = grid;
 				}
@@ -299,7 +295,7 @@ namespace FileExplorerCore.ViewModels
 
 		public TabItemViewModel()
 		{
-			Files.CountChanged += count => { Count = count; };
+			Files.CountChanged += count => Count = count;
 
 			//Files.OnPropertyChanged += property =>
 			//{
@@ -311,7 +307,7 @@ namespace FileExplorerCore.ViewModels
 			//	}
 			//};
 
-			FileModel.SelectionChanged += () => { OnPropertyChanged(nameof(SelectionText)); };
+			FileModel.SelectionChanged += async () => await OnPropertyChanged(nameof(SelectionText));
 		}
 
 		public FileSystemTreeItem? Undo()
@@ -463,7 +459,7 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		private IEnumerable<FileModel> GetFileSystemEntriesRecursive(FileSystemTreeItem path, string search)
+		private static IEnumerable<FileModel> GetFileSystemEntriesRecursive(FileSystemTreeItem path, string search)
 		{
 			return path
 				// .EnumerateChildren((ref FileSystemEntry file) => !file.IsHidden && FileSystemName.MatchesSimpleExpression(search, file.FileName)) //|| (!file.IsDirectory && File.ReadLines(file.ToSpecifiedFullPath()).Any(a => a.Contains(search))))
@@ -472,14 +468,14 @@ namespace FileExplorerCore.ViewModels
 				.Select(s => new FileModel(s));
 		}
 
-		private IEnumerable<FileModel> GetFileSystemEntries(FileSystemTreeItem path)
+		private static IEnumerable<FileModel> GetFileSystemEntries(FileSystemTreeItem path)
 		{
 			return path
 				.EnumerateChildren((ref FileSystemEntry file) => !file.IsHidden, 0)
 				.Select(s => new FileModel(s));
 		}
 
-		private int GetFileSystemEntriesCount(FileSystemTreeItem path, string search, CancellationToken token)
+		private static int GetFileSystemEntriesCount(FileSystemTreeItem path, string search, CancellationToken token)
 		{
 			return path.GetChildrenCount();
 		}

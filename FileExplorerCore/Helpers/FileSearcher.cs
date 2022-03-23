@@ -140,7 +140,7 @@ namespace FileExplorerCore.Helpers
 									}
 								}
 
-								list.Add((category, (Value: func, datetime.Date)));
+								list.Add((category, (func, datetime.Date)));
 								break;
 							}
 						}

@@ -63,11 +63,6 @@ namespace FileExplorerCore.Popup
 			AvaloniaXamlLoader.Load(this);
 		}
 
-		public async Task ReIndex()
-		{
-
-		}
-
 		public void Close()
 		{
 			OnClose();
