@@ -176,7 +176,7 @@ namespace FileExplorerCore.Models
 				yield break;
 			}
 
-			if (layers == 0)
+			if (layers is 0)
 			{
 				foreach (var child in Children)
 				{
@@ -216,7 +216,7 @@ namespace FileExplorerCore.Models
 
 			var enumerable = Children;
 
-			if (layers == 0)
+			if (layers is 0)
 			{
 				foreach (var child in enumerable)
 				{
