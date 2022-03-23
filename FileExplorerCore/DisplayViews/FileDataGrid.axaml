@@ -27,7 +27,7 @@
 					             IsSelected="{Binding IsSelected}"
 					             VerticalContentAlignment="Stretch"
 					             HorizontalContentAlignment="Stretch">
-            <ToolTip.Tip>
+						<ToolTip.Tip>
               <Grid ColumnDefinitions="Auto Auto"
                     RowDefinitions="Auto Auto Auto Auto">
                 <TextBlock Text="Name: " />
@@ -51,7 +51,7 @@
                            Grid.Column="1"
                            IsVisible="{Binding !IsFolder}" />
 
-                <TextBlock Text="Edited on: "
+                <TextBlock Text="Edited: "
                            Grid.Row="3" />
                 <TextBlock Text="{Binding Converter={StaticResource editedOnConverter}}"
                            Margin="4 0 0 0"

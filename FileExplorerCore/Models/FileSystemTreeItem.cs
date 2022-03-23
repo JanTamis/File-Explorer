@@ -249,23 +249,23 @@ namespace FileExplorerCore.Models
 
 		public T GetPath<T>(ReadOnlySpanFunc<char, T> action)
 		{
-			using var builder = new ValueStringBuilder(stackalloc char[512]);
+			var builder = new ValueStringBuilder(stackalloc char[512]);
 
-			var count = GetPath(builder);
+			GetPath(ref builder);
 
-			return action(builder.RawChars[0..count]);
+			return action(builder.AsSpan());
 		}
 
 		public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
 		{
-			using var builder = new ValueStringBuilder(stackalloc char[512]);
+			var builder = new ValueStringBuilder(stackalloc char[512]);
 
-			var count = GetPath(builder);
+			GetPath(ref builder);
 
-			return action(builder.RawChars[0..count], parameter);
+			return action(builder.AsSpan(), parameter);
 		}
 
-		private int GetPath(ValueStringBuilder builder)
+		private void GetPath(ref ValueStringBuilder builder)
 		{
 			foreach (var item in EnumerateToRoot().Reverse())
 			{
@@ -281,8 +281,6 @@ namespace FileExplorerCore.Models
 			{
 				builder.Append(PathHelper.DirectorySeparator);
 			}
-
-			return builder.Length;
 		}
 
 		public override string ToString()

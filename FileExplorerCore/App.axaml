@@ -282,12 +282,13 @@
     <Style Selector="ToolTip">
       <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
       <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
+      <Setter Property="MaxWidth" Value="100000" />
       <Setter Property="Padding" Value="5" />
       <Setter Property="Template">
         <ControlTemplate>
           <styles:Card Name="PART_LayoutRoot"
-                       Margin="2.5"
-                       assists:ShadowAssist.ShadowDepth="CenterDepth1"
+                       Margin="10"
+                       assists:ShadowAssist.ShadowDepth="CenterDepth2"
                        BorderThickness="{TemplateBinding BorderThickness}"
                        Background="{TemplateBinding Background}"
                        BorderBrush="{TemplateBinding BorderBrush}"

@@ -48,13 +48,44 @@
           <ListBoxItem Margin="0"
 											 MaxWidth="400"
                        x:Name="container"
-											 ToolTip.Tip="{Binding Name}"
 											 IsSelected="{Binding IsSelected}"
 											 VerticalContentAlignment="Stretch"
 											 HorizontalContentAlignment="Stretch">
-            <StackPanel Margin="0 0 0 5"
-												HorizontalAlignment="Center"
-												VerticalAlignment="Center">
+	          <ToolTip.Tip>
+		          <Grid ColumnDefinitions="Auto Auto"
+		                RowDefinitions="Auto Auto Auto Auto">
+			          <TextBlock Text="Name: " />
+			          <TextBlock Text="{Binding Name}"
+			                     Margin="4 0 0 0"
+			                     Grid.Column="1" />
+
+			          <TextBlock Text="Type: "
+			                     Grid.Row="1" />
+			          <TextBlock Text="{Binding Converter={StaticResource extensionConverter}}"
+			                     Margin="4 0 0 0"
+			                     Grid.Row="1"
+			                     Grid.Column="1" />
+
+			          <TextBlock Text="Size: "
+			                     Grid.Row="2"
+			                     IsVisible="{Binding !IsFolder}" />
+			          <TextBlock Text="{Binding Converter={StaticResource sizeConverter}}"
+			                     Margin="4 0 0 0"
+			                     Grid.Row="2"
+			                     Grid.Column="1"
+			                     IsVisible="{Binding !IsFolder}" />
+
+			          <TextBlock Text="Edited: "
+			                     Grid.Row="3" />
+			          <TextBlock Text="{Binding Converter={StaticResource editedOnConverter}}"
+			                     Margin="4 0 0 0"
+			                     Grid.Row="3"
+			                     Grid.Column="1" />
+		          </Grid>
+	          </ToolTip.Tip>
+	          <StackPanel Margin="0 0 0 5"
+	                      HorizontalAlignment="Center"
+	                      VerticalAlignment="Center">
               <Image x:DataType="models:FileModel"
                      Source="{Binding Image^}"
                      Margin="4"

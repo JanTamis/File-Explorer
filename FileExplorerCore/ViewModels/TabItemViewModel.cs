@@ -154,7 +154,7 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		public bool IsIndeterminate => FileCount == -1;
+		public bool IsIndeterminate => FileCount is -1;
 
 		public double SearchProgression => Count / (double)FileCount;
 
