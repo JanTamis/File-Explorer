@@ -27,13 +27,9 @@ namespace FileExplorerCore.Popup
 
 		public Rename()
 		{
-			InitializeComponent();
+			AvaloniaXamlLoader.Load(this);
 
 			DataContext = this;
-		}
-		private void InitializeComponent()
-		{
-			AvaloniaXamlLoader.Load(this);
 		}
 
 		public void Close()

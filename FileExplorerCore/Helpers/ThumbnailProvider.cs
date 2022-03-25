@@ -163,7 +163,7 @@ namespace FileExplorerCore.Helpers
 				{
 					using var memoryStream = new MemoryStream();
 
-					if (source.Save(memoryStream, SkiaSharp.SKColors.Transparent) == true)
+					if (source.Save(memoryStream, SkiaSharp.SKColors.Transparent))
 					{
 						memoryStream.Seek(0, SeekOrigin.Begin);
 

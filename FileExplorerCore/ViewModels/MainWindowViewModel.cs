@@ -11,6 +11,7 @@ using FileExplorerCore.Popup;
 using Microsoft.VisualBasic.FileIO;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Timers;
 using System.Threading.Tasks;
@@ -210,6 +211,31 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
+		public void ZipFiles()
+		{
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+			{
+				var zip = new Zip
+				{
+					SelectedFiles = Files.Where(w => w.IsSelected),
+					TreeItem = CurrentTab.TreeItem,
+					CompressionLevel = CompressionLevel.Optimal,
+				};
+
+				CurrentTab.PopupContent = zip;
+
+				zip.ZipFiles();
+				
+				zip.OnClose += () =>
+				{
+					if (zip.FileModel is not null)
+					{
+						CurrentTab.Files.Add(zip.FileModel);
+					}
+				};
+			}
+		}
+
 		public async Task CopyFiles()
 		{
 			var data = new DataObject();
@@ -232,20 +258,20 @@ namespace FileExplorerCore.ViewModels
 		public void DeleteFiles()
 		{
 			var selectedFiles = CurrentTab.Files.Where(x => x.IsSelected);
-			var SelectedFileCount = selectedFiles.Count();
+			var selectedFileCount = CurrentTab.SelectionCount;
 
-			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && SelectedFileCount > 0)
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && selectedFileCount > 0)
 			{
 				var choice = new Choice
 				{
 					CloseText = "Cancel",
 					SubmitText = "Delete",
-					Message = CultureInfo.CurrentCulture.TextInfo.ToTitleCase($"Are you sure you want to delete {SelectedFileCount} item{(SelectedFileCount > 1 ? "s" : String.Empty)}?"),
+					Message = CultureInfo.CurrentCulture.TextInfo.ToTitleCase($"Are you sure you want to delete {selectedFileCount} item{(selectedFileCount > 1 ? "s" : String.Empty)}?"),
 				};
 
 				choice.OnSubmit += () =>
 				{
-					var deletedFiles = new List<FileModel>(SelectedFileCount);
+					var deletedFiles = new List<FileModel>(selectedFileCount);
 
 					foreach (var file in selectedFiles)
 					{

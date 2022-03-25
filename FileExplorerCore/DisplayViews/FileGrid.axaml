@@ -7,9 +7,6 @@
 						 xmlns:converters="using:FileExplorerCore.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FileExplorerCore.DisplayViews.FileGrid">
-  <UserControl.Resources>
-    <system:Int32 x:Key="ImageSize">100</system:Int32>
-  </UserControl.Resources>
 
   <ScrollViewer>
     <ItemsRepeater Items="{Binding Files}"
@@ -22,11 +19,11 @@
 
       <ItemsRepeater.Styles>
         <Style Selector="ListBoxItem">
-          <Setter Property="Background" Value="Transparent" />
           <Setter Property="Template">
             <ControlTemplate>
               <Border CornerRadius="10"
 											Name="PART_ContentPresenter"
+											Background="Transparent"
 											Margin="10">
                 <ContentPresenter ClipToBounds="true"
 																	Background="{TemplateBinding Background}"
@@ -54,14 +51,18 @@
 	          <ToolTip.Tip>
 		          <Grid ColumnDefinitions="Auto Auto"
 		                RowDefinitions="Auto Auto Auto Auto">
-			          <TextBlock Text="Name: " />
+			          <TextBlock Text="Name: "
+			                     Foreground="{DynamicResource MaterialDesignBody}" />
 			          <TextBlock Text="{Binding Name}"
+			                     Foreground="{DynamicResource MaterialDesignBody}"
 			                     Margin="4 0 0 0"
 			                     Grid.Column="1" />
 
 			          <TextBlock Text="Type: "
+			                     Foreground="{DynamicResource MaterialDesignBody}"
 			                     Grid.Row="1" />
 			          <TextBlock Text="{Binding Converter={StaticResource extensionConverter}}"
+			                     Foreground="{DynamicResource MaterialDesignBody}"
 			                     Margin="4 0 0 0"
 			                     Grid.Row="1"
 			                     Grid.Column="1" />
@@ -76,8 +77,10 @@
 			                     IsVisible="{Binding !IsFolder}" />
 
 			          <TextBlock Text="Edited: "
+			                     Foreground="{DynamicResource MaterialDesignBody}"
 			                     Grid.Row="3" />
 			          <TextBlock Text="{Binding Converter={StaticResource editedOnConverter}}"
+			                     Foreground="{DynamicResource MaterialDesignBody}"
 			                     Margin="4 0 0 0"
 			                     Grid.Row="3"
 			                     Grid.Column="1" />
@@ -94,6 +97,7 @@
               </Image>
 
               <TextBlock Text="{Binding Name}"
+                         Foreground="{DynamicResource MaterialDesignBody}"
 												 TextTrimming="CharacterEllipsis"
 												 HorizontalAlignment="Stretch"
 												 TextAlignment="Center"
@@ -101,7 +105,7 @@
 
               <TextBlock Text="{Binding Size, Converter={StaticResource sizeConverter}}"
 												 FontSize="12"
-												 Foreground="{DynamicResource SystemBaseMediumColor}"
+												 Foreground="{DynamicResource MaterialDesignBody}"
 												 HorizontalAlignment="Center" />
             </StackPanel>
           </ListBoxItem>

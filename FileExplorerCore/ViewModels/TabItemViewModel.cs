@@ -10,6 +10,7 @@ using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
+using FileExplorerCore.Popup;
 using Humanizer;
 
 namespace FileExplorerCore.ViewModels
@@ -25,7 +26,7 @@ namespace FileExplorerCore.ViewModels
 
 		private bool _isUserEntered = true;
 		private bool _isLoading;
-		private bool _isGrid;
+		private ViewTypes _currentViewMode = ViewTypes.List;
 
 		private readonly Stack<FileSystemTreeItem?> _undoStack = new();
 		private readonly Stack<FileSystemTreeItem?> _redoStack = new();
@@ -41,7 +42,7 @@ namespace FileExplorerCore.ViewModels
 		private TimeSpan _previousLoadTime;
 
 		private SortEnum _sort = SortEnum.None;
-		private FileSystemTreeItem _treeItem;
+		private FileSystemTreeItem? _treeItem;
 
 		public event Action PathChanged;
 
@@ -117,6 +118,9 @@ namespace FileExplorerCore.ViewModels
 				}
 			}
 
+			OnPropertyChanged(nameof(SelectionCount));
+			OnPropertyChanged(nameof(HasSelection));
+
 			if (SelectionCount > 0)
 			{
 				result = $"{SelectionCount:N0} items selected";
@@ -133,8 +137,14 @@ namespace FileExplorerCore.ViewModels
 		public int SelectionCount
 		{
 			get => _selectionCount;
-			private set => OnPropertyChanged(ref _selectionCount, value);
+			private set
+			{
+				OnPropertyChanged(ref _selectionCount, value);
+				OnPropertyChanged(nameof(HasSelection));
+			}
 		}
+
+		public bool HasSelection => SelectionCount > 0;
 
 		public TimeSpan LoadTime => DateTime.Now - _startSearchTime;
 
@@ -190,11 +200,11 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		public bool SearchFailed => !IsLoading && Files.Count == 0 && DisplayControl is not Quickstart;
+		public bool SearchFailed => !IsLoading && Files.Count is 0 && DisplayControl is not Quickstart;
 
 		public ObservableRangeCollection<FileModel> Files { get; } = new();
 
-		public FileSystemTreeItem TreeItem
+		public FileSystemTreeItem? TreeItem
 		{
 			get => _treeItem;
 			set
@@ -211,7 +221,7 @@ namespace FileExplorerCore.ViewModels
 				}
 				else
 				{
-					IsGrid = IsGrid;
+					CurrentViewMode = CurrentViewMode;
 				}
 
 				if (_isUserEntered)
@@ -243,34 +253,37 @@ namespace FileExplorerCore.ViewModels
 
 		public bool IsSearching { get; set; }
 
-		public bool IsGrid
+		public ViewTypes CurrentViewMode
 		{
-			get => _isGrid;
+			get => _currentViewMode;
 			set
 			{
-				OnPropertyChanged(ref _isGrid, value);
+				OnPropertyChanged(ref _currentViewMode, value);
 
-				if (IsGrid == false)
+				switch (value)
 				{
-					var list = new FileDataGrid
-					{
-						Files = Files,
-					};
+					case ViewTypes.Grid:
+						var grid = new FileGrid
+						{
+							Files = Files,
+						};
 
-					list.PathChanged += async path => await SetPath(path);
+						grid.PathChanged += async path => await SetPath(path);
+						grid.SelectionChanged += count => SelectionCount = count;
 
-					DisplayControl = list;
-				}
-				else
-				{
-					var grid = new FileGrid
-					{
-						Files = Files,
-					};
+						DisplayControl = grid;
+						break;
+					case ViewTypes.List:
+						var list = new FileDataGrid
+						{
+							Files = Files,
+						};
 
-					grid.PathChanged += async path => await SetPath(path);
+						list.PathChanged += async path => await SetPath(path);
+						list.SelectionChanged += count => SelectionCount = count;
 
-					DisplayControl = grid;
+						DisplayControl = list;
+						break;
 				}
 			}
 		}
@@ -296,18 +309,6 @@ namespace FileExplorerCore.ViewModels
 		public TabItemViewModel()
 		{
 			Files.CountChanged += count => Count = count;
-
-			//Files.OnPropertyChanged += property =>
-			//{
-			//	if (property is "IsSelected")
-			//	{
-			//		SelectionCount = Files.Count(x => x.IsSelected);
-
-			//		OnPropertyChanged(nameof(SelectionText));
-			//	}
-			//};
-
-			FileModel.SelectionChanged += async () => await OnPropertyChanged(nameof(SelectionText));
 		}
 
 		public FileSystemTreeItem? Undo()

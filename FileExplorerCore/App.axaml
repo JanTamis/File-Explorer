@@ -44,15 +44,17 @@
     <converters:MainTitleMarginConverter x:Key="mainTitleMarginConverter" />
     <converters:MinSizeConverter x:Key="minSizeConverter" />
     <converters:MoreThanConverter x:Key="moreThanConverter" />
+    <converters:EnumToValuesConverter x:Key="enumToValuesConverter" />
   </Application.Resources>
 
   <Application.Styles>
     <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml" />
     <StyleInclude Source="avares://Material.Avalonia/Material.Avalonia.Templates.xaml" />
     <StyleInclude Source="avares://Material.Icons.Avalonia/App.xaml" />
-
+    
     <Style Selector="TabStrip > TabStripItem">
       <Setter Property="Background" Value="Transparent" />
+      <Setter Property="MaxWidth" Value="2000" />
       <Setter Property="assists:TabControlAssist.TabHeaderForeground"
 			        Value="{Binding Path=(assists:TabControlAssist.TabHeaderInactiveBrush), RelativeSource={RelativeSource AncestorType=TabStrip}}" />
       <Setter Property="assists:ShadowAssist.ShadowDepth" Value="CenterDepth1"></Setter>
@@ -271,9 +273,9 @@
       <Setter Property="Cursor" Value="Arrow" />
     </Style>
 
-    <Style Selector="ListBoxItem">
-      <Setter Property="Cursor" Value="Arrow" />
-    </Style>
+    <!-- <Style Selector="ListBoxItem"> -->
+    <!--   <Setter Property="Cursor" Value="Arrow" /> -->
+    <!-- </Style> -->
 
     <Style Selector="TextBlock">
 	    <Setter Property="VerticalAlignment" Value="Center" />

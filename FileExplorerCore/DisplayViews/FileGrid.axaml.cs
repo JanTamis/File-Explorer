@@ -6,14 +6,17 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using FileExplorerCore.Helpers;
+using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
 
 namespace FileExplorerCore.DisplayViews
 {
-	public partial class FileGrid : UserControl
+	public partial class FileGrid : UserControl, ISelectableControl
 	{
 		private int anchorIndex = 0;
+		
 		public event Action<FileSystemTreeItem> PathChanged = delegate { };
+		public event Action<int> SelectionChanged = delegate { };
 
 		public ObservableRangeCollection<FileModel> Files
 		{
@@ -52,7 +55,7 @@ namespace FileExplorerCore.DisplayViews
 					file.IsSelected = true;
 				}
 
-				FileModel.RaiseSelectionChanged();
+				SelectionChanged?.Invoke(Files.Count);
 			}
 		}
 
@@ -131,6 +134,8 @@ namespace FileExplorerCore.DisplayViews
 			var toggle = toggleModifier || mode.HasAllFlags(SelectionMode.Toggle);
 			var range = multi && rangeModifier;
 
+			var count = 0;
+
 			if (!select)
 			{
 				files[index].IsSelected = false;
@@ -147,6 +152,7 @@ namespace FileExplorerCore.DisplayViews
 					for (var i = anchorIndex; i <= index; i++)
 					{
 						files[i].IsSelected = true;
+						count++;
 					}
 				}
 				else
@@ -154,6 +160,7 @@ namespace FileExplorerCore.DisplayViews
 					for (var i = index; i <= anchorIndex; i++)
 					{
 						files[i].IsSelected = true;
+						count++;
 					}
 				}
 			}
@@ -166,6 +173,7 @@ namespace FileExplorerCore.DisplayViews
 				else
 				{
 					files[index].IsSelected = true;
+					count++;
 				}
 			}
 			else
@@ -176,15 +184,13 @@ namespace FileExplorerCore.DisplayViews
 				}
 
 				files[index].IsSelected = true;
+				count++;
 			}
 
 			if (!range)
 			{
 				anchorIndex = index;
 			}
-
-			files.PropertyChanged("IsSelected");
-			FileModel.RaiseSelectionChanged();
 		}
 	}
 }

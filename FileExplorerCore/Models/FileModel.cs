@@ -29,7 +29,6 @@ namespace FileExplorerCore.Models
 
 		private bool _needsTranslation;
 
-		public static event Action SelectionChanged = delegate { };
 
 		private static bool _isNotLoading = true;
 		private bool isVisible = true;
@@ -56,7 +55,7 @@ namespace FileExplorerCore.Models
 			{
 				if (App.Current.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { DataContext: MainWindowViewModel context } })
 				{
-					return ThumbnailProvider.GetFileImage(TreeItem, context.CurrentTab.IsGrid ? 100 : 24, () => IsVisible);
+					return ThumbnailProvider.GetFileImage(TreeItem, context.CurrentTab.CurrentViewMode is ViewTypes.Grid ? 100 : 24, () => IsVisible);
 				}
 
 				return null;
@@ -160,42 +159,36 @@ namespace FileExplorerCore.Models
 
 		public bool IsFolder => TreeItem.IsFolder;
 
-		public Task<string> SizeFromTask
+		public Task<string> SizeFromTask => Task.Run(() =>
 		{
-			get
+			var size = TreeItem.GetPath(path =>
 			{
-				return Task.Run(() =>
+				var result = 0L;
+
+				if (!IsFolder)
 				{
-					var size = TreeItem.GetPath(path =>
-					{
-						var result = 0L;
-
-						if (!IsFolder)
+					result = Size;
+				}
+				else if (path[^1] is '\\' && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
+				{
+					result = info.TotalSize - info.TotalFreeSpace;
+				}
+				else if (IsFolder)
+				{
+					var query = new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length,
+						new EnumerationOptions { RecurseSubdirectories = true })
 						{
-							result = Size;
-						}
-						else if (path[^1] is '\\' && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
-						{
-							result = info.TotalSize - info.TotalFreeSpace;
-						}
-						else if (IsFolder)
-						{
-							var query = new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length,
-								new EnumerationOptions { RecurseSubdirectories = true })
-							{
-								ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
-							};
+							ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
+						};
 
-							result = query.Sum();
-						}
+					result = query.Sum();
+				}
 
-						return result;
-					});
+				return result;
+			});
 
-					return size.Bytes().ToString();
-				});
-			}
-		}
+			return size.Bytes().ToString();
+		});
 
 		public DateTime EditedOn
 		{
@@ -220,11 +213,6 @@ namespace FileExplorerCore.Models
 		public FileModel(FileSystemTreeItem item)
 		{
 			TreeItem = item;
-		}
-
-		public static void RaiseSelectionChanged()
-		{
-			SelectionChanged?.Invoke();
 		}
 
 		public void Dispose()

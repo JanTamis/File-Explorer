@@ -32,8 +32,7 @@ namespace FileExplorerCore.Models
 
 					if (Directory.Exists(path))
 					{
-						return new FileSystemEnumerable<FileSystemTreeItem>(path, (ref FileSystemEntry x)
-							=> new FileSystemTreeItem(x.FileName, x.IsDirectory, this), Options);
+						return new FileSystemEnumerable<FileSystemTreeItem>(path, (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName, x.IsDirectory, this), Options);
 					}
 				}
 
@@ -293,4 +292,4 @@ namespace FileExplorerCore.Models
 			return GetPath(HashCode<char>.Combine);
 		}
 	}
-}
+} 
