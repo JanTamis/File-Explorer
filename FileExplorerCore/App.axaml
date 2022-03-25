@@ -23,7 +23,7 @@
 		<SolidColorBrush Color="#DFDFDF" x:Key="CardPointerOverBackground" />
 		<SolidColorBrush Color="#DFDFDF" x:Key="CardHighBackground" />-->
 
-    <themes:BundledTheme BaseTheme="Light" PrimaryColor="Blue" SecondaryColor="Blue" />
+    <themes:BundledTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Blue" />
 
     <!-- <SolidColorBrush Color="#454545" x:Key="Background" /> -->
     <!-- <SolidColorBrush Color="#404040" x:Key="ContentBackground" /> -->
