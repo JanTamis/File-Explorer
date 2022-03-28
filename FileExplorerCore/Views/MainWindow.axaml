@@ -379,6 +379,17 @@
 														<Button Width="40"
 														        Height="40"
 														        IsVisible="{Binding CurrentTab.HasSelection}"
+														        ToolTip.Tip="Properties"
+														        Command="{Binding ShowProperties}"
+														        Classes="Flat">
+															<Image Source="{SvgImage /Assets/UIIcons/Properties.svg}"
+															       Width="30"
+															       Height="30" />
+														</Button>
+
+														<Button Width="40"
+														        Height="40"
+														        IsVisible="{Binding CurrentTab.HasSelection}"
 														        ToolTip.Tip="Zip Selected Files"
 														        Command="{Binding ZipFiles}"
 														        Classes="Flat">
@@ -591,7 +602,6 @@
 			</Grid>
 		</styles:Card>
 	</Grid>
-
 
 	<!--</Grid>-->
 </views:FluentWindow>

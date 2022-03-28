@@ -38,7 +38,7 @@ namespace FileExplorerCore.Popup
 
 		private CancellationTokenSource _source;
 
-		public Task<IImage?> Icon => ThumbnailProvider.GetFileImage(_model.TreeItem, 32);
+		public Task<IImage?> Icon => ThumbnailProvider.GetFileImage(_model.TreeItem, 48);
 
 		private ObservableRangeCollection<MetadataExtractor.Directory> MetaData { get; } = new();
 
@@ -70,40 +70,42 @@ namespace FileExplorerCore.Popup
 				OnPropertyChanged(nameof(ItemName));
 				OnPropertyChanged(nameof(Size));
 
-				ThreadPool.QueueUserWorkItem(_ =>
+				if (value.IsFolder)
 				{
-					var enumerable = _model.TreeItem.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions
+					ThreadPool.QueueUserWorkItem(_ =>
 					{
-						RecurseSubdirectories = true,
-						IgnoreInaccessible = true,
-						AttributesToSkip = FileSystemTreeItem.Options.AttributesToSkip,
-					}));
-
-					var watch = Stopwatch.StartNew();
-
-					_source = new CancellationTokenSource();
-
-					foreach (var child in enumerable)
-					{
-						if (_source.IsCancellationRequested)
+						var enumerable = _model.TreeItem.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions
 						{
-							OnPropertyChanged(nameof(Size));
-							break;
-						}
-						
-						_size += child;
-					
-						if (watch.ElapsedMilliseconds > 50)
+							RecurseSubdirectories = true,
+							IgnoreInaccessible = true,
+							AttributesToSkip = FileSystemTreeItem.Options.AttributesToSkip,
+						}));
+
+						var watch = Stopwatch.StartNew();
+
+						_source = new CancellationTokenSource();
+
+						foreach (var child in enumerable)
 						{
-							OnPropertyChanged(nameof(Size));
-						
-							watch.Restart();
+							if (_source.IsCancellationRequested)
+							{
+								OnPropertyChanged(nameof(Size));
+								break;
+							}
+
+							_size += child;
+
+							if (watch.ElapsedMilliseconds > 50)
+							{
+								OnPropertyChanged(nameof(Size));
+
+								watch.Restart();
+							}
 						}
-					}
-				});
+					});	
+				}
 			}
 		}
-
 
 		public string Path
 		{

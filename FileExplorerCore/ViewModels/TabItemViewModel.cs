@@ -178,7 +178,7 @@ namespace FileExplorerCore.ViewModels
 				}
 
 				var loadTime = LoadTime;
-				_predictedTime = _predictedTime.Subtract(TimeSpan.FromSeconds(1));
+				_predictedTime -= TimeSpan.FromSeconds(1);
 
 				if ((loadTime - _previousLoadTime).TotalSeconds >= 3)
 				{
