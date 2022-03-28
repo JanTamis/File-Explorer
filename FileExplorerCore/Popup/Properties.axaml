@@ -18,6 +18,7 @@
 	<TabControl MinWidth="400">
 		<TabItem Header="General">
 			<Grid ColumnDefinitions="Auto, *"
+            Margin="5 0"
 						RowDefinitions="Auto, Auto, 30, Auto, 30, 30, Auto, 30, Auto, Auto" >
 				
 				<StackPanel Orientation="Horizontal"
@@ -128,7 +129,8 @@
 			</Grid>
 		</TabItem>
 		
-		<TabItem Header="Details">
+		<TabItem Header="Details"
+             Padding="5 0">
 			<DataGrid Items="{Binding MetaData}"
 								Height="500"
 								Background="{DynamicResource CardHighBackground}"

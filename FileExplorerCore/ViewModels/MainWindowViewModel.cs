@@ -407,12 +407,12 @@ namespace FileExplorerCore.ViewModels
 
 			if (OperatingSystem.IsMacOS())
 			{
-				item = new FileSystemTreeItem(path.Slice(0, 1), true);
+				item = new FileSystemTreeItem(path[..1], true);
 				enumerable = new Enumerable1<char>(path[1..], PathHelper.DirectorySeparator);
 			}
 			else if (OperatingSystem.IsWindows())
 			{
-				item = new FileSystemTreeItem(path.Slice(0, 3), true);
+				item = new FileSystemTreeItem(path[..3], true);
 				enumerable = new Enumerable1<char>(path[3..], PathHelper.DirectorySeparator);
 			}
 

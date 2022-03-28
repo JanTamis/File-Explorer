@@ -1,6 +1,7 @@
 ﻿using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
@@ -23,6 +24,7 @@ namespace FileExplorerCore.Helpers
 	}
 
 	[SupportedOSPlatform("Windows")]
+	[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 	public unsafe class WindowsThumbnailProvider
 	{
 		private const string IShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
@@ -150,6 +152,7 @@ namespace FileExplorerCore.Helpers
 		[ComImport]
 		[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 		[Guid("43826d1e-e718-42ee-bc55-a1e261c37bfe")]
+		[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 		internal interface IShellItem
 		{
 			void BindToHandler(IntPtr pbc,
@@ -194,6 +197,7 @@ namespace FileExplorerCore.Helpers
 
 		[ComImport]
 		[Guid("bcc18b79-ba16-442f-80c4-8a59c30c463b")]
+		[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 		[InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
 		internal interface IShellItemImageFactory
 		{
@@ -205,6 +209,7 @@ namespace FileExplorerCore.Helpers
 		}
 
 		[StructLayout(LayoutKind.Sequential)]
+		[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 		internal struct NativeSize
 		{
 			private int width;
@@ -222,6 +227,7 @@ namespace FileExplorerCore.Helpers
 		}
 	}
 
+	[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 	static class NativeMethods
 	{
 		[StructLayout(LayoutKind.Sequential)]

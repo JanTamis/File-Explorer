@@ -23,8 +23,6 @@ namespace FileExplorerCore.Popup
 
 		private string _path;
 
-		private Bitmap? _icon;
-
 		private long _size = -1;
 
 		private FileModel _model;
@@ -128,13 +126,8 @@ namespace FileExplorerCore.Popup
 
 		public Properties()
 		{
-			InitializeComponent();
+			AvaloniaXamlLoader.Load(this);
 			DataContext = this;
-
-			void InitializeComponent()
-			{
-				AvaloniaXamlLoader.Load(this);
-			}
 		}
 
 		public void Close()

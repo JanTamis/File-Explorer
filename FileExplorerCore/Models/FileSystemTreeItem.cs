@@ -77,6 +77,12 @@ namespace FileExplorerCore.Models
 			}
 		}
 
+		public Utf8String UTF8String
+		{
+			get => _value;
+			set => _value = value;
+		}
+
 		public bool HasParent => Parent is not null;
 		public bool HasChildren => Children.Any();
 
@@ -185,7 +191,8 @@ namespace FileExplorerCore.Models
 				yield break;
 			}
 
-			var children = new List<FileSystemTreeItem>();
+			ArrayPoolList<FileSystemTreeItem> children = default;
+			var isPoolSet = false;
 
 			foreach (var child in Children)
 			{
@@ -193,17 +200,31 @@ namespace FileExplorerCore.Models
 
 				if (child.IsFolder)
 				{
+					if (!isPoolSet)
+					{
+						children = new ArrayPoolList<FileSystemTreeItem>(1024);
+						isPoolSet = true;
+					}
+
 					children.Add(child);
 				}
 			}
 
-			foreach (var child in children)
+			if (isPoolSet)
 			{
-				foreach (var childOfChild in child.EnumerateChildren(layers - 1))
+				foreach (var child in children)
 				{
-					yield return childOfChild;
+					if (child is not null)
+					{
+						foreach (var childOfChild in child.EnumerateChildren(layers - 1))
+						{
+							yield return childOfChild;
+						}
+					}
 				}
 			}
+
+			children.Dispose();
 		}
 
 		public IEnumerable<FileSystemTreeItem> EnumerateChildren(FileSystemEnumerable<FileSystemTreeItem>.FindPredicate findPredicate, uint layers = UInt32.MaxValue)
@@ -292,4 +313,4 @@ namespace FileExplorerCore.Models
 			return GetPath(HashCode<char>.Combine);
 		}
 	}
-} 
+}

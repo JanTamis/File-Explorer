@@ -462,10 +462,27 @@ namespace FileExplorerCore.ViewModels
 
 		private static IEnumerable<FileModel> GetFileSystemEntriesRecursive(FileSystemTreeItem path, string search)
 		{
+			if (search is "*" or "*.*")
+			{
+				return path
+					.EnumerateChildren()
+					.Select(s => new FileModel(s));
+			}
+
 			return path
-				// .EnumerateChildren((ref FileSystemEntry file) => !file.IsHidden && FileSystemName.MatchesSimpleExpression(search, file.FileName)) //|| (!file.IsDirectory && File.ReadLines(file.ToSpecifiedFullPath()).Any(a => a.Contains(search))))
 				.EnumerateChildren()
-				.Where(w => FileSystemName.MatchesSimpleExpression(search, w.Value))
+				.Where(w =>
+				{
+					if (w.UTF8String.Length <= 512)
+					{
+						Span<char> stack = stackalloc char[w.UTF8String.Length];
+						w.UTF8String.CopyToSpan(stack);
+
+						return FileSystemName.MatchesSimpleExpression(search, stack);
+					}
+
+					return FileSystemName.MatchesSimpleExpression(search, w.Value);
+				})
 				.Select(s => new FileModel(s));
 		}
 

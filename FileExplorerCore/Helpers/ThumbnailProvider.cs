@@ -9,11 +9,13 @@ using Avalonia.Threading;
 using System.Threading;
 using FileExplorerCore.Models;
 using Avalonia.Media.Imaging;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FileExplorerCore.Helpers
 {
 #pragma warning disable CA1416
 
+	[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 	public static class ThumbnailProvider
 	{
 		// private static readonly Dictionary<string, string>? fileTypes = OperatingSystem.IsWindows() ? RegisteredFileType.GetFileTypeAndIcon() : new();
@@ -22,7 +24,6 @@ namespace FileExplorerCore.Helpers
 		private static readonly Dictionary<string, string[]> TypeMap = new();
 
 		private static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default, Environment.ProcessorCount / 2); // BitOperations.Log2((uint)Environment.ProcessorCount));
-		private static int taskCount;
 
 		static ThumbnailProvider()
 		{

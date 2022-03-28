@@ -18,7 +18,7 @@
                     x:Name="MainWindow"
                     Icon="/Assets/Icon.ico"
                     Foreground="{DynamicResource MaterialDesignBody}"
-                    MinWidth="1000"
+                    MinWidth="800"
                     MinHeight="400"
                     Width="1000"
                     Background="#333337"
@@ -568,7 +568,10 @@
 		             x:Name="settingsPanel">
 			<Grid RowDefinitions="Auto, *">
 
-				<Border CornerRadius="10 10 0 0">
+				<Border CornerRadius="10 10 0 0"
+                Background="#333337"
+                BorderBrush="#1a212e"
+                BorderThickness="0 0 0 1">
 					<Grid Margin="4"
 					      ColumnDefinitions="* Auto">
 						<Label Content="{Binding CurrentTab.PopupContent.Title}"
