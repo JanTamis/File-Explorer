@@ -80,12 +80,9 @@ namespace FileExplorerCore.Views
 					
 					if (OperatingSystem.IsWindows() && treeItem.Parent is TreeView)
 					{
+						treeItem.Margin = new Avalonia.Thickness(0, 0, 0, 15);
 						treeItem.IsExpanded = true;
 						await Task.Delay(100);
-					}
-					else
-					{
-						
 					}
 				}
 			}
