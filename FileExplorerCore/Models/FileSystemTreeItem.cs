@@ -281,6 +281,10 @@ namespace FileExplorerCore.Models
 			{
 				return action(builder.AsSpan(0, builder.Length - 1));
 			}
+			else if (builder.Length > 1 && builder[^1] == PathHelper.DirectorySeparator)
+			{
+				return action(builder.AsSpan(0, builder.Length - 1));
+			}
 
 			return action(builder.AsSpan());
 		}

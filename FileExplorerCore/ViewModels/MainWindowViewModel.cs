@@ -415,6 +415,8 @@ namespace FileExplorerCore.ViewModels
 					};
 
 					await DialogHost.DialogHost.Show(properties);
+
+					properties.Close();
 					CurrentTab.PopupContent = null;
 				}
 			}

@@ -36,7 +36,7 @@ namespace FileExplorerCore.Popup
 
 		private CancellationTokenSource _source;
 
-		public Task<IImage?> Icon => ThumbnailProvider.GetFileImage(_model.TreeItem, 48);
+		public Task<IImage?> Icon => ThumbnailProvider.GetFileImage(_model?.TreeItem, 48);
 
 		private ObservableRangeCollection<MetadataExtractor.Directory> MetaData { get; } = new();
 
@@ -74,7 +74,7 @@ namespace FileExplorerCore.Popup
 					_size = 0;
 					OnPropertyChanged(nameof(Size));
 
-					ThreadPool.QueueUserWorkItem(_ =>
+					Task.Run(() =>
 					{
 						var enumerable = _model.TreeItem.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions
 						{
