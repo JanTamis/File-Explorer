@@ -107,13 +107,13 @@ namespace FileExplorerCore.Models
 
 						Directory.Move(path, newPath);
 					}
-
-					OnPropertyChanged(ref _name, value);
 				}
 				catch (Exception)
 				{
 					// ignored
 				}
+
+				OnPropertyChanged(ref _name, value);
 			}
 		}
 

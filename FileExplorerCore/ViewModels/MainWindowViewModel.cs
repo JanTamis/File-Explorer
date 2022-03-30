@@ -17,6 +17,7 @@ using System.Timers;
 using System.Threading.Tasks;
 using Avalonia;
 using static FileExplorerCore.Helpers.SpanSplitExtensions;
+using DialogHost;
 
 namespace FileExplorerCore.ViewModels
 {
@@ -78,12 +79,24 @@ namespace FileExplorerCore.ViewModels
 				var drives = DriveInfo
 					.GetDrives()
 					.Where(w => w.IsReady)
-					.Select(s => new FolderModel(new FileSystemTreeItem(s.Name, true)));
+					.OrderBy(o => o.DriveType)
+					.ThenBy(t => t.Name)
+					.Select(s =>
+					{
+						var treeItem = new FileSystemTreeItem(s.Name, true);
+						return new FolderModel(treeItem, $"{s.VolumeLabel} ({s.Name})", null);
+					});
 
 				var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
 													select new FolderModel(GetTreeItem(KnownFolders.GetPath(specialFolder)));
 
-				Folders = new ObservableRangeCollection<FolderModel>(quickAccess.Concat(drives), true);
+				var result = new FolderModel[]
+				{
+					new FolderModel("Quick Access", quickAccess),
+					new FolderModel("Drives", drives),
+				};
+
+				Folders = new ObservableRangeCollection<FolderModel>(result, true);
 			}
 			else
 			{
@@ -182,11 +195,12 @@ namespace FileExplorerCore.ViewModels
 			CurrentTab.Files.PropertyChanged("IsSelected");
 		}
 
-		public void ShowSettings()
+		public async Task ShowSettings()
 		{
 			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
 			{
-				CurrentTab.PopupContent = new Settings();
+				await DialogHost.DialogHost.Show(new Settings());
+				CurrentTab.PopupContent = null;
 			}
 		}
 
@@ -211,7 +225,7 @@ namespace FileExplorerCore.ViewModels
 			}
 		}
 
-		public void ZipFiles()
+		public async Task ZipFiles()
 		{
 			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
 			{
@@ -222,17 +236,16 @@ namespace FileExplorerCore.ViewModels
 					CompressionLevel = CompressionLevel.Optimal,
 				};
 
-				CurrentTab.PopupContent = zip;
-
 				zip.ZipFiles();
-				
-				zip.OnClose += () =>
+
+				await DialogHost.DialogHost.Show(zip);
+
+				CurrentTab.PopupContent = null;
+
+				if (zip.FileModel is not null)
 				{
-					if (zip.FileModel is not null)
-					{
-						CurrentTab.Files.Add(zip.FileModel);
-					}
-				};
+					CurrentTab.Files.Add(zip.FileModel);
+				}
 			}
 		}
 
@@ -318,6 +331,11 @@ namespace FileExplorerCore.ViewModels
 
 		public async Task AnalyzeFolder()
 		{
+			if (CurrentTab.TreeItem is null)
+			{
+				return;
+			}
+
 			var view = new AnalyzerView();
 			CurrentTab.DisplayControl = view;
 
@@ -326,7 +344,8 @@ namespace FileExplorerCore.ViewModels
 
 			var rootTask = Task.Run(async () =>
 			{
-				var query = CurrentTab.TreeItem.EnumerateChildren()
+				var query = CurrentTab.TreeItem
+					.EnumerateChildren()
 					.Select(s => new FileIndexModel(s));
 
 				var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
@@ -382,7 +401,7 @@ namespace FileExplorerCore.ViewModels
 			await Task.WhenAll(rootTask, extensionTask);
 		}
 
-		public void ShowProperties()
+		public async Task ShowProperties()
 		{
 			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
 			{
@@ -390,12 +409,13 @@ namespace FileExplorerCore.ViewModels
 
 				if (model is not null)
 				{
-					var properties = new Properties
+					var properties = new Properties()
 					{
 						Model = model,
 					};
 
-					CurrentTab.PopupContent = properties;
+					await DialogHost.DialogHost.Show(properties);
+					CurrentTab.PopupContent = null;
 				}
 			}
 		}
@@ -408,19 +428,17 @@ namespace FileExplorerCore.ViewModels
 			if (OperatingSystem.IsMacOS())
 			{
 				item = new FileSystemTreeItem(path[..1], true);
-				enumerable = new Enumerable1<char>(path[1..], PathHelper.DirectorySeparator);
+				enumerable = path[1..].Split(PathHelper.DirectorySeparator);
 			}
 			else if (OperatingSystem.IsWindows())
 			{
 				item = new FileSystemTreeItem(path[..3], true);
-				enumerable = new Enumerable1<char>(path[3..], PathHelper.DirectorySeparator);
+				enumerable = path[3..].Split(PathHelper.DirectorySeparator);
 			}
 
-			var enumerator = enumerable.GetEnumerator();
-
-			while (enumerator.MoveNext())
+			foreach (var name in enumerable)
 			{
-				item = new FileSystemTreeItem(enumerator.Current, true, item);
+				item = new FileSystemTreeItem(name, true, item);
 			}
 
 			return item;

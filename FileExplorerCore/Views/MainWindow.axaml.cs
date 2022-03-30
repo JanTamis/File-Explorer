@@ -15,8 +15,6 @@ namespace FileExplorerCore.Views
 {
 	public class MainWindow : FluentWindow
 	{
-		private readonly FolderModel[] defaultFolders = new[] { new FolderModel(new FileSystemTreeItem("Loading...", false)) };
-
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -55,7 +53,7 @@ namespace FileExplorerCore.Views
 
 				TreeViewItem.IsExpandedProperty.Changed.Subscribe(async x =>
 				{
-					if (x.Sender is TreeViewItem { DataContext: FolderModel folderModel } treeItem && treeItem.Items == defaultFolders)
+					if (x.Sender is TreeViewItem { DataContext: FolderModel folderModel } treeItem && (treeItem.Items is FolderModel[]))
 					{
 						treeItem.Items = await Task.Run(() => folderModel.SubFolders.ToArray());
 					}
@@ -68,18 +66,27 @@ namespace FileExplorerCore.Views
 			}
 
 			searchBar.KeyUp += SearchBar_KeyUp;
-
 			PointerPressed += MainWindow_PointerPressed;
 		}
 
-		private void TreeItemGenerated(object? sender, ItemContainerEventArgs e)
+		private async void TreeItemGenerated(object? sender, ItemContainerEventArgs e)
 		{
 			for (int i = 0; i < e.Containers.Count; i++)
 			{
-				if (e.Containers[i] is { ContainerControl: TreeViewItem { DataContext: FolderModel { TreeItem: { HasFolders: true } } folderModel } treeItem })
+				if (e.Containers[i] is { ContainerControl: TreeViewItem { DataContext: FolderModel folderModel } treeItem })
 				{
 					treeItem.ItemContainerGenerator.Materialized += TreeItemGenerated;
-					treeItem.Items = defaultFolders;
+					treeItem.Items = new FolderModel[] { new FolderModel(new FileSystemTreeItem("Loading...", false)) };
+					
+					if (OperatingSystem.IsWindows() && treeItem.Parent is TreeView)
+					{
+						treeItem.IsExpanded = true;
+						await Task.Delay(100);
+					}
+					else
+					{
+						
+					}
 				}
 			}
 		}
@@ -102,7 +109,7 @@ namespace FileExplorerCore.Views
 					model.Tabs.Remove(tab);
 
 					GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-					GC.Collect(2, GCCollectionMode.Forced, false, true);
+					GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
 				}
 			}
 		}
@@ -122,7 +129,7 @@ namespace FileExplorerCore.Views
 					{
 						foreach (var info in ee.Containers)
 						{
-							if (info.ContainerControl is MenuItem menuItem && info.Item is FolderModel folderModel)
+							if (info is { ContainerControl: MenuItem menuItem, Item: FolderModel folderModel })
 							{
 								menuItem.Tapped += delegate
 								{
@@ -137,17 +144,14 @@ namespace FileExplorerCore.Views
 
 		private void ItemContainerGenerator_Materialized(object? sender, ItemContainerEventArgs e)
 		{
-			foreach (var container in e.Containers)
+			if (DataContext is MainWindowViewModel model)
 			{
-				if (container.ContainerControl is ListBoxItem item)
+				foreach (var container in e.Containers)
 				{
-					item.DoubleTapped += async delegate
+					if (container.ContainerControl is ListBoxItem { DataContext: FileModel fileModel } item)
 					{
-						if (DataContext is MainWindowViewModel model && item.DataContext is FileModel fileModel)
-						{
-							await model.SetPath(fileModel.TreeItem);
-						}
-					};
+						item.DoubleTapped += async delegate { await model.SetPath(fileModel.TreeItem); };
+					}
 				}
 			}
 		}
@@ -171,7 +175,7 @@ namespace FileExplorerCore.Views
 
 		private async void Tree_SelectionChanged(object? sender, SelectionChangedEventArgs e)
 		{
-			if (DataContext is MainWindowViewModel model && e.AddedItems is { Count: > 0 } && e.AddedItems[0] is FolderModel folderModel)
+			if (DataContext is MainWindowViewModel model && e.AddedItems is [FolderModel { TreeItem: not null } folderModel, ..])
 			{
 				await model.SetPath(folderModel.TreeItem);
 			}

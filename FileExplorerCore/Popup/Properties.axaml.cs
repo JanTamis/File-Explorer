@@ -49,7 +49,9 @@ namespace FileExplorerCore.Popup
 					return String.Empty;
 				}
 
-				var date = File.Exists(Path) ? new FileInfo(Path).CreationTime : new DirectoryInfo(Path).CreationTime;
+				var date = File.Exists(Path) 
+					? new FileInfo(Path).CreationTime 
+					: new DirectoryInfo(Path).CreationTime;
 
 				return $"{date.ToLongDateString()}, {date.ToLongTimeString()}";
 			}
@@ -60,16 +62,18 @@ namespace FileExplorerCore.Popup
 			get => _model;
 			set
 			{
-				_model = value;
+				OnPropertyChanged(ref _model, value);
 				Path = Model.Path;
 				ItemName = _model.Name;
 				_size = _model.Size;
-				
-				OnPropertyChanged(nameof(ItemName));
 				OnPropertyChanged(nameof(Size));
-
+				OnPropertyChanged(nameof(ItemName));
+				
 				if (value.IsFolder)
 				{
+					_size = 0;
+					OnPropertyChanged(nameof(Size));
+
 					ThreadPool.QueueUserWorkItem(_ =>
 					{
 						var enumerable = _model.TreeItem.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions
@@ -133,6 +137,7 @@ namespace FileExplorerCore.Popup
 		public void Close()
 		{
 			_source?.Cancel();
+			DialogHost.DialogHost.Close(null);
 			OnClose();
 		}
 

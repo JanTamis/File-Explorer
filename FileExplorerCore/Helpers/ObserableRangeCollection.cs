@@ -60,20 +60,27 @@ namespace FileExplorerCore.Helpers
 
 		public ObservableRangeCollection(IEnumerable<T> items, bool needsReset = false) : this()
 		{
-			ThreadPool.QueueUserWorkItem(async x => { await AddRange<Comparer<T>>(items, needsReset: needsReset); });
+			if (items is ICollection<T>)
+			{
+				Data.AddRange(items);
+			}
+			else
+			{
+				ThreadPool.QueueUserWorkItem(async x => await AddRange<Comparer<T>>(items, needsReset: needsReset));
+			}
 		}
 
 		/// <summary> 
 		/// Removes the first occurence of each item in the specified collection from ObservableCollection(Of T). 
 		/// </summary> 
-		public void RemoveRange(IEnumerable<T> collection)
+		public ValueTask RemoveRange(IEnumerable<T> collection)
 		{
 			ArgumentNullException.ThrowIfNull(collection);
 
 			foreach (var i in collection)
 				Data.Remove(i);
 
-			OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+			return OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 		}
 
 		/// <summary> 

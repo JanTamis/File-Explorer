@@ -88,9 +88,7 @@ namespace FileExplorerCore.Helpers
 						{
 							var folderText = Enum.GetName(folder);
 
-
 							if (folderText is not null && treeItem.GetPath((path, knownFolder) => path.SequenceEqual(KnownFolders.GetPath(knownFolder)), folder))
-
 							{
 								name = folderText;
 								break;

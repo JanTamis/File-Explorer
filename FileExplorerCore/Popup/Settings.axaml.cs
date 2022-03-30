@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Themes.Fluent;
@@ -8,13 +7,6 @@ using FileExplorerCore.Interfaces;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using FileExplorerCore.Helpers;
-using System.IO;
-using System.Linq;
-using FileExplorerCore.ViewModels;
-using FileExplorerCore.Models;
-using System.Threading.Tasks;
-using System.Runtime;
 using Avalonia;
 
 namespace FileExplorerCore.Popup

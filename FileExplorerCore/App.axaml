@@ -10,6 +10,7 @@
              xmlns:assist="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:sys="clr-namespace:System;assembly=netstandard"
              xmlns:avaloniaConverters="using:Avalonia.Controls.Converters"
+             xmlns:dialogHost="clr-namespace:DialogHost"
              x:Class="FileExplorerCore.App">
   <Application.DataTemplates>
     <local:ViewLocator />
@@ -51,6 +52,7 @@
     <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml" />
     <StyleInclude Source="avares://Material.Avalonia/Material.Avalonia.Templates.xaml" />
     <StyleInclude Source="avares://Material.Icons.Avalonia/App.xaml" />
+    <StyleInclude Source="avares://DialogHost.Avalonia/Styles.xaml"/>
     
     <Style Selector="TabStrip > TabStripItem">
       <Setter Property="Background" Value="Transparent" />

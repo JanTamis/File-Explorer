@@ -50,10 +50,14 @@ namespace FileExplorerCore.Models
 
 					if (Directory.Exists(path))
 					{
-						return new FileSystemEnumerable<byte>(path, (ref FileSystemEntry x) => 0, Options)
+						var enumerable = new FileSystemEnumerable<byte>(path, (ref FileSystemEntry x) => 0, Options)
 						{
 							ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
-						}.Any();
+						};
+
+						return enumerable
+							.GetEnumerator()
+							.MoveNext();
 					}
 				}
 
@@ -273,6 +277,11 @@ namespace FileExplorerCore.Models
 
 			GetPath(ref builder);
 
+			if (OperatingSystem.IsWindows() && builder.Length > 3 && builder[^1] == PathHelper.DirectorySeparator)
+			{
+				return action(builder.AsSpan(0, builder.Length - 1));
+			}
+
 			return action(builder.AsSpan());
 		}
 
@@ -289,7 +298,7 @@ namespace FileExplorerCore.Models
 		{
 			foreach (var item in EnumerateToRoot().Reverse())
 			{
-				item._value.CopyToSpan(builder.AppendSpan(item.Value.Length));
+				item.UTF8String.CopyToSpan(builder.AppendSpan(item.Value.Length));
 
 				if (builder.Length > 0 && builder[^1] != PathHelper.DirectorySeparator)
 				{
