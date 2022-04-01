@@ -5,7 +5,7 @@ using FileExplorerCore.Models;
 using System.Globalization;
 using System.Linq;
 using FileExplorerCore.Helpers;
-using static FileExplorerCore.Helpers.SpanSplitExtensions;
+using Microsoft.Toolkit.HighPerformance;
 
 namespace FileExplorerCore.Converters
 {
@@ -29,22 +29,19 @@ namespace FileExplorerCore.Converters
 			}
 
 			FileSystemTreeItem item = null!;
-			Enumerable1<char> enumerable = new();
 
 			if (OperatingSystem.IsMacOS())
 			{
-				item = new FileSystemTreeItem(path.AsSpan().Slice(0, 1), true);
-				enumerable = new Enumerable1<char>(path.AsSpan(1), PathHelper.DirectorySeparator);
+				item = new FileSystemTreeItem(path.AsSpan(0, 1), true);
 			}
 			else if (OperatingSystem.IsWindows())
 			{
-				item = new FileSystemTreeItem(path.AsSpan().Slice(0, 3), true);
-				enumerable = new Enumerable1<char>(path.AsSpan(3), PathHelper.DirectorySeparator);
+				item = new FileSystemTreeItem(path.AsSpan(0, 3), true);
 			}
 
 			yield return new FolderModel(item);
 
-			foreach (var subPath in path[(OperatingSystem.IsWindows() ? 3 : 1)..].Split(PathHelper.DirectorySeparator))
+			foreach (var subPath in path.Substring(OperatingSystem.IsWindows() ? 3 : 1).Split(PathHelper.DirectorySeparator))
 			{
 				item = new FileSystemTreeItem(subPath, true, item);
 

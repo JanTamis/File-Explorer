@@ -16,8 +16,8 @@ using System.Linq;
 using System.Timers;
 using System.Threading.Tasks;
 using Avalonia;
-using static FileExplorerCore.Helpers.SpanSplitExtensions;
 using DialogHost;
+using Microsoft.Toolkit.HighPerformance;
 
 namespace FileExplorerCore.ViewModels
 {
@@ -424,21 +424,13 @@ namespace FileExplorerCore.ViewModels
 
 		public static FileSystemTreeItem GetTreeItem(ReadOnlySpan<char> path)
 		{
-			FileSystemTreeItem item = null!;
-			Enumerable1<char> enumerable = new();
+			var offset = OperatingSystem.IsWindows()
+				? 3
+				: 1;
 
-			if (OperatingSystem.IsMacOS())
-			{
-				item = new FileSystemTreeItem(path[..1], true);
-				enumerable = path[1..].Split(PathHelper.DirectorySeparator);
-			}
-			else if (OperatingSystem.IsWindows())
-			{
-				item = new FileSystemTreeItem(path[..3], true);
-				enumerable = path[3..].Split(PathHelper.DirectorySeparator);
-			}
+			var item = new FileSystemTreeItem(path[..offset], true);
 
-			foreach (var name in enumerable)
+			foreach (var name in path[offset..].Tokenize(PathHelper.DirectorySeparator))
 			{
 				item = new FileSystemTreeItem(name, true, item);
 			}

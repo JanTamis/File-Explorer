@@ -76,7 +76,11 @@ namespace FileExplorerCore.Views
 				if (e.Containers[i] is { ContainerControl: TreeViewItem { DataContext: FolderModel folderModel } treeItem })
 				{
 					treeItem.ItemContainerGenerator.Materialized += TreeItemGenerated;
-					treeItem.Items = new FolderModel[] { new FolderModel(new FileSystemTreeItem("Loading...", false)) };
+
+          if (folderModel.HasFolders || folderModel.TreeItem is null)
+          {
+            treeItem.Items = new FolderModel[] { new FolderModel(new FileSystemTreeItem("Loading...", false)) }; 
+          }
 					
 					if (OperatingSystem.IsWindows() && treeItem.Parent is TreeView)
 					{

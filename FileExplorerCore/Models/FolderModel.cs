@@ -17,6 +17,8 @@ namespace FileExplorerCore.Models
 
 		public string Name => _name ?? TreeItem?.Value ?? String.Empty;
 
+		public bool HasFolders => TreeItem?.HasFolders ?? false;
+
 		public Task<IImage?> Image => ThumbnailProvider.GetFileImage(TreeItem, 24);
 
 		public IEnumerable<FolderModel> SubFolders => _folders is not null 

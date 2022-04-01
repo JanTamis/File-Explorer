@@ -20,7 +20,7 @@ namespace FileExplorerCore.Models
 			AttributesToSkip = FileAttributes.System | FileAttributes.Hidden,
 		};
 
-		private Utf8String _value;
+		private DynamicString _value;
 
 		public IEnumerable<FileSystemTreeItem> Children
 		{
@@ -77,11 +77,11 @@ namespace FileExplorerCore.Models
 			}
 			set
 			{
-				_value = new Utf8String(value);
+				_value = new DynamicString(value);
 			}
 		}
 
-		public Utf8String UTF8String
+		public DynamicString DynamicString
 		{
 			get => _value;
 			set => _value = value;
@@ -95,7 +95,7 @@ namespace FileExplorerCore.Models
 			IsFolder = isFolder;
 			Parent = parent;
 
-			_value = new Utf8String(name);
+			_value = new DynamicString(name);
 		}
 
 		/// <summary>
@@ -277,16 +277,24 @@ namespace FileExplorerCore.Models
 
 			GetPath(ref builder);
 
-			if (OperatingSystem.IsWindows() && builder.Length > 3 && builder[^1] == PathHelper.DirectorySeparator)
-			{
-				return action(builder.AsSpan(0, builder.Length - 1));
-			}
-			else if (builder.Length > 1 && builder[^1] == PathHelper.DirectorySeparator)
-			{
-				return action(builder.AsSpan(0, builder.Length - 1));
-			}
+			var span = builder.AsSpan(true);
+			var index = span.IndexOf('\0');
 
-			return action(builder.AsSpan());
+      if (index is not -1)
+      {
+        span = span[..index]; 
+      }
+
+			//if (OperatingSystem.IsWindows() && span.Length > 3 && span[^1] == PathHelper.DirectorySeparator)
+			//{
+			//	return action(span[0..^1]);
+			//}
+			//else if (builder.Length > 1 && span[^1] == PathHelper.DirectorySeparator)
+			//{
+			//	return action(span[..(builder.Length - 1)]);
+			//}
+
+			return action(span);
 		}
 
 		public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
@@ -295,14 +303,14 @@ namespace FileExplorerCore.Models
 
 			GetPath(ref builder);
 
-			return action(builder.AsSpan(), parameter);
+			return action(builder.AsSpan(true), parameter);
 		}
 
 		private void GetPath(ref ValueStringBuilder builder)
 		{
 			foreach (var item in EnumerateToRoot().Reverse())
 			{
-				item.UTF8String.CopyToSpan(builder.AppendSpan(item.Value.Length));
+				item.DynamicString.CopyToSpan(builder.AppendSpan(item.Value.Length));
 
 				if (builder.Length > 0 && builder[^1] != PathHelper.DirectorySeparator)
 				{
