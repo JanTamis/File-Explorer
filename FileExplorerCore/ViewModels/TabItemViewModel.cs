@@ -10,7 +10,6 @@ using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
-using FileExplorerCore.Popup;
 using Humanizer;
 
 namespace FileExplorerCore.ViewModels
@@ -416,7 +415,7 @@ namespace FileExplorerCore.ViewModels
 
 			IsLoading = false;
 		}
-
+		
 		public async ValueTask SetPath(FileSystemTreeItem? path)
 		{
 			if (path is null)

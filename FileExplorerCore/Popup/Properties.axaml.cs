@@ -86,6 +86,7 @@ namespace FileExplorerCore.Popup
 						var watch = Stopwatch.StartNew();
 
 						_source = new CancellationTokenSource();
+						
 
 						foreach (var child in enumerable)
 						{

@@ -24,7 +24,6 @@ namespace FileExplorerCore.ViewModels
 		public ValueTask OnPropertyChanged<T>(ref T field, T value, [CallerMemberName] string? name = null)
 		{
 			field = value;
-
 			return OnPropertyChanged(name);
 		}
 	}

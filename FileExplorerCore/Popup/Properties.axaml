@@ -2,22 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-						 xmlns:converters="using:FileExplorerCore.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FileExplorerCore.Popup.Properties">
-  <UserControl.Resources>
-    <converters:PathToImageConverter x:Key="imageConverter" />
-    <converters:EditedOnConverter x:Key="editedOnConverter" />
-    <converters:ExtensionConverter x:Key="extensionConverter" />
-    <converters:SizeConverter x:Key="sizeConverter" />
-    <converters:FileNameConverter x:Key="fileNameConverter" />
-    <converters:ImageTransformConverter x:Key="imageTransformConverter" />
-  </UserControl.Resources>
-
-  <Grid ColumnDefinitions="Auto, *"
-        MinWidth="400"
-        Margin="5 0"
-        RowDefinitions="Auto, Auto, 30, Auto, 30, 30, Auto, 30, Auto, Auto" >
+	<Grid ColumnDefinitions="Auto, *"
+	      MinWidth="400"
+	      Margin="5 0"
+	      RowDefinitions="Auto, Auto, 30, Auto, 30, 30, Auto, 30, Auto, Auto" >
 
     <StackPanel Orientation="Horizontal"
                 Grid.ColumnSpan="2">
