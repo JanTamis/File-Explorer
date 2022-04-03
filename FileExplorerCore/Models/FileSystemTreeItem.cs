@@ -20,8 +20,6 @@ namespace FileExplorerCore.Models
 			AttributesToSkip = FileAttributes.System | FileAttributes.Hidden,
 		};
 
-		private DynamicString _value;
-
 		public IEnumerable<FileSystemTreeItem> Children
 		{
 			get
@@ -50,7 +48,7 @@ namespace FileExplorerCore.Models
 
 					if (Directory.Exists(path))
 					{
-						var enumerable = new FileSystemEnumerable<byte>(path, (ref FileSystemEntry x) => 0, Options)
+						var enumerable = new FileSystemEnumerable<byte>(path, (ref FileSystemEntry _) => 0, Options)
 						{
 							ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
 						};
@@ -71,31 +69,42 @@ namespace FileExplorerCore.Models
 
 		public string Value
 		{
-			get
-			{
-				return _value.ToString();
-			}
-			set
-			{
-				_value = new DynamicString(value);
-			}
+			get => DynamicString.ToString();
+			set => DynamicString = new DynamicString(value);
 		}
 
-		public DynamicString DynamicString
-		{
-			get => _value;
-			set => _value = value;
-		}
+		public DynamicString DynamicString { get; set; }
 
 		public bool HasParent => Parent is not null;
-		public bool HasChildren => Children.Any();
+
+		public bool HasChildren
+		{
+			get
+			{
+				if (IsFolder)
+				{
+					var path = GetPath(x => x.ToString());
+
+					if (Directory.Exists(path))
+					{
+						var enumerable = new FileSystemEnumerable<byte>(path, (ref FileSystemEntry _) => 0, Options);
+
+						return enumerable
+							.GetEnumerator()
+							.MoveNext();
+					}
+				}
+
+				return false;
+			}
+		}
 
 		public FileSystemTreeItem(ReadOnlySpan<char> name, bool isFolder, FileSystemTreeItem? parent = null)
 		{
 			IsFolder = isFolder;
 			Parent = parent;
 
-			_value = new DynamicString(name);
+			DynamicString = new DynamicString(name);
 		}
 
 		/// <summary>
@@ -273,7 +282,7 @@ namespace FileExplorerCore.Models
 
 		public T GetPath<T>(ReadOnlySpanFunc<char, T> action)
 		{
-			var builder = new ValueStringBuilder(stackalloc char[512]);
+			var builder = new ValueStringBuilder(stackalloc char[256]);
 
 			GetPath(ref builder);
 
@@ -299,7 +308,7 @@ namespace FileExplorerCore.Models
 
 		public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
 		{
-			var builder = new ValueStringBuilder(stackalloc char[512]);
+			var builder = new ValueStringBuilder(stackalloc char[256]);
 
 			GetPath(ref builder);
 

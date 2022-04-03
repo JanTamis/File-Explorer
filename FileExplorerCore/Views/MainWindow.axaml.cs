@@ -71,7 +71,7 @@ namespace FileExplorerCore.Views
 
 		private async void TreeItemGenerated(object? sender, ItemContainerEventArgs e)
 		{
-			for (int i = 0; i < e.Containers.Count; i++)
+			for (var i = 0; i < e.Containers.Count; i++)
 			{
 				if (e.Containers[i] is { ContainerControl: TreeViewItem { DataContext: FolderModel folderModel } treeItem })
 				{

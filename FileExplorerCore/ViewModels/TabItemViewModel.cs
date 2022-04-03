@@ -411,8 +411,6 @@ namespace FileExplorerCore.ViewModels
         });
       }
 
-      //timer.Stop();
-
       IsLoading = false;
     }
 

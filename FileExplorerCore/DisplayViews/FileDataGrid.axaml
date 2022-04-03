@@ -14,7 +14,7 @@
 
 	<ScrollViewer>
 		<ItemsRepeater Items="{Binding Files}"
-					   VerticalCacheLength="0"
+		               VerticalCacheLength="0"
 		               Margin="0 0 0 5"
 		               x:Name="fileList">
 			<ItemsRepeater.Layout>

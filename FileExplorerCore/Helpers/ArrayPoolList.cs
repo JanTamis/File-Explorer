@@ -34,7 +34,7 @@ namespace FileExplorerCore.Helpers
     {
       _version++;
       var array = DisposeCheck(_items);
-      int size = _size;
+      var size = _size;
       if ((uint)size < (uint)array.Length)
       {
         _size = size + 1;
@@ -60,7 +60,7 @@ namespace FileExplorerCore.Helpers
     [MethodImpl(MethodImplOptions.NoInlining)]
     private void AddWithResize(T item)
     {
-      int size = _size;
+      var size = _size;
       EnsureCapacity(size + 1);
       _size = size + 1;
       _items[size] = item;
@@ -72,7 +72,7 @@ namespace FileExplorerCore.Helpers
     {
       if (_items.Length < min)
       {
-        int newCapacity = _items.Length == 0 ? DefaultCapacity : _items.Length * 2;
+        var newCapacity = _items.Length == 0 ? DefaultCapacity : _items.Length * 2;
         if ((uint)newCapacity > MaxArrayLength)
 				{
 					newCapacity = MaxArrayLength;
@@ -114,7 +114,7 @@ namespace FileExplorerCore.Helpers
         {
           if (value > 0)
           {
-            T[] newItems = ArrayPool<T>.Shared.Rent(value);
+            var newItems = ArrayPool<T>.Shared.Rent(value);
             if (_size > 0)
             {
               Array.Copy(_items, 0, newItems, 0, _size);
@@ -177,7 +177,7 @@ namespace FileExplorerCore.Helpers
 
 		public IEnumerator<T> GetEnumerator()
 		{
-			for (int i = 0; i < _size; i++)
+			for (var i = 0; i < _size; i++)
 			{
         yield return _items[i];
 			}
