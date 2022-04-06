@@ -10,7 +10,7 @@ using ProtoBuf;
 
 namespace FileExplorerCore.Models
 {
-	[ProtoContract]
+	//[ProtoContract]
 	public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
 	{
 		public static readonly EnumerationOptions Options = new()
@@ -87,11 +87,9 @@ namespace FileExplorerCore.Models
 
 					if (Directory.Exists(path))
 					{
-						var enumerable = new FileSystemEnumerable<byte>(path, (ref FileSystemEntry _) => 0, Options);
+						var enumerable = new DelegateFileSystemEnumerator<byte>(path, Options);
 
-						return enumerable
-							.GetEnumerator()
-							.MoveNext();
+						return enumerable.MoveNext();
 					}
 				}
 

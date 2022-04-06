@@ -64,9 +64,9 @@ namespace FileExplorerCore.ViewModels
     }
 
     public IEnumerable<FolderModel> Folders => TreeItem?
-        .EnumerateToRoot()
-        .Reverse()
-        .Select(s => new FolderModel(s)) ?? Enumerable.Empty<FolderModel>();
+      .EnumerateToRoot()
+      .Reverse()
+      .Select(s => new FolderModel(s)) ?? Enumerable.Empty<FolderModel>();
 
     public int Count
     {
@@ -353,7 +353,6 @@ namespace FileExplorerCore.ViewModels
       foreach (var file in Files)
       {
         file.IsVisible = false;
-        file.Dispose();
       }
 
       TokenSource?.Cancel();

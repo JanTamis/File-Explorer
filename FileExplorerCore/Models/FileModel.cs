@@ -10,27 +10,27 @@ using System.IO.Enumeration;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
+using System.ComponentModel;
+using Avalonia.Threading;
+using System.Runtime.CompilerServices;
 
 namespace FileExplorerCore.Models
 {
-	public class FileModel : ViewModelBase, IDisposable
+	public class FileModel : INotifyPropertyChanged
 	{
 		public static readonly ConcurrentBag<FileModel> FileImageQueue = new();
+
+		public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
 		public FileSystemTreeItem TreeItem { get; }
 
 		private bool _isSelected;
-		public bool NeedsNewImage = true;
-
 		private string? _name;
 		private string? _extension;
 		private long _size = -1;
 
 		private DateTime _editedOn;
 
-		private bool _needsTranslation;
-
-		private static bool _isNotLoading = true;
 		private bool isVisible = true;
 
 		public string? ExtensionName { get; set; }
@@ -58,7 +58,7 @@ namespace FileExplorerCore.Models
 					return ThumbnailProvider.GetFileImage(TreeItem, context.CurrentTab.CurrentViewMode is ViewTypes.Grid ? 100 : 24, () => IsVisible);
 				}
 
-				return null;
+				return Task.FromResult((IImage?)null);
 			}
 		}
 
@@ -72,12 +72,6 @@ namespace FileExplorerCore.Models
 					OnPropertyChanged(ref _isSelected, value);
 				}
 			}
-		}
-
-		public bool NeedsTranslation
-		{
-			get => _needsTranslation;
-			set => OnPropertyChanged(ref _needsTranslation, value);
 		}
 
 		public string Path => TreeItem.GetPath(path => path.ToString());
@@ -202,9 +196,22 @@ namespace FileExplorerCore.Models
 			TreeItem = item;
 		}
 
-		public void Dispose()
+		public void OnPropertyChanged([CallerMemberName] string? name = null)
 		{
-			GC.SuppressFinalize(this);
+			if (Dispatcher.UIThread.CheckAccess())
+			{
+				PropertyChanged(this, new PropertyChangedEventArgs(name));
+			}
+			else
+			{
+				Dispatcher.UIThread.InvokeAsync(() => PropertyChanged(this, new PropertyChangedEventArgs(name)));
+			}
+		}
+
+		public void OnPropertyChanged<T>(ref T field, T value, [CallerMemberName] string? name = null)
+		{
+			field = value;
+			OnPropertyChanged(name);
 		}
 	}
 }
