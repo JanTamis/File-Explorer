@@ -5,6 +5,7 @@ using Avalonia.Controls.Notifications;
 using Avalonia.Markup.Xaml;
 using Avalonia.Themes.Fluent;
 using DiscUtils.FileSystems;
+using FileExplorerCore.Helpers;
 using FileExplorerCore.ViewModels;
 using FileExplorerCore.Views;
 
@@ -38,6 +39,8 @@ namespace FileExplorerCore
 				Current.Styles[0] = fluentTheme;
 				//	}
 				//}
+
+				var temp = new DynamicString("5");
 
 				desktop.MainWindow = new MainWindow();
 				desktop.MainWindow.DataContext = new MainWindowViewModel(new WindowNotificationManager(desktop.MainWindow)
