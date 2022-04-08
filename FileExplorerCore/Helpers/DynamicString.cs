@@ -21,7 +21,7 @@ namespace FileExplorerCore.Helpers
 
     private readonly bool _isUtf8;
 
-    public static DynamicString Empty = new DynamicString(stackalloc byte[0], true);
+    public static DynamicString Empty = new DynamicString(Array.Empty<byte>(), true);
 
     public DynamicString(ReadOnlySpan<char> data)
     {
@@ -30,15 +30,17 @@ namespace FileExplorerCore.Helpers
 
       if (_isUtf8)
       {
-        _data = new byte[Encoding.UTF8.GetByteCount(data)];
+	      _data = new byte[data.Length];
+	      var textSpan = MemoryMarshal.AsBytes(data);
 
-        Encoding.UTF8.GetBytes(data, _data);
+	      for (var i = 0; i < _data.Length; i++)
+	      {
+		      _data[i] = textSpan[i << 1];
+	      }
       }
       else
       {
-        _data = data
-          .Cast<char, byte>()
-          .ToArray();
+        _data = MemoryMarshal.AsBytes(data).ToArray();
       }
     }
 
@@ -49,7 +51,7 @@ namespace FileExplorerCore.Helpers
 
       Length = isUtf8
         ? data.Length
-        : data.Length / 2;
+        : data.Length >> 1;
     }
 
     private DynamicString(byte[] data, bool isUtf8 = true)
@@ -59,7 +61,7 @@ namespace FileExplorerCore.Helpers
 
       Length = isUtf8
         ? data.Length
-        : data.Length / 2;
+        : data.Length >> 1;
     }
 
     private char this[int index]
@@ -721,7 +723,7 @@ namespace FileExplorerCore.Helpers
       }
     }
 
-    public ReadOnlySpan<byte> AsSpan()
+    public ReadOnlySpan<byte> AsBytes()
     {
       return _data.AsSpan();
     }

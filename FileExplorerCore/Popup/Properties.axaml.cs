@@ -87,7 +87,6 @@ namespace FileExplorerCore.Popup
 
 						_source = new CancellationTokenSource();
 						
-
 						foreach (var child in enumerable)
 						{
 							if (_source.IsCancellationRequested)

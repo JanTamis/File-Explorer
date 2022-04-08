@@ -461,7 +461,7 @@ namespace FileExplorerCore.ViewModels
       if (search is "*" or "*.*")
       {
         return path
-          .EnumerateChildren()
+	        .EnumerateChildren((ref FileSystemEntry file) => !file.IsHidden)
           .Select(s => new FileModel(s));
       }
 

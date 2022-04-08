@@ -4,9 +4,10 @@ using System.IO.Enumeration;
 
 namespace FileExplorerCore.Helpers
 {
-  public sealed class DelegateFileSystemEnumerator<TResult> : FileSystemEnumerator<TResult> where TResult : struct
+  public sealed class DelegateFileSystemEnumerator<TResult> : FileSystemEnumerator<TResult>
   {
-    public FileSystemEnumerable<TResult>.FindTransform? Transformation { get; }
+    public FileSystemEnumerable<TResult>.FindTransform? Transformation { get; set; }
+    public FileSystemEnumerable<TResult>.FindPredicate? Find { get; set; }
 
     public DelegateFileSystemEnumerator(string directory,  EnumerationOptions options) : base(directory, options)
     {
@@ -21,7 +22,7 @@ namespace FileExplorerCore.Helpers
     }
 
     protected override bool ShouldRecurseIntoEntry(ref FileSystemEntry entry) => false;
-    protected override bool ShouldIncludeEntry(ref FileSystemEntry entry) => true;
+    protected override bool ShouldIncludeEntry(ref FileSystemEntry entry) => Find is null || Find(ref entry);
 
     protected override bool ContinueOnError(int error) => true;
   }

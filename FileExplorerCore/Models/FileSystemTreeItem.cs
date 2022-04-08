@@ -192,6 +192,11 @@ namespace FileExplorerCore.Models
 				yield break;
 			}
 
+			var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(GetPath(x => x.ToString()), Options)
+			{
+				Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
+			};
+
 			if (layers is 0)
 			{
 				foreach (var child in Children)
@@ -245,27 +250,31 @@ namespace FileExplorerCore.Models
 				yield break;
 			}
 
-			var enumerable = Children;
+			var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(GetPath(x => x.ToString()), Options)
+			{
+				Find = findPredicate,
+				Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
+			};
 
 			if (layers is 0)
 			{
-				foreach (var child in enumerable)
+				while (enumerable.MoveNext())
 				{
-					yield return child;
+					yield return enumerable.Current;
 				}
 
 				yield break;
 			}
 
 			var children = new List<FileSystemTreeItem>();
-
-			foreach (var child in enumerable)
+			
+			while (enumerable.MoveNext())
 			{
-				yield return child;
+				yield return enumerable.Current;
 
-				if (child.IsFolder)
+				if (enumerable.Current.IsFolder)
 				{
-					children.Add(child);
+					children.Add(enumerable.Current);
 				}
 			}
 
