@@ -40,8 +40,6 @@ namespace FileExplorerCore
 				//	}
 				//}
 
-				var temp = new DynamicString("5");
-
 				desktop.MainWindow = new MainWindow();
 				desktop.MainWindow.DataContext = new MainWindowViewModel(new WindowNotificationManager(desktop.MainWindow)
 				{

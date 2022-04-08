@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
+using System.Text.Unicode;
 
 namespace FileExplorerCore.Helpers
 {
@@ -16,52 +16,32 @@ namespace FileExplorerCore.Helpers
   public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
   {
     private readonly byte[] _data;
+    private readonly int _length;
 
-    public int Length { get; }
+    public int Length => _length;
 
-    private readonly bool _isUtf8;
+    static int temporary;
 
-    public static DynamicString Empty = new DynamicString(Array.Empty<byte>(), true);
+    public static DynamicString Empty = new(Array.Empty<byte>(), 0);
 
     public DynamicString(ReadOnlySpan<char> data)
     {
-      _isUtf8 = IsUTF8(data);
-      Length = data.Length;
+      Span<byte> temp = stackalloc byte[data.Length * sizeof(char)];
 
-      if (_isUtf8)
-      {
-	      _data = new byte[data.Length];
-	      var textSpan = MemoryMarshal.AsBytes(data);
+      var state = Utf8.FromUtf16(data, temp, out _length, out var bytes, false, false);
 
-	      for (var i = 0; i < _data.Length; i++)
-	      {
-		      _data[i] = textSpan[i << 1];
-	      }
-      }
-      else
+      if (bytes > temp.Length / 2)
       {
-        _data = MemoryMarshal.AsBytes(data).ToArray();
+        temporary += temp.Length - bytes;
       }
+
+      _data = temp[0..bytes].ToArray();
     }
 
-    private DynamicString(ReadOnlySpan<byte> data, bool isUtf8 = true)
+    private DynamicString(ReadOnlySpan<byte> data, int length)
     {
       _data = data.ToArray();
-      _isUtf8 = isUtf8;
-
-      Length = isUtf8
-        ? data.Length
-        : data.Length >> 1;
-    }
-
-    private DynamicString(byte[] data, bool isUtf8 = true)
-    {
-      _data = data;
-      _isUtf8 = isUtf8;
-
-      Length = isUtf8
-        ? data.Length
-        : data.Length >> 1;
+      _length = length;
     }
 
     private char this[int index]
@@ -72,8 +52,10 @@ namespace FileExplorerCore.Helpers
         {
           throw new ArgumentOutOfRangeException(nameof(index));
         }
+        
+        var span = GetChars(_data, stackalloc char[index + 1]);
 
-        return GetElement(index);
+        return span[index];
       }
     }
 
@@ -113,104 +95,32 @@ namespace FileExplorerCore.Helpers
 
     public static DynamicString Concat(DynamicString str0, DynamicString str1)
     {
-      switch (str0._isUtf8)
+      return Create(str0.Length + str1.Length, (str0, str1), (span, state) =>
       {
-        case true when str1._isUtf8:
-          {
-            var data = new byte[str0.Length + str1.Length];
-
-            str0._data.CopyTo(data, 0);
-            str1._data.CopyTo(data, str0.Length);
-
-            return new DynamicString(data, true);
-          }
-        case false when !str1._isUtf8:
-          {
-            var data = new byte[str0._data.Length + str1._data.Length];
-
-            str0._data.CopyTo(data, 0);
-            str1._data.CopyTo(data, str0._data.Length);
-
-            return new DynamicString(data, false);
-          }
-        default:
-          return Create(str0.Length + str1.Length, (str0, str1), (span, state) =>
-          {
-            state.str0.CopyToSpan(span);
-            state.str1.CopyToSpan(span[state.str0.Length..]);
-          });
-      }
+        state.str0.CopyToSpan(span);
+        state.str1.CopyToSpan(span[state.str0.Length..]);
+      });
     }
 
     public static DynamicString Concat(DynamicString str0, DynamicString str1, DynamicString str2)
     {
-      switch (str0._isUtf8)
+      return Create(str0.Length + str1.Length + str2.Length, (str0, str1, str2), (span, state) =>
       {
-        case true when str1._isUtf8 && str2._isUtf8:
-          {
-            var data = new byte[str0.Length + str1.Length + str2.Length];
-
-            str0._data.CopyTo(data, 0);
-            str1._data.CopyTo(data, str0.Length);
-            str2._data.CopyTo(data, str0.Length + str1.Length);
-
-            return new DynamicString(data, true);
-          }
-        case false when !str1._isUtf8 && !str2._isUtf8:
-          {
-            var data = new byte[str0._data.Length + str1._data.Length + str2._data.Length];
-
-            str0._data.CopyTo(data, 0);
-            str1._data.CopyTo(data, str0._data.Length);
-            str2._data.CopyTo(data, str0._data.Length + str1._data.Length);
-
-            return new DynamicString(data, false);
-          }
-        default:
-          return Create(str0.Length + str1.Length + str2.Length, (str0, str1, str2), (span, state) =>
-          {
-            state.str0.CopyToSpan(span);
-            state.str1.CopyToSpan(span[state.str0.Length..]);
-            state.str2.CopyToSpan(span[(state.str0.Length + state.str1.Length)..]);
-          });
-      }
+        state.str0.CopyToSpan(span);
+        state.str1.CopyToSpan(span[state.str0.Length..]);
+        state.str2.CopyToSpan(span[(state.str0.Length + state.str1.Length)..]);
+      });
     }
 
     public static DynamicString Concat(DynamicString str0, DynamicString str1, DynamicString str2, DynamicString str3)
     {
-      switch (str0._isUtf8)
+      return Create(str0.Length + str1.Length + str2.Length + str3.Length, (str0, str1, str2, str3), (span, state) =>
       {
-        case true when str1._isUtf8 && str2._isUtf8 && str3._isUtf8:
-          {
-            var data = new byte[str0.Length + str1.Length + str2.Length + str3.Length];
-
-            str0._data.CopyTo(data, 0);
-            str1._data.CopyTo(data, str0.Length);
-            str2._data.CopyTo(data, str0.Length + str1.Length);
-            str3._data.CopyTo(data, str0.Length + str1.Length + str2.Length);
-
-            return new DynamicString(data, true);
-          }
-        case false when !str1._isUtf8 && !str2._isUtf8 && !str3._isUtf8:
-          {
-            var data = new byte[str0._data.Length + str1._data.Length + str2._data.Length + str3._data.Length];
-
-            str0._data.CopyTo(data, 0);
-            str1._data.CopyTo(data, str0._data.Length);
-            str2._data.CopyTo(data, str0._data.Length + str1._data.Length);
-            str3._data.CopyTo(data, str0._data.Length + str1._data.Length + str2._data.Length);
-
-            return new DynamicString(data, false);
-          }
-        default:
-          return Create(str0.Length + str1.Length + str2.Length + str3.Length, (str0, str1, str2, str3), (span, state) =>
-          {
-            state.str0.CopyToSpan(span);
-            state.str1.CopyToSpan(span[state.str0.Length..]);
-            state.str2.CopyToSpan(span[(state.str0.Length + state.str1.Length)..]);
-            state.str3.CopyToSpan(span[(state.str0.Length + state.str1.Length + state.str2.Length)..]);
-          });
-      }
+        state.str0.CopyToSpan(span);
+        state.str1.CopyToSpan(span[state.str0.Length..]);
+        state.str2.CopyToSpan(span[(state.str0.Length + state.str1.Length)..]);
+        state.str3.CopyToSpan(span[(state.str0.Length + state.str1.Length + state.str2.Length)..]);
+      });
     }
 
     public static DynamicString Concat(params DynamicString[] items)
@@ -241,77 +151,17 @@ namespace FileExplorerCore.Helpers
 
     public DynamicString Trim()
     {
-      int start;
-      int end;
-
-      for (start = 0; start < _data.Length; start++)
-      {
-        if (!Char.IsWhiteSpace(GetElement(start)))
-        {
-          break;
-        }
-      }
-
-      for (end = _data.Length - 1; end >= 0; end--)
-      {
-        if (!Char.IsWhiteSpace(GetElement(end)))
-        {
-          break;
-        }
-      }
-
-      var length = end - start;
-
-      if (_isUtf8)
-      {
-        return new DynamicString(_data.AsSpan(start, length), _isUtf8);
-      }
-
-      return new DynamicString(_data.AsSpan(start * 2, length * 2), _isUtf8);
+      return new DynamicString(GetChars(_data, stackalloc char[Length]).Trim());
     }
 
-    public DynamicString TrimLeft()
+    public DynamicString TrimStart()
     {
-      int start;
-
-      for (start = 0; start < _data.Length; start++)
-      {
-        if (!Char.IsWhiteSpace(GetElement(start)))
-        {
-          break;
-        }
-      }
-
-      var length = start + 1;
-
-      if (_isUtf8)
-      {
-        return new DynamicString(_data.AsSpan(start, length), _isUtf8);
-      }
-
-      return new DynamicString(_data.AsSpan(start * 2, length * 2), _isUtf8);
+      return new DynamicString(GetChars(_data, stackalloc char[Length]).TrimStart());
     }
 
-    public DynamicString TrimRight()
+    public DynamicString TrimEnd()
     {
-      int end;
-
-      for (end = _data.Length - 1; end >= 0; end--)
-      {
-        if (!Char.IsWhiteSpace(GetElement(end)))
-        {
-          break;
-        }
-      }
-
-      var length = Length - end;
-
-      if (_isUtf8)
-      {
-        return new DynamicString(_data.AsSpan(0, length), _isUtf8);
-      }
-
-      return new DynamicString(_data.AsSpan(0, length * 2), _isUtf8);
+      return new DynamicString(GetChars(_data, stackalloc char[Length]).TrimEnd());
     }
 
     #endregion
@@ -320,25 +170,14 @@ namespace FileExplorerCore.Helpers
 
     public DynamicString Remove(int startIndex)
     {
-      if (!_isUtf8)
-      {
-        startIndex *= 2;
-      }
-
-      return new DynamicString(_data[..startIndex], _isUtf8);
+      return new DynamicString(GetChars(_data, stackalloc char[Length])
+        .Slice(startIndex)
+        .TrimStart());
     }
 
     public DynamicString Remove(int startIndex, int count)
     {
-      // TODO Implementation is not correct
-
-      if (!_isUtf8)
-      {
-        startIndex *= 2;
-        count *= 2;
-      }
-
-      return new DynamicString(_data[startIndex..(startIndex + count)], _isUtf8);
+      throw new NotImplementedException();
     }
 
     #endregion
@@ -347,23 +186,16 @@ namespace FileExplorerCore.Helpers
 
     public DynamicString Substring(int startIndex)
     {
-      if (!_isUtf8)
-      {
-        startIndex *= 2;
-      }
+      var span = GetChars(_data, stackalloc char[Length]);
 
-      return new DynamicString(_data[startIndex..], _isUtf8);
+      return new DynamicString(span[startIndex..]);
     }
 
     public DynamicString Substring(int startIndex, int length)
     {
-      if (!_isUtf8)
-      {
-        startIndex *= 2;
-        length *= 2;
-      }
+      var span = GetChars(_data, stackalloc char[Length]);
 
-      return new DynamicString(_data[startIndex..(startIndex + length)], _isUtf8);
+      return new DynamicString(span[startIndex..(startIndex + length)]);
     }
 
     #endregion
@@ -411,9 +243,11 @@ namespace FileExplorerCore.Helpers
         return true;
       }
 
-      for (var i = 0; i < Length; i++)
+      var chars = GetChars(_data, stackalloc char[Length]);
+
+      for (int i = 0; i < chars.Length; i++)
       {
-        if (Char.IsWhiteSpace(GetElement(i)))
+        if (Char.IsWhiteSpace(chars[i]))
         {
           return true;
         }
@@ -424,263 +258,66 @@ namespace FileExplorerCore.Helpers
 
     public bool Contains(char value)
     {
-      switch (_isUtf8)
-      {
-        case false:
-          return MemoryMarshal.Cast<byte, char>(_data).Contains(value);
-        case true when value <= Byte.MaxValue:
-          return _data.AsSpan().Contains((byte)value);
-      }
-
-      for (var i = 0; i < Length; i++)
-      {
-        if (GetElement(i) == value)
-        {
-          return true;
-        }
-      }
-
-      return false;
+      return GetChars(_data, stackalloc char[Length])
+        .Contains(value);
     }
 
     public int IndexOf(char value)
     {
-      switch (_isUtf8)
-      {
-        case false:
-          return MemoryMarshal.Cast<byte, char>(_data).IndexOf(value);
-        case true when value <= Byte.MaxValue:
-          return _data.AsSpan().IndexOf((byte)value);
-      }
-
-      for (var i = 0; i < Length; i++)
-      {
-        if (GetElement(i) == value)
-        {
-          return i;
-        }
-      }
-
-      return -1;
+      return GetChars(_data, stackalloc char[Length])
+        .IndexOf(value);
     }
 
     public int IndexOf(char value, int startIndex)
     {
-      if (startIndex < 0)
-      {
-        throw new ArgumentOutOfRangeException(nameof(startIndex));
-      }
-
-      if (startIndex >= Length)
-      {
-        return -1;
-      }
-
-      switch (_isUtf8)
-      {
-        case false:
-          return MemoryMarshal.Cast<byte, char>(_data)[startIndex..].IndexOf(value);
-        case true when value <= Byte.MaxValue:
-          return _data.AsSpan(startIndex).IndexOf((byte)value);
-      }
-
-      for (var i = startIndex; i < Length; i++)
-      {
-        if (GetElement(i) == value)
-        {
-          return i;
-        }
-      }
-
-      return -1;
+      return GetChars(_data, stackalloc char[Length])
+        .Slice(startIndex)
+        .IndexOf(value);
     }
 
     public int IndexOf(char value, int startIndex, int count)
     {
-      if (startIndex < 0)
-      {
-        throw new ArgumentOutOfRangeException(nameof(startIndex));
-      }
-
-      if (startIndex >= Length)
-      {
-        return -1;
-      }
-
-      if (count < 0)
-      {
-        throw new ArgumentOutOfRangeException(nameof(count));
-      }
-
-      switch (_isUtf8)
-      {
-        case false:
-          return MemoryMarshal.Cast<byte, char>(_data)[startIndex..].IndexOf(value);
-        case true when value <= Byte.MaxValue:
-          return _data.AsSpan(startIndex).IndexOf((byte)value);
-      }
-
-      for (var i = startIndex; i < Length; i++)
-      {
-        if (GetElement(i) == value)
-        {
-          return i;
-        }
-      }
-
-      return -1;
+      return GetChars(_data, stackalloc char[Length])
+        .Slice(startIndex, startIndex + count)
+        .IndexOf(value);
     }
 
     public int LastIndexOf(char value)
     {
-      switch (_isUtf8)
-      {
-        case false:
-          return MemoryMarshal.Cast<byte, char>(_data).LastIndexOf(value);
-        case true when value <= Byte.MaxValue:
-          return _data.AsSpan().LastIndexOf((byte)value);
-      }
-
-      for (var i = Length - 1; i >= 0; i--)
-      {
-        if (GetElement(i) == value)
-        {
-          return i;
-        }
-      }
-
-      return -1;
+      return GetChars(_data, stackalloc char[Length])
+        .LastIndexOf(value);
     }
 
     public int LastIndexOf(char value, int startIndex)
     {
-      if (startIndex < 0)
-      {
-        throw new ArgumentOutOfRangeException(nameof(startIndex));
-      }
-
-      if (startIndex >= Length)
-      {
-        return -1;
-      }
-
-      switch (_isUtf8)
-      {
-        case false:
-          return MemoryMarshal.Cast<byte, char>(_data)[startIndex..].LastIndexOf(value);
-        case true when value <= Byte.MaxValue:
-          return _data.AsSpan(0, startIndex).LastIndexOf((byte)value);
-      }
-
-      for (var i = startIndex - 1; i >= 0; i--)
-      {
-        if (GetElement(i) == value)
-        {
-          return i;
-        }
-      }
-
-      return -1;
+      return GetChars(_data, stackalloc char[Length])
+        .Slice(startIndex)
+        .LastIndexOf(value);
     }
 
     public int LastIndexOf(char value, int startIndex, int count)
     {
-      if (startIndex < 0)
-      {
-        throw new ArgumentOutOfRangeException(nameof(startIndex));
-      }
-
-      if (startIndex >= Length)
-      {
-        return -1;
-      }
-
-      if (count < 0)
-      {
-        throw new ArgumentOutOfRangeException(nameof(count));
-      }
-
-      switch (_isUtf8)
-      {
-        case false:
-          return MemoryMarshal.Cast<byte, char>(_data)[startIndex..(startIndex + count)].LastIndexOf(value);
-        case true when value <= Byte.MaxValue:
-          return _data.AsSpan(0, startIndex).LastIndexOf((byte)value);
-      }
-
-      for (var i = startIndex - 1; i >= 0; i--)
-      {
-        if (GetElement(i) == value)
-        {
-          return i;
-        }
-      }
-
-      return -1;
+      return GetChars(_data, stackalloc char[Length])
+        .Slice(startIndex, startIndex + count)
+        .LastIndexOf(value);
     }
 
-    public int IndexOfAny(ReadOnlySpan<Char> anyOf)
+    public int IndexOfAny(ReadOnlySpan<char> anyOf)
     {
-      if (anyOf.Length == 0)
-      {
-        throw new ArgumentOutOfRangeException(nameof(anyOf), "sequence must contains elements");
-      }
-
-      if (!_isUtf8)
-      {
-        return MemoryMarshal.Cast<byte, char>(_data).IndexOfAny(anyOf);
-      }
-
-      for (var i = 0; i < Length; i++)
-      {
-        var result = IndexOf(GetElement(i));
-
-        if (result != -1)
-        {
-          return result;
-        }
-      }
-
-      return -1;
+      return GetChars(_data, stackalloc char[Length])
+        .IndexOfAny(anyOf);
     }
 
     public DynamicString[] Split(char separator)
     {
-      var data = new DynamicString[Count(separator)];
+      var characters = GetChars(_data, stackalloc char[Length]);
+
+      var data = new DynamicString[characters.Count(separator)];
       var index = 0;
 
-      switch (_isUtf8)
+      foreach (var element in characters.Tokenize(separator))
       {
-        case true when separator <= Byte.MaxValue:
-          {
-            foreach (var element in _data.Tokenize((byte)separator))
-            {
-              data[index++] = new DynamicString(element);
-            }
-
-            break;
-          }
-        case false when separator > Byte.MaxValue:
-          {
-            foreach (var element in _data.AsSpan().Cast<byte, char>().Tokenize(separator))
-            {
-              data[index++] = new DynamicString(element);
-            }
-
-            break;
-          }
-        default:
-          {
-            //for (var i = 0; i < Length; i++)
-            //{
-            //  if (GetElement(i) == separator)
-            //  {
-            //    data[i++] = new DynamicString();
-            //  }
-            //}
-
-            break;
-          }
+        data[index++] = new DynamicString(element);
       }
 
       return data;
@@ -688,39 +325,13 @@ namespace FileExplorerCore.Helpers
 
     public int Count(char character)
     {
-      switch (_isUtf8)
-      {
-        case true when character <= Byte.MaxValue:
-          return _data.Count((byte)character);
-        case false when character > Byte.MaxValue:
-          return MemoryMarshal.Cast<byte, char>(_data).Count(character);
-        default:
-          var count = 0;
-
-          for (var i = 0; i < Length; i++)
-          {
-            var result = GetElement(i) == character;
-
-            count += Unsafe.As<bool, byte>(ref result);
-          }
-
-          return count;
-      }
+      return GetChars(_data, stackalloc char[Length])
+        .Count(character);
     }
 
     public void CopyToSpan(Span<char> span)
     {
-      if (_isUtf8)
-      {
-        Encoding.UTF8.GetChars(_data, span);
-      }
-      else
-      {
-        _data
-          .AsSpan()
-          .Cast<byte, char>()
-          .CopyTo(span);
-      }
+      Utf8.ToUtf16(_data, span, out _, out _, false, false);
     }
 
     public ReadOnlySpan<byte> AsBytes()
@@ -735,25 +346,19 @@ namespace FileExplorerCore.Helpers
 
     public override int GetHashCode()
     {
-      return HashCode.Combine(_data.GetDjb2HashCode(), _isUtf8.GetHashCode());
+      return HashCode.Combine(_data.GetDjb2HashCode(), Length);
     }
 
     public IEnumerator<char> GetEnumerator()
     {
-      if (_isUtf8)
+      var array = ArrayPool<char>.Shared.Rent(Length);
+
+      for (int i = 0; i < Length; i++)
       {
-        for (var i = 0; i < Length; i++)
-        {
-          yield return GetElementUTF8(i);
-        }
+        yield return array[i];
       }
-      else
-      {
-        for (var i = 0; i < Length; i++)
-        {
-          yield return GetElementNonUTF8(i);
-        }
-      }
+
+      ArrayPool<char>.Shared.Return(array);
     }
 
     IEnumerator IEnumerable.GetEnumerator()
@@ -763,7 +368,7 @@ namespace FileExplorerCore.Helpers
 
     public bool Equals(DynamicString x, DynamicString y)
     {
-      return x._isUtf8 == y._isUtf8 && x._data.Length == y.Length && x._data.AsSpan().SequenceEqual(y._data);
+      return x._data.Length == y.Length && x._data.AsSpan().SequenceEqual(y._data);
     }
 
     public int GetHashCode(DynamicString obj)
@@ -772,39 +377,11 @@ namespace FileExplorerCore.Helpers
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private char GetElement(int index)
+    private ReadOnlySpan<char> GetChars(ReadOnlySpan<byte> data, Span<char> buffer)
     {
-      if (_isUtf8)
-      {
-        return GetElementUTF8(index);
-      }
+      Utf8.ToUtf16(data, buffer, out var characters, out _, false, false);
 
-      return GetElementNonUTF8(index);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private char GetElementUTF8(int index)
-    {
-      return (char)Unsafe.AddByteOffset(ref MemoryMarshal.GetArrayDataReference(_data), (nuint)index);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private char GetElementNonUTF8(int index)
-    {
-      return Unsafe.ReadUnaligned<char>(ref Unsafe.AddByteOffset(ref MemoryMarshal.GetArrayDataReference(_data), (nuint)(index * sizeof(char))));
-    }
-
-    private static bool IsUTF8(ReadOnlySpan<char> data)
-    {
-      for (var i = 0; i < data.Length; i++)
-      {
-        if (data[i] > Byte.MaxValue)
-        {
-          return false;
-        }
-      }
-
-      return true;
+      return buffer[..characters];
     }
   }
 }

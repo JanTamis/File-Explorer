@@ -207,8 +207,7 @@ namespace FileExplorerCore.Models
 				yield break;
 			}
 
-			ArrayPoolList<FileSystemTreeItem> children = default;
-			var isPoolSet = false;
+			var children = new ArrayPoolList<FileSystemTreeItem>(128);
 
 			foreach (var child in Children)
 			{
@@ -216,17 +215,11 @@ namespace FileExplorerCore.Models
 
 				if (child.IsFolder)
 				{
-					if (!isPoolSet)
-					{
-						children = new ArrayPoolList<FileSystemTreeItem>(1024);
-						isPoolSet = true;
-					}
-
 					children.Add(child);
 				}
 			}
 
-			if (isPoolSet)
+			if (children.Count > 0)
 			{
 				foreach (var child in children)
 				{
