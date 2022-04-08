@@ -1,6 +1,7 @@
 ﻿using Microsoft.Toolkit.HighPerformance;
 using System;
 using System.Buffers;
+using System.Buffers.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -196,6 +197,38 @@ namespace FileExplorerCore.Helpers
       var span = GetChars(_data, stackalloc char[Length]);
 
       return new DynamicString(span[startIndex..(startIndex + length)]);
+    }
+
+    #endregion
+
+    #region Format
+
+    public static bool TryFormat(bool value, out DynamicString result)
+    {
+      Span<byte> buffer = stackalloc byte[5];
+
+      if (Utf8Formatter.TryFormat(value, buffer, out var written))
+      {
+        result = new DynamicString(buffer[..written], written);
+        return true;
+      }
+
+      result = Empty;
+      return false;
+    }
+
+    public static bool TryFormat(DateTime value, out DynamicString result)
+    {
+      Span<byte> buffer = stackalloc byte[50];
+
+      if (Utf8Formatter.TryFormat(value, buffer, out var written))
+      {
+        result = new DynamicString(buffer[..written], written);
+        return true;
+      }
+
+      result = Empty;
+      return false;
     }
 
     #endregion
