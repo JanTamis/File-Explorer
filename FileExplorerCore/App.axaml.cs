@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Notifications;
@@ -20,7 +21,7 @@ namespace FileExplorerCore
 
 		public override void OnFrameworkInitializationCompleted()
 		{
-			SetupHelper.SetupFileSystems();
+			// SetupHelper.SetupFileSystems();
 
 			if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 			{
@@ -36,7 +37,7 @@ namespace FileExplorerCore
 					Mode = FluentThemeMode.Dark,
 				};
 
-				Current.Styles[0] = fluentTheme;
+				Current!.Styles[0] = fluentTheme;
 				//	}
 				//}
 

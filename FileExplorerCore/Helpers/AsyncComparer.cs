@@ -8,7 +8,7 @@ namespace FileExplorerCore.Helpers
 	{
 		readonly AsyncComparison<T> comparison;
 
-		public AsyncComparer(AsyncComparison<T> comparison!!)
+		public AsyncComparer(AsyncComparison<T> comparison)
 		{
 			this.comparison = comparison;
 		}

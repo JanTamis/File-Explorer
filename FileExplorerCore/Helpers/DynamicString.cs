@@ -21,22 +21,15 @@ namespace FileExplorerCore.Helpers
 
     public int Length => _length;
 
-    static int temporary;
-
     public static DynamicString Empty = new(Array.Empty<byte>(), 0);
 
     public DynamicString(ReadOnlySpan<char> data)
     {
       Span<byte> temp = stackalloc byte[data.Length * sizeof(char)];
 
-      var state = Utf8.FromUtf16(data, temp, out _length, out var bytes, false, false);
+      Utf8.FromUtf16(data, temp, out _length, out var bytes, false, false);
 
-      if (bytes > temp.Length / 2)
-      {
-        temporary += temp.Length - bytes;
-      }
-
-      _data = temp[0..bytes].ToArray();
+      _data = temp[..bytes].ToArray();
     }
 
     private DynamicString(ReadOnlySpan<byte> data, int length)
@@ -385,8 +378,10 @@ namespace FileExplorerCore.Helpers
     public IEnumerator<char> GetEnumerator()
     {
       var array = ArrayPool<char>.Shared.Rent(Length);
+      
+      GetChars(_data, array);
 
-      for (int i = 0; i < Length; i++)
+      for (var i = 0; i < Length; i++)
       {
         yield return array[i];
       }
