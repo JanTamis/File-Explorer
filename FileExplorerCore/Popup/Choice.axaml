@@ -4,26 +4,29 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FileExplorerCore.Popup.Choice">
-	<Grid ColumnDefinitions="*, *"
-				Margin="4">
-		<Button Content="{Binding CloseText}" 
-						Command="{Binding Close}"
-						Grid.Column="1"
-						Cursor="Hand"
-						Height="50"
-						FontSize="21"
-						HorizontalContentAlignment="Center"
-						VerticalContentAlignment="Center"
-						HorizontalAlignment="Stretch"/>
-	
-		<Button Content="{Binding SubmitText}"
-						Command="{Binding Confirm}"
-						Grid.Column="0" 
-						Cursor="Hand"
-						Height="50"
-						FontSize="21"
-						HorizontalContentAlignment="Center"
-						VerticalContentAlignment="Center"
-						HorizontalAlignment="Stretch"/>
-	</Grid>
+  <StackPanel>
+	<TextBlock Text="{Binding Message}" />
+
+	<StackPanel HorizontalAlignment="Right"
+				Orientation="Horizontal">
+	  <Button Content="{Binding CloseText}"
+			  Command="{Binding Close}"
+			  Cursor="Hand"
+			  Margin="2.5 0 0 0"
+			  Classes="Flat"
+			  FontSize="21"
+			  HorizontalContentAlignment="Center"
+			  VerticalContentAlignment="Center"
+			  HorizontalAlignment="Stretch"/>
+
+	  <Button Content="{Binding SubmitText}"
+			  Command="{Binding Confirm}"
+			  Margin="0 0 2.5 0"
+			  Cursor="Hand"
+			  FontSize="21"
+			  HorizontalContentAlignment="Center"
+			  VerticalContentAlignment="Center"
+			  HorizontalAlignment="Stretch"/>
+	</StackPanel>
+  </StackPanel>	
 </UserControl>

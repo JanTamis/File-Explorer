@@ -17,6 +17,13 @@ public ref struct ValueListBuilder<T>
 		_pos = 0;
 	}
 
+	public ValueListBuilder(int length)
+	{
+		_arrayFromPool = ArrayPool<T>.Shared.Rent(length);
+		_span = _arrayFromPool;
+		_pos = 0;
+	}
+
 	public int Length
 	{
 		get => _pos;

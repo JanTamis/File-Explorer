@@ -18,7 +18,7 @@ public sealed class DelegateFileSystemEnumerator<TResult> : FileSystemEnumerator
 	{
 		return Transformation is not null 
 			? Transformation(ref entry) 
-			: default;
+			: default!;
 	}
 
 	protected override bool ShouldRecurseIntoEntry(ref FileSystemEntry entry) => false;

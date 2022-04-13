@@ -14,6 +14,8 @@ namespace FileExplorerCore;
 
 public class App : Application
 {
+	public static MainWindowViewModel MainViewModel { get; set; }
+
 	public override void Initialize()
 	{
 		AvaloniaXamlLoader.Load(this);
@@ -42,7 +44,7 @@ public class App : Application
 			//}
 
 			desktop.MainWindow = new MainWindow();
-			desktop.MainWindow.DataContext = new MainWindowViewModel(new WindowNotificationManager(desktop.MainWindow)
+			desktop.MainWindow.DataContext = MainViewModel = new MainWindowViewModel(new WindowNotificationManager(desktop.MainWindow)
 			{
 				Position = NotificationPosition.TopRight,
 				Margin = new Thickness(0, 40, 0, 0),

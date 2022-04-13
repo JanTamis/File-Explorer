@@ -43,7 +43,6 @@ public partial class Choice : UserControl, IPopup, INotifyPropertyChanged
 
 	public event Action OnClose = delegate { };
 	public event Action OnSubmit = delegate { };
-	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
 
 	public Choice()
 	{
@@ -58,6 +57,7 @@ public partial class Choice : UserControl, IPopup, INotifyPropertyChanged
 	public void Close()
 	{
 		OnClose();
+		DialogHost.DialogHost.Close(null);
 	}
 
 	private void InitializeComponent()
@@ -65,6 +65,8 @@ public partial class Choice : UserControl, IPopup, INotifyPropertyChanged
 		AvaloniaXamlLoader.Load(this);
 		DataContext = this;
 	}
+
+	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
 
 	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
 	{

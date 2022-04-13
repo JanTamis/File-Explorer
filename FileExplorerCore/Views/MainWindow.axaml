@@ -431,6 +431,7 @@
                               </Button>
                               <Button Width="40"
                                       Height="40"
+									  Command="{Binding DeleteFiles}"
                                       ToolTip.Tip="Remove"
                                       Classes="Flat">
                                 <Image Source="{SvgImage /Assets/UIIcons/Remove.svg}"

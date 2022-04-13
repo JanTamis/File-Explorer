@@ -243,7 +243,9 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
 			yield break;
 		}
 
-		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(GetPath(x => x.ToString()), Options)
+		var path = GetPath(x => x.ToString());
+
+		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(path, Options)
 		{
 			Find = findPredicate,
 			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
@@ -287,23 +289,8 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
 		GetPath(ref builder);
 
 		var span = builder.AsSpan(true);
-		var index = span.IndexOf('\0');
 
-		if (index is not -1)
-		{
-			span = span[..index]; 
-		}
-
-		//if (OperatingSystem.IsWindows() && span.Length > 3 && span[^1] == PathHelper.DirectorySeparator)
-		//{
-		//	return action(span[0..^1]);
-		//}
-		//else if (builder.Length > 1 && span[^1] == PathHelper.DirectorySeparator)
-		//{
-		//	return action(span[..(builder.Length - 1)]);
-		//}
-
-		return action(span);
+    return action(span);
 	}
 
 	public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
@@ -312,25 +299,40 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
 
 		GetPath(ref builder);
 
-		return action(builder.AsSpan(true), parameter);
+		var span = builder.AsSpan();
+
+		return action(span, parameter);
 	}
 
 	private void GetPath(ref ValueStringBuilder builder)
 	{
-		foreach (var item in EnumerateToRoot().Reverse())
-		{
-			item.DynamicString.CopyToSpan(builder.AppendSpan(item.Value.Length));
+		var items = EnumerateToRoot().ToArray();
+		Array.Reverse(items);
 
-			if (builder.Length > 0 && builder[^1] != PathHelper.DirectorySeparator)
+    for (int i = 0; i < items.Length; i++)
+    {
+			items[i].DynamicString.CopyToSpan(builder.AppendSpan(items[i].Value.Length));
+
+			if (i != items.Length - 1 && builder[^1] != PathHelper.DirectorySeparator)
 			{
 				builder.Append(PathHelper.DirectorySeparator);
 			}
 		}
 
-		if (builder.Length > 0 && builder[^1] != PathHelper.DirectorySeparator)
-		{
-			builder.Append(PathHelper.DirectorySeparator);
-		}
+		//foreach (var item in )
+		//{
+		//	item.DynamicString.CopyToSpan(builder.AppendSpan(item.Value.Length));
+
+		//	if (builder.Length > 0 && builder[^1] != PathHelper.DirectorySeparator)
+		//	{
+		//		builder.Append(PathHelper.DirectorySeparator);
+		//	}
+		//}
+
+		//if (builder.Length > 0 && builder[^1] != PathHelper.DirectorySeparator)
+		//{
+		//	builder.Append(PathHelper.DirectorySeparator);
+		//}
 	}
 
 	public override string ToString()

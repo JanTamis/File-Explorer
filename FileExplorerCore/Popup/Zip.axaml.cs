@@ -48,6 +48,8 @@ public partial class Zip : UserControl, IPopup, INotifyPropertyChanged
 
 	public FileModel? FileModel { get; private set; }
 
+	public string CurrentFile { get; set; }
+
 	public Zip()
 	{
 		AvaloniaXamlLoader.Load(this);
@@ -57,7 +59,7 @@ public partial class Zip : UserControl, IPopup, INotifyPropertyChanged
 
 	public async Task ZipFiles()
 	{
-		var count = 0;
+		CurrentCount = 0;
 		_source = new CancellationTokenSource();
 		
 		var task = Task.Run(() =>
@@ -72,6 +74,8 @@ public partial class Zip : UserControl, IPopup, INotifyPropertyChanged
 					{
 						break;
 					}
+
+					CurrentFile = file.Name;
 					
 					try
 					{
@@ -80,14 +84,24 @@ public partial class Zip : UserControl, IPopup, INotifyPropertyChanged
 							zip.CreateEntryFromFile(file.TreeItem.GetPath(path => path.ToString()), file.Name, CompressionLevel);
 						}
 					}
-					finally
+					catch (Exception)
 					{
-						count++;
+						
 					}
+
+					CurrentCount++;
+
+					OnPropertyChanged(nameof(CurrentCount));
+					OnPropertyChanged(nameof(Progress));
 				}
 			}
 
 			FileModel = new FileModel(new FileSystemTreeItem("Archive1.zip", false, TreeItem));
+
+			CurrentCount = Count;
+
+			OnPropertyChanged(nameof(CurrentCount));
+			OnPropertyChanged(nameof(Progress));
 
 			Close();
 		}, _source.Token);
@@ -96,20 +110,14 @@ public partial class Zip : UserControl, IPopup, INotifyPropertyChanged
 
 		while (await timer.WaitForNextTickAsync(_source.Token))
 		{
-			CurrentCount = count;
-			OnPropertyChanged(nameof(CurrentCount));
-			OnPropertyChanged(nameof(Progress));
-
 			if (task.IsCompleted)
 			{
 				break;
 			}
-		}
 
-		if (_source.IsCancellationRequested)
-		{
-			var path = TreeItem.GetPath(path => Path.Combine(path.ToString(), "Archive1.zip"));
-			File.Delete(path);
+			OnPropertyChanged(nameof(CurrentCount));
+			OnPropertyChanged(nameof(Progress));
+			OnPropertyChanged(nameof(CurrentFile));
 		}
 	}
 
@@ -117,6 +125,8 @@ public partial class Zip : UserControl, IPopup, INotifyPropertyChanged
 	{
 		_source?.Cancel();
 		OnClose?.Invoke();
+
+		DialogHost.DialogHost.Close(null);
 	}
 
 	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)

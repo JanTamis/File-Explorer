@@ -4,16 +4,22 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FileExplorerCore.Popup.Zip">
-		<Panel>
-			<ProgressBar CornerRadius="10"
-			             Height="25"
-			             ShowProgressText="True"
-			             Margin="5"
-			             Maximum="{Binding Count}"
-			             Value="{Binding CurrentCount}"/>
-			
-			<Label Content="{Binding Progress}" 
-			       HorizontalAlignment="Center"
-			       VerticalAlignment="Center"/>
-		</Panel>
+  <StackPanel>
+	<TextBlock Text="{Binding CurrentFile}"
+			   VerticalAlignment="Center"
+			   Margin="5"
+			   FontSize="15"/>
+	<Panel>
+	  <ProgressBar CornerRadius="10"
+				   Height="25"
+				   ShowProgressText="True"
+				   Margin="5"
+				   Maximum="{Binding Count}"
+				   Value="{Binding CurrentCount}"/>
+
+	  <Label Content="{Binding Progress}"
+			 HorizontalAlignment="Center"
+			 VerticalAlignment="Center"/>
+	</Panel>
+  </StackPanel>
 </UserControl>
