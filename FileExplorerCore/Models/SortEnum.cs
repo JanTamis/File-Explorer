@@ -1,11 +1,10 @@
-﻿namespace FileExplorerCore.Models
+﻿namespace FileExplorerCore.Models;
+
+public enum SortEnum
 {
-	public enum SortEnum
-	{
-		None,
-		Name,
-		Extension,
-		Size,
-		Edited
-	}
+	None,
+	Name,
+	Extension,
+	Size,
+	Edited
 }

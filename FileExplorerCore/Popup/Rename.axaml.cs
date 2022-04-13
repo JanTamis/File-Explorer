@@ -7,66 +7,65 @@ using FileExplorerCore.Models;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace FileExplorerCore.Popup
+namespace FileExplorerCore.Popup;
+
+public partial class Rename : UserControl, IPopup, INotifyPropertyChanged
 {
-	public partial class Rename : UserControl, IPopup, INotifyPropertyChanged
+	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+	public FileModel File => Files?[Index];
+
+	public ObservableRangeCollection<FileModel> Files { get; set; }
+	public int Index { get; set; }
+
+	public bool HasShadow => false;
+	public bool HasToBeCanceled => false;
+
+	public string Title => $"Rename: {File.Name}";
+
+	public event Action OnClose = delegate { };
+
+	public Rename()
 	{
-		public new event PropertyChangedEventHandler PropertyChanged = delegate { };
+		AvaloniaXamlLoader.Load(this);
 
-		public FileModel File => Files?[Index];
+		DataContext = this;
+	}
 
-		public ObservableRangeCollection<FileModel> Files { get; set; }
-		public int Index { get; set; }
+	public void Close()
+	{
+		OnClose();
+	}
 
-		public bool HasShadow => false;
-		public bool HasToBeCanceled => false;
+	public void PreviousFile()
+	{
+		Index--;
 
-		public string Title => $"Rename: {File.Name}";
-
-		public event Action OnClose = delegate { };
-
-		public Rename()
+		if (Index < 0)
 		{
-			AvaloniaXamlLoader.Load(this);
-
-			DataContext = this;
+			Index = Files.Count - 1;
 		}
 
-		public void Close()
-		{
-			OnClose();
-		}
+		OnPropertyChanged(nameof(File));
+		OnPropertyChanged(nameof(Title));
+	}
 
-		public void PreviousFile()
-		{
-			Index--;
+	public void NextFile()
+	{
+		Index = (Index + 1) % Files.Count;
 
-			if (Index < 0)
-			{
-				Index = Files.Count - 1;
-			}
+		OnPropertyChanged(nameof(File));
+		OnPropertyChanged(nameof(Title));
+	}
 
-			OnPropertyChanged(nameof(File));
-			OnPropertyChanged(nameof(Title));
-		}
+	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
+	{
+		property = value;
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+	}
 
-		public void NextFile()
-		{
-			Index = (Index + 1) % Files.Count;
-
-			OnPropertyChanged(nameof(File));
-			OnPropertyChanged(nameof(Title));
-		}
-
-		protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
-		{
-			property = value;
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-		}
-
-		public void OnPropertyChanged(string name)
-		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-		}
+	public void OnPropertyChanged(string name)
+	{
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 	}
 }

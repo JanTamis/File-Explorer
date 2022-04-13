@@ -5,76 +5,75 @@ using FileExplorerCore.Interfaces;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace FileExplorerCore.Popup
+namespace FileExplorerCore.Popup;
+
+public partial class Choice : UserControl, IPopup, INotifyPropertyChanged
 {
-	public partial class Choice : UserControl, IPopup, INotifyPropertyChanged
+	private string _submitText;
+	private string _closeText;
+	private string _message;
+
+	public bool HasShadow => true;
+	public bool HasToBeCanceled => false;
+
+
+	public string SubmitText
 	{
-		private string _submitText;
-		private string _closeText;
-		private string _message;
+		get => _submitText;
+		set => OnPropertyChanged(ref _submitText, value);
+	}
 
-		public bool HasShadow => true;
-		public bool HasToBeCanceled => false;
+	public string CloseText
+	{
+		get => _closeText;
+		set => OnPropertyChanged(ref _closeText, value);
+	}
 
-
-		public string SubmitText
+	public string Message
+	{
+		get => _message;
+		set
 		{
-			get => _submitText;
-			set => OnPropertyChanged(ref _submitText, value);
+			_message = value;
+			OnPropertyChanged(nameof(Title));
 		}
+	}
 
-		public string CloseText
-		{
-			get => _closeText;
-			set => OnPropertyChanged(ref _closeText, value);
-		}
+	public string Title => Message;
 
-		public string Message
-		{
-			get => _message;
-			set
-			{
-				_message = value;
-				OnPropertyChanged(nameof(Title));
-			}
-		}
+	public event Action OnClose = delegate { };
+	public event Action OnSubmit = delegate { };
+	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-		public string Title => Message;
+	public Choice()
+	{
+		InitializeComponent();
+	}
 
-		public event Action OnClose = delegate { };
-		public event Action OnSubmit = delegate { };
-		public new event PropertyChangedEventHandler PropertyChanged = delegate { };
+	public void Confirm()
+	{
+		OnSubmit();
+	}
 
-		public Choice()
-		{
-			InitializeComponent();
-		}
+	public void Close()
+	{
+		OnClose();
+	}
 
-		public void Confirm()
-		{
-			OnSubmit();
-		}
+	private void InitializeComponent()
+	{
+		AvaloniaXamlLoader.Load(this);
+		DataContext = this;
+	}
 
-		public void Close()
-		{
-			OnClose();
-		}
+	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
+	{
+		property = value;
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+	}
 
-		private void InitializeComponent()
-		{
-			AvaloniaXamlLoader.Load(this);
-			DataContext = this;
-		}
-
-		protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
-		{
-			property = value;
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-		}
-
-		public void OnPropertyChanged(string name)
-		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-		}
+	public void OnPropertyChanged(string name)
+	{
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 	}
 }

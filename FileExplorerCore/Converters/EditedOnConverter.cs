@@ -4,23 +4,22 @@ using FileExplorerCore.Models;
 using System.Globalization;
 using Humanizer;
 
-namespace FileExplorerCore.Converters
+namespace FileExplorerCore.Converters;
+
+public class EditedOnConverter : IValueConverter
 {
-	public class EditedOnConverter : IValueConverter
+	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
-		public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+		if (value is FileModel model)
 		{
-			if (value is FileModel model)
-			{
-				return model.EditedOn.Humanize();
-			}
-
-			return String.Empty;
+			return model.EditedOn.Humanize();
 		}
 
-		public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-		{
-			return String.Empty;
-		}
+		return String.Empty;
+	}
+
+	public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+	{
+		return String.Empty;
 	}
 }

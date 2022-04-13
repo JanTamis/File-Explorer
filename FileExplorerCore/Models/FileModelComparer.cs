@@ -1,48 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FileExplorerCore.Models
+namespace FileExplorerCore.Models;
+
+public struct FileModelComparer : IComparer<FileModel>
 {
-	public struct FileModelComparer : IComparer<FileModel>
+	private readonly SortEnum sortMember;
+
+	public FileModelComparer(SortEnum sortMember)
 	{
-		private readonly SortEnum sortMember;
+		this.sortMember = sortMember;
+	}
 
-		public FileModelComparer(SortEnum sortMember)
+	public int Compare(FileModel? x, FileModel? y)
+	{
+		var result = sortMember switch
 		{
-			this.sortMember = sortMember;
-		}
+			SortEnum.Name => String.Compare(x.Name, y.Name),
+			SortEnum.Edited => y.EditedOn.CompareTo(x.EditedOn),
+			SortEnum.Size => x.Size.CompareTo(y.Size),
+			SortEnum.Extension => String.Compare(x.Extension, y.Extension),
+			_ => 0
+		};
 
-		public int Compare(FileModel? x, FileModel? y)
+		if (sortMember is SortEnum.None)
 		{
-			var result = sortMember switch
-			{
-				SortEnum.Name => String.Compare(x.Name, y.Name),
-				SortEnum.Edited => y.EditedOn.CompareTo(x.EditedOn),
-				SortEnum.Size => x.Size.CompareTo(y.Size),
-				SortEnum.Extension => String.Compare(x.Extension, y.Extension),
-				_ => 0
-			};
+			var xIsFolder = x.IsFolder;
+			var yIsFolder = y.IsFolder;
 
-			if (sortMember is SortEnum.None)
+			if (xIsFolder == yIsFolder)
 			{
-				var xIsFolder = x.IsFolder;
-				var yIsFolder = y.IsFolder;
-
-				if (xIsFolder == yIsFolder)
-				{
-					result = String.Compare(x.Name, y.Name);
-				}
-				else if (xIsFolder)
-				{
-					result = -1;
-				}
-				else if (yIsFolder)
-				{
-					result = 1;
-				}
+				result = String.Compare(x.Name, y.Name);
 			}
-
-			return result;
+			else if (xIsFolder)
+			{
+				result = -1;
+			}
+			else if (yIsFolder)
+			{
+				result = 1;
+			}
 		}
+
+		return result;
 	}
 }

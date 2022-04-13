@@ -10,46 +10,45 @@ using FileExplorerCore.Helpers;
 using FileExplorerCore.ViewModels;
 using FileExplorerCore.Views;
 
-namespace FileExplorerCore
+namespace FileExplorerCore;
+
+public class App : Application
 {
-	public class App : Application
+	public override void Initialize()
 	{
-		public override void Initialize()
-		{
-			AvaloniaXamlLoader.Load(this);
-		}
+		AvaloniaXamlLoader.Load(this);
+	}
 
-		public override void OnFrameworkInitializationCompleted()
-		{
-			// SetupHelper.SetupFileSystems();
+	public override void OnFrameworkInitializationCompleted()
+	{
+		// SetupHelper.SetupFileSystems();
 
-			if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+		{
+			//if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+			//{
+			//	var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
+			//	var value = key.GetValue("AppsUseLightTheme");
+
+			//	if (value is 0)
+			//	{
+			var fluentTheme = new FluentTheme(new Uri(@"avares://FileExplorer"))
 			{
-				//if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-				//{
-				//	var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
-				//	var value = key.GetValue("AppsUseLightTheme");
+				Mode = FluentThemeMode.Dark,
+			};
 
-				//	if (value is 0)
-				//	{
-				var fluentTheme = new FluentTheme(new Uri(@"avares://FileExplorer"))
-				{
-					Mode = FluentThemeMode.Dark,
-				};
+			Current!.Styles[0] = fluentTheme;
+			//	}
+			//}
 
-				Current!.Styles[0] = fluentTheme;
-				//	}
-				//}
-
-				desktop.MainWindow = new MainWindow();
-				desktop.MainWindow.DataContext = new MainWindowViewModel(new WindowNotificationManager(desktop.MainWindow)
-				{
-					Position = NotificationPosition.TopRight,
-					Margin = new Thickness(0, 40, 0, 0),
-				});
-			}
-
-			base.OnFrameworkInitializationCompleted();
+			desktop.MainWindow = new MainWindow();
+			desktop.MainWindow.DataContext = new MainWindowViewModel(new WindowNotificationManager(desktop.MainWindow)
+			{
+				Position = NotificationPosition.TopRight,
+				Margin = new Thickness(0, 40, 0, 0),
+			});
 		}
+
+		base.OnFrameworkInitializationCompleted();
 	}
 }

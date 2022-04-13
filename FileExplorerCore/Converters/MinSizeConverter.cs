@@ -2,23 +2,22 @@
 using Avalonia.Data.Converters;
 using System.Globalization;
 
-namespace FileExplorerCore.Converters
+namespace FileExplorerCore.Converters;
+
+public class MinSizeConverter : IValueConverter
 {
-	public class MinSizeConverter : IValueConverter
+	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
-		public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-		{
-			//if (value is double width && Double.TryParse(parameter.ToString(), out var minSize))
-			//{
-			//	return width > minSize;
-			//}
+		//if (value is double width && Double.TryParse(parameter.ToString(), out var minSize))
+		//{
+		//	return width > minSize;
+		//}
 
-			return true;
-		}
+		return true;
+	}
 
-		public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-		{
-			return String.Empty;
-		}
+	public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+	{
+		return String.Empty;
 	}
 }

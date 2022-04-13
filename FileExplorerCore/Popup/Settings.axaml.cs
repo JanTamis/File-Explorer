@@ -9,61 +9,60 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Avalonia;
 
-namespace FileExplorerCore.Popup
+namespace FileExplorerCore.Popup;
+
+public partial class Settings : UserControl, IPopup, INotifyPropertyChanged
 {
-	public partial class Settings : UserControl, IPopup, INotifyPropertyChanged
+	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+	private bool isDarkMode;
+
+	public bool HasShadow => true;
+	public bool HasToBeCanceled => false;
+
+	public string Title => "Settings";
+
+	public event Action OnClose = delegate { };
+
+	public bool IsDarkMode
 	{
-		public new event PropertyChangedEventHandler PropertyChanged = delegate { };
-
-		private bool isDarkMode;
-
-		public bool HasShadow => true;
-		public bool HasToBeCanceled => false;
-
-		public string Title => "Settings";
-
-		public event Action OnClose = delegate { };
-
-		public bool IsDarkMode
+		get => isDarkMode;
+		set
 		{
-			get => isDarkMode;
-			set
+			OnPropertyChanged(ref isDarkMode, value);
+
+			ThreadPool.QueueUserWorkItem(x =>
 			{
-				OnPropertyChanged(ref isDarkMode, value);
-
-				ThreadPool.QueueUserWorkItem(x =>
+				var fluentTheme = new FluentTheme(new Uri(@"avares://FileExplorer"))
 				{
-					var fluentTheme = new FluentTheme(new Uri(@"avares://FileExplorer"))
-					{
-						Mode = IsDarkMode ? FluentThemeMode.Dark : FluentThemeMode.Light,
-					};
+					Mode = IsDarkMode ? FluentThemeMode.Dark : FluentThemeMode.Light,
+				};
 
-					Dispatcher.UIThread.Post(() => Application.Current.Styles[0] = fluentTheme);
-				});
-			}
+				Dispatcher.UIThread.Post(() => Application.Current.Styles[0] = fluentTheme);
+			});
 		}
+	}
 
-		public Settings()
-		{
-			InitializeComponent();
+	public Settings()
+	{
+		InitializeComponent();
 
-			DataContext = this;
-		}
+		DataContext = this;
+	}
 
-		private void InitializeComponent()
-		{
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent()
+	{
+		AvaloniaXamlLoader.Load(this);
+	}
 
-		public void Close()
-		{
-			OnClose();
-		}
+	public void Close()
+	{
+		OnClose();
+	}
 
-		protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
-		{
-			property = value;
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-		}
+	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
+	{
+		property = value;
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 	}
 }

@@ -3,22 +3,21 @@ using Avalonia.Markup.Xaml;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 
-namespace FileExplorerCore.DisplayViews
+namespace FileExplorerCore.DisplayViews;
+
+public partial class AnalyzerView : UserControl
 {
-	public partial class AnalyzerView : UserControl
+	public ObservableRangeCollection<FileIndexModel> Root { get; private set; } = new();
+	public ObservableRangeCollection<ExtensionModel> Extensions { get; private set; } = new();
+
+	public AnalyzerView()
 	{
-		public ObservableRangeCollection<FileIndexModel> Root { get; private set; } = new();
-		public ObservableRangeCollection<ExtensionModel> Extensions { get; private set; } = new();
+		DataContext = this;
+		InitializeComponent();
+	}
 
-		public AnalyzerView()
-		{
-			DataContext = this;
-			InitializeComponent();
-		}
-
-		private void InitializeComponent()
-		{
-			AvaloniaXamlLoader.Load(this);
-		}
+	private void InitializeComponent()
+	{
+		AvaloniaXamlLoader.Load(this);
 	}
 }

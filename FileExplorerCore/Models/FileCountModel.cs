@@ -1,8 +1,7 @@
-﻿namespace FileExplorerCore.Models
+﻿namespace FileExplorerCore.Models;
+
+public class FileCountModel
 {
-	public class FileCountModel
-	{
-		public int FolderCount { get; set; }
-		public int FullFolderCount { get; set; }
-	}
+	public int FolderCount { get; set; }
+	public int FullFolderCount { get; set; }
 }

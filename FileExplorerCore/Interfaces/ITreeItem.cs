@@ -1,27 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FileExplorerCore.Interfaces
+namespace FileExplorerCore.Interfaces;
+
+public interface ITreeItem<TValue, TChildren> where TChildren : class, ITreeItem<TValue, TChildren>
 {
-	public interface ITreeItem<TValue, TChildren> where TChildren : class, ITreeItem<TValue, TChildren>
-	{
-		IEnumerable<TChildren> Children { get; }
+	IEnumerable<TChildren> Children { get; }
 
-		TChildren? Parent { get; set; }
+	TChildren? Parent { get; set; }
 
-		TValue Value { get; set; }
+	TValue Value { get; set; }
 
-		bool HasParent { get; }
-		bool HasChildren { get; }
+	bool HasParent { get; }
+	bool HasChildren { get; }
 
-		TChildren GetRoot();
+	TChildren GetRoot();
 
-		IEnumerable<TChildren> EnumerateToRoot();
+	IEnumerable<TChildren> EnumerateToRoot();
 
-		IEnumerable<TValue> EnumerateValuesToRoot();
+	IEnumerable<TValue> EnumerateValuesToRoot();
 
-		public int GetChildrenCount();
+	public int GetChildrenCount();
 
-		IEnumerable<TChildren> EnumerateChildren(uint layers = UInt32.MaxValue);
-	}
+	IEnumerable<TChildren> EnumerateChildren(uint layers = UInt32.MaxValue);
 }

@@ -1,15 +1,14 @@
 ﻿using System;
 
-namespace FileExplorerCore.Interfaces
+namespace FileExplorerCore.Interfaces;
+
+public interface IPopup
 {
-	public interface IPopup
-	{
-		void Close();
+	void Close();
 
-		bool HasShadow { get; }
-		bool HasToBeCanceled { get; }
-		string Title { get; }
+	bool HasShadow { get; }
+	bool HasToBeCanceled { get; }
+	string Title { get; }
 
-		event Action OnClose;
-	}
+	event Action OnClose;
 }

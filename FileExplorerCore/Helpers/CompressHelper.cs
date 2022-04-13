@@ -3,54 +3,53 @@ using System.IO;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
 
-namespace FileExplorerCore.Helpers
+namespace FileExplorerCore.Helpers;
+
+public static class CompressHelper
 {
-	public static class CompressHelper
+	public static byte[] Compress(string text)
 	{
-		public static byte[] Compress(string text)
-		{
-			var data = GetBytes(text);
-			var output = new MemoryStream();
+		var data = GetBytes(text);
+		var output = new MemoryStream();
 
-			using (var dstream = new DeflateStream(output, CompressionLevel.Fastest, false))
-			{
-				dstream.Write(data, 0, data.Length);
-			}
-			return output.ToArray();
+		using (var dstream = new DeflateStream(output, CompressionLevel.Fastest, false))
+		{
+			dstream.Write(data, 0, data.Length);
+		}
+		return output.ToArray();
+	}
+
+	public static string Decompress(byte[] data)
+	{
+		var input = new MemoryStream(data);
+		var output = new MemoryStream();
+
+		using (var dstream = new DeflateStream(input, CompressionMode.Decompress))
+		{
+			dstream.CopyTo(output);
 		}
 
-		public static string Decompress(byte[] data)
-		{
-			var input = new MemoryStream(data);
-			var output = new MemoryStream();
+		var buffer = new ArraySegment<byte>(output.GetBuffer(), 0, (int)output.Length);
 
-			using (var dstream = new DeflateStream(input, CompressionMode.Decompress))
-			{
-				dstream.CopyTo(output);
-			}
+		return new string(GetString(buffer.AsSpan()));
+	}
 
-			var buffer = new ArraySegment<byte>(output.GetBuffer(), 0, (int)output.Length);
+	public static byte[] GetBytes(string str)
+	{
+		var bytes = new byte[str.Length * sizeof(char)];
 
-			return new string(GetString(buffer.AsSpan()));
-		}
+		Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
 
-		public static byte[] GetBytes(string str)
-		{
-			var bytes = new byte[str.Length * sizeof(char)];
+		return bytes;
+	}
 
-			Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+	public static ReadOnlySpan<byte> GetBytes(ReadOnlySpan<char> str)
+	{
+		return MemoryMarshal.AsBytes(str);
+	}
 
-			return bytes;
-		}
-
-		public static ReadOnlySpan<byte> GetBytes(ReadOnlySpan<char> str)
-		{
-			return MemoryMarshal.AsBytes(str);
-		}
-
-		public static ReadOnlySpan<char> GetString(ReadOnlySpan<byte> bytes)
-		{
-			return MemoryMarshal.Cast<byte, char>(bytes);
-		}
+	public static ReadOnlySpan<char> GetString(ReadOnlySpan<byte> bytes)
+	{
+		return MemoryMarshal.Cast<byte, char>(bytes);
 	}
 }

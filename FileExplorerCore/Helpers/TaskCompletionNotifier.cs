@@ -2,47 +2,47 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FileExplorerCore.Helpers
+namespace FileExplorerCore.Helpers;
+
+/// <summary>
+/// Watches a task and raises property-changed notifications when the task completes.
+/// </summary>
+public sealed class TaskCompletionNotifier<TResult> : INotifyPropertyChanged
 {
-	/// <summary>
-	/// Watches a task and raises property-changed notifications when the task completes.
-	/// </summary>
-	public sealed class TaskCompletionNotifier<TResult> : INotifyPropertyChanged
+	// Gets the task being watched. This property never changes and is never <c>null</c>.
+	public Task<TResult> Task { get; }
+
+	// Gets the result of the task. Returns the default value of TResult if the task has not completed successfully.
+	public TResult? Result => Task.Status is TaskStatus.RanToCompletion ? Task.Result : _defaultResult;
+
+	// Gets whether the task has completed.
+	public bool IsCompleted => Task.IsCompleted;
+
+	// Gets whether the task has completed successfully.
+	public bool IsSuccessfullyCompleted => Task.Status is TaskStatus.RanToCompletion;
+
+	// Gets whether the task has been canceled.
+	public bool IsCanceled => Task.IsCanceled;
+
+	// Gets whether the task has faulted.
+	public bool IsFaulted => Task.IsFaulted;
+
+	public event PropertyChangedEventHandler? PropertyChanged = delegate { };
+
+	private TResult _defaultResult;
+
+	public TaskCompletionNotifier(Task<TResult> task, TResult defaultValue = default)
 	{
-		// Gets the task being watched. This property never changes and is never <c>null</c>.
-		public Task<TResult> Task { get; }
+		Task = task;
+		_defaultResult = defaultValue;
 
-		// Gets the result of the task. Returns the default value of TResult if the task has not completed successfully.
-		public TResult? Result => Task.Status is TaskStatus.RanToCompletion ? Task.Result : _defaultResult;
-
-		// Gets whether the task has completed.
-		public bool IsCompleted => Task.IsCompleted;
-
-		// Gets whether the task has completed successfully.
-		public bool IsSuccessfullyCompleted => Task.Status is TaskStatus.RanToCompletion;
-
-		// Gets whether the task has been canceled.
-		public bool IsCanceled => Task.IsCanceled;
-
-		// Gets whether the task has faulted.
-		public bool IsFaulted => Task.IsFaulted;
-
-		public event PropertyChangedEventHandler? PropertyChanged = delegate { };
-
-		private TResult _defaultResult;
-
-		public TaskCompletionNotifier(Task<TResult> task, TResult defaultValue = default)
+		if (!task.IsCompleted)
 		{
-			Task = task;
-			_defaultResult = defaultValue;
+			var scheduler = (SynchronizationContext.Current is null)
+				? TaskScheduler.Current
+				: TaskScheduler.FromCurrentSynchronizationContext();
 
-			if (!task.IsCompleted)
-			{
-				var scheduler = (SynchronizationContext.Current is null)
-					? TaskScheduler.Current
-					: TaskScheduler.FromCurrentSynchronizationContext();
-
-				task.ContinueWith(t =>
+			task.ContinueWith(t =>
 				{
 					var propertyChanged = PropertyChanged;
 
@@ -68,7 +68,6 @@ namespace FileExplorerCore.Helpers
 				CancellationToken.None,
 				TaskContinuationOptions.ExecuteSynchronously,
 				scheduler);
-			}
 		}
 	}
 }
