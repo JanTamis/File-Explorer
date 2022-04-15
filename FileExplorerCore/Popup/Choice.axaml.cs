@@ -35,7 +35,7 @@ public partial class Choice : UserControl, IPopup, INotifyPropertyChanged
 		set
 		{
 			_message = value;
-			OnPropertyChanged(nameof(Title));
+			OnPropertyChanged(nameof(Message));
 		}
 	}
 

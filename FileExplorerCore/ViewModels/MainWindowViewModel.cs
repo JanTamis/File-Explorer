@@ -1,24 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using Avalonia;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input;
 using Avalonia.Threading;
+using DialogHost;
 using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using FileExplorerCore.Popup;
+using Microsoft.Toolkit.HighPerformance;
 using Microsoft.VisualBasic.FileIO;
-using System.Globalization;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Timers;
 using System.Threading.Tasks;
-using Avalonia;
-using DialogHost;
-using Microsoft.Toolkit.HighPerformance;
-using System.Diagnostics.Tracing;
+using System.Timers;
 
 namespace FileExplorerCore.ViewModels;
 
@@ -283,11 +281,11 @@ public class MainWindowViewModel : ViewModelBase
         CloseText = "Cancel",
         SubmitText = "Delete",
         Message = selectedFileCount is 1
-          ? $"Are you sure you want to delete {selectedFiles.First().Name}"
-          : $"Are you sure you want to delete {selectedFileCount} item{(selectedFileCount > 1 ? "s" : String.Empty)}?",
+          ? $"Are you sure you want to delete {selectedFiles.First().Name}?"
+          : $"Are you sure you want to delete {selectedFileCount} items?",
       };
 
-      choice.OnSubmit += async () =>
+      choice.OnSubmit += () =>
       {
         var deletedFiles = new List<FileModel>(selectedFileCount);
 
@@ -311,7 +309,7 @@ public class MainWindowViewModel : ViewModelBase
           }
         }
 
-        await CurrentTab.Files.RemoveRange(deletedFiles);
+        CurrentTab.Files.RemoveRange(deletedFiles);
         CurrentTab.PopupContent = null;
 
         DialogHost.DialogHost.Close(null);

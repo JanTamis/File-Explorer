@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using Microsoft.Toolkit.HighPerformance.Helpers;
@@ -311,28 +313,15 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
 
     for (int i = 0; i < items.Length; i++)
     {
-			items[i].DynamicString.CopyToSpan(builder.AppendSpan(items[i].Value.Length));
+			var item = items[i];
+
+			item.DynamicString.CopyToSpan(builder.AppendSpan(item.Value.Length));
 
 			if (i != items.Length - 1 && builder[^1] != PathHelper.DirectorySeparator)
 			{
 				builder.Append(PathHelper.DirectorySeparator);
 			}
 		}
-
-		//foreach (var item in )
-		//{
-		//	item.DynamicString.CopyToSpan(builder.AppendSpan(item.Value.Length));
-
-		//	if (builder.Length > 0 && builder[^1] != PathHelper.DirectorySeparator)
-		//	{
-		//		builder.Append(PathHelper.DirectorySeparator);
-		//	}
-		//}
-
-		//if (builder.Length > 0 && builder[^1] != PathHelper.DirectorySeparator)
-		//{
-		//	builder.Append(PathHelper.DirectorySeparator);
-		//}
 	}
 
 	public override string ToString()

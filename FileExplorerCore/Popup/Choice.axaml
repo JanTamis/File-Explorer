@@ -5,7 +5,9 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FileExplorerCore.Popup.Choice">
   <StackPanel>
-	<TextBlock Text="{Binding Message}" />
+	<TextBlock Text="{Binding Message}"
+			   FontSize="21"
+			   Margin="0 0 0 10"/>
 
 	<StackPanel HorizontalAlignment="Right"
 				Orientation="Horizontal">
