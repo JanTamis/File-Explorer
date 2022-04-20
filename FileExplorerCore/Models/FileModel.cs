@@ -1,7 +1,5 @@
-﻿using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Media;
+﻿using Avalonia.Media;
 using FileExplorerCore.Helpers;
-using FileExplorerCore.ViewModels;
 using Humanizer;
 using System;
 using System.Collections.Concurrent;
@@ -9,7 +7,6 @@ using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
 using System.Threading.Tasks;
-using Avalonia;
 using System.ComponentModel;
 using Avalonia.Threading;
 using System.Runtime.CompilerServices;

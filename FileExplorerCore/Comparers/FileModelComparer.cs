@@ -12,7 +12,7 @@ public struct FileModelComparer : IComparer<FileModel>
 		this.sortMember = sortMember;
 	}
 
-	public int Compare(FileModel? x, FileModel? y)
+	public int Compare(FileModel x, FileModel y)
 	{
 		var result = sortMember switch
 		{

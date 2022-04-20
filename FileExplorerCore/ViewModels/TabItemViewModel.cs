@@ -25,6 +25,8 @@ public class TabItemViewModel : ViewModelBase
 
 	private bool _isUserEntered = true;
 	private bool _isLoading;
+	private bool _isSelected;
+
 	private ViewTypes _currentViewMode = ViewTypes.List;
 
 	private readonly Stack<FileSystemTreeItem?> _undoStack = new();
@@ -68,7 +70,13 @@ public class TabItemViewModel : ViewModelBase
 		.Reverse()
 		.Select(s => new FolderModel(s)) ?? Enumerable.Empty<FolderModel>();
 
-	public int Count
+  public bool IsSelected
+  {
+    get => _isSelected;
+    set => OnPropertyChanged(ref _isSelected, value);
+  }
+
+  public int Count
 	{
 		get => _count;
 		set
@@ -448,7 +456,7 @@ public class TabItemViewModel : ViewModelBase
 
 			foreach (var parent in path.EnumerateToRoot().Reverse())
 			{
-				item = new FileSystemTreeItem(parent.Value.ToString(), true, item);
+				item = new FileSystemTreeItem(parent.Value, true, item);
 			}
 
 			TreeItem = item;
@@ -466,18 +474,19 @@ public class TabItemViewModel : ViewModelBase
 		}
 
 		return path
-			.EnumerateChildren()
+			.EnumerateChildren((ref FileSystemEntry entry) => entry.IsDirectory || FileSystemName.MatchesSimpleExpression(search, entry.FileName))
 			.Where(w =>
 			{
-				if (w.DynamicString.Length <= 512)
-				{
-					Span<char> stack = stackalloc char[w.Value.Length];
-					w.DynamicString.CopyToSpan(stack);
+        if (!w.IsFolder)
+        {
+          return true;
+        }
 
-					return FileSystemName.MatchesSimpleExpression(search, stack);
-				}
+        using var buffer = new Buffer<char>(w.DynamicString.Length);
 
-				return FileSystemName.MatchesSimpleExpression(search, w.Value.ToString());
+				w.DynamicString.CopyToSpan(buffer);
+
+				return FileSystemName.MatchesSimpleExpression(search, buffer);
 			})
 			.Select(s => new FileModel(s));
 	}

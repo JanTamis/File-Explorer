@@ -12,7 +12,7 @@ namespace FileExplorerCore.Helpers;
 /// <summary>
 /// A string that uses the best encoding
 /// </summary>
-public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
+public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
 {
   private readonly byte[] _data;
 
@@ -22,7 +22,7 @@ public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<Dyna
 
   private int ByteLength => _data.Length;
 
-  public static DynamicString Empty = new(ReadOnlySpan<byte>.Empty, 0);
+  public static DynamicString Empty = new(Array.Empty<byte>(), 0);
 
   public DynamicString(ReadOnlySpan<char> data)
   {
@@ -41,9 +41,9 @@ public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<Dyna
     _data = buffer[..bytes].ToArray();
   }
 
-  private DynamicString(ReadOnlySpan<byte> data, int length)
+  private DynamicString(byte[] data, int length)
   {
-    _data = data.ToArray();
+    _data = data;
     _length = length;
   }
 
@@ -91,10 +91,10 @@ public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<Dyna
   {
     var length = str0.ByteLength + str1.ByteLength;
 
-    using var buffer = new Buffer<byte>(length);
+    var buffer = new byte[length];
 
     str0.AsBytes().CopyTo(buffer);
-    str1.AsBytes().CopyTo(buffer[str1.ByteLength..]);
+    str1.AsBytes().CopyTo(buffer.AsSpan()[str1.ByteLength..]);
 
     return new DynamicString(buffer, str0.Length + str1.Length);
   }
@@ -103,11 +103,11 @@ public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<Dyna
   {
     var length = str0.ByteLength + str1.ByteLength + str2.ByteLength;
 
-    using var buffer = new Buffer<byte>(length);
+    var buffer = new byte[length];
 
     str0.AsBytes().CopyTo(buffer);
-    str1.AsBytes().CopyTo(buffer[str0.ByteLength..]);
-    str2.AsBytes().CopyTo(buffer[(str0.ByteLength + str1.ByteLength)..]);
+    str1.AsBytes().CopyTo(buffer.AsSpan()[str0.ByteLength..]);
+    str2.AsBytes().CopyTo(buffer.AsSpan()[(str0.ByteLength + str1.ByteLength)..]);
 
     return new DynamicString(buffer, str0.Length + str1.Length + str2.Length);
   }
@@ -116,12 +116,12 @@ public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<Dyna
   {
     var length = str0.ByteLength + str1.ByteLength + str2.ByteLength + str3.ByteLength;
 
-    using var buffer = new Buffer<byte>(length);
+    var buffer = new byte[length];
 
     str0.AsBytes().CopyTo(buffer);
-    str1.AsBytes().CopyTo(buffer[str0.ByteLength..]);
-    str2.AsBytes().CopyTo(buffer[(str0.ByteLength + str1.ByteLength)..]);
-    str3.AsBytes().CopyTo(buffer[(str0.ByteLength + str1.ByteLength + str2.ByteLength)..]);
+    str1.AsBytes().CopyTo(buffer.AsSpan()[str0.ByteLength..]);
+    str2.AsBytes().CopyTo(buffer.AsSpan()[(str0.ByteLength + str1.ByteLength)..]);
+    str3.AsBytes().CopyTo(buffer.AsSpan()[(str0.ByteLength + str1.ByteLength + str2.ByteLength)..]);
 
     return new DynamicString(buffer, str0.Length + str1.Length + str2.Length + str3.Length);
   }
@@ -137,7 +137,7 @@ public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<Dyna
       byteLength += item.ByteLength;
     }
 
-    using var builder = new ValueListBuilder<byte>(stackalloc byte[byteLength]);
+    using var builder = new ArrayPoolList<byte>(byteLength);
 
     for (var i = 0; i < items.Length; i++)
     {
@@ -146,7 +146,7 @@ public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<Dyna
       str.AsBytes().CopyTo(builder.AppendSpan(str.ByteLength));
     }
 
-    return new DynamicString(builder.AsSpan(), length);
+    return new DynamicString(builder.ToArray(), length);
   }
 
   #endregion
@@ -188,7 +188,7 @@ public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<Dyna
 
   public DynamicString Remove(int startIndex, int count)
   {
-    using var builder = new ValueListBuilder<char>(Length - count);
+    using var builder = new ArrayPoolList<char>(Length - count);
     using var buffer = new Buffer<char>(Length);
 
     var chars = GetChars(_data, buffer);
@@ -231,7 +231,7 @@ public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<Dyna
 
     if (Utf8Formatter.TryFormat(value, buffer, out var written))
     {
-      result = new DynamicString(buffer[..written], written);
+      result = new DynamicString(buffer[..written].ToArray(), written);
       return true;
     }
 
@@ -245,7 +245,7 @@ public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<Dyna
 
     if (Utf8Formatter.TryFormat(value, buffer, out var written))
     {
-      result = new DynamicString(buffer[..written], written);
+      result = new DynamicString(buffer[..written].ToArray(), written);
       return true;
     }
 
@@ -275,7 +275,7 @@ public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<Dyna
       byteLength += item.ByteLength;
     }
 
-    using var builder = new ValueListBuilder<byte>(byteLength);
+    using var builder = new ArrayPoolList<byte>(byteLength);
 
     for (var i = 0; i < strings.Length; i++)
     {
@@ -285,11 +285,11 @@ public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<Dyna
 
       if (i < strings.Length - 1)
       {
-        builder.Append((byte)separator);
+        builder.Add((byte)separator);
       }
     }
 
-    return new DynamicString(builder.AsSpan(), length);
+    return new DynamicString(builder.ToArray(), length);
   }
 
   public static DynamicString Join(char separator, params string[] strings)
@@ -465,9 +465,9 @@ public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<Dyna
     return GetEnumerator();
   }
 
-  public bool Equals(DynamicString x, DynamicString y)
+  public bool Equals(DynamicString? x, DynamicString? y)
   {
-    return x.ByteLength == y.Length && x._data.AsSpan().SequenceEqual(y._data);
+    return x == y;
   }
 
   int IEqualityComparer<DynamicString>.GetHashCode(DynamicString obj)
@@ -475,12 +475,21 @@ public readonly struct DynamicString : IEnumerable<char>, IEqualityComparer<Dyna
     return obj.GetHashCode();
   }
 
-  public static bool operator ==(DynamicString x, DynamicString y)
+  public static bool operator ==(DynamicString? x, DynamicString? y)
   {
+    if (x is null && y is null)
+    {
+      return true;
+    }
+    if (x is null || y is null)
+    {
+      return false;
+    }
+
     return x.ByteLength == y.Length && x._data.AsSpan().SequenceEqual(y._data);
   }
 
-  public static bool operator !=(DynamicString x, DynamicString y)
+  public static bool operator !=(DynamicString? x, DynamicString? y)
   {
     return !(x == y);
   }

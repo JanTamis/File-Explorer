@@ -1,10 +1,8 @@
 ﻿using Avalonia.Media;
 using FileExplorerCore.Helpers;
-using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace FileExplorerCore.Models;

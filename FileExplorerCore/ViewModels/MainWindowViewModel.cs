@@ -5,6 +5,7 @@ using Avalonia.Threading;
 using DialogHost;
 using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
+using FileExplorerCore.Injection;
 using FileExplorerCore.Models;
 using FileExplorerCore.Popup;
 using Microsoft.Toolkit.HighPerformance;
@@ -50,6 +51,11 @@ public class MainWindowViewModel : ViewModelBase
     get => _currentTab;
     set
     {
+      foreach (var tab in Tabs)
+      {
+        tab.IsSelected = tab == value;
+      }
+
       OnPropertyChanged(ref _currentTab, value);
 
       OnPropertyChanged(nameof(Files));
@@ -104,6 +110,8 @@ public class MainWindowViewModel : ViewModelBase
         new FolderModel(new FileSystemTreeItem(new string(PathHelper.DirectorySeparator, 1), true))
       });
     }
+
+    _currentTab = null!;
 
     AddTab();
   }
@@ -198,7 +206,8 @@ public class MainWindowViewModel : ViewModelBase
   {
     if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
     {
-      await DialogHost.DialogHost.Show(new Settings());
+      await App.Container.Run<Settings, Task>(setting => DialogHost.DialogHost.Show(setting));
+
       CurrentTab.PopupContent = null;
     }
   }
@@ -324,11 +333,11 @@ public class MainWindowViewModel : ViewModelBase
 
   public void CopyTo()
   {
-    if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && Tabs.Count(x => !String.IsNullOrWhiteSpace(x.TreeItem.GetPath(x => x.ToString()))) > 1)
+    if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && Tabs.Count(x => x.TreeItem is not null && !String.IsNullOrWhiteSpace(x.TreeItem.GetPath(x => x.ToString()))) > 1)
     {
       var selector = new TabSelector
       {
-        Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab && !String.IsNullOrWhiteSpace(x.TreeItem.GetPath(x => x.ToString())))),
+        Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x.TreeItem is not null && x != CurrentTab && !String.IsNullOrWhiteSpace(x.TreeItem.GetPath(x => x.ToString())))),
       };
 
       selector.TabSelectionChanged += _ => { selector.Close(); };
@@ -374,7 +383,7 @@ public class MainWindowViewModel : ViewModelBase
       var extensionQuery = CurrentTab.TreeItem
         .EnumerateChildren()
         .Where(w => !w.IsFolder)
-        .GroupBy(g => Path.GetExtension(g.Value.ToString()));
+        .GroupBy(g => Path.GetExtension(g.Value));
 
       var comparer = new ExtensionModelComparer();
 
@@ -417,14 +426,15 @@ public class MainWindowViewModel : ViewModelBase
 
       if (model is not null)
       {
-        var properties = new Properties()
+        await App.Container.Run<Properties, Task, FileModel>(async (properties, model) =>
         {
-          Model = model,
-        };
+          properties.Model = model;
 
-        await DialogHost.DialogHost.Show(properties);
+          await DialogHost.DialogHost.Show(properties);
 
-        properties.Close();
+          properties.Close();
+        }, model);
+
         CurrentTab.PopupContent = null;
       }
     }

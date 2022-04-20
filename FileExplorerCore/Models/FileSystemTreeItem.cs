@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using Microsoft.Toolkit.HighPerformance.Helpers;
-using ProtoBuf;
 
 namespace FileExplorerCore.Models;
 
@@ -175,13 +172,13 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
 
 		var query = IsFolder
 			? GetPath((path, fileOptions) =>
-			{
-				var currentPath = path.ToString();
+				{
+					var currentPath = path.ToString();
 
-				return Directory.Exists(currentPath)
-					? new FileSystemEnumerable<bool>(currentPath, (ref FileSystemEntry _) => false, fileOptions)
-					: Enumerable.Empty<bool>();
-			}, options)
+					return Directory.Exists(currentPath)
+						? new FileSystemEnumerable<bool>(currentPath, (ref FileSystemEntry _) => false, fileOptions)
+						: Enumerable.Empty<bool>();
+				}, options)
 			: Enumerable.Empty<bool>();
 
 		return query.Count();
@@ -194,10 +191,10 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
 			yield break;
 		}
 
-		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(GetPath(x => x.ToString()), Options)
-		{
-			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
-		};
+		//var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(GetPath(x => x.ToString()), Options)
+		//{
+		//	Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
+		//};
 
 		if (layers is 0)
 		{
@@ -315,7 +312,7 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
     {
 			var item = items[i];
 
-			item.DynamicString.CopyToSpan(builder.AppendSpan(item.Value.Length));
+			item.DynamicString.CopyToSpan(builder.AppendSpan(item.DynamicString.Length));
 
 			if (i != items.Length - 1 && builder[^1] != PathHelper.DirectorySeparator)
 			{

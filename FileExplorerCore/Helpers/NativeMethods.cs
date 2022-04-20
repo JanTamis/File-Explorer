@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FileExplorerCore.Helpers;
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
@@ -11,7 +12,7 @@ public unsafe class NativeMethods
 	private const int FILE_ATTRIBUTE_NORMAL = 0x80;
 	private const int SHGFI_TYPENAME = 0x400;
 
-	[DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+	[DllImport("shell32.dll", CharSet = CharSet.Ansi)]
 	private static extern IntPtr SHGetFileInfo(
 		char* pszPath,
 		int dwFileAttributes,
@@ -42,12 +43,15 @@ public unsafe class NativeMethods
 	};
 
 
-	public static string GetShellFileType(ReadOnlySpan<char> fileName)
+	public static string GetShellFileType(DynamicString fileName)
 	{
 		var shinfo = new SHFILEINFO(true);
 		const int flags = SHGFI_TYPENAME;
 
-		fixed (char* name = &fileName[0])
+		Span<char> result = stackalloc char[fileName.Length];
+		fileName.CopyToSpan(result);
+
+		fixed (char* name = result)
 		{
 			if (SHGetFileInfo(name, FILE_ATTRIBUTE_NORMAL, ref shinfo, (uint)Unsafe.SizeOf<SHFILEINFO>(), flags) == IntPtr.Zero)
 			{

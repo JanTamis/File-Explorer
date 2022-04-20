@@ -1,12 +1,10 @@
 using System;
-using System.Diagnostics;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Notifications;
 using Avalonia.Markup.Xaml;
 using Avalonia.Themes.Fluent;
-using DiscUtils.FileSystems;
-using FileExplorerCore.Helpers;
+using FileExplorerCore.Injection;
 using FileExplorerCore.ViewModels;
 using FileExplorerCore.Views;
 
@@ -15,6 +13,7 @@ namespace FileExplorerCore;
 public class App : Application
 {
 	public static MainWindowViewModel MainViewModel { get; set; }
+	public static Container Container { get; } = new Container();
 
 	public override void Initialize()
 	{

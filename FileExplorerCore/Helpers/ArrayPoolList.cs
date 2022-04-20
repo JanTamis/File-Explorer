@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,219 +9,241 @@ namespace FileExplorerCore.Helpers;
 
 public struct ArrayPoolList<T> : IList<T>, IDisposable
 {
-	private T[] _items;
-	private int _size, _version;
+  private T[] _items;
+  private int _size, _version;
 
-	public ArrayPoolList()
-	{
-		_items = Array.Empty<T>();
-		_size = 0;
-		_version = 0;
-	}
+  public ArrayPoolList()
+  {
+    _items = Array.Empty<T>();
+    _size = 0;
+    _version = 0;
+  }
 
-	public ArrayPoolList(int capacity)
-	{
-		_items = ArrayPool<T>.Shared.Rent(capacity);
-		_size = capacity;
-		_version = 0;
-	}
+  public ArrayPoolList(int capacity)
+  {
+    _items = ArrayPool<T>.Shared.Rent(capacity);
+    _size = capacity;
+    _version = 0;
+  }
 
-	public int Count => _size;
+  public int Count => _size;
 
-	public bool IsReadOnly => false;
+  public bool IsReadOnly => false;
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public void Add(T item)
-	{
-		_version++;
-		var array = DisposeCheck(_items);
-		var size = _size;
-		if ((uint)size < (uint)array.Length)
-		{
-			_size = size + 1;
-			array[size] = item;
-		}
-		else
-		{
-			AddWithResize(item);
-		}
-	}
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  public void Add(T item)
+  {
+    _version++;
+    var array = DisposeCheck(_items);
+    var size = _size;
+    if ((uint)size < (uint)array.Length)
+    {
+      _size = size + 1;
+      array[size] = item;
+    }
+    else
+    {
+      AddWithResize(item);
+    }
+  }
 
-	public void Dispose()
-	{
-		var arr = _items;
-		_items = null!;
+  public Span<T> AppendSpan(int length)
+  {
+    _version++;
 
-		if (arr != null)
-		{
-			ArrayPool<T>.Shared.Return(arr);
-		}
-	}
+    EnsureCapacity(_size + length);
 
-	[MethodImpl(MethodImplOptions.NoInlining)]
-	private void AddWithResize(T item)
-	{
-		var size = _size;
-		EnsureCapacity(size + 1);
-		_size = size + 1;
-		_items[size] = item;
-	}
+    return _items.AsSpan(_size, length);
+  }
 
-	private const int DefaultCapacity = 4, MaxArrayLength = 0x7FEFFFFF;
+  public void Dispose()
+  {
+    var arr = _items;
+    _items = null!;
 
-	private void EnsureCapacity(int min)
-	{
-		if (_items.Length < min)
-		{
-			var newCapacity = _items.Length == 0 ? DefaultCapacity : _items.Length * 2;
-			if ((uint)newCapacity > MaxArrayLength)
-			{
-				newCapacity = MaxArrayLength;
-			}
+    if (arr != null)
+    {
+      ArrayPool<T>.Shared.Return(arr);
+    }
+  }
 
-			if (newCapacity < min)
-			{
-				newCapacity = min;
-			}
+  [MethodImpl(MethodImplOptions.NoInlining)]
+  private void AddWithResize(T item)
+  {
+    var size = _size;
+    EnsureCapacity(size + 1);
+    _size = size + 1;
+    _items[size] = item;
+  }
 
-			Capacity = newCapacity;
-		}
-	}
+  private const int DefaultCapacity = 4, MaxArrayLength = 0x7FEFFFFF;
 
-	[MethodImpl(MethodImplOptions.NoInlining)]
-	static T[] ThrowObjectDisposedException()
-	{
-		ThrowHelper.ThrowObjectDisposedException(nameof(ArrayPoolList<T>));
-		return null!; // just to make compiler happy
-	}
+  private void EnsureCapacity(int min)
+  {
+    if (_items.Length < min)
+    {
+      var newCapacity = _items.Length == 0 ? DefaultCapacity : _items.Length * 2;
+      if ((uint)newCapacity > MaxArrayLength)
+      {
+        newCapacity = MaxArrayLength;
+      }
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	static T[] DisposeCheck(T[] array)
-	{
-		return array ?? ThrowObjectDisposedException();
-	}
+      if (newCapacity < min)
+      {
+        newCapacity = min;
+      }
 
-	public int Capacity
-	{
-		get => DisposeCheck(_items).Length;
-		set
-		{
-			if (value < _size)
-			{
-				ThrowHelper.ThrowArgumentOutOfRangeException(nameof(Capacity));
-			}
+      Capacity = newCapacity;
+    }
+  }
 
-			if (value != _items.Length)
-			{
-				if (value > 0)
-				{
-					var newItems = ArrayPool<T>.Shared.Rent(value);
-					if (_size > 0)
-					{
-						Array.Copy(_items, 0, newItems, 0, _size);
-					}
-					ArrayPool<T>.Shared.Return(_items);
-					_items = newItems;
-				}
-				else
-				{
-					ArrayPool<T>.Shared.Return(_items);
-					_items = Array.Empty<T>();
-				}
-			}
-		}
-	}
+  [MethodImpl(MethodImplOptions.NoInlining)]
+  static T[] ThrowObjectDisposedException()
+  {
+    ThrowHelper.ThrowObjectDisposedException(nameof(ArrayPoolList<T>));
+    return null!; // just to make compiler happy
+  }
 
-	public T this[int index]
-	{
-		get
-		{
-			if ((uint)index >= (uint)_size)
-			{
-				ThrowHelper.ThrowIndexOutOfRangeException();
-			}
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  static T[] DisposeCheck(T[] array)
+  {
+    return array ?? ThrowObjectDisposedException();
+  }
 
-			return DisposeCheck(_items)[index];
-		}
-		set
-		{
-			if ((uint)index >= (uint)_size)
-			{
-				ThrowHelper.ThrowIndexOutOfRangeException();
-			}
+  public int Capacity
+  {
+    get => DisposeCheck(_items).Length;
+    set
+    {
+      if (value < _size)
+      {
+        ThrowHelper.ThrowArgumentOutOfRangeException(nameof(Capacity));
+      }
 
-			_version++;
-			DisposeCheck(_items)[index] = value;
-		}
-	}
+      if (value != _items.Length)
+      {
+        if (value > 0)
+        {
+          var newItems = ArrayPool<T>.Shared.Rent(value);
+          if (_size > 0)
+          {
+            Array.Copy(_items, 0, newItems, 0, _size);
+          }
+          ArrayPool<T>.Shared.Return(_items);
+          _items = newItems;
+        }
+        else
+        {
+          ArrayPool<T>.Shared.Return(_items);
+          _items = Array.Empty<T>();
+        }
+      }
+    }
+  }
 
-	public void Clear()
-	{
-		_version++;
-		_size = 0;
-	}
+  public T this[int index]
+  {
+    get
+    {
+      if ((uint)index >= (uint)_size)
+      {
+        ThrowHelper.ThrowIndexOutOfRangeException();
+      }
 
-	public bool Contains(T item)
-	{
-		return _size != 0 && IndexOf(item) != -1;
-	}
+      return DisposeCheck(_items)[index];
+    }
+    set
+    {
+      if ((uint)index >= (uint)_size)
+      {
+        ThrowHelper.ThrowIndexOutOfRangeException();
+      }
 
-	public int IndexOf(T item)
-	{
-		return Array.IndexOf(DisposeCheck(_items), item, 0, _size);
-	}
+      _version++;
+      DisposeCheck(_items)[index] = value;
+    }
+  }
 
-	public void CopyTo(T[] array, int arrayIndex)
-	{
-		Array.Copy(DisposeCheck(_items), 0, array, arrayIndex, _size);
-	}
+  public void Clear()
+  {
+    _version++;
+    _size = 0;
+  }
 
-	public IEnumerator<T> GetEnumerator()
-	{
-		for (var i = 0; i < _size; i++)
-		{
-			yield return _items[i];
-		}
-	}
+  public bool Contains(T item)
+  {
+    return _size != 0 && IndexOf(item) != -1;
+  }
 
-	public bool Remove(T item)
-	{
-		throw new NotImplementedException();
-	}
+  public int IndexOf(T item)
+  {
+    return Array.IndexOf(DisposeCheck(_items), item, 0, _size);
+  }
 
-	public void Insert(int index, T item)
-	{
-		throw new NotImplementedException();
-	}
+  public void CopyTo(T[] array, int arrayIndex)
+  {
+    Array.Copy(DisposeCheck(_items), 0, array, arrayIndex, _size);
+  }
 
-	public void RemoveAt(int index)
-	{
-		throw new NotImplementedException();
-	}
+  public T[] ToArray()
+  {
+    var array = new T[_size];
+    CopyTo(array, 0);
 
-	IEnumerator IEnumerable.GetEnumerator()
-	{
-		return GetEnumerator();
-	}
+    return array;
+  }
 
-	static class ThrowHelper
-	{
-		[MethodImpl(MethodImplOptions.NoInlining)]
-		public static void ThrowArgumentOutOfRangeException(string paramName)
-		{
-			throw new ArgumentOutOfRangeException(paramName);
-		}
+  public ReadOnlySpan<T> AsSpan()
+  {
+    return _items.AsSpan(0, _size);
+  }
 
-		[MethodImpl(MethodImplOptions.NoInlining)]
-		public static void ThrowIndexOutOfRangeException()
-		{
-			throw new IndexOutOfRangeException();
-		}
+  public IEnumerator<T> GetEnumerator()
+  {
+    for (var i = 0; i < _size; i++)
+    {
+      yield return _items[i];
+    }
+  }
 
-		[MethodImpl(MethodImplOptions.NoInlining)]
-		public static void ThrowObjectDisposedException(string objectName)
-		{
-			throw new ObjectDisposedException(objectName);
-		}
-	}
+  public bool Remove(T item)
+  {
+    throw new NotImplementedException();
+  }
+
+  public void Insert(int index, T item)
+  {
+    throw new NotImplementedException();
+  }
+
+  public void RemoveAt(int index)
+  {
+    throw new NotImplementedException();
+  }
+
+  IEnumerator IEnumerable.GetEnumerator()
+  {
+    return GetEnumerator();
+  }
+
+  static class ThrowHelper
+  {
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void ThrowArgumentOutOfRangeException(string paramName)
+    {
+      throw new ArgumentOutOfRangeException(paramName);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void ThrowIndexOutOfRangeException()
+    {
+      throw new IndexOutOfRangeException();
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static void ThrowObjectDisposedException(string objectName)
+    {
+      throw new ObjectDisposedException(objectName);
+    }
+  }
 }
