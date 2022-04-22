@@ -484,7 +484,7 @@ public class TabItemViewModel : ViewModelBase
 
         using var buffer = new Buffer<char>(w.DynamicString.Length);
 
-				w.DynamicString.CopyToSpan(buffer);
+				w.DynamicString.CopyTo(buffer);
 
 				return FileSystemName.MatchesSimpleExpression(search, buffer);
 			})

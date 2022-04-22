@@ -49,7 +49,7 @@ public unsafe class NativeMethods
 		const int flags = SHGFI_TYPENAME;
 
 		Span<char> result = stackalloc char[fileName.Length];
-		fileName.CopyToSpan(result);
+		fileName.CopyTo(result);
 
 		fixed (char* name = result)
 		{

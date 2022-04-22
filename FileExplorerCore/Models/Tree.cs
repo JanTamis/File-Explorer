@@ -1,15 +1,13 @@
 ﻿using FileExplorerCore.Interfaces;
-using ProtoBuf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace FileExplorerCore.Helpers;
 
-[ProtoContract]
 public class Tree<TTreeItem, TValue> where TTreeItem : class, ITreeItem<TValue, TTreeItem>
 {
-	[ProtoMember(1)] public List<TTreeItem> Children { get; }
+	public List<TTreeItem> Children { get; }
 
 	public bool HasChildren => Children.Count > 0;
 

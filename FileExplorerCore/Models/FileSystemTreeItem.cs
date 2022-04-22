@@ -312,7 +312,7 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
     {
 			var item = items[i];
 
-			item.DynamicString.CopyToSpan(builder.AppendSpan(item.DynamicString.Length));
+			item.DynamicString.CopyTo(builder.AppendSpan(item.DynamicString.Length));
 
 			if (i != items.Length - 1 && builder[^1] != PathHelper.DirectorySeparator)
 			{

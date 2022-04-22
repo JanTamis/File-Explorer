@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Buffers;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,8 +33,10 @@ public struct ArrayPoolList<T> : IList<T>, IDisposable
   public void Add(T item)
   {
     _version++;
+
     var array = DisposeCheck(_items);
     var size = _size;
+
     if ((uint)size < (uint)array.Length)
     {
       _size = size + 1;
@@ -51,9 +52,11 @@ public struct ArrayPoolList<T> : IList<T>, IDisposable
   {
     _version++;
 
-    EnsureCapacity(_size + length);
+    var index = _size;
 
-    return _items.AsSpan(_size, length);
+    EnsureCapacity(index + length);
+
+    return _items.AsSpan(index, length);
   }
 
   public void Dispose()
@@ -71,7 +74,9 @@ public struct ArrayPoolList<T> : IList<T>, IDisposable
   private void AddWithResize(T item)
   {
     var size = _size;
+
     EnsureCapacity(size + 1);
+
     _size = size + 1;
     _items[size] = item;
   }
@@ -82,7 +87,8 @@ public struct ArrayPoolList<T> : IList<T>, IDisposable
   {
     if (_items.Length < min)
     {
-      var newCapacity = _items.Length == 0 ? DefaultCapacity : _items.Length * 2;
+      var newCapacity = Math.Min(_items.Length * 2, DefaultCapacity);
+
       if ((uint)newCapacity > MaxArrayLength)
       {
         newCapacity = MaxArrayLength;
@@ -95,19 +101,6 @@ public struct ArrayPoolList<T> : IList<T>, IDisposable
 
       Capacity = newCapacity;
     }
-  }
-
-  [MethodImpl(MethodImplOptions.NoInlining)]
-  static T[] ThrowObjectDisposedException()
-  {
-    ThrowHelper.ThrowObjectDisposedException(nameof(ArrayPoolList<T>));
-    return null!; // just to make compiler happy
-  }
-
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  static T[] DisposeCheck(T[] array)
-  {
-    return array ?? ThrowObjectDisposedException();
   }
 
   public int Capacity
@@ -208,7 +201,14 @@ public struct ArrayPoolList<T> : IList<T>, IDisposable
 
   public bool Remove(T item)
   {
-    throw new NotImplementedException();
+    var index = IndexOf(item);
+
+    if (index >= 0)
+    {
+      RemoveAt(index);
+    }
+
+    return index != -1 && index < _size;
   }
 
   public void Insert(int index, T item)
@@ -218,12 +218,41 @@ public struct ArrayPoolList<T> : IList<T>, IDisposable
 
   public void RemoveAt(int index)
   {
-    throw new NotImplementedException();
+    if ((uint)index >= (uint)_size)
+    {
+      throw new ArgumentOutOfRangeException(nameof(index), "index must be in the correct range");
+    }
+
+    _size--;
+
+    if (index < _size)
+    {
+      Array.Copy(_items, index + 1, _items, index, _size - index);
+    }
+    if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+    {
+      _items[_size] = default!;
+    }
+
+    _version++;
   }
 
   IEnumerator IEnumerable.GetEnumerator()
   {
     return GetEnumerator();
+  }
+
+  [MethodImpl(MethodImplOptions.NoInlining)]
+  private static T[] ThrowObjectDisposedException()
+  {
+    ThrowHelper.ThrowObjectDisposedException(nameof(ArrayPoolList<T>));
+    return null!; // just to make compiler happy
+  }
+
+  [MethodImpl(MethodImplOptions.AggressiveInlining)]
+  private static T[] DisposeCheck(T[] array)
+  {
+    return array ?? ThrowObjectDisposedException();
   }
 
   static class ThrowHelper

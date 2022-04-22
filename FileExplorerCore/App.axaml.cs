@@ -1,9 +1,11 @@
-using System;
+﻿using System;
+using System.Text;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Notifications;
 using Avalonia.Markup.Xaml;
 using Avalonia.Themes.Fluent;
+using FileExplorerCore.Helpers;
 using FileExplorerCore.Injection;
 using FileExplorerCore.ViewModels;
 using FileExplorerCore.Views;
@@ -23,6 +25,16 @@ public class App : Application
 	public override void OnFrameworkInitializationCompleted()
 	{
 		// SetupHelper.SetupFileSystems();
+
+		var world = "hello world";
+		var bytes = Encoding.UTF8.GetBytes(world[0..10]);
+
+		var temp = new DynamicString(world);
+
+		var result = temp[..10];
+		var temporary = Encoding.UTF8.GetString(result.AsBytes());
+
+		var item = result[3];
 
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{

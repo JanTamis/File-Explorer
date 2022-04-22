@@ -1,18 +1,19 @@
-﻿using System;
+﻿using Microsoft.Toolkit.HighPerformance;
+using System;
 using System.Buffers;
 using System.Buffers.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.Unicode;
-using Microsoft.Toolkit.HighPerformance;
 
 namespace FileExplorerCore.Helpers;
 
 /// <summary>
 /// A string that uses the best encoding
 /// </summary>
-public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
+public class DynamicString : IEnumerable<Rune>, IEqualityComparer<DynamicString>
 {
   private readonly byte[] _data;
 
@@ -34,11 +35,13 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
       return;
     }
 
-    using var buffer = new Buffer<byte>(data.Length * 2);
+    // var codePoints = new CodePointEnumerator(data);
+    Span<byte> span = stackalloc byte[data.Length * 2];
 
-    Utf8.FromUtf16(data, buffer, out _length, out var bytes, false, false);
+    Utf8.FromUtf16(data, span, out _, out var bytes);
 
-    _data = buffer[..bytes].ToArray();
+    _length = data.Length;
+    _data = span[0..bytes].ToArray();
   }
 
   private DynamicString(byte[] data, int length)
@@ -47,7 +50,7 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
     _length = length;
   }
 
-  public char this[Index index]
+  public Rune this[Index index]
   {
     get
     {
@@ -58,11 +61,21 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
         throw new ArgumentOutOfRangeException(nameof(index));
       }
 
-      using var buffer = new Buffer<char>(offset + 1);
+      var startOffset = 0;
 
-      var span = GetChars(_data, buffer);
+      for (int i = 0; i < offset; i++)
+      {
+        var result = TryGetCount(_data, startOffset);
 
-      return span[index];
+        if (result != 255)
+        {
+          startOffset += result;
+        }
+      }
+
+      Decode(_data, startOffset, out var codePoint);
+
+      return new Rune(codePoint);
     }
   }
 
@@ -93,8 +106,8 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
 
     var buffer = new byte[length];
 
-    str0.AsBytes().CopyTo(buffer);
-    str1.AsBytes().CopyTo(buffer.AsSpan()[str1.ByteLength..]);
+    str0.CopyTo(buffer);
+    str1.CopyTo(buffer.AsSpan(str1.ByteLength));
 
     return new DynamicString(buffer, str0.Length + str1.Length);
   }
@@ -105,9 +118,9 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
 
     var buffer = new byte[length];
 
-    str0.AsBytes().CopyTo(buffer);
-    str1.AsBytes().CopyTo(buffer.AsSpan()[str0.ByteLength..]);
-    str2.AsBytes().CopyTo(buffer.AsSpan()[(str0.ByteLength + str1.ByteLength)..]);
+    str0.CopyTo(buffer);
+    str1.CopyTo(buffer.AsSpan(str0.ByteLength));
+    str2.CopyTo(buffer.AsSpan(str0.ByteLength + str1.ByteLength));
 
     return new DynamicString(buffer, str0.Length + str1.Length + str2.Length);
   }
@@ -118,10 +131,10 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
 
     var buffer = new byte[length];
 
-    str0.AsBytes().CopyTo(buffer);
-    str1.AsBytes().CopyTo(buffer.AsSpan()[str0.ByteLength..]);
-    str2.AsBytes().CopyTo(buffer.AsSpan()[(str0.ByteLength + str1.ByteLength)..]);
-    str3.AsBytes().CopyTo(buffer.AsSpan()[(str0.ByteLength + str1.ByteLength + str2.ByteLength)..]);
+    str0.CopyTo(buffer);
+    str1.CopyTo(buffer.AsSpan(str0.ByteLength));
+    str2.CopyTo(buffer.AsSpan(str0.ByteLength + str1.ByteLength));
+    str3.CopyTo(buffer.AsSpan(str0.ByteLength + str1.ByteLength + str2.ByteLength));
 
     return new DynamicString(buffer, str0.Length + str1.Length + str2.Length + str3.Length);
   }
@@ -139,11 +152,9 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
 
     using var builder = new ArrayPoolList<byte>(byteLength);
 
-    for (var i = 0; i < items.Length; i++)
+    foreach (var str in items)
     {
-      var str = items[i];
-
-      str.AsBytes().CopyTo(builder.AppendSpan(str.ByteLength));
+      str.CopyTo(builder.AppendSpan(str.ByteLength));
     }
 
     return new DynamicString(builder.ToArray(), length);
@@ -180,10 +191,19 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
 
   public DynamicString Remove(int startIndex)
   {
-    using var buffer = new Buffer<char>(Length);
+    var endIndex = 0;
 
-    return new DynamicString(GetChars(_data, buffer)
-      .Slice(0, startIndex + 1));
+    for (int i = 0; i < startIndex; i++)
+    {
+      var count = TryGetCount(_data, endIndex);
+
+      if (count != 255)
+      {
+        endIndex += count;
+      }
+    }
+
+    return new DynamicString(_data[0..endIndex], startIndex);
   }
 
   public DynamicString Remove(int startIndex, int count)
@@ -193,8 +213,8 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
 
     var chars = GetChars(_data, buffer);
 
-    chars.Slice(0, startIndex).CopyTo(builder.AppendSpan(startIndex));
-    chars.Slice(startIndex + count).CopyTo(builder.AppendSpan(Length - startIndex - count));
+    chars[..startIndex].CopyTo(builder.AppendSpan(startIndex));
+    chars[(startIndex + count)..].CopyTo(builder.AppendSpan(Length - startIndex - count));
 
     return new DynamicString(builder.AsSpan());
   }
@@ -205,20 +225,36 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
 
   public DynamicString Substring(int startIndex)
   {
-    using var buffer = new Buffer<char>(Length);
-
-    var span = GetChars(_data, buffer);
-
-    return new DynamicString(span[startIndex..]);
+    return Substring(startIndex, Length - startIndex);
   }
 
   public DynamicString Substring(int startIndex, int length)
   {
-    using var buffer = new Buffer<char>(Length);
+    var byteStartOffset = 0;
 
-    var span = GetChars(_data, buffer);
+    for (int i = 0; i < startIndex; i++)
+    {
+      var result = TryGetCount(_data, byteStartOffset);
 
-    return new DynamicString(span[startIndex..(startIndex + length)]);
+      if (result != 255)
+      {
+        byteStartOffset += result;
+      }
+    }
+
+    var byteEndOffset = byteStartOffset;
+
+    for (int i = 0; i < length; i++)
+    {
+      var result = TryGetCount(_data, byteEndOffset);
+
+      if (result != 255)
+      {
+        byteEndOffset += result;
+      }
+    }
+
+    return new DynamicString(_data[byteStartOffset..(byteEndOffset - byteStartOffset)], length);
   }
 
   #endregion
@@ -259,7 +295,7 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
   {
     var array = new char[Length];
 
-    CopyToSpan(array);
+    CopyTo(array);
 
     return array;
   }
@@ -268,6 +304,8 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
   {
     var length = strings.Length - 1;
     var byteLength = 0;
+
+    var rune = new Rune(separator);
 
     foreach (var item in strings)
     {
@@ -281,11 +319,11 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
     {
       var str = strings[i];
 
-      str._data.CopyTo(builder.AppendSpan(str.ByteLength));
+      str.CopyTo(builder.AppendSpan(str.ByteLength));
 
       if (i < strings.Length - 1)
       {
-        builder.Add((byte)separator);
+        rune.EncodeToUtf8(builder.AppendSpan(rune.Utf8SequenceLength));
       }
     }
 
@@ -330,11 +368,9 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
       return true;
     }
 
-    var chars = GetChars(_data, stackalloc char[Length]);
-
-    for (var i = 0; i < chars.Length; i++)
+    foreach (var rune in this)
     {
-      if (Char.IsWhiteSpace(chars[i]))
+      if (Rune.IsWhiteSpace(rune))
       {
         return true;
       }
@@ -345,9 +381,17 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
 
   public bool Contains(char value)
   {
-    var span = GetBytes(stackalloc char[] { value }, stackalloc byte[3]);
+    var rune = new Rune(value);
 
-    return _data.AsSpan().IndexOf(span) != -1;
+    foreach (var item in this)
+    {
+      if (rune == item)
+      {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   public int IndexOf(char value)
@@ -422,11 +466,19 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
       .Count(character);
   }
 
-  public void CopyToSpan(Span<char> span)
+  public void CopyTo(Span<char> span)
   {
     if (!span.IsEmpty && ByteLength > 0)
     {
       GetChars(_data, span);
+    }
+  }
+
+  public void CopyTo(Span<byte> span)
+  {
+    if (!span.IsEmpty && ByteLength > 0)
+    {
+      _data.CopyTo(span);
     }
   }
 
@@ -438,7 +490,7 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
 
   public override string ToString()
   {
-    return String.Create(Length, this, (span, data) => data.CopyToSpan(span));
+    return Encoding.UTF8.GetString(_data);
   }
 
   public override int GetHashCode()
@@ -446,18 +498,14 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
     return HashCode.Combine(_data.GetDjb2HashCode(), Length);
   }
 
-  public IEnumerator<char> GetEnumerator()
+  public IEnumerator<Rune> GetEnumerator()
   {
-    var array = ArrayPool<char>.Shared.Rent(Length);
-
-    GetChars(_data, array);
-
-    for (var i = 0; i < Length; i++)
+    for (int i = 0; i < ByteLength;)
     {
-      yield return array[i];
-    }
+      i += Decode(_data, i, out var codePoint);
 
-    ArrayPool<char>.Shared.Return(array);
+      yield return new Rune(codePoint);
+    }
   }
 
   IEnumerator IEnumerable.GetEnumerator()
@@ -486,7 +534,7 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
       return false;
     }
 
-    return x.ByteLength == y.Length && x._data.AsSpan().SequenceEqual(y._data);
+    return x.Length == y.Length && x._data.AsSpan().SequenceEqual(y._data);
   }
 
   public static bool operator !=(DynamicString? x, DynamicString? y)
@@ -507,21 +555,102 @@ public class DynamicString : IEnumerable<char>, IEqualityComparer<DynamicString>
     return ReadOnlySpan<char>.Empty;
   }
 
-  [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static ReadOnlySpan<byte> GetBytes(ReadOnlySpan<char> data, Span<byte> buffer)
-  {
-    Utf8.FromUtf16(data, buffer, out _, out var bytesWritten, false, false);
-
-    if (bytesWritten < buffer.Length)
-    {
-      return buffer[..bytesWritten];
-    }
-
-    return ReadOnlySpan<byte>.Empty;
-  }
-
   public override bool Equals(object? obj)
   {
     return obj is DynamicString dynamicString && Equals(dynamicString, this);
+  }
+
+  private static byte TryGetCount(ReadOnlySpan<byte> buffer, int index)
+  {
+    if (index >= buffer.Length)
+      return 255;
+
+    uint x = buffer[index];
+
+    var byteCount =
+        (x < 192U) ? (byte)1 :
+        (x < 224U) ? (byte)2 :
+        (x < 240U) ? (byte)3 :
+        (byte)4;
+
+    if (index + byteCount > buffer.Length)
+      return 255;
+
+    return byteCount;
+  }
+
+  private static unsafe int Encode(uint codePoint, Span<byte> to)
+  {
+    if (codePoint < 128)
+    {
+      to[0] = (byte)codePoint;
+      return 1;
+    }
+    else if (codePoint < 2048)
+    {
+      to[0] = (byte)(0b1100_0000 | ((codePoint >> 6) & 0b01_1111));
+      to[1] = (byte)(0b1000_0000 | (codePoint & 0b11_1111));
+      return 2;
+    }
+    else if (codePoint < 65536)
+    {
+      to[0] = (byte)(0b1110_0000 | ((codePoint >> 12) & 0b1111));
+      to[1] = (byte)(0b1000_0000 | ((codePoint >> 6) & 0b11_1111));
+      to[2] = (byte)(0b1000_0000 | (codePoint & 0b11_1111));
+      return 3;
+    }
+    else
+    {
+      to[0] = (byte)(0b1111_0000 | ((codePoint >> 18) & 0b0111));
+      to[1] = (byte)(0b1000_0000 | ((codePoint >> 12) & 0b11_1111));
+      to[2] = (byte)(0b1000_0000 | ((codePoint >> 6) & 0b11_1111));
+      to[3] = (byte)(0b1000_0000 | (codePoint & 0b11_1111));
+      return 4;
+    }
+  }
+
+  public static byte Decode(ReadOnlySpan<byte> buffer, int index, out uint codePoint)
+  {
+    const byte InvalidCount = 0xff;
+    const uint EoS = 0xffff_ffff;
+
+    if (index >= buffer.Length) { codePoint = EoS; return InvalidCount; }
+
+    uint code = buffer[index];
+
+    if (code < 0b1100_0000)
+    {
+      // ASCII 文字
+      codePoint = code;
+      return 1;
+    }
+    if (code < 0b1110_0000)
+    {
+      // 2バイト文字
+      if (index + 1 >= buffer.Length) { codePoint = EoS; return InvalidCount; }
+      code &= 0b1_1111;
+      code = (code << 6) | (uint)(buffer[++index] & 0b0011_1111);
+      codePoint = code;
+      return 2;
+    }
+    if (code < 0b1111_0000)
+    {
+      // 3バイト文字
+      if (index + 2 >= buffer.Length) { codePoint = EoS; return InvalidCount; }
+      code &= 0b1111;
+      code = (code << 6) | (uint)(buffer[++index] & 0b0011_1111);
+      code = (code << 6) | (uint)(buffer[++index] & 0b0011_1111);
+      codePoint = code;
+      return 3;
+    }
+
+    // 4バイト文字
+    if (index + 3 >= buffer.Length) { codePoint = EoS; return InvalidCount; }
+    code &= 0b0111;
+    code = (code << 6) | (uint)(buffer[++index] & 0b0011_1111);
+    code = (code << 6) | (uint)(buffer[++index] & 0b0011_1111);
+    code = (code << 6) | (uint)(buffer[++index] & 0b0011_1111);
+    codePoint = code;
+    return 4;
   }
 }
