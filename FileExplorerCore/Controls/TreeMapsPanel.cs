@@ -19,7 +19,7 @@ public class TreeMapsPanel : Panel
 
 	#region dependency properties
 
-	public static AttachedProperty<double> WeightProperty = AvaloniaProperty.RegisterAttached<WeightedPanel, Control, double>("Weight", 0.0);
+	public static AttachedProperty<double> WeightProperty = AvaloniaProperty.RegisterAttached<TreeMapsPanel, Control, double>("Weight", 0.0);
 
 	#endregion
 

@@ -6,7 +6,6 @@ namespace FileExplorerCore.Helpers;
 public ref struct Buffer<T> where T : unmanaged
 {
 	private T[] _array;
-
 	private Span<T> _span;
 
 	public Buffer(int length)
