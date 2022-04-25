@@ -9,12 +9,12 @@ namespace FileExplorerCore.Models;
 
 public class FolderModel
 {
-	private readonly DynamicString? _name;
+	private readonly Utf8String? _name;
 	private readonly IEnumerable<FolderModel>? _folders;
 
 	public FileSystemTreeItem? TreeItem { get; }
 
-	public DynamicString Name => _name ?? TreeItem?.DynamicString ?? DynamicString.Empty;
+	public Utf8String Name => _name ?? TreeItem?.DynamicString ?? Utf8String.Empty;
 
 	public bool HasFolders => TreeItem?.HasFolders ?? false;
 
@@ -33,13 +33,13 @@ public class FolderModel
 	public FolderModel(ReadOnlySpan<char> name, IEnumerable<FolderModel> children)
 	{
 		TreeItem = null;
-		_name = new DynamicString(name);
+		_name = new Utf8String(name);
 		_folders = children;
 	}
 
 	public FolderModel(FileSystemTreeItem item, ReadOnlySpan<char> name, IEnumerable<FolderModel>? children)
 	{
-		_name = new DynamicString(name);
+		_name = new Utf8String(name);
 		_folders = children;
 		TreeItem = item;
 	}

@@ -43,7 +43,7 @@ public unsafe class NativeMethods
 	};
 
 
-	public static string GetShellFileType(DynamicString fileName)
+	public static string GetShellFileType(Utf8String fileName)
 	{
 		var shinfo = new SHFILEINFO(true);
 		const int flags = SHGFI_TYPENAME;

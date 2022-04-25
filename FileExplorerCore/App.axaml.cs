@@ -26,15 +26,9 @@ public class App : Application
 	{
 		// SetupHelper.SetupFileSystems();
 
-		var world = "hello world";
-		var bytes = Encoding.UTF8.GetBytes(world[0..10]);
+		var temp = new Utf8String("hello world");
 
-		var temp = new DynamicString(world);
-
-		var result = temp[..10];
-		var temporary = Encoding.UTF8.GetString(result.AsBytes());
-
-		var item = result[3];
+		var item = temp[^2];
 
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{

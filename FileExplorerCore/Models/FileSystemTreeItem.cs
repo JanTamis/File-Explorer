@@ -69,10 +69,10 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
 	public string Value
 	{
 		get => DynamicString.ToString();
-		set => DynamicString = new DynamicString(value);
+		set => DynamicString = new Utf8String(value);
 	}
 
-	public DynamicString DynamicString { get; set; }
+	public Utf8String DynamicString { get; set; }
 
 	public bool HasParent => Parent is not null;
 
@@ -101,7 +101,7 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
 		IsFolder = isFolder;
 		Parent = parent;
 
-		DynamicString = new DynamicString(name);
+		DynamicString = new Utf8String(name);
 	}
 
 	/// <summary>
