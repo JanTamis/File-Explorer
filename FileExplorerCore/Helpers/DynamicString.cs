@@ -55,11 +55,6 @@ public class DynamicString : IEnumerable<Rune>
 		_data = span[..bytesWritten].ToArray();
 	}
 
-	public DynamicString(ReadOnlySpan<byte> data)
-	{
-		_data = data.ToArray();
-	}
-
 	public static DynamicString FromFile(string filepath)
 	{
 		using var stream = File.OpenRead(filepath);
@@ -108,7 +103,7 @@ public class DynamicString : IEnumerable<Rune>
 			{
 				var result = TryGetCount(_data, startOffset);
 
-				if (result != 255)
+				if (result != -1)
 				{
 					startOffset += result;
 				}
@@ -130,9 +125,9 @@ public class DynamicString : IEnumerable<Rune>
 		}
 	}
 
-	public static DynamicString Create<TState>(int length, TState state, SpanAction<char, TState> action)
+	public static DynamicString Create<TState>(int length, TState state, SpanAction<byte, TState> action)
 	{
-		using var buffer = new Buffer<char>(length);
+		var buffer = new byte[length];
 
 		action(buffer, state);
 
@@ -148,7 +143,7 @@ public class DynamicString : IEnumerable<Rune>
 		var buffer = new byte[length];
 
 		str0.CopyTo(buffer);
-		str1.CopyTo(buffer.AsSpan(str1.ByteLength));
+		str1.CopyTo(buffer.AsSpan(str0.ByteLength));
 
 		return new DynamicString(buffer, str0.Length + str1.Length);
 	}
@@ -269,7 +264,7 @@ public class DynamicString : IEnumerable<Rune>
 		{
 			var count = TryGetCount(_data, endIndex);
 
-			if (count != 255)
+			if (count != -1)
 			{
 				endIndex += count;
 			}
@@ -303,7 +298,7 @@ public class DynamicString : IEnumerable<Rune>
 		{
 			var result = TryGetCount(_data, byteStartOffset);
 
-			if (result != 255)
+			if (result != -1)
 			{
 				byteStartOffset += result;
 			}
@@ -320,7 +315,7 @@ public class DynamicString : IEnumerable<Rune>
 		{
 			var result = TryGetCount(_data, byteStartOffset);
 
-			if (result != 255)
+			if (result != -1)
 			{
 				byteStartOffset += result;
 			}
@@ -332,7 +327,7 @@ public class DynamicString : IEnumerable<Rune>
 		{
 			var result = TryGetCount(_data, byteEndOffset);
 
-			if (result != 255)
+			if (result != -1)
 			{
 				byteEndOffset += result;
 			}
@@ -518,12 +513,6 @@ public class DynamicString : IEnumerable<Rune>
 		return data;
 	}
 
-	public int Count(char character)
-	{
-		return GetChars(_data, stackalloc char[Length])
-			.Count(character);
-	}
-
 	public void CopyTo(Span<char> span)
 	{
 		if (!span.IsEmpty && ByteLength > 0)
@@ -606,21 +595,21 @@ public class DynamicString : IEnumerable<Rune>
 		return obj is DynamicString dynamicString && Equals(dynamicString, this);
 	}
 
-	private static byte TryGetCount(ReadOnlySpan<byte> buffer, int index)
+	private static int TryGetCount(ReadOnlySpan<byte> buffer, int index)
 	{
 		if (index >= buffer.Length)
-			return 255;
+			return -1;
 
 		uint x = buffer[index];
 
 		var byteCount =
-			x < 192U ? (byte)1 :
-			x < 224U ? (byte)2 :
-			x < 240U ? (byte)3 :
-			(byte)4;
+			x < 192U ? 1 :
+			x < 224U ? 2 :
+			x < 240U ? 3 :
+			4;
 
 		if (index + byteCount > buffer.Length)
-			return 255;
+			return -1;
 
 		return byteCount;
 	}
