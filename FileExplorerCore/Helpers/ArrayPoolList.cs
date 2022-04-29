@@ -9,13 +9,14 @@ namespace FileExplorerCore.Helpers;
 public struct ArrayPoolList<T> : IList<T>, IDisposable
 {
   private T[] _items;
-  private int _size, _version;
+  private int _size, _version, _pos;
 
   public ArrayPoolList()
   {
     _items = Array.Empty<T>();
     _size = 0;
     _version = 0;
+    _pos = 0;
   }
 
   public ArrayPoolList(int capacity)
@@ -23,6 +24,7 @@ public struct ArrayPoolList<T> : IList<T>, IDisposable
     _items = ArrayPool<T>.Shared.Rent(capacity);
     _size = capacity;
     _version = 0;
+    _pos = 0;
   }
 
   public int Count => _size;
@@ -33,6 +35,8 @@ public struct ArrayPoolList<T> : IList<T>, IDisposable
   public void Add(T item)
   {
     _version++;
+    var index = _pos;
+    
 
     var array = DisposeCheck(_items);
     var size = _size;
@@ -40,24 +44,42 @@ public struct ArrayPoolList<T> : IList<T>, IDisposable
     if ((uint)size < (uint)array.Length)
     {
       _size = size + 1;
-      array[size] = item;
+      array[index] = item;
     }
     else
     {
       AddWithResize(item);
     }
+
+    _pos++;
   }
 
   public Span<T> AppendSpan(int length)
   {
     _version++;
 
-    var index = _size;
+    var index = _pos;
+
+    _pos += length;
 
     EnsureCapacity(index + length);
 
     return _items.AsSpan(index, length);
   }
+
+  public void AppendSpan(ReadOnlySpan<T> span)
+	{
+		_version++;
+
+		var index = _pos;
+		_pos += span.Length;
+
+		EnsureCapacity(index + span.Length);
+
+		span.CopyTo(_items.AsSpan(index));
+
+		_size = index + span.Length;
+	}
 
   public void Dispose()
   {
@@ -78,7 +100,7 @@ public struct ArrayPoolList<T> : IList<T>, IDisposable
     EnsureCapacity(size + 1);
 
     _size = size + 1;
-    _items[size] = item;
+    _items[_pos] = item;
   }
 
   private const int DefaultCapacity = 4, MaxArrayLength = 0x7FEFFFFF;
@@ -250,7 +272,7 @@ public struct ArrayPoolList<T> : IList<T>, IDisposable
   }
 
   [MethodImpl(MethodImplOptions.AggressiveInlining)]
-  private static T[] DisposeCheck(T[] array)
+  private static T[] DisposeCheck(T[]? array)
   {
     return array ?? ThrowObjectDisposedException();
   }

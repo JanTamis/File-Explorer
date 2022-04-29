@@ -283,18 +283,18 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
 
 	public T GetPath<T>(ReadOnlySpanFunc<char, T> action)
 	{
-		var builder = new ValueStringBuilder(stackalloc char[256]);
+		var builder = new ValueBuilder<char>(stackalloc char[256]);
 
 		GetPath(ref builder);
 
-		var span = builder.AsSpan(true);
+		var span = builder.AsSpan();
 
     return action(span);
 	}
 
 	public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
 	{
-		var builder = new ValueStringBuilder(stackalloc char[256]);
+		var builder = new ValueBuilder<char>(stackalloc char[256]);
 
 		GetPath(ref builder);
 
@@ -303,12 +303,12 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
 		return action(span, parameter);
 	}
 
-	private void GetPath(ref ValueStringBuilder builder)
+	private void GetPath(ref ValueBuilder<char> builder)
 	{
 		var items = EnumerateToRoot().ToArray();
 		Array.Reverse(items);
 
-    for (int i = 0; i < items.Length; i++)
+    for (var i = 0; i < items.Length; i++)
     {
 			var item = items[i];
 

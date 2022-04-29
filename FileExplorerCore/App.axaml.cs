@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Notifications;
@@ -24,30 +23,20 @@ public class App : Application
 
 	public override void OnFrameworkInitializationCompleted()
 	{
-		// SetupHelper.SetupFileSystems();
+		var temp = Utf8String.Create($"hello world how are you {Random.Shared.NextDouble()}");
 
-		var temp = new Utf8String("hello world");
-
-		var item = temp[^2];
+		foreach (var _string in temp.Split(' '))
+		{
+			Console.WriteLine(_string);
+		}
 
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
-			//if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-			//{
-			//	var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
-			//	var value = key.GetValue("AppsUseLightTheme");
-
-			//	if (value is 0)
-			//	{
-			var fluentTheme = new FluentTheme(new Uri(@"avares://FileExplorer"))
+			Current!.Styles[0] = new FluentTheme(new Uri(@"avares://FileExplorer"))
 			{
 				Mode = FluentThemeMode.Dark,
 			};
-
-			Current!.Styles[0] = fluentTheme;
-			//	}
-			//}
-
+			
 			desktop.MainWindow = new MainWindow();
 			desktop.MainWindow.DataContext = MainViewModel = new MainWindowViewModel(new WindowNotificationManager(desktop.MainWindow)
 			{

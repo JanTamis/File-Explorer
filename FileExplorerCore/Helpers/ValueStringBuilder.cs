@@ -6,22 +6,22 @@ using System.Runtime.InteropServices;
 
 namespace FileExplorerCore.Helpers;
 
-public ref struct ValueStringBuilder
+public ref struct ValueBuilder<T> where T : unmanaged
 {
-	private char[]? _arrayToReturnToPool;
-	private Span<char> _chars;
+	private T[]? _arrayToReturnToPool;
+	private Span<T> _chars;
 	public int Position;
 
-	public ValueStringBuilder(Span<char> initialBuffer)
+	public ValueBuilder(Span<T> initialBuffer)
 	{
 		_arrayToReturnToPool = null;
 		_chars = initialBuffer;
 		Position = 0;
 	}
 
-	public ValueStringBuilder(int initialCapacity)
+	public ValueBuilder(int initialCapacity)
 	{
-		_arrayToReturnToPool = ArrayPool<char>.Shared.Rent(initialCapacity);
+		_arrayToReturnToPool = ArrayPool<T>.Shared.Rent(initialCapacity);
 		_chars = _arrayToReturnToPool;
 		Position = 0;
 	}
@@ -39,33 +39,18 @@ public ref struct ValueStringBuilder
 
 	/// <summary>
 	/// Get a pinnable reference to the builder.
-	/// Does not ensure there is a null char after <see cref="Length"/>
+	/// Does not ensure there is a null T after <see cref="Length"/>
 	/// This overload is pattern matched in the C# 7.3+ compiler so you can omit
-	/// the explicit method call, and write eg "fixed (char* c = builder)"
+	/// the explicit method call, and write eg "fixed (T* c = builder)"
 	/// </summary>
-	public ref char GetPinnableReference()
+	public ref T GetPinnableReference()
 	{
 		return ref MemoryMarshal.GetReference(_chars);
 	}
 
-	/// <summary>
-	/// Get a pinnable reference to the builder.
-	/// </summary>
-	/// <param name="terminate">Ensures that the builder has a null char after <see cref="Length"/></param>
-	public ref char GetPinnableReference(bool terminate)
-	{
-		if (terminate)
-		{
-			EnsureCapacity(Length + 1);
-			_chars[Length] = '\0';
-		}
+	public ref T this[int index] => ref _chars[index];
 
-		return ref MemoryMarshal.GetReference(_chars);
-	}
-
-	public ref char this[int index] => ref _chars[index];
-
-	public ReadOnlySpan<char> this[Range range]
+	public ReadOnlySpan<T> this[Range range]
 	{
 		get
 		{
@@ -76,40 +61,18 @@ public ref struct ValueStringBuilder
 				return AsSpan(offset, length);
 			}
 
-			return ReadOnlySpan<char>.Empty;
+			return ReadOnlySpan<T>.Empty;
 		}
 	}
-
-	// public override string ToString()
-	// {
-	// 	var s = _chars[..Position].ToString();
-	// 	Dispose();
-	// 	return s;
-	// }
 
 	/// <summary>Returns the underlying storage of the builder.</summary>
-	public Span<char> RawChars => _chars;
+	public Span<T> RawChars => _chars;
 
-	/// <summary>
-	/// Returns a span around the contents of the builder.
-	/// </summary>
-	/// <param name="terminate">Ensures that the builder has a null char after <see cref="Length"/></param>
-	public ReadOnlySpan<char> AsSpan(bool terminate)
-	{
-		if (terminate)
-		{
-			EnsureCapacity(Length + 1);
-			_chars[Length] = '\0';
-		}
+	public ReadOnlySpan<T> AsSpan() => _chars[..Position];
+	public ReadOnlySpan<T> AsSpan(int start) => _chars[start..Position];
+	public ReadOnlySpan<T> AsSpan(int start, int length) => _chars.Slice(start, length);
 
-		return _chars[..Position];
-	}
-
-	public ReadOnlySpan<char> AsSpan() => _chars[..Position];
-	public ReadOnlySpan<char> AsSpan(int start) => _chars[start..Position];
-	public ReadOnlySpan<char> AsSpan(int start, int length) => _chars.Slice(start, length);
-
-	public bool TryCopyTo(Span<char> destination, out int charsWritten)
+	public bool TryCopyTo(Span<T> destination, out int charsWritten)
 	{
 		if (_chars[..Position].TryCopyTo(destination))
 		{
@@ -123,7 +86,7 @@ public ref struct ValueStringBuilder
 		return false;
 	}
 
-	public void Insert(int index, char value, int count)
+	public void Insert(int index, T value, int count)
 	{
 		if (Position > _chars.Length - count)
 		{
@@ -136,7 +99,7 @@ public ref struct ValueStringBuilder
 		Position += count;
 	}
 
-	public void Insert(int index, char value)
+	public void Insert(int index, T value)
 	{
 		if (Position > _chars.Length - 1)
 		{
@@ -149,31 +112,7 @@ public ref struct ValueStringBuilder
 		Position++;
 	}
 
-	public void Insert(int index, string? s)
-	{
-		if (s == null)
-		{
-			return;
-		}
-
-		var count = s.Length;
-
-		if (Position > (_chars.Length - count))
-		{
-			Grow(count);
-		}
-
-		var remaining = Position - index;
-		_chars.Slice(index, remaining).CopyTo(_chars[(index + count)..]);
-		s
-#if !NET6_0_OR_GREATER
-                .AsSpan()
-#endif
-			.CopyTo(_chars[index..]);
-		Position += count;
-	}
-
-	public void Insert(int index, ReadOnlySpan<char> s)
+	public void Insert(int index, ReadOnlySpan<T> s)
 	{
 		var count = s.Length;
 
@@ -194,7 +133,7 @@ public ref struct ValueStringBuilder
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public void Append(char c)
+	public void Append(T c)
 	{
 		var pos = Position;
 		if ((uint)pos < (uint)_chars.Length)
@@ -208,45 +147,7 @@ public ref struct ValueStringBuilder
 		}
 	}
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public void Append(string? s)
-	{
-		if (s is null)
-		{
-			return;
-		}
-
-		var pos = Position;
-		if (s.Length == 1 &&
-		    (uint)pos < (uint)_chars
-			    .Length) // very common case, e.g. appending strings from NumberFormatInfo like separators, percent symbols, etc.
-		{
-			_chars[pos] = s[0];
-			Position = pos + 1;
-		}
-		else
-		{
-			AppendSlow(s);
-		}
-	}
-
-	private void AppendSlow(string s)
-	{
-		var pos = Position;
-		if (pos > _chars.Length - s.Length)
-		{
-			Grow(s.Length);
-		}
-
-		s
-#if !NET6_0_OR_GREATER
-                .AsSpan()
-#endif
-			.CopyTo(_chars[pos..]);
-		Position += s.Length;
-	}
-
-	public void Append(char c, int count)
+	public void Append(T c, int count)
 	{
 		if (Position > _chars.Length - count)
 		{
@@ -262,7 +163,7 @@ public ref struct ValueStringBuilder
 		Position += count;
 	}
 
-	public unsafe void Append(char* value, int length)
+	public unsafe void Append(T* value, int length)
 	{
 		var pos = Position;
 		if (pos > _chars.Length - length)
@@ -279,7 +180,7 @@ public ref struct ValueStringBuilder
 		Position += length;
 	}
 
-	public void Append(ReadOnlySpan<char> value)
+	public void Append(ReadOnlySpan<T> value)
 	{
 		var pos = Position;
 		if (pos > _chars.Length - value.Length)
@@ -292,7 +193,7 @@ public ref struct ValueStringBuilder
 	}
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public Span<char> AppendSpan(int length)
+	public Span<T> AppendSpan(int length)
 	{
 		var origPos = Position;
 		if (origPos > _chars.Length - length)
@@ -303,9 +204,27 @@ public ref struct ValueStringBuilder
 		Position = origPos + length;
 		return _chars.Slice(origPos, length);
 	}
+	
+	public T[] ToArray()
+	{
+		return AsSpan().ToArray();
+	}
+
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	public void AppendSpan(ReadOnlySpan<T> data)
+	{
+		var origPos = Position;
+		if (origPos > _chars.Length - data.Length)
+		{
+			Grow(data.Length);
+		}
+
+		Position = origPos + data.Length;
+		data.CopyTo(_chars.Slice(origPos, data.Length));
+	}
 
 	[MethodImpl(MethodImplOptions.NoInlining)]
-	private void GrowAndAppend(char c)
+	private void GrowAndAppend(T c)
 	{
 		Grow(1);
 		Append(c);
@@ -323,7 +242,7 @@ public ref struct ValueStringBuilder
 	private void Grow(int additionalCapacityBeyondPos)
 	{
 		// Make sure to let Rent throw an exception if the caller has a bug and the desired capacity is negative
-		var poolArray = ArrayPool<char>.Shared.Rent((int)Math.Max((uint)(Position + additionalCapacityBeyondPos), (uint)_chars.Length * 2));
+		var poolArray = ArrayPool<T>.Shared.Rent((int)Math.Max((uint)(Position + additionalCapacityBeyondPos), (uint)_chars.Length * 2));
 
 		_chars[..Position].CopyTo(poolArray);
 
@@ -332,15 +251,15 @@ public ref struct ValueStringBuilder
 
 		if (toReturn != null)
 		{
-			ArrayPool<char>.Shared.Return(toReturn);
+			ArrayPool<T>.Shared.Return(toReturn);
 		}
 	}
 
-	public void Replace(char source, char replace)
+	public void Replace(T source, T replace)
 	{
 		for (var i = 0; i < Length; i++)
 		{
-			if (_chars[i] == source)
+			if (_chars[i].Equals(source))
 			{
 				_chars[i] = replace;
 			}
@@ -355,7 +274,7 @@ public ref struct ValueStringBuilder
 
 		if (toReturn is not null)
 		{
-			ArrayPool<char>.Shared.Return(toReturn);
+			ArrayPool<T>.Shared.Return(toReturn);
 		}
 	}
 }
