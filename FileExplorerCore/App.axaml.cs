@@ -23,14 +23,15 @@ public class App : Application
 
 	public override void OnFrameworkInitializationCompleted()
 	{
-		var temp = Utf8String.Create($"hello world how are you {Random.Shared.NextDouble()}");
+		var temp = Utf8String.Create($"hello  ");
 
-		foreach (var _string in temp.Split(' '))
-		{
-			Console.WriteLine(_string);
-		}
 
-		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+    foreach (var _string in temp.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+    {
+      Console.WriteLine(_string);
+    }
+
+    if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
 			Current!.Styles[0] = new FluentTheme(new Uri(@"avares://FileExplorer"))
 			{

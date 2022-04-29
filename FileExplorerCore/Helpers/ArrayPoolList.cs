@@ -35,9 +35,8 @@ public struct ArrayPoolList<T> : IList<T>, IDisposable
   public void Add(T item)
   {
     _version++;
-    var index = _pos;
-    
 
+    var index = _pos;
     var array = DisposeCheck(_items);
     var size = _size;
 

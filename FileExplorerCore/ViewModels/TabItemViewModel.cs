@@ -11,6 +11,7 @@ using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
 using FileExplorerCore.Models;
 using Humanizer;
+using Microsoft.Toolkit.HighPerformance.Buffers;
 
 namespace FileExplorerCore.ViewModels;
 
@@ -482,11 +483,11 @@ public class TabItemViewModel : ViewModelBase
           return true;
         }
 
-        using var buffer = new Buffer<char>(w.DynamicString.Length);
+        using var buffer = SpanOwner<char>.Allocate(w.DynamicString.Length);
 
-				w.DynamicString.CopyTo(buffer);
+				w.DynamicString.CopyTo(buffer.Span);
 
-				return FileSystemName.MatchesSimpleExpression(search, buffer);
+				return FileSystemName.MatchesSimpleExpression(search, buffer.Span);
 			})
 			.Select(s => new FileModel(s));
 	}
