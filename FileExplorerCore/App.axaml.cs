@@ -23,7 +23,7 @@ public class App : Application
 
 	public override void OnFrameworkInitializationCompleted()
 	{
-		var temp = new Utf8String("hello world how are you");
+		var temp = new Utf8String("hello world how are you").Replace(' ', '|');
 
     foreach (var _string in temp.Split(' '))
     {
