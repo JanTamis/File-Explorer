@@ -23,10 +23,9 @@ public class App : Application
 
 	public override void OnFrameworkInitializationCompleted()
 	{
-		var temp = Utf8String.Create($"hello  ");
+		var temp = new Utf8String("hello world how are you");
 
-
-    foreach (var _string in temp.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+    foreach (var _string in temp.Split(' '))
     {
       Console.WriteLine(_string);
     }

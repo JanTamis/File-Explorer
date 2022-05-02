@@ -1,11 +1,11 @@
 ﻿using System;
-using Microsoft.Toolkit.HighPerformance;
 using System.Buffers;
 using System.Buffers.Text;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -18,9 +18,9 @@ namespace FileExplorerCore.Helpers;
 /// <summary>
 /// A string that uses the UTF-8 encoding
 /// </summary>
-public struct Utf8String : IEnumerable<char>
+public struct Utf8String : IEnumerable<char>, IEqualityOperators<Utf8String, Utf8String>, IAdditionOperators<Utf8String, Utf8String, Utf8String>
 {
-	private static readonly Dictionary<int, Utf8String> _internPool = new();
+	private static readonly Dictionary<int, Utf8String> InternPool = new();
 
 	private readonly byte[] _data;
 
@@ -63,18 +63,20 @@ public struct Utf8String : IEnumerable<char>
 			return;
 		}
 
-		var hash = HashCode<char>.Combine(chars);
+		if (InternPool.Any())
+		{
+			var hash = HashCode<char>.Combine(chars);
 
-    if (_internPool.TryGetValue(hash, out var poolItem))
-    {
-			this = poolItem;
-    }
-    else
-    {
-			_data = new byte[Encoding.UTF8.GetByteCount(chars)];
-
-			Utf8.FromUtf16(chars, _data, out _length, out _);
+			if (InternPool.TryGetValue(hash, out var poolItem))
+			{
+				this = poolItem;
+				return;
+			}
 		}
+
+		_data = new byte[Encoding.UTF8.GetByteCount(chars)];
+
+		Utf8.FromUtf16(chars, _data, out _length, out _);
 	}
 
 	/// <summary>
@@ -139,6 +141,7 @@ public struct Utf8String : IEnumerable<char>
 	/// </summary>
 	/// <param name="index">the index of the character</param>
 	/// <exception cref="IndexOutOfRangeException">if the index was out of the bounds</exception>
+	[IndexerName("Chars")]
 	public char this[Index index]
 	{
 		get
@@ -195,6 +198,7 @@ public struct Utf8String : IEnumerable<char>
 	/// Returns a subset of the string specified by the range
 	/// </summary>
 	/// <param name="range">the range of the subset</param>
+	[IndexerName("Chars")]
 	public Utf8String this[Range range]
 	{
 		get
@@ -243,7 +247,7 @@ public struct Utf8String : IEnumerable<char>
 		return new Utf8String(handler.ToArrayAndClear());
 	}
 
-	#region Concat
+	 #region Concat
 
 	/// <summary>
 	/// Combines two strings
@@ -338,7 +342,7 @@ public struct Utf8String : IEnumerable<char>
 	public static Utf8String Concat(IEnumerable<Utf8String> strings)
 	{
 		using var builder = new ValueBuilder<byte>(stackalloc byte[1024]);
-		
+
 		foreach (var str in strings)
 		{
 			builder.AppendSpan(str.AsBytes());
@@ -435,15 +439,46 @@ public struct Utf8String : IEnumerable<char>
 	/// <returns>a new string that is equivalent to this instance except for the removed characters</returns>
 	public Utf8String Remove(int startIndex, int count)
 	{
-		using var builder = new ArrayPoolList<char>(Length - count);
-		using var buffer = SpanOwner<char>.Allocate(Length);
+		var byteStartOffset = 0;
 
-		CopyTo(buffer.Span);
+		for (var i = 0; i < startIndex; i++)
+		{
+			var result = TryGetCount(_data, byteStartOffset);
 
-		buffer.Span[..startIndex].CopyTo(builder.AppendSpan(startIndex));
-		buffer.Span[(startIndex + count)..].CopyTo(builder.AppendSpan(Length - startIndex - count));
+			if (result != -1)
+			{
+				byteStartOffset += result;
+			}
+		}
 
-		return new Utf8String(builder.AsSpan());
+		var byteEndOffset = byteStartOffset;
+
+		for (var i = 0; i < count; i++)
+		{
+			var result = TryGetCount(_data, byteEndOffset);
+
+			if (result != -1)
+			{
+				byteEndOffset += result;
+			}
+		}
+
+		var buffer = new byte[Length - (byteEndOffset - byteStartOffset)];
+
+		AsBytes().Slice(0, byteStartOffset).CopyTo(buffer);
+		AsBytes().Slice(byteEndOffset).CopyTo(buffer.AsSpan(byteStartOffset));
+
+		// using var builder = new ArrayPoolList<char>(Length - count);
+		// using var buffer = SpanOwner<char>.Allocate(Length);
+		//
+		// CopyTo(buffer.Span);
+		//
+		// buffer.Span[..startIndex].CopyTo(builder.AppendSpan(startIndex));
+		// buffer.Span[(startIndex + count)..].CopyTo(builder.AppendSpan(Length - startIndex - count));
+		//
+		// return new Utf8String(builder.AsSpan());
+
+		return new Utf8String(buffer);
 	}
 
 	#endregion
@@ -521,7 +556,7 @@ public struct Utf8String : IEnumerable<char>
 	public static bool TryFormat<T>(T value, out Utf8String result) where T : struct
 	{
 		Span<byte> buffer = stackalloc byte[128];
-		
+
 		var written = 0;
 		var succeeded = typeof(T) == typeof(DateTime) && Utf8Formatter.TryFormat((DateTime)(object)value, buffer, out written) ||
 		                typeof(T) == typeof(DateTimeOffset) && Utf8Formatter.TryFormat((DateTimeOffset)(object)value, buffer, out written) ||
@@ -581,7 +616,7 @@ public struct Utf8String : IEnumerable<char>
 	/// </summary>
 	/// <param name="separator">the character to insert between the strings</param>
 	/// <param name="strings">the strings the combine</param>
-	/// <returns>a string that contains the combination of the strings seperated bij the seperator</returns>
+	/// <returns>a string that contains the combination of the strings seperated bij the separator</returns>
 	public static Utf8String Join(char separator, params Utf8String[] strings)
 	{
 		var length = strings.Length - 1;
@@ -723,7 +758,7 @@ public struct Utf8String : IEnumerable<char>
 	{
 		Span<byte> buffer = stackalloc byte[4];
 		var rune = new Rune(value);
-		
+
 		var bytesWritten = rune.EncodeToUtf8(buffer);
 
 		return AsBytes().EndsWith(buffer[..bytesWritten]);
@@ -773,10 +808,13 @@ public struct Utf8String : IEnumerable<char>
 			}
 		}
 
-		yield return new Utf8String(_data[previousOffset..]);
+		if (!options.HasFlag(StringSplitOptions.RemoveEmptyEntries) || previousOffset < _data.Length)
+		{
+			yield return new Utf8String(_data[previousOffset..]);
+		}
 	}
 
-	public IEnumerable<Utf8String> Split(char[] separators, bool skipEmpty = true)
+	public IEnumerable<Utf8String> Split(char[] separators, StringSplitOptions options = StringSplitOptions.None)
 	{
 		var byteOffset = 0;
 		var previousOffset = 0;
@@ -791,11 +829,15 @@ public struct Utf8String : IEnumerable<char>
 			{
 				var charByteCount = Math.Min(bytesConsumed, 2);
 
-				if (Array.IndexOf(separators, buffer[i]) != -1)
+				if (Array.IndexOf(separators, buffer[i]) > -1)
 				{
-					if (!skipEmpty || byteOffset - previousOffset > 0)
+					var length = byteOffset - previousOffset;
+
+					if (!options.HasFlag(StringSplitOptions.RemoveEmptyEntries) || length > 0)
 					{
-						yield return new Utf8String(_data.AsSpan(previousOffset, byteOffset - previousOffset));
+						yield return options.HasFlag(StringSplitOptions.TrimEntries)
+							? new Utf8String(_data.AsSpan(previousOffset, length)).Trim()
+							: new Utf8String(_data.AsSpan(previousOffset, length));
 					}
 
 					previousOffset = byteOffset + charByteCount;
@@ -806,7 +848,10 @@ public struct Utf8String : IEnumerable<char>
 			}
 		}
 
-		yield return new Utf8String(_data[previousOffset..]);
+		if (!options.HasFlag(StringSplitOptions.RemoveEmptyEntries) || previousOffset < _data.Length)
+		{
+			yield return new Utf8String(_data[previousOffset..]);
+		}
 	}
 
 	public Utf8String ToUpper()
@@ -870,12 +915,17 @@ public struct Utf8String : IEnumerable<char>
 	}
 
 	public bool IsInterned()
-  {
+	{
+		if (!InternPool.Any())
+		{
+			return false;
+		}
+		
 		using var buffer = SpanOwner<char>.Allocate(Length);
 		CopyTo(buffer.Span);
 
-		return _internPool.ContainsKey(HashCode<char>.Combine(buffer.Span));
-  }
+		return InternPool.ContainsKey(HashCode<char>.Combine(buffer.Span));
+	}
 
 	public Utf8String Intern()
 	{
@@ -884,57 +934,48 @@ public struct Utf8String : IEnumerable<char>
 
 		var hash = HashCode<char>.Combine(buffer.Span);
 
+		if (!InternPool.ContainsKey(hash))
+		{
+			InternPool.Add(hash, this);
+		}
 
-		if (_internPool.TryGetValue(hash, out var internValue))
-    {
-			return internValue;
-    }
-    else
-    {
-			_internPool.Add(hash, this);
-			return this;
-    }
+		return this;
 	}
 
-	public Utf8String PadLeft(int totalWidth)
-  {
-		return PadLeft(totalWidth, ' ');
-  }
-
-	public Utf8String PadLeft(int totalWidth, char paddingChar)
-  {
-    if (totalWidth <= Length)
-    {
+	public Utf8String PadLeft(int totalWidth, char paddingChar = ' ')
+	{
+		if (totalWidth <= Length)
+		{
 			return this;
-    }
+		}
 
 		var rune = new Rune(paddingChar);
 
 		Span<byte> buffer = stackalloc byte[rune.Utf8SequenceLength];
 		rune.EncodeToUtf8(buffer);
-		
+
 		var resultBuffer = new byte[ByteLength + buffer.Length * (totalWidth - Length)];
 
 		CopyTo(resultBuffer.AsSpan(buffer.Length * (totalWidth - Length)));
 
 		var temp = resultBuffer.AsSpan(0, buffer.Length * (totalWidth - Length));
 
-    while (buffer.TryCopyTo(temp))
-    {
-			temp = temp[buffer.Length..];
-    }
-
-		buffer.CopyTo(resultBuffer);
+		if (buffer.Length == 1)
+		{
+			temp.Fill(buffer[0]);
+		}
+		else
+		{
+			while (buffer.TryCopyTo(temp))
+			{
+				temp = temp[buffer.Length..];
+			}
+		}
 
 		return new Utf8String(resultBuffer);
-  }
-
-	public Utf8String PadRight(int totalWidth)
-	{
-		return PadRight(totalWidth, ' ');
 	}
 
-	public Utf8String PadRight(int totalWidth, char paddingChar)
+	public Utf8String PadRight(int totalWidth, char paddingChar = ' ')
 	{
 		if (totalWidth <= Length)
 		{
@@ -952,9 +993,16 @@ public struct Utf8String : IEnumerable<char>
 
 		var temp = resultBuffer.AsSpan(ByteLength);
 
-		while (buffer.TryCopyTo(temp))
+		if (buffer.Length == 1)
 		{
-			temp = temp[buffer.Length..];
+			temp.Fill(buffer[0]);
+		}
+		else
+		{
+			while (buffer.TryCopyTo(temp))
+			{
+				temp = temp[buffer.Length..];
+			}
 		}
 
 		return new Utf8String(resultBuffer);
@@ -962,12 +1010,12 @@ public struct Utf8String : IEnumerable<char>
 
 	public void CopyTo(Span<char> span)
 	{
-    Utf8.ToUtf16(_data, span, out _, out _, false, false);
+		Utf8.ToUtf16(_data, span, out _, out _, false, false);
 	}
 
 	public bool TryCopyTo(Span<char> span)
 	{
-    return Utf8.ToUtf16(_data, span, out _, out _, false, false) is OperationStatus.Done;
+		return Utf8.ToUtf16(_data, span, out _, out _, false, false) is OperationStatus.Done;
 	}
 
 	public void CopyTo(Span<byte> span)
@@ -1023,18 +1071,20 @@ public struct Utf8String : IEnumerable<char>
 	public IEnumerator<char> GetEnumerator()
 	{
 		var buffer = ArrayPool<char>.Shared.Rent(2);
-		var byteCount = 0;
 
-		while (Rune.DecodeFromUtf8(_data.AsSpan(byteCount), out var rune, out var bytesConsumed) is OperationStatus.Done)
+		foreach (var rune in EnumerateRunes())
 		{
-			var charsWritten = rune.EncodeToUtf16(buffer);
+			var count = rune.EncodeToUtf16(buffer);
 
-			for (var i = 0; i < charsWritten; i++)
+			if (count > 0)
 			{
-				yield return buffer[i];
+				yield return MemoryMarshal.GetArrayDataReference(buffer);
 			}
 
-			byteCount += bytesConsumed;
+			if (count > 1)
+			{
+				yield return Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(buffer), 1);
+			}
 		}
 
 		ArrayPool<char>.Shared.Return(buffer);
@@ -1045,14 +1095,9 @@ public struct Utf8String : IEnumerable<char>
 		return GetEnumerator();
 	}
 
-	public bool Equals(Utf8String x, Utf8String y)
-	{
-		return x.AsBytes().SequenceEqual(y.AsBytes());
-	}
-
 	public static bool operator ==(Utf8String x, Utf8String y)
 	{
-		return x.AsBytes().SequenceEqual(y.AsBytes());
+		return x.Equals(y);
 	}
 
 	public static bool operator !=(Utf8String x, Utf8String y)
@@ -1067,7 +1112,7 @@ public struct Utf8String : IEnumerable<char>
 
 	public override bool Equals(object? obj)
 	{
-		return obj is Utf8String dynamicString && Equals(dynamicString, this);
+		return obj is Utf8String dynamicString && Equals(dynamicString);
 	}
 
 	private static int TryGetCount(ReadOnlySpan<byte> buffer, int index)
@@ -1087,5 +1132,10 @@ public struct Utf8String : IEnumerable<char>
 			return -1;
 
 		return byteCount;
+	}
+
+	public bool Equals(Utf8String other)
+	{
+		return AsBytes().SequenceEqual(other.AsBytes());
 	}
 }

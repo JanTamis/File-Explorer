@@ -1,11 +1,13 @@
+
+
+#nullable enable
 using System;
 using System.Buffers;
 using System.Buffers.Text;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Unicode;
-
-#nullable enable
 namespace FileExplorerCore.Helpers
 {
 	[InterpolatedStringHandler]

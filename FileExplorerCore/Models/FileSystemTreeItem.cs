@@ -10,7 +10,7 @@ using Microsoft.Toolkit.HighPerformance.Helpers;
 namespace FileExplorerCore.Models;
 
 //[ProtoContract]
-public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
+public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, IEquatable<FileSystemTreeItem>
 {
 	public static readonly EnumerationOptions Options = new()
 	{
@@ -324,6 +324,27 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>
 	public override string ToString()
 	{
 		return Value;
+	}
+
+	public override bool Equals(object? obj)
+	{
+		return obj is FileSystemTreeItem item && Equals(item);
+	}
+
+	public bool Equals(FileSystemTreeItem? other)
+	{
+		if (other is null)
+		{
+			return false;
+		}
+
+		var thisBuilder = new ValueBuilder<char>();
+		var otherBuilder = new ValueBuilder<char>();
+
+		GetPath(ref thisBuilder);
+		other.GetPath(ref otherBuilder);
+
+		return thisBuilder.AsSpan().SequenceEqual(otherBuilder.AsSpan());
 	}
 
 	public override int GetHashCode()
