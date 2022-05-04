@@ -10,6 +10,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Text.Unicode;
 using Microsoft.Toolkit.HighPerformance.Buffers;
 
@@ -231,6 +232,23 @@ public struct Utf8String : IEnumerable<char>,
 	}
 
 	/// <summary>
+	/// Creates a new string with a specific length and initializes it after creation by using the specified callback  
+	/// </summary>
+	/// <param name="length">the length of the specified Utf8String</param>
+	/// <param name="state">the state to propagate to the action</param>
+	/// <param name="action">the action that will be invoked while making the string</param>
+	/// <typeparam name="TState">The type of the element to pass to <param name="action"></param></typeparam>
+	/// <returns>a immutable Utf8String</returns>
+	public static Utf8String Create<TState>(int length, TState state, SpanAction<char, TState> action)
+	{
+		using var buffer = SpanOwner<char>.Allocate(length);
+
+		action(buffer.Span[..length], state);
+
+		return new Utf8String(buffer.Span[..length]);
+	}
+
+	/// <summary>
 	/// Creates a string from String Interpolation
 	/// </summary>
 	/// <remarks>See https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated for more information</remarks>
@@ -250,6 +268,14 @@ public struct Utf8String : IEnumerable<char>,
 	{
 		return new Utf8String(handler.ToArrayAndClear());
 	}
+
+	public static Utf8String EncodeFromBase64(ReadOnlySpan<byte> bytes)
+  {
+		var buffer = new byte[Base64.GetMaxEncodedToUtf8Length(bytes.Length)];
+		Base64.EncodeToUtf8(bytes, buffer, out _, out _);
+
+		return new Utf8String(buffer);
+  }
 
 	#region Concat
 
@@ -548,7 +574,7 @@ public struct Utf8String : IEnumerable<char>,
 	/// <param name="result">the formatted string</param>
 	/// <typeparam name="T">the type of the <see cref="value"/></typeparam>
 	/// <returns>if the value was successfully formatted</returns>
-	public static bool TryFormat<T>(T value, ReadOnlySpan<char> format, out Utf8String result) where T : ISpanFormattable
+	public static bool TryFormat<T>(T value, ReadOnlySpan<char> format, out Utf8String result) where T : struct
 	{
 		Span<byte> buffer = stackalloc byte[128];
 
@@ -575,11 +601,8 @@ public struct Utf8String : IEnumerable<char>,
 			return true;
 		}
 
-		Span<char> charBuffer = stackalloc char[256];
-		var succeeded = value.TryFormat(charBuffer, out var chars, format, null);
-
-		result = new Utf8String(charBuffer[..chars]);
-		return succeeded;
+		result = Empty;
+		return false;
 	}
 
 	/// <summary>
@@ -590,15 +613,120 @@ public struct Utf8String : IEnumerable<char>,
 	/// <typeparam name="T">the type of the <see cref="value"/></typeparam>
 	/// <returns>the formatted string</returns>
 	/// <exception cref="InvalidOperationException">if the value could not be formatted</exception>
-	public static Utf8String Format<T>(T value, ReadOnlySpan<char> format) where T : ISpanFormattable
+	public static Utf8String Format<T>(T value, ReadOnlySpan<char> format = default) where T : struct
 	{
 		if (TryFormat(value, format, out var result))
 		{
 			return result;
 		}
 
-		throw new InvalidOperationException($"Unable to format value of type {typeof(T).FullName}");
+		throw new InvalidOperationException($"Unable to format value of type {typeof(T).Name}");
 	}
+
+	public bool TryParse<T>(out T value, char format = default) where T : struct
+  {
+    if (typeof(T) == typeof(byte) && Utf8Parser.TryParse(_data, out byte byteValue, out _, format))
+    {
+			value = (T)(object)byteValue;
+			return true;
+    }
+		if (typeof(T) == typeof(bool) && Utf8Parser.TryParse(_data, out bool boolValue, out _, format))
+		{
+			value = (T)(object)boolValue;
+			return true;
+		}
+		if (typeof(T) == typeof(DateTime) && Utf8Parser.TryParse(_data, out DateTime datetimeValue, out _, format))
+		{
+			value = (T)(object)datetimeValue;
+			return true;
+		}
+		if (typeof(T) == typeof(DateTimeOffset) && Utf8Parser.TryParse(_data, out DateTimeOffset datetimeoffsetValue, out _, format))
+		{
+			value = (T)(object)datetimeoffsetValue;
+			return true;
+		}
+		if (typeof(T) == typeof(decimal) && Utf8Parser.TryParse(_data, out decimal decimalValue, out _, format))
+		{
+			value = (T)(object)decimalValue;
+			return true;
+		}
+		if (typeof(T) == typeof(double) && Utf8Parser.TryParse(_data, out double doubleValue, out _, format))
+		{
+			value = (T)(object)doubleValue;
+			return true;
+		}
+		if (typeof(T) == typeof(float) && Utf8Parser.TryParse(_data, out float floatValue, out _, format))
+		{
+			value = (T)(object)floatValue;
+			return true;
+		}
+		if (typeof(T) == typeof(Guid) && Utf8Parser.TryParse(_data, out Guid guidValue, out _, format))
+		{
+			value = (T)(object)guidValue;
+			return true;
+		}
+		if (typeof(T) == typeof(int) && Utf8Parser.TryParse(_data, out int intValue, out _, format))
+		{
+			value = (T)(object)intValue;
+			return true;
+		}
+		if (typeof(T) == typeof(long) && Utf8Parser.TryParse(_data, out long longValue, out _, format))
+		{
+			value = (T)(object)longValue;
+			return true;
+		}
+		if (typeof(T) == typeof(sbyte) && Utf8Parser.TryParse(_data, out sbyte sbyteValue, out _, format))
+		{
+			value = (T)(object)sbyteValue;
+			return true;
+		}
+		if (typeof(T) == typeof(short) && Utf8Parser.TryParse(_data, out short shortValue, out _, format))
+		{
+			value = (T)(object)shortValue;
+			return true;
+		}
+		if (typeof(T) == typeof(TimeSpan) && Utf8Parser.TryParse(_data, out TimeSpan timespanValue, out _, format))
+		{
+			value = (T)(object)timespanValue;
+			return true;
+		}
+		if (typeof(T) == typeof(uint) && Utf8Parser.TryParse(_data, out uint uintValue, out _, format))
+		{
+			value = (T)(object)uintValue;
+			return true;
+		}
+		if (typeof(T) == typeof(ulong) && Utf8Parser.TryParse(_data, out ulong ulongValue, out _, format))
+		{
+			value = (T)(object)ulongValue;
+			return true;
+		}
+		if (typeof(T) == typeof(ushort) && Utf8Parser.TryParse(_data, out ushort ushortValue, out _, format))
+		{
+			value = (T)(object)ushortValue;
+			return true;
+		}
+
+		value = default;
+		return false;
+	}
+
+	public T Parse<T>(char format = default) where T : struct
+  {
+    if (TryParse(out T value, format))
+    {
+			return value;
+    }
+
+		throw new Exception($"Unable to parse {typeof(T).Name}");
+  }
+
+	public byte[] DecodeToBase64()
+  {
+		var buffer = new byte[Base64.GetMaxDecodedFromUtf8Length(ByteLength)];
+		Base64.DecodeFromUtf8(_data, buffer, out _, out _);
+		
+		return buffer;
+  }
 
 	#endregion
 
@@ -623,32 +751,35 @@ public struct Utf8String : IEnumerable<char>,
 	/// <returns>a string that contains the combination of the strings seperated bij the separator</returns>
 	public static Utf8String Join(char separator, params Utf8String[] strings)
 	{
-		var length = strings.Length - 1;
 		var byteLength = 0;
-
 		var rune = new Rune(separator);
+		var SeparatorByteLength = rune.Utf8SequenceLength;
 
 		foreach (var item in strings)
 		{
-			length += item.Length;
 			byteLength += item.ByteLength;
 		}
 
-		using var builder = new ArrayPoolList<byte>(byteLength);
+		byteLength += SeparatorByteLength * (strings.Length - 1);
+
+		var buffer = new byte[byteLength];
+		var index = 0;
 
 		for (var i = 0; i < strings.Length; i++)
 		{
 			var str = strings[i];
 
-			str.CopyTo(builder.AppendSpan(str.ByteLength));
+			str.CopyTo(buffer.AsSpan(index));
+			index += str.ByteLength;
 
 			if (i < strings.Length - 1)
 			{
-				rune.EncodeToUtf8(builder.AppendSpan(rune.Utf8SequenceLength));
+				rune.EncodeToUtf8(buffer.AsSpan(index));
+				index += SeparatorByteLength;
 			}
 		}
 
-		return new Utf8String(builder.ToArray(), length);
+		return new Utf8String(buffer);
 	}
 
 	/// <summary>
@@ -661,12 +792,33 @@ public struct Utf8String : IEnumerable<char>,
 	}
 
 	/// <summary>
+	/// Returns if the string only contains whitespace characters
+	/// </summary>
+	/// <returns>if the string only contains whitespace characters</returns>
+	public bool IsWhitespace()
+  {
+		var byteCount = 0;
+
+		while (Rune.DecodeFromUtf8(_data.AsSpan(byteCount), out var rune, out var bytesConsumed) is OperationStatus.Done)
+		{
+      if (!Rune.IsWhiteSpace(rune))
+      {
+				return false;
+      }
+
+			byteCount += bytesConsumed;
+		}
+
+		return true;
+	}
+
+	/// <summary>
 	/// Returns if the string if empty or only contains whitespace characters
 	/// </summary>
 	/// <returns>if the string if empty or only contains whitespace characters</returns>
 	public bool IsEmptyOrWhiteSpace()
 	{
-		return IsEmpty() || EnumerateRunes().Any(Rune.IsWhiteSpace);
+		return IsEmpty() || IsWhitespace();
 	}
 
 	/// <summary>
@@ -684,20 +836,10 @@ public struct Utf8String : IEnumerable<char>,
 
 	public int IndexOf(char value)
 	{
-		var index = 0;
-		var valueRune = new Rune(value);
+		using var buffer = SpanOwner<char>.Allocate(Length);
+		CopyTo(buffer.Span);
 
-		foreach (var rune in EnumerateRunes())
-		{
-			if (rune == valueRune)
-			{
-				return index;
-			}
-
-			index += rune.Utf16SequenceLength;
-		}
-
-		return -1;
+		return buffer.Span.IndexOf(value);
 	}
 
 	public int IndexOf(char value, int startIndex)
@@ -742,17 +884,10 @@ public struct Utf8String : IEnumerable<char>,
 
 	public int IndexOfAny(ReadOnlySpan<char> anyOf)
 	{
-		var index = 0;
+		using var buffer = SpanOwner<char>.Allocate(Length);
+		CopyTo(buffer.Span);
 
-		foreach (var item in this)
-		{
-			if (anyOf.Contains(item))
-				return index;
-
-			index++;
-		}
-
-		return -1;
+		return buffer.Span.IndexOfAny(anyOf);
 	}
 
 	public Utf8String Replace(char oldChar, char newChar)
@@ -774,6 +909,7 @@ public struct Utf8String : IEnumerable<char>,
 		}
 
 		return new Utf8String(buffer.Span);
+		
 	}
 
 	public bool EndsWith(char value)
@@ -838,7 +974,7 @@ public struct Utf8String : IEnumerable<char>,
 		}
 	}
 
-	public IEnumerable<Utf8String> Split(ReadOnlySpan<char> separators, StringSplitOptions options = StringSplitOptions.None)
+	public IEnumerable<Utf8String> Split(char[] separators, StringSplitOptions options = StringSplitOptions.None)
 	{
 		var byteOffset = 0;
 		var previousOffset = 0;
@@ -853,7 +989,7 @@ public struct Utf8String : IEnumerable<char>,
 			{
 				var charByteCount = Math.Min(bytesConsumed, 2);
 
-				if (separators.IndexOf(buffer[i]) > -1)
+				if (Array.IndexOf(separators, buffer[i]) > -1)
 				{
 					var length = byteOffset - previousOffset;
 

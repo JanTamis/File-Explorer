@@ -475,7 +475,7 @@ public class TabItemViewModel : ViewModelBase
 		}
 
 		return path
-			.EnumerateChildren((ref FileSystemEntry entry) => entry.IsDirectory || FileSystemName.MatchesSimpleExpression(search, entry.FileName))
+			.EnumerateChildren((ref FileSystemEntry entry) => entry.IsDirectory)
 			.Where(w =>
 			{
         if (!w.IsFolder)

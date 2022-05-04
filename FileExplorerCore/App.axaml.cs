@@ -4,7 +4,6 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Notifications;
 using Avalonia.Markup.Xaml;
 using Avalonia.Themes.Fluent;
-using FileExplorerCore.Helpers;
 using FileExplorerCore.Injection;
 using FileExplorerCore.ViewModels;
 using FileExplorerCore.Views;
@@ -23,12 +22,13 @@ public class App : Application
 
 	public override void OnFrameworkInitializationCompleted()
 	{
-		var temp = new Utf8String("hello world how are you").Replace(' ', '|');
+		// var temp = Utf8String.Format(1.5f).Parse<float>();
+		// var value = temp.Parse<bool>();
 
-    foreach (var _string in temp.Split(' '))
-    {
-      Console.WriteLine(_string);
-    }
+    //foreach (var _string in temp.Split(' '))
+    //{
+    //  Console.WriteLine(_string);
+    //}
 
     if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
