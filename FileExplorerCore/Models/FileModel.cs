@@ -72,7 +72,7 @@ public class FileModel : INotifyPropertyChanged
   {
     get => TreeItem.IsFolder
       ? TreeItem.Value
-      : System.IO.Path.GetFileNameWithoutExtension(TreeItem.Value);
+      : TreeItem.GetPath(path => System.IO.Path.GetFileNameWithoutExtension(path).ToString());
     set
     {
       TreeItem.Value = value;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Text.Unicode;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;

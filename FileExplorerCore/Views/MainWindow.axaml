@@ -498,19 +498,17 @@
                                         SelectedItem="{Binding CurrentTab.Sort}"
                                         Items="{Binding SortValues}" />
 
-                              <ComboBox
-                                Items="{Binding Converter={StaticResource enumToValuesConverter}, ConverterParameter={x:Type models:ViewTypes}}"
-                                Background="Transparent"
-                                SelectedItem="{Binding CurrentTab.CurrentViewMode}"
-                                Foreground="{DynamicResource MaterialDesignBody}">
+                              <ComboBox Items="{Binding Converter={StaticResource enumToValuesConverter}, ConverterParameter={x:Type models:ViewTypes}}"
+                                        Background="Transparent"
+                                        SelectedItem="{Binding CurrentTab.CurrentViewMode}"
+                                        Foreground="{DynamicResource MaterialDesignBody}">
                                 <ComboBox.ItemTemplate>
                                   <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                      <Image
-                                        Source="{Binding Converter={x:Static converters:EnumToIconConverter.Instance}, ConverterParameter={x:Type models:ViewTypes}}"
-                                        Width="21"
-                                        Height="21"
-                                        Margin="0 0 5 0" />
+                                      <Image Source="{Binding Converter={x:Static converters:EnumToIconConverter.Instance}, ConverterParameter={x:Type models:ViewTypes}}"
+                                             Width="21"
+                                             Height="21"
+                                             Margin="0 0 5 0" />
                                       <TextBlock Text="{Binding Converter={x:Static converters:EnumToTextConverter.Instance}}"
                                                  Foreground="{DynamicResource MaterialDesignBody}" />
                                     </StackPanel>

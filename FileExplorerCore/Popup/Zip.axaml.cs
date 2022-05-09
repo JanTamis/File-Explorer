@@ -16,127 +16,134 @@ namespace FileExplorerCore.Popup;
 
 public partial class Zip : UserControl, IPopup, INotifyPropertyChanged
 {
-	private IEnumerable<FileModel> _selectedFiles;
-	public new event PropertyChangedEventHandler? PropertyChanged = delegate { };
+  private IEnumerable<FileModel> _selectedFiles;
+  public new event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
-	public bool HasShadow => true;
-	public bool HasToBeCanceled => true;
-	public string Title => $"Zipping Items...";
+  public bool HasShadow => true;
+  public bool HasToBeCanceled => true;
+  public string Title => $"Zipping Items...";
 
-	private CancellationTokenSource? _source;
+  private CancellationTokenSource? _source;
 
-	public event Action? OnClose;
+  public event Action? OnClose;
 
-	public IEnumerable<FileModel> SelectedFiles
-	{
-		get => _selectedFiles;
-		set
-		{
-			_selectedFiles = value;
+  public IEnumerable<FileModel> SelectedFiles
+  {
+    get => _selectedFiles;
+    set
+    {
+      _selectedFiles = value;
 
-			OnPropertyChanged(nameof(CurrentCount));
-			OnPropertyChanged(nameof(Count));
-		}
-	}
+      OnPropertyChanged(nameof(CurrentCount));
+      OnPropertyChanged(nameof(Count));
+    }
+  }
 
-	public FileSystemTreeItem TreeItem { get; set; }
-	public CompressionLevel CompressionLevel { get; set; } = CompressionLevel.Optimal;
-	public int Count => SelectedFiles?.Count() ?? 1;
-	public int CurrentCount { get; set; }
+  public FileSystemTreeItem TreeItem { get; set; }
+  public CompressionLevel CompressionLevel { get; set; } = CompressionLevel.Optimal;
+  public int Count => SelectedFiles?.Count() ?? 1;
+  public int CurrentCount { get; set; }
 
-	public string Progress => (CurrentCount / (double)Count).ToString("P");
+  public string Progress => (CurrentCount / (double)Count).ToString("P");
 
-	public FileModel? FileModel { get; private set; }
+  public FileModel? FileModel { get; private set; }
 
-	public string CurrentFile { get; set; }
+  public string CurrentFile { get; set; }
 
-	public Zip()
-	{
-		AvaloniaXamlLoader.Load(this);
+  public Zip()
+  {
+    AvaloniaXamlLoader.Load(this);
 
-		DataContext = this;
-	}
+    DataContext = this;
+  }
 
-	public async Task ZipFiles()
-	{
-		CurrentCount = 0;
-		_source = new CancellationTokenSource();
-		
-		var task = Task.Run(() =>
-		{
-			var path = TreeItem.GetPath(path => Path.Combine(path.ToString(), "Archive1.zip"));
+  public async Task ZipFiles()
+  {
+    CurrentCount = 0;
+    _source = new CancellationTokenSource();
 
-			using (var zip = ZipFile.Open(path, ZipArchiveMode.Create))
-			{
-				foreach (var file in SelectedFiles)
-				{
-					if (_source.IsCancellationRequested)
-					{
-						break;
-					}
+    var task = Task.Run(() =>
+    {
+      var path = String.Empty;
+      var attempt = 0;
 
-					CurrentFile = file.Name;
-					
-					try
-					{
-						if (!file.IsFolder)
-						{
-							zip.CreateEntryFromFile(file.TreeItem.GetPath(path => path.ToString()), file.Name, CompressionLevel);
-						}
-					}
-					catch (Exception)
-					{
-						
-					}
+      do
+      {
+        attempt++;
+        path = TreeItem.GetPath(path => Path.Combine(path.ToString(), $"Archive{attempt}.zip"));
+      } while (File.Exists(path));
 
-					CurrentCount++;
+      using (var zip = ZipFile.Open(path, ZipArchiveMode.Create))
+      {
+        foreach (var file in SelectedFiles)
+        {
+          if (_source.IsCancellationRequested)
+          {
+            break;
+          }
 
-					OnPropertyChanged(nameof(CurrentCount));
-					OnPropertyChanged(nameof(Progress));
-				}
-			}
+          CurrentFile = file.Name;
 
-			FileModel = new FileModel(new FileSystemTreeItem("Archive1.zip", false, TreeItem));
+          if (!file.IsFolder)
+          {
+            try
+            {
+              zip.CreateEntryFromFile(file.TreeItem.GetPath(path => path.ToString()), file.Name, CompressionLevel);
+            }
+            catch (Exception) { }
+          }
 
-			CurrentCount = Count;
+          CurrentCount++;
 
-			OnPropertyChanged(nameof(CurrentCount));
-			OnPropertyChanged(nameof(Progress));
+          OnPropertyChanged(nameof(CurrentCount));
+          OnPropertyChanged(nameof(Progress));
+        }
+      }
 
-			Close();
-		}, _source.Token);
+      FileModel = new FileModel(new FileSystemTreeItem(Path.GetFileName(path), false, TreeItem));
 
-		var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(100));
+      CurrentCount = Count;
 
-		while (await timer.WaitForNextTickAsync(_source.Token))
-		{
-			if (task.IsCompleted)
-			{
-				break;
-			}
+      OnPropertyChanged(nameof(CurrentCount));
+      OnPropertyChanged(nameof(Progress));
 
-			OnPropertyChanged(nameof(CurrentCount));
-			OnPropertyChanged(nameof(Progress));
-			OnPropertyChanged(nameof(CurrentFile));
-		}
-	}
+      Close();
+    }, _source.Token);
 
-	public void Close()
-	{
-		_source?.Cancel();
-		OnClose?.Invoke();
+    var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(100));
 
-		DialogHost.DialogHost.Close(null);
-	}
+    while (await timer.WaitForNextTickAsync(_source.Token))
+    {
+      if (task.IsCompleted)
+      {
+        break;
+      }
 
-	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
-	{
-		property = value;
-		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-	}
+      OnPropertyChanged(nameof(CurrentCount));
+      OnPropertyChanged(nameof(Progress));
+      OnPropertyChanged(nameof(CurrentFile));
+    }
+  }
 
-	public void OnPropertyChanged(string name)
-	{
-		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-	}
+  public void Close()
+  {
+    _source?.Cancel();
+    OnClose?.Invoke();
+
+    if (DialogHost.DialogHost.IsDialogOpen(null))
+    {
+      DialogHost.DialogHost.Close(null);
+    }
+  }
+
+  protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
+  {
+    property = value;
+    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+  }
+
+  public void OnPropertyChanged(string name)
+  {
+    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+  }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.IO;
 using Avalonia.Data.Converters;
 using Avalonia.Svg.Skia;
 using FileExplorerCore.Interfaces;
@@ -14,13 +15,17 @@ public class EnumToIconConverter : IValueConverter, ISingleton<EnumToIconConvert
 	{
 		if (value is Enum && parameter is Type type)
 		{
-			var name = Enum.GetName(type, value);
-			var source = SvgSource.Load<SvgSource>($"avares://FileExplorerCore/Assets/UIIcons/{name}.svg", null);
-
-			return new SvgImage
+			try
 			{
-				Source = source,
-			};
+				var name = Enum.GetName(type, value);
+				var source = SvgSource.Load<SvgSource>($"avares://FileExplorerCore/Assets/UIIcons/{name}.svg", null);
+
+				return new SvgImage
+				{
+					Source = source,
+				};
+			}
+			catch (FileNotFoundException) { }			
 		}
 
 		return null;

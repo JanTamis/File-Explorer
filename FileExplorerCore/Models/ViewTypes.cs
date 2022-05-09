@@ -4,4 +4,5 @@ public enum ViewTypes
 {
 	List,
 	Grid,
+	Tree,
 }

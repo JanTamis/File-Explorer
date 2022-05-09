@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Notifications;
 using Avalonia.Markup.Xaml;
+using Avalonia.Platform.Interop;
 using Avalonia.Themes.Fluent;
 using FileExplorerCore.Injection;
 using FileExplorerCore.ViewModels;
@@ -22,14 +23,6 @@ public class App : Application
 
 	public override void OnFrameworkInitializationCompleted()
 	{
-		// var temp = Utf8String.Format(1.5f).Parse<float>();
-		// var value = temp.Parse<bool>();
-
-    //foreach (var _string in temp.Split(' '))
-    //{
-    //  Console.WriteLine(_string);
-    //}
-
     if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
 			Current!.Styles[0] = new FluentTheme(new Uri(@"avares://FileExplorer"))

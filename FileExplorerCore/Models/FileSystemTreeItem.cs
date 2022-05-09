@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Text.Unicode;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Interfaces;
-using Microsoft.Toolkit.HighPerformance.Helpers;
 
 namespace FileExplorerCore.Models;
 
@@ -349,6 +349,6 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, IEquata
 
 	public override int GetHashCode()
 	{
-		return GetPath(HashCode<char>.Combine);
+		return GetPath(String.GetHashCode);
 	}
 }
