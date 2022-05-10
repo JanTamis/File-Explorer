@@ -293,6 +293,17 @@ public class TabItemViewModel : ViewModelBase
 
 					DisplayControl = list;
 					break;
+				case ViewTypes.Tree:
+					var tree = new FileTreeGrid()
+					{
+						Files = Files,
+					};
+
+					tree.PathChanged += async path => await SetPath(path);
+					tree.SelectionChanged += count => SelectionCount = count;
+
+					DisplayControl = tree;
+					break;
 			}
 		}
 	}

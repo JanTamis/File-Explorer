@@ -13,7 +13,9 @@ public sealed class TaskCompletionNotifier<TResult> : INotifyPropertyChanged
 	public Task<TResult> Task { get; }
 
 	// Gets the result of the task. Returns the default value of TResult if the task has not completed successfully.
-	public TResult? Result => Task.Status is TaskStatus.RanToCompletion ? Task.Result : _defaultResult;
+	public TResult? Result => Task.Status is TaskStatus.RanToCompletion 
+		? Task.Result 
+		: _defaultResult;
 
 	// Gets whether the task has completed.
 	public bool IsCompleted => Task.IsCompleted;
@@ -43,31 +45,31 @@ public sealed class TaskCompletionNotifier<TResult> : INotifyPropertyChanged
 				: TaskScheduler.FromCurrentSynchronizationContext();
 
 			task.ContinueWith(t =>
+			{
+				var propertyChanged = PropertyChanged;
+
+				if (propertyChanged is not null)
 				{
-					var propertyChanged = PropertyChanged;
+					propertyChanged(this, new PropertyChangedEventArgs(nameof(IsCompleted)));
 
-					if (propertyChanged is not null)
+					if (t.IsCanceled)
 					{
-						propertyChanged(this, new PropertyChangedEventArgs(nameof(IsCompleted)));
-
-						if (t.IsCanceled)
-						{
-							propertyChanged(this, new PropertyChangedEventArgs(nameof(IsCanceled)));
-						}
-						else if (t.IsFaulted)
-						{
-							propertyChanged(this, new PropertyChangedEventArgs(nameof(IsFaulted)));
-						}
-						else
-						{
-							propertyChanged(this, new PropertyChangedEventArgs(nameof(IsSuccessfullyCompleted)));
-							propertyChanged(this, new PropertyChangedEventArgs(nameof(Result)));
-						}
+						propertyChanged(this, new PropertyChangedEventArgs(nameof(IsCanceled)));
 					}
-				},
-				CancellationToken.None,
-				TaskContinuationOptions.ExecuteSynchronously,
-				scheduler);
+					else if (t.IsFaulted)
+					{
+						propertyChanged(this, new PropertyChangedEventArgs(nameof(IsFaulted)));
+					}
+					else
+					{
+						propertyChanged(this, new PropertyChangedEventArgs(nameof(IsSuccessfullyCompleted)));
+						propertyChanged(this, new PropertyChangedEventArgs(nameof(Result)));
+					}
+				}
+			},
+			CancellationToken.None,
+			TaskContinuationOptions.ExecuteSynchronously,
+			scheduler);
 		}
 	}
 }

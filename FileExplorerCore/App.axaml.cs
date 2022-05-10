@@ -3,7 +3,6 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Notifications;
 using Avalonia.Markup.Xaml;
-using Avalonia.Platform.Interop;
 using Avalonia.Themes.Fluent;
 using FileExplorerCore.Injection;
 using FileExplorerCore.ViewModels;

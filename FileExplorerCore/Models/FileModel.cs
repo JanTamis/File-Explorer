@@ -3,6 +3,7 @@ using FileExplorerCore.Helpers;
 using Humanizer;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
@@ -65,6 +66,8 @@ public class FileModel : INotifyPropertyChanged
       }
     }
   }
+
+  public IEnumerable<FileModel> Children => TreeItem.Children.Select(s => new FileModel(s));
 
   public string Path => TreeItem.GetPath(path => path.ToString());
 

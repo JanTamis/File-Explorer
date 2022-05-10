@@ -25,7 +25,7 @@
 		<SolidColorBrush Color="#DFDFDF" x:Key="CardHighBackground" />-->
 
     <themes:BundledTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Blue" />
-
+    
     <!-- <SolidColorBrush Color="#454545" x:Key="Background" /> -->
     <!-- <SolidColorBrush Color="#404040" x:Key="ContentBackground" /> -->
     <!-- <SolidColorBrush Color="#505050" x:Key="MenuBackground" /> -->
@@ -53,6 +53,8 @@
     <StyleInclude Source="avares://Material.Avalonia/Material.Avalonia.Templates.xaml" />
     <StyleInclude Source="avares://Material.Icons.Avalonia/App.xaml" />
     <StyleInclude Source="avares://DialogHost.Avalonia/Styles.xaml"/>
+    <FluentTheme Mode="Dark" />
+    <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml" />
     
     <Style Selector="TabStrip > TabStripItem">
       <Setter Property="Background" Value="Transparent" />
