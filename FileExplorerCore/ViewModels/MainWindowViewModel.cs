@@ -5,7 +5,6 @@ using Avalonia.Threading;
 using DialogHost;
 using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
-using FileExplorerCore.Injection;
 using FileExplorerCore.Models;
 using FileExplorerCore.Popup;
 using Microsoft.Toolkit.HighPerformance;
@@ -18,7 +17,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace FileExplorerCore.ViewModels;
 
@@ -278,7 +276,7 @@ public class MainWindowViewModel : ViewModelBase
 
 	public async void CopyPath()
 	{
-		await Application.Current!.Clipboard!.SetTextAsync(CurrentTab.TreeItem.GetPath(x => x.ToString()));
+		await Application.Current!.Clipboard!.SetTextAsync(CurrentTab.TreeItem!.GetPath(x => x.ToString()));
 
 		NotificationManager.Show(new Notification("Copy Path", "The path has been copied"));
 	}

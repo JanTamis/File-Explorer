@@ -12,7 +12,7 @@ namespace FileExplorerCore;
 
 public class App : Application
 {
-	public static MainWindowViewModel MainViewModel { get; set; }
+	public static MainWindowViewModel? MainViewModel { get; set; }
 	public static Container Container { get; } = new Container();
 
 	public override void Initialize()

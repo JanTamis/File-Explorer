@@ -1,9 +1,7 @@
-﻿using FileExplorerCore.Helpers;
-using System;
+﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-using System.Text.Unicode;
 
 namespace FileExplorerCore.Converters;
 

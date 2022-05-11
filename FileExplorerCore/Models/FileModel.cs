@@ -51,7 +51,7 @@ public class FileModel : INotifyPropertyChanged
   {
     get
     {
-      return ThumbnailProvider.GetFileImage(TreeItem, App.MainViewModel.CurrentTab.CurrentViewMode is ViewTypes.Grid ? 100 : 24, () => IsVisible);
+      return ThumbnailProvider.GetFileImage(TreeItem, App.MainViewModel?.CurrentTab.CurrentViewMode is ViewTypes.Grid ? 100 : 24, () => IsVisible);
     }
   }
 
@@ -147,7 +147,7 @@ public class FileModel : INotifyPropertyChanged
       {
         result = state.Size;
       }
-      else if (path[^1] is '\\' && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
+      else if (path[^1] == PathHelper.DirectorySeparator && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
       {
         result = info.TotalSize - info.TotalFreeSpace;
       }

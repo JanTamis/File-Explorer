@@ -12,7 +12,7 @@ public class ExtensionConverter : IValueConverter
 {
 return value switch
 {
-			FileModel model when OperatingSystem.IsWindows() && !model.IsFolder => model.ExtensionName ??= NativeMethods.GetShellFileType(model.TreeItem.DynamicString),
+			FileModel model when OperatingSystem.IsWindows() && !model.IsFolder => model.ExtensionName ??= "", // NativeMethods.GetShellFileType(model.TreeItem.DynamicString),
 			FileModel model => !model.IsFolder
 				? model.TreeItem.GetPath(path =>
 					{
