@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
@@ -486,7 +487,7 @@ public class TabItemViewModel : ViewModelBase
 
     return path
       .EnumerateChildren((ref FileSystemEntry entry) => !entry.IsHidden)
-      .Where(w => FileSystemName.MatchesSimpleExpression(search, w.Value))
+      .Where(w => FileSystemName.MatchesSimpleExpression(search, w.Value) || Regex.IsMatch(w.Value, search))
       .Select(s => new FileModel(s));
   }
 

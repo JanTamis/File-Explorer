@@ -46,14 +46,12 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, IEquata
 
         if (Directory.Exists(path))
         {
-          var enumerable = new FileSystemEnumerable<byte>(path, (ref FileSystemEntry _) => 0, Options)
+          var enumerable = new DelegateFileSystemEnumerator<byte>(path, Options)
           {
-            ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
+            Find = (ref FileSystemEntry x) => x.IsDirectory,
           };
 
-          return enumerable
-            .GetEnumerator()
-            .MoveNext();
+          return enumerable.MoveNext();
         }
       }
 
