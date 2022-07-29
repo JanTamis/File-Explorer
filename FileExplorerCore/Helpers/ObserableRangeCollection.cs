@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -101,16 +102,22 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
     foreach (var item in collection)
     {
       if (token.IsCancellationRequested)
-        break;
+      {
+	      break;
+      }
 
       if (comparer != null && Data.Count > 0)
       {
-        var i = Data.BinarySearch(item, comparer);
+        var i = BinarySearch(item, comparer);
 
         if (i >= 0)
-          Data.Insert(i, item);
+        {
+	        Data.Insert(i, item);
+        }
         else
-          Data.Insert(~i, item);
+        {
+	        Data.Insert(~i, item);
+        }
       }
       else
       {
@@ -131,12 +138,16 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
             while (buffer.Count > 0 && !token.IsCancellationRequested)
             {
               if (token.IsCancellationRequested)
-                break;
+              {
+	              break;
+              }
 
               while (buffer.TryDequeue(out var temp))
               {
                 if (token.IsCancellationRequested)
-                  break;
+                {
+	                break;
+                }
 
                 action!(temp);
               }
@@ -205,19 +216,20 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
     var watch = Stopwatch.StartNew();
     var countWatch = Stopwatch.StartNew();
 
-    foreach (var item in collection)
+    foreach (var item in collection.Where(_ => !token.IsCancellationRequested))
     {
-      if (token.IsCancellationRequested)
-        break;
-
-      if (comparer != null && Data.Count > 0)
+      if (comparer is not null && Data.Count > 0)
       {
-        var i = await BinarySearchAsync(item, 0, Data.Count, comparer);
+	      var i = await BinarySearchAsync(item, 0, Data.Count, comparer);
 
-        if (i >= 0)
-          Data.Insert(i, item);
-        else
-          Data.Insert(~i, item);
+	      if (i >= 0)
+	      {
+		      Data.Insert(i, item);
+	      }
+	      else
+	      {
+		      Data.Insert(~i, item);
+	      }
       }
       else
       {

@@ -1,468 +1,415 @@
-using Avalonia;
+using System;
+using System.Collections.Generic;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input;
 using Avalonia.Threading;
-using DialogHost;
 using FileExplorerCore.DisplayViews;
 using FileExplorerCore.Helpers;
 using FileExplorerCore.Models;
 using FileExplorerCore.Popup;
-using Microsoft.Toolkit.HighPerformance;
 using Microsoft.VisualBasic.FileIO;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
-using System.IO.Compression;
+using System.IO.Enumeration;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using FileExplorerCore.Interfaces;
+using FileExplorerCore.Providers;
 
-namespace FileExplorerCore.ViewModels;
-
-public class MainWindowViewModel : ViewModelBase
+namespace FileExplorerCore.ViewModels
 {
-	public readonly WindowNotificationManager NotificationManager;
-
-	private TabItemViewModel _currentTab;
-
-	public static IEnumerable<SortEnum> SortValues => Enum.GetValues<SortEnum>();
-
-	public ObservableRangeCollection<FolderModel> Folders { get; set; }
-
-	//public static Tree<FileSystemTreeItem, string>? Tree { get; set; }
-
-	public ObservableRangeCollection<FileModel> Files => CurrentTab.Files;
-
-	public ObservableCollection<TabItemViewModel> Tabs { get; } = new();
-
-	public IEnumerable<string> SearchHistory => CurrentTab.TreeItem is not null
-		? Files
-			.Where(w => !w.IsFolder)
-			.GroupBy(g => g.Extension)
-			.Where(w => !String.IsNullOrWhiteSpace(w.Key))
-			.OrderBy(o => o.Key)
-			.Select(s => "*" + s.Key)
-		: Enumerable.Empty<string>();
-
-	public TabItemViewModel CurrentTab
+	public class MainWindowViewModel : ViewModelBase
 	{
-		get => _currentTab;
-		set
+		public readonly WindowNotificationManager notificationManager;
+
+		private TabItemViewModel _currentTab;
+		private IEnumerable<string> searchHistory;
+
+		public static IEnumerable<SortEnum> SortValues => Enum.GetValues<SortEnum>();
+
+		public IEnumerable<FolderModel> Folders { get; set; }
+
+		public IEnumerable<IItem> Files => CurrentTab.Files;
+
+		public ObservableRangeCollection<TabItemViewModel> Tabs { get; set; } = new();
+
+		public IEnumerable<string> SearchHistory
 		{
-			foreach (var tab in Tabs)
+			get => searchHistory;
+			set => this.OnPropertyChanged(ref searchHistory, value);
+		}
+
+		public TabItemViewModel CurrentTab
+		{
+			get => _currentTab;
+			set
 			{
-				tab.IsSelected = tab == value;
+				this.OnPropertyChanged(ref _currentTab, value);
+
+				this.OnPropertyChanged(nameof(Files));
+				this.OnPropertyChanged(nameof(Path));
+			}
+		}
+
+		public string Path
+		{
+			get => CurrentTab.Path;
+			set
+			{
+				if (value == Path)
+				{
+					return;
+				}
+
+				CurrentTab.SetPath(value);
+
+				this.OnPropertyChanged();
+
+				CurrentTab.UpdateFiles(false, "*").AsTask().ContinueWith(x =>
+				{
+					var categories = Enum.GetValues<Categories>().Select(s => s + ":");
+					SearchHistory = categories.Concat(CurrentTab.Files.Select(s => "*" + s.Extension).Distinct());
+				});
+			}
+		}
+
+		public MainWindowViewModel(WindowNotificationManager manager)
+		{
+			notificationManager = manager;
+
+			var drives = from drive in DriveInfo.GetDrives()
+				where drive.IsReady
+				select new FolderModel(PathHelper.FromPath(drive.RootDirectory.FullName), $"{drive.VolumeLabel} ({drive.Name})", null);
+
+			// var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
+			// 	select new FolderModel(PathHelper.FromPath(KnownFolders.GetPath(specialFolder).ToString()));
+
+			Folders = drives;
+
+			AddTab();
+		}
+
+		private void Timer_Elapsed(object sender, ElapsedEventArgs e)
+		{
+			StartSearch();
+		}
+
+		public void AddTab()
+		{
+			var tab = new TabItemViewModel();
+
+			Tabs.Add(tab);
+			CurrentTab = tab;
+		}
+
+		public void GoUp()
+		{
+			if (Path is { Length: > 0 })
+			{
+				var directory = new DirectoryInfo(Path);
+
+				Path = directory.Parent?.FullName ?? String.Empty;
+			}
+		}
+
+		public async ValueTask StartSearch()
+		{
+			if (CurrentTab.Search is { Length: > 0 } && Path is { Length: > 0 })
+			{
+				CurrentTab.IsSearching = true;
+
+				await CurrentTab.UpdateFiles(CurrentTab.IsSearching, CurrentTab.Search);
+			}
+		}
+
+		public async ValueTask Undo()
+		{
+			CurrentTab.SetPath(CurrentTab.Undo());
+
+			await CurrentTab.UpdateFiles(false, "*");
+		}
+
+		public async ValueTask Redo()
+		{
+			CurrentTab.SetPath(CurrentTab.Redo());
+			await CurrentTab.UpdateFiles(false, "*");
+		}
+
+		public void CancelUpdateFiles()
+		{
+			CurrentTab.CancelUpdateFiles();
+		}
+
+		public async ValueTask SetPath(FileSystemTreeItem path)
+		{
+			if (CurrentTab is not null)
+			{
+				if (CurrentTab.Provider is not FileSystemProvider)
+				{
+					CurrentTab.Provider = new FileSystemProvider();
+				}
+
+				await CurrentTab.SetPath(path.GetPath(path => path.ToString()));
+			}
+		}
+
+		public async void Refresh()
+		{
+			if (!String.IsNullOrWhiteSpace(Path))
+			{
+				await CurrentTab.UpdateFiles(CurrentTab.IsSearching, CurrentTab.IsSearching ? CurrentTab.Search : "*");
+			}
+		}
+
+		public void SelectAll()
+		{
+			foreach (var file in CurrentTab.Files)
+			{
+				file.IsSelected = true;
 			}
 
-			OnPropertyChanged(ref _currentTab, value);
-
-			OnPropertyChanged(nameof(Files));
-			OnPropertyChanged(nameof(Path));
+			// CurrentTab.OnPropertyChanged(nameof(CurrentTab.SelectionText));
+			// CurrentTab.Files.PropertyChanged("IsSelected");
 		}
-	}
 
-	public MainWindowViewModel(WindowNotificationManager manager)
-	{
-		NotificationManager = manager;
-
-		//if (OperatingSystem.IsWindows() && (Tree is null || Tree.Children.Count != DriveInfo.GetDrives().Count(a => a.IsReady)))
-		//{
-		//	Tree = new Tree<FileSystemTreeItem, string>(DriveInfo
-		//		.GetDrives()
-		//		.Where(w => w.IsReady)
-		//		.Select(s => new FileSystemTreeItem(s.RootDirectory.FullName, true)));
-		//}
-		//else if (OperatingSystem.IsMacOS() && (Tree is null || Tree.Children.Count != 1))
-		//{
-		//	Tree = new Tree<FileSystemTreeItem, string>(new[] { new FileSystemTreeItem("/", true) });
-		//}
-
-		if (OperatingSystem.IsWindows())
+		public void SelectNone()
 		{
-			var drives = DriveInfo
-				.GetDrives()
-				.Where(w => w.IsReady)
-				.OrderBy(o => o.DriveType)
-				.ThenBy(t => t.Name)
-				.Select(s =>
+			foreach (var file in CurrentTab.Files)
+			{
+				file.IsSelected = false;
+			}
+
+			//CurrentTab.OnPropertyChanged(nameof(CurrentTab.SelectionText));
+			// CurrentTab.Files.PropertyChanged("IsSelected");
+		}
+
+		public void SelectInvert()
+		{
+			foreach (var file in CurrentTab.Files)
+			{
+				file.IsSelected ^= true;
+			}
+
+			// CurrentTab.OnPropertyChanged(nameof(CurrentTab.SelectionText));
+			// CurrentTab.Files.PropertyChanged("IsSelected");
+		}
+
+		public void ShowSettings()
+		{
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+			{
+				CurrentTab.PopupContent = new Settings();
+			}
+		}
+
+		public void Rename()
+		{
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+			{
+				// var fileIndex = CurrentTab.Files.IndexOf(CurrentTab.Files.FirstOrDefault(x => x.IsSelected));
+				//
+				// if (fileIndex is not -1)
+				// {
+				// 	var rename = new Rename
+				// 	{
+				// 		// Files = CurrentTab.Files,
+				// 		Index = fileIndex,
+				// 	};
+				//
+				// 	CurrentTab.PopupContent = rename;
+				//
+				// 	rename.OnPropertyChanged(nameof(rename.File));
+				// }
+			}
+		}
+
+		public async void CopyFiles()
+		{
+			var data = new DataObject();
+			data.Set(DataFormats.FileNames, CurrentTab.Files.Where(x => x.IsSelected)
+				.Select(s => s.Path)
+				.ToArray());
+
+			await App.Current.Clipboard.SetDataObjectAsync(data);
+
+			notificationManager.Show(new Notification("Copy Files", "Files has been copied"));
+		}
+
+		public async void CopyPath()
+		{
+			await App.Current.Clipboard.SetTextAsync(CurrentTab.Path);
+
+			notificationManager.Show(new Notification("Copy Path", "The path has been copied"));
+		}
+
+		public void DeleteFiles()
+		{
+			var selectedFiles = CurrentTab.Files.Where(x => x.IsSelected);
+			var SelectedFileCount = selectedFiles.Count();
+
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && SelectedFileCount > 0)
+			{
+				var choice = new Choice
 				{
-					var treeItem = new FileSystemTreeItem(s.Name, true);
-					return new FolderModel(treeItem, $"{s.VolumeLabel} ({s.Name})", null);
-				});
-
-			var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
-				select new FolderModel(GetTreeItem(KnownFolders.GetPath(specialFolder)));
-
-			var result = new[]
-			{
-				new FolderModel("Quick Access", quickAccess),
-				new FolderModel("Drives", drives),
-			};
-
-			Folders = new ObservableRangeCollection<FolderModel>(result, true);
-		}
-		else
-		{
-			var quickAccess = (from specialFolder in Enum.GetValues<Environment.SpecialFolder>()
-												 let path = Environment.GetFolderPath(specialFolder, Environment.SpecialFolderOption.DoNotVerify)
-												 where !String.IsNullOrWhiteSpace(path)
-												 select new FolderModel(GetTreeItem(path)))
-				.DistinctBy(d => d.TreeItem);
-
-			Folders = new ObservableRangeCollection<FolderModel>(new[]
-			{
-				new FolderModel("Quick Access", quickAccess),
-				new FolderModel(new FileSystemTreeItem(new string(PathHelper.DirectorySeparator, 1), true)),
-			});
-		}
-
-		_currentTab = null!;
-
-		AddTab();
-	}
-
-	private async ValueTask Timer_Elapsed(object sender, ElapsedEventArgs e)
-	{
-		await StartSearch();
-	}
-
-	public void AddTab()
-	{
-		var tab = new TabItemViewModel();
-
-		Tabs.Add(tab);
-		CurrentTab = tab;
-
-		tab.PathChanged += async () => await OnPropertyChanged(nameof(SearchHistory));
-	}
-
-	public async Task GoUp()
-	{
-		await CurrentTab.SetPath(CurrentTab?.TreeItem?.Parent);
-	}
-
-	public async ValueTask StartSearch()
-	{
-		if (CurrentTab.Search is { Length: > 0 } && CurrentTab.TreeItem is not null)
-		{
-			await CurrentTab.UpdateFiles(true, CurrentTab.Search);
-		}
-	}
-
-	public async ValueTask Undo()
-	{
-		await CurrentTab.SetPath(CurrentTab.Undo());
-	}
-
-	public async ValueTask Redo()
-	{
-		await CurrentTab.SetPath(CurrentTab.Redo());
-	}
-
-	public void CancelUpdateFiles()
-	{
-		CurrentTab.CancelUpdateFiles();
-	}
-
-	public async ValueTask SetPath(FileSystemTreeItem path)
-	{
-		await CurrentTab.SetPath(path);
-	}
-
-	public async ValueTask Refresh()
-	{
-		await CurrentTab.SetPath(CurrentTab.TreeItem);
-	}
-
-	public async ValueTask SelectAll()
-	{
-		foreach (var file in CurrentTab.Files)
-		{
-			file.IsSelected = true;
-		}
-
-		await CurrentTab.OnPropertyChanged(nameof(CurrentTab.SelectionText));
-		CurrentTab.Files.PropertyChanged("IsSelected");
-	}
-
-	public async ValueTask SelectNone()
-	{
-		foreach (var file in CurrentTab.Files)
-		{
-			file.IsSelected = false;
-		}
-
-		await CurrentTab.OnPropertyChanged(nameof(CurrentTab.SelectionText));
-		CurrentTab.Files.PropertyChanged("IsSelected");
-	}
-
-	public async ValueTask SelectInvert()
-	{
-		foreach (var file in CurrentTab.Files)
-		{
-			file.IsSelected ^= true;
-		}
-
-		await CurrentTab.OnPropertyChanged(nameof(CurrentTab.SelectionText));
-		CurrentTab.Files.PropertyChanged("IsSelected");
-	}
-
-	public async Task ShowSettings()
-	{
-		if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
-		{
-			await App.Container.Run<Settings, Task>(setting => DialogHost.DialogHost.Show(setting));
-
-			CurrentTab.PopupContent = null;
-		}
-	}
-
-	public void Rename()
-	{
-		if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && CurrentTab.SelectionCount > 0)
-		{
-			var fileIndex = CurrentTab.Files.IndexOf(CurrentTab.Files.FirstOrDefault(x => x.IsSelected)!);
-
-			if (fileIndex is not -1)
-			{
-				var rename = new Rename
-				{
-					Files = CurrentTab.Files,
-					Index = fileIndex,
+					CloseText = "Cancel",
+					SubmitText = "Delete",
+					Message = CultureInfo.CurrentCulture.TextInfo.ToTitleCase($"Are you sure you want to delete {SelectedFileCount} item{(SelectedFileCount > 1 ? "s" : String.Empty)}?"),
 				};
 
-				CurrentTab.PopupContent = rename;
-
-				rename.OnPropertyChanged(nameof(rename.File));
-			}
-		}
-	}
-
-	public async Task ZipFiles()
-	{
-		if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && CurrentTab.TreeItem is not null)
-		{
-			var zip = new Zip
-			{
-				SelectedFiles = Files.Where(w => w.IsSelected),
-				TreeItem = CurrentTab.TreeItem,
-				CompressionLevel = CompressionLevel.SmallestSize,
-			};
-			zip.ZipFiles();
-
-			await DialogHost.DialogHost.Show(zip, (object sender, DialogClosingEventArgs eventArgs) => { zip.Close(); });
-
-			CurrentTab.PopupContent = null;
-
-			if (zip.FileModel is not null)
-			{
-				CurrentTab.Files.Add(zip.FileModel);
-			}
-		}
-	}
-
-	public async Task CopyFiles()
-	{
-		var data = new DataObject();
-		data.Set(DataFormats.FileNames, CurrentTab.Files.Where(x => x.IsSelected)
-			.Select(s => s.Path)
-			.ToArray());
-
-		await Application.Current!.Clipboard!.SetDataObjectAsync(data);
-
-		NotificationManager.Show(new Notification("Copy Files", "Files has been copied"));
-	}
-
-	public async void CopyPath()
-	{
-		await Application.Current!.Clipboard!.SetTextAsync(CurrentTab.TreeItem!.GetPath(x => x.ToString()));
-
-		NotificationManager.Show(new Notification("Copy Path", "The path has been copied"));
-	}
-
-	public async Task DeleteFiles()
-	{
-		var selectedFiles = CurrentTab.Files.Where(x => x.IsSelected);
-		var selectedFileCount = CurrentTab.SelectionCount;
-
-		if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && selectedFileCount > 0)
-		{
-			var choice = new Choice
-			{
-				CloseText = "Cancel",
-				SubmitText = "Delete",
-				Message = selectedFileCount is 1
-					? $"Are you sure you want to delete {selectedFiles.First().Name}?"
-					: $"Are you sure you want to delete {selectedFileCount} items?",
-			};
-
-			choice.OnSubmit += () =>
-			{
-				var deletedFiles = new List<FileModel>(selectedFileCount);
-
-				foreach (var file in selectedFiles)
+				choice.OnSubmit += () =>
 				{
-					try
+					var deletedFiles = new List<IItem>(SelectedFileCount);
+
+					foreach (var file in selectedFiles)
 					{
-						if (File.Exists(file.Path))
+						try
 						{
-							FileSystem.DeleteFile(file.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+							if (File.Exists(file.Path))
+							{
+								FileSystem.DeleteFile(file.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+							}
+							else if (Directory.Exists(file.Path))
+							{
+								FileSystem.DeleteDirectory(file.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+							}
+
+							deletedFiles.Add(file);
 						}
-						else if (Directory.Exists(file.Path))
+						catch (Exception)
 						{
-							FileSystem.DeleteDirectory(file.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
 						}
-
-						deletedFiles.Add(file);
 					}
-					catch (Exception)
-					{
-					}
-				}
 
-				CurrentTab.Files.RemoveRange(deletedFiles);
-				CurrentTab.PopupContent = null;
+					CurrentTab.PopupContent = null;
+				};
 
-				DialogHost.DialogHost.Close(null);
+				CurrentTab.PopupContent = choice;
+			}
+		}
+
+		public void CopyTo()
+		{
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && Tabs.Count(x => !String.IsNullOrEmpty(x.Path)) > 1)
+			{
+				var selector = new TabSelector()
+				{
+					Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab && !String.IsNullOrEmpty(x.Path))),
+				};
+
+				selector.TabSelectionChanged += _ => { selector.Close(); };
+
+				CurrentTab.PopupContent = selector;
+			}
+		}
+
+		public void AnalyzeFolder()
+		{
+			var view = new AnalyzerView();
+			CurrentTab.DisplayControl = view;
+
+			var drive = new DriveInfo(Path.Substring(0, 1));
+			var parent = new FileIndexModel(PathHelper.FromPath(Path));
+
+			if (drive.Name == Path)
+			{
+				parent = new FileIndexModel(PathHelper.FromPath(Path));
+			}
+
+			var options = new EnumerationOptions()
+			{
+				IgnoreInaccessible = true,
+				AttributesToSkip = FileAttributes.Temporary,
 			};
 
-			CurrentTab.PopupContent = choice;
-
-			await DialogHost.DialogHost.Show(choice);
-			CurrentTab.PopupContent = null;
-		}
-	}
-
-	public void CopyTo()
-	{
-		if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && Tabs.Count(x => x.TreeItem is not null && !String.IsNullOrWhiteSpace(x.TreeItem.GetPath(x => x.ToString()))) > 1)
-		{
-			var selector = new TabSelector
+			var folderQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(new FileSystemTreeItem(x.FileName, x.IsDirectory)), options)
 			{
-				Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x.TreeItem is not null && x != CurrentTab && !String.IsNullOrWhiteSpace(x.TreeItem.GetPath(x => x.ToString())))),
+				ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
 			};
 
-			selector.TabSelectionChanged += _ => { selector.Close(); };
-
-			CurrentTab.PopupContent = selector;
-		}
-	}
-
-	public async Task AnalyzeFolder()
-	{
-		if (CurrentTab.TreeItem is null)
-		{
-			return;
-		}
-
-		var view = new AnalyzerView();
-		CurrentTab.DisplayControl = view;
-
-		CurrentTab.TokenSource?.Cancel();
-		CurrentTab.TokenSource = new System.Threading.CancellationTokenSource();
-
-		var rootTask = Task.Run(async () =>
-		{
-			var query = CurrentTab.TreeItem
-				.EnumerateChildren()
-				.Select(s => new FileIndexModel(s));
-
-			var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
+			var fileQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(new FileSystemTreeItem(x.FileName, x.IsDirectory)), options)
 			{
-				var resultX = await x.TaskSize;
-				var resultY = await y.TaskSize;
+				ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
+			};
 
-				return resultY.CompareTo(resultX);
+			ThreadPool.QueueUserWorkItem(async x =>
+			{
+				var query = folderQuery.Concat(fileQuery);
+
+				var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
+				{
+					var resultX = await x.TaskSize;
+					var resultY = await y.TaskSize;
+
+					return resultY.CompareTo(resultX);
+				});
+
+				await view.Root.AddRangeAsync(query, comparer, token: CurrentTab.TokenSource.Token);
 			});
 
-			await view.Root.AddRangeAsync(query, comparer, token: CurrentTab.TokenSource.Token);
-		}, CurrentTab.TokenSource.Token);
-
-		var extensionTask = Task.Run(async () =>
-		{
-			await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = true);
-
-			var extensionQuery = CurrentTab.TreeItem
-				.EnumerateChildren()
-				.Where(w => !w.IsFolder)
-				.GroupBy(g => Path.GetExtension(g.Value));
-
-			var comparer = new ExtensionModelComparer();
-
-			foreach (var extension in extensionQuery)
+			ThreadPool.QueueUserWorkItem(async x =>
 			{
-				if (CurrentTab.TokenSource.IsCancellationRequested)
-					break;
-
-				if (!String.IsNullOrEmpty(extension.Key))
+				var options = new EnumerationOptions()
 				{
-					var model = new ExtensionModel(extension.Key, extension.Sum(s => new FileInfo(s.GetPath(path => path.ToString())).Length))
-					{
-						TotalFiles = extension.Count(),
-					};
+					IgnoreInaccessible = true,
+					AttributesToSkip = FileAttributes.System,
+					RecurseSubdirectories = true
+				};
 
-					var index = view.Extensions.BinarySearch(model, comparer);
+				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = true);
 
-					if (index >= 0)
+				var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(Path, (ref FileSystemEntry x) => (System.IO.Path.GetExtension(x.FileName).ToString(), x.Length), options)
 					{
-						await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(index, model));
+						ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
 					}
-					else
+					.Where(w => !String.IsNullOrEmpty(w.Extension))
+					.GroupBy(g => g.Extension);
+
+				var comparer = new ExtensionModelComparer();
+
+				foreach (var extension in extensionQuery)
+				{
+					if (CurrentTab.TokenSource.IsCancellationRequested)
+						break;
+
+					if (!String.IsNullOrEmpty(extension.Key))
 					{
-						await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(~index, model));
+						var model = new ExtensionModel(extension.Key, extension.Sum(s => s.Size))
+						{
+							TotalFiles = extension.Count()
+						};
+
+						var index = view.Extensions.BinarySearch(model, comparer);
+
+						if (index >= 0)
+						{
+							await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(index, model));
+						}
+						else
+						{
+							await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(~index, model));
+						}
 					}
 				}
-			}
 
-			await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = false);
-		});
+				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = false);
+			});
+		}
 
-		await Task.WhenAll(rootTask, extensionTask);
-	}
-
-	public async Task ShowProperties()
-	{
-		if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+		public void ShowProperties()
 		{
-			var model = CurrentTab.Files.FirstOrDefault(x => x.IsSelected);
-
-			if (model is not null)
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
 			{
-				await App.Container.Run<Properties, Task, FileModel>(async (properties, model) =>
+				var model = CurrentTab.Files.FirstOrDefault(x => x.IsSelected) ?? new FileModel(PathHelper.FromPath(Path));
+
+				var properties = new Properties
 				{
-					properties.Model = model;
+					Model = model,
+				};
 
-					await DialogHost.DialogHost.Show(properties);
-
-					properties.Close();
-				}, model);
-
-				CurrentTab.PopupContent = null;
+				CurrentTab.PopupContent = properties;
 			}
 		}
-	}
-
-	public static FileSystemTreeItem? GetTreeItem(ReadOnlySpan<char> path)
-	{
-		if (path.IsEmpty)
-		{
-			return null;
-		}
-
-		var offset = OperatingSystem.IsWindows()
-			? 3
-			: 1;
-
-		var item = new FileSystemTreeItem(path[..offset], true);
-		path = path[offset..];
-
-		while (path.IndexOf(PathHelper.DirectorySeparator) is var charOffset && charOffset >= 0)
-		{
-			item = new FileSystemTreeItem(path[..charOffset], true, item);
-			path = path[(charOffset + 1)..];
-		}
-
-		return new FileSystemTreeItem(path, true, item);
 	}
 }

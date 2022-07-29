@@ -11,10 +11,11 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using Avalonia.Threading;
 using System.Runtime.CompilerServices;
+using FileExplorerCore.Interfaces;
 
 namespace FileExplorerCore.Models;
 
-public class FileModel : INotifyPropertyChanged
+public class FileModel : INotifyPropertyChanged, IItem
 {
   public static readonly ConcurrentBag<FileModel> FileImageQueue = new();
 
@@ -47,13 +48,7 @@ public class FileModel : INotifyPropertyChanged
     }
   }
 
-  public Task<IImage?> Image
-  {
-    get
-    {
-      return ThumbnailProvider.GetFileImage(TreeItem, App.MainViewModel?.CurrentTab.CurrentViewMode is ViewTypes.Grid ? 100 : 24, () => IsVisible);
-    }
-  }
+  public Task<IImage?> Image => ThumbnailProvider.GetFileImage(this, App.MainViewModel?.CurrentTab.CurrentViewMode is ViewTypes.Grid ? 100 : 24, () => IsVisible);
 
   public bool IsSelected
   {
@@ -67,7 +62,12 @@ public class FileModel : INotifyPropertyChanged
     }
   }
 
-  public IEnumerable<FileModel> Children => TreeItem.Children.Select(s => new FileModel(s));
+  public bool IsRoot => TreeItem.HasParent;
+
+  public IEnumerable<IItem> Children => TreeItem.Children
+	  .OrderBy(o => !o.IsFolder)
+	  .ThenBy(t => t.Value)
+	  .Select(s => new FileModel(s));
 
   public string Path => TreeItem.GetPath(path => path.ToString());
 
@@ -128,11 +128,11 @@ public class FileModel : INotifyPropertyChanged
 
   public long TotalSize => IsFolder
     ? TreeItem.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions
-    {
-      RecurseSubdirectories = true,
-      IgnoreInaccessible = true,
-      AttributesToSkip = FileSystemTreeItem.Options.AttributesToSkip,
-    })).Sum()
+	    {
+	      RecurseSubdirectories = true,
+	      IgnoreInaccessible = true,
+	      AttributesToSkip = FileSystemTreeItem.Options.AttributesToSkip,
+	    })).Sum()
     : Size;
 
   public bool IsFolder => TreeItem.IsFolder;
@@ -191,6 +191,16 @@ public class FileModel : INotifyPropertyChanged
   public FileModel(FileSystemTreeItem item)
   {
     TreeItem = item;
+  }
+
+  public T GetPath<T>(ReadOnlySpanFunc<char, T> action)
+  {
+	  return TreeItem.GetPath(action);
+  }
+
+  public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
+  {
+	  return TreeItem.GetPath(action, parameter);
   }
 
   public void OnPropertyChanged([CallerMemberName] string? name = null)

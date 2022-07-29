@@ -4,5 +4,5 @@ namespace FileExplorerCore.Interfaces;
 
 public interface ISelectableControl
 {
-	event Action<int> SelectionChanged;
+	event Action SelectionChanged;
 }

@@ -24,7 +24,7 @@ public partial class Properties : UserControl, IPopup, INotifyPropertyChanged
 
 	private long _size = -1;
 
-	private FileModel _model;
+	private IItem _model;
 
 	public bool HasShadow => false;
 	public bool HasToBeCanceled => false;
@@ -35,7 +35,7 @@ public partial class Properties : UserControl, IPopup, INotifyPropertyChanged
 
 	private CancellationTokenSource _source;
 
-	public Task<IImage?> Icon => ThumbnailProvider.GetFileImage(_model?.TreeItem, 48);
+	public Task<IImage?> Icon => ThumbnailProvider.GetFileImage(_model, 48);
 
 	private ObservableRangeCollection<MetadataExtractor.Directory> MetaData { get; } = new();
 
@@ -56,7 +56,7 @@ public partial class Properties : UserControl, IPopup, INotifyPropertyChanged
 		}
 	}
 
-	public FileModel Model
+	public IItem Model
 	{
 		get => _model;
 		set
@@ -75,7 +75,7 @@ public partial class Properties : UserControl, IPopup, INotifyPropertyChanged
 
 				Task.Run(() =>
 				{
-					var enumerable = _model.TreeItem.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions
+					var enumerable = _model.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions
 					{
 						RecurseSubdirectories = true,
 						IgnoreInaccessible = true,

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using FileExplorerCore.Interfaces;
 
 namespace FileExplorerCore.Models;
 
-public struct FileModelComparer : IComparer<FileModel>
+public struct FileModelComparer : IComparer<FileModel>, IAsyncComparer<FileModel>
 {
 	private readonly SortEnum sortMember;
 
@@ -20,7 +22,7 @@ public struct FileModelComparer : IComparer<FileModel>
 			SortEnum.Edited => y.EditedOn.CompareTo(x.EditedOn),
 			SortEnum.Size => x.Size.CompareTo(y.Size),
 			SortEnum.Extension => String.Compare(x.Extension, y.Extension),
-			_ => 0
+			_ => 0,
 		};
 
 		if (sortMember is SortEnum.None)
@@ -43,5 +45,10 @@ public struct FileModelComparer : IComparer<FileModel>
 		}
 
 		return result;
+	}
+
+	public ValueTask<int> CompareAsync(FileModel x, FileModel y)
+	{
+		return ValueTask.FromResult(Compare(x, y));
 	}
 }

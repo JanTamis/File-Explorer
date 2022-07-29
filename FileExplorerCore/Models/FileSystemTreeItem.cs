@@ -94,7 +94,13 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, IEquata
     IsFolder = isFolder;
     Parent = parent;
     Value = name.ToString();
-    // DynamicString = Utf8String.CreateFromRelaxed(name);
+  }
+
+  public FileSystemTreeItem(string name, bool isFolder, FileSystemTreeItem? parent = null)
+  {
+	  IsFolder = isFolder;
+	  Parent = parent;
+	  Value = name;
   }
 
   /// <summary>

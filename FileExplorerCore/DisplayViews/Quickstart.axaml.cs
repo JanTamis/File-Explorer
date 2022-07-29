@@ -4,10 +4,12 @@ using FileExplorerCore.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using FileExplorerCore.Interfaces;
 
 namespace FileExplorerCore.DisplayViews;
 
-public partial class Quickstart : UserControl
+public partial class Quickstart : UserControl, IFileViewer
 {
 	private IEnumerable<FileModel> RecentFiles
 	{
@@ -53,4 +55,14 @@ public partial class Quickstart : UserControl
 	{
 		AvaloniaXamlLoader.Load(this);
 	}
+
+	public IEnumerable<IItem> Items { get; set; }
+	public Task<int> ItemCount => Task.FromResult(0);
+
+	public event Action<string>? PathChanged;
+	public event Action? SelectionChanged;
+
+	public Action SelectAll { get; }
+	public Action SelectNone { get; }
+	public Action SelectInvert { get; }
 }

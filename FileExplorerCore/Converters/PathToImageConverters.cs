@@ -15,8 +15,8 @@ public class PathToImageConverter : IValueConverter
 		{
 			var task = value switch
 			{
-				FileModel model => ThumbnailProvider.GetFileImage(model.TreeItem, size, () => model.IsVisible),
-				FileSystemTreeItem treeItem => ThumbnailProvider.GetFileImage(treeItem, size),
+				FileModel model => ThumbnailProvider.GetFileImage(model, size, () => model.IsVisible),
+				//FileSystemTreeItem treeItem => ThumbnailProvider.GetFileImage(treeItem, size),
 				_ => null,
 			};
 

@@ -7,9 +7,11 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using System.Threading;
-using FileExplorerCore.Models;
 using Avalonia.Media.Imaging;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using FileExplorerCore.Interfaces;
+using FileExplorerCore.Models;
 
 namespace FileExplorerCore.Helpers;
 #pragma warning disable CA1416
@@ -49,16 +51,16 @@ public static class ThumbnailProvider
 		}
 	}
 
-	public static async Task<IImage?> GetFileImage(FileSystemTreeItem? treeItem, int size, Func<bool>? shouldReturnImage = null)
+	public static async Task<IImage?> GetFileImage(IItem model, int size, Func<bool>? shouldReturnImage = null)
 	{
-		if (treeItem is null || shouldReturnImage is not null && !shouldReturnImage())
+		if (model is null || shouldReturnImage is not null && !shouldReturnImage())
 		{
 			return null;
 		}
 
 		if (OperatingSystem.IsWindows())
 		{
-			return await Task.Factory.StartNew(() => treeItem?.GetPath((path, imageSize) =>
+			return await Task.Factory.StartNew(() => model?.GetPath((path, imageSize) =>
 			{
 				Bitmap? image = null!;
 
@@ -75,11 +77,11 @@ public static class ThumbnailProvider
 			}, size), CancellationToken.None, TaskCreationOptions.DenyChildAttach, concurrentExclusiveScheduler.ConcurrentScheduler).ConfigureAwait(false);
 		}
 
-		return await await Task.Factory.StartNew(() => treeItem?.GetPath((path, imageSize) =>
+		return await await Task.Factory.StartNew(() => model?.GetPath((path, imageSize) =>
 		{
 			var name = String.Empty;
 
-			if (treeItem.IsFolder)
+			if (model.IsFolder)
 			{
 				if (OperatingSystem.IsWindows())
 				{
@@ -87,7 +89,7 @@ public static class ThumbnailProvider
 					{
 						var folderText = Enum.GetName(folder);
 
-						if (folderText is not null && treeItem.GetPath((path, knownFolder) => path.SequenceEqual(KnownFolders.GetPath(knownFolder)), folder))
+						if (folderText is not null && model.GetPath((path, knownFolder) => path.SequenceEqual(KnownFolders.GetPath(knownFolder)), folder))
 						{
 							name = folderText;
 							break;
@@ -95,9 +97,9 @@ public static class ThumbnailProvider
 					}
 				}
 
-				if (!treeItem.HasParent && name == String.Empty)
+				if (!model.IsRoot && name == String.Empty)
 				{
-					var driveInfo = new DriveInfo(new string(treeItem.Value[0], 1));
+					var driveInfo = new DriveInfo(new string(model.Name[0], 1));
 
 					if (driveInfo.IsReady)
 					{
@@ -107,7 +109,7 @@ public static class ThumbnailProvider
 
 				if (name == String.Empty)
 				{
-					name = treeItem.HasChildren
+					name = model.Children.Any()
 						? "FolderFiles"
 						: "Folder";
 				}
@@ -116,7 +118,104 @@ public static class ThumbnailProvider
 			{
 				name = "File";
 
-				var extension = Path.GetExtension(treeItem.Value).ToLower();
+				var extension = Path.GetExtension(model.Name).ToLower();
+
+				if (extension.Length > 1)
+				{
+					extension = extension[1..];
+
+					if (Images.ContainsKey(extension))
+					{
+						name = extension;
+					}
+					else
+					{
+						foreach (var (key, value) in TypeMap)
+						{
+							foreach (var val in value)
+							{
+								if (extension == val)
+								{
+									name = key;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			return GetImage(name!);
+		}, size) ?? Task.FromResult<SvgImage?>(null), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
+	}
+
+	public static async Task<IImage?> GetFileImage(FileSystemTreeItem model, int size, Func<bool>? shouldReturnImage = null)
+	{
+		if (model is null || shouldReturnImage is not null && !shouldReturnImage())
+		{
+			return null;
+		}
+
+		if (OperatingSystem.IsWindows())
+		{
+			return await Task.Factory.StartNew(() => model?.GetPath((path, imageSize) =>
+			{
+				Bitmap? image = null!;
+
+				if (shouldReturnImage is null || shouldReturnImage?.Invoke() == true)
+				{
+					image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly, () => size is < 64 and >= 32);
+				}
+				if (image is null && (shouldReturnImage is null || shouldReturnImage?.Invoke() == true))
+				{
+					image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly, () => true);
+				}
+
+				return image;
+			}, size), CancellationToken.None, TaskCreationOptions.DenyChildAttach, concurrentExclusiveScheduler.ConcurrentScheduler).ConfigureAwait(false);
+		}
+
+		return await await Task.Factory.StartNew(() => model?.GetPath((path, imageSize) =>
+		{
+			var name = String.Empty;
+
+			if (model.IsFolder)
+			{
+				if (OperatingSystem.IsWindows())
+				{
+					foreach (var folder in Enum.GetValues<KnownFolder>())
+					{
+						var folderText = Enum.GetName(folder);
+
+						if (folderText is not null && model.GetPath((path, knownFolder) => path.SequenceEqual(KnownFolders.GetPath(knownFolder)), folder))
+						{
+							name = folderText;
+							break;
+						}
+					}
+				}
+
+				if (!model.HasParent && name == String.Empty)
+				{
+					var driveInfo = new DriveInfo(new string(model.Value[0], 1));
+
+					if (driveInfo.IsReady)
+					{
+						name = Enum.GetName(driveInfo.DriveType);
+					}
+				}
+
+				if (name == String.Empty)
+				{
+					name = model.Children.Any()
+						? "FolderFiles"
+						: "Folder";
+				}
+			}
+			else
+			{
+				name = "File";
+
+				var extension = Path.GetExtension(model.Value).ToLower();
 
 				if (extension.Length > 1)
 				{

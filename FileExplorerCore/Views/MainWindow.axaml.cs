@@ -46,6 +46,14 @@ public class MainWindow : FluentWindow
 				if (DataContext is MainWindowViewModel viewModel)
 				{
 					tree.Items = viewModel.Folders;
+
+					this.KeyUp += (sender, args) =>
+					{
+						if (args.KeyModifiers is KeyModifiers.Control && args.Key is Key.A)
+						{
+							viewModel.CurrentTab.DisplayControl.SelectAll();
+						}
+					};
 				}
 			};
 
@@ -53,7 +61,7 @@ public class MainWindow : FluentWindow
 
 			TreeViewItem.IsExpandedProperty.Changed.Subscribe(async x =>
 			{
-				if (x.Sender is TreeViewItem { DataContext: FolderModel folderModel } treeItem && (treeItem.Items is FolderModel[]))
+				if (x.Sender is TreeViewItem { DataContext: FolderModel folderModel, Items: FolderModel[] } treeItem)
 				{
 					treeItem.Items = await Task.Run(() => folderModel.SubFolders.ToArray());
 				}
@@ -79,7 +87,7 @@ public class MainWindow : FluentWindow
 
 				if (folderModel.HasFolders || folderModel.TreeItem is null)
 				{
-					treeItem.Items = new FolderModel[] { new FolderModel(new FileSystemTreeItem("Loading...", false)) }; 
+					treeItem.Items = new[] { new FolderModel(new FileSystemTreeItem("Loading...", false)) };
 				}
 					
 				if (OperatingSystem.IsWindows() && treeItem.Parent is TreeView)
@@ -123,7 +131,7 @@ public class MainWindow : FluentWindow
 			{
 				item.Command = ReactiveCommand.Create(() =>
 				{
-					model.CurrentTab.TreeItem = folder.TreeItem;
+					model.CurrentTab.Path = folder.TreeItem.GetPath(path => path.ToString());
 				});
 
 				item.ContextMenu.ItemContainerGenerator.Materialized += (_, ee) =>
@@ -134,7 +142,7 @@ public class MainWindow : FluentWindow
 						{
 							menuItem.Tapped += delegate
 							{
-								model.CurrentTab.TreeItem = folderModel.TreeItem;
+								model.CurrentTab.Path = folder.TreeItem.GetPath(path => path.ToString());
 							};
 						}
 					}
