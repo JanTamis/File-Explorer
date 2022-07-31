@@ -3,12 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.32126.315
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileExplorerCore", "FileExplorerCore\FileExplorerCore.csproj", "{8B547594-A893-44CF-BA43-6C0D03910D59}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FileExplorer", "FileExplorer\FileExplorer.csproj", "{8B547594-A893-44CF-BA43-6C0D03910D59}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D0629D7B-D9C5-4F84-9B91-A79A261B4754}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileExplorer.Core", "FileExplorer.Core\FileExplorer.Core.csproj", "{F51C490B-44E7-4235-A633-6337EAF15B75}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,6 +28,14 @@ Global
 		{8B547594-A893-44CF-BA43-6C0D03910D59}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8B547594-A893-44CF-BA43-6C0D03910D59}.Release|x64.ActiveCfg = Release|x64
 		{8B547594-A893-44CF-BA43-6C0D03910D59}.Release|x64.Build.0 = Release|x64
+		{F51C490B-44E7-4235-A633-6337EAF15B75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F51C490B-44E7-4235-A633-6337EAF15B75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F51C490B-44E7-4235-A633-6337EAF15B75}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F51C490B-44E7-4235-A633-6337EAF15B75}.Debug|x64.Build.0 = Debug|Any CPU
+		{F51C490B-44E7-4235-A633-6337EAF15B75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F51C490B-44E7-4235-A633-6337EAF15B75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F51C490B-44E7-4235-A633-6337EAF15B75}.Release|x64.ActiveCfg = Release|Any CPU
+		{F51C490B-44E7-4235-A633-6337EAF15B75}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

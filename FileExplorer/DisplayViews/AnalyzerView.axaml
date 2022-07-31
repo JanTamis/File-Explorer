@@ -1,0 +1,144 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+						 xmlns:converters="using:FileExplorer.Converters"
+						 xmlns:controls="using:FileExplorer.Controls"
+						 xmlns:models="clr-namespace:FileExplorer.Models"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="FileExplorer.DisplayViews.AnalyzerView">
+	<UserControl.Resources>
+		<converters:PathToImageConverter x:Key="imageConverter" />
+		<converters:EditedOnConverter x:Key="editedOnConverter" />
+		<converters:ExtensionConverter x:Key="extensionConverter" />
+		<converters:SizeConverter x:Key="sizeConverter" />
+		<converters:FileNameConverter x:Key="fileNameConverter" />
+		<converters:MinSizeConverter x:Key="minSizeConverter" />
+		<converters:MoreThanConverter x:Key="moreThanConverter" />
+		<converters:BackgroundConverter x:Key="backgroundConverter" />
+		<converters:ForegroundConverter x:Key="foregroundConverter" />
+
+		<converters:PathToFoldersConverter x:Key="pathToFoldersConverter" />
+	</UserControl.Resources>
+
+	<Grid ColumnDefinitions="2*, *"
+				RowDefinitions="*, 0.5*">
+		<TreeView Items="{Binding Root}">
+			<TreeView.DataTemplates>
+				<TreeDataTemplate DataType="{x:Type models:FileIndexModel}" ItemsSource="{Binding Items}">
+					<Grid ColumnDefinitions="250, Auto, *">
+						<TextBlock Text="{Binding Name}"
+											 TextTrimming="CharacterEllipsis"
+											 VerticalAlignment="Center" />
+
+						<ProgressBar Value="{Binding TaskSize^}"
+												 MinWidth="75"
+												 Maximum="{Binding ParentSize^}"
+												 Grid.Column="1" />
+
+						<TextBlock Text="{Binding TaskSize^, Converter={StaticResource sizeConverter}, FallbackValue=Loading...}"
+											 VerticalAlignment="Center"
+											 Grid.Column="2"
+											 Margin="5 0 0 0" />
+					</Grid>
+				</TreeDataTemplate>
+			</TreeView.DataTemplates>
+
+			<TreeView.ItemsPanel>
+				<ItemsPanelTemplate>
+					<StackPanel Orientation="Vertical" />
+				</ItemsPanelTemplate>
+			</TreeView.ItemsPanel>
+		</TreeView>
+
+		<GridSplitter ResizeDirection="Columns"
+									HorizontalAlignment="Left"
+									Background="{DynamicResource MenuBackground}"
+									Width="5"
+									Grid.RowSpan="2"
+									Grid.Column="1" />
+
+		<DataGrid Grid.Column="1"
+							Grid.RowSpan="2"
+							IsReadOnly="True"
+							Items="{Binding Extensions}"
+							Margin="5 0 0 0">
+			<DataGrid.Columns>
+				<DataGridTemplateColumn Header="Extension"
+																Width="*"
+																SortMemberPath="Extension">
+					<DataGridTemplateColumn.CellTemplate>
+						<DataTemplate>
+							<TextBlock Text="{Binding Extension}"
+												 TextTrimming="CharacterEllipsis"
+												 VerticalAlignment="Center" />
+						</DataTemplate>
+					</DataGridTemplateColumn.CellTemplate>
+				</DataGridTemplateColumn>
+				<!--<DataGridTextColumn Header="Description" 
+														Width="*"/>-->
+				<DataGridTextColumn Header="Bytes"
+														Width="Auto"
+														Binding="{Binding TotalSize, Converter={StaticResource sizeConverter}}"/>
+
+				<DataGridTextColumn Header="Files"
+														Binding="{Binding TotalFiles, StringFormat={}{0:N0}, Mode=OneWay}"
+														Width="Auto"/>
+			</DataGrid.Columns>
+		</DataGrid>
+
+		<ItemsControl Grid.Row="2"
+									Margin="0 5 0 0"
+									Items="{Binding Root}">
+			<ItemsControl.ItemsPanel>
+				<ItemsPanelTemplate>
+					<controls:SquarifiedTreeMapsPanel />
+				</ItemsPanelTemplate>
+			</ItemsControl.ItemsPanel>
+
+			<ItemsControl.ItemTemplate>
+				<DataTemplate>
+					<Border Background="{Binding Name, Converter={StaticResource backgroundConverter}}"
+									ToolTip.Tip="{Binding Name}"
+									BorderThickness="0">
+							<!--<TextBlock Text="{Binding Name}"
+												 Foreground="{Binding $parent.Background, Converter={StaticResource foregroundConverter}}"
+												 HorizontalAlignment="Center"
+												 VerticalAlignment="Center"
+												 TextTrimming="CharacterEllipsis" />-->
+
+						<ItemsControl Margin="0 5 0 0"
+													Items="{Binding Items}">
+							<ItemsControl.ItemsPanel>
+								<ItemsPanelTemplate>
+									<controls:SquarifiedTreeMapsPanel />
+								</ItemsPanelTemplate>
+							</ItemsControl.ItemsPanel>
+
+							<ItemsControl.ItemTemplate>
+								<DataTemplate>
+									<Border Background="{Binding Name, Converter={StaticResource backgroundConverter}}"
+													ToolTip.Tip="{Binding Name}"
+													BorderThickness="1">
+										<TextBlock Text="{Binding Name}"
+															 Foreground="{Binding $parent.Background, Converter={StaticResource foregroundConverter}}"
+															 HorizontalAlignment="Center"
+															 VerticalAlignment="Center"
+															 TextWrapping="WrapWithOverflow"
+															 TextTrimming="CharacterEllipsis" />
+									</Border>
+								</DataTemplate>
+							</ItemsControl.ItemTemplate>
+						</ItemsControl>
+					</Border>
+				</DataTemplate>
+			</ItemsControl.ItemTemplate>
+		</ItemsControl>
+
+		<GridSplitter ResizeDirection="Rows"
+									VerticalAlignment="Top"
+									Background="{DynamicResource MenuBackground}"
+									Height="5"
+									Grid.Row="1" />
+	</Grid>
+</UserControl>

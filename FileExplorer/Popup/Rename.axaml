@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="FileExplorer.Popup.Rename">
+	<StackPanel Margin="5">
+		<TextBox Text="{Binding File.Name}"
+						 Focusable="True"/>
+
+		<StackPanel Orientation="Horizontal"
+								HorizontalAlignment="Center" >
+			<Button Background="Transparent"
+							Command="{Binding PreviousFile}"
+							Padding="5"
+							Cursor="Hand">
+				<Viewbox Height="25">
+					<Image Source="{SvgImage /Assets/UIIcons/Previous.svg}" />
+				</Viewbox>
+			</Button>
+
+			<Button Background="Transparent"
+							Cursor="Hand"
+							IsDefault="True"
+							Command="{Binding NextFile}"
+							Padding="5">
+				<Viewbox Height="25">
+					<Image Source="{SvgImage /Assets/UIIcons/Next.svg}" />
+				</Viewbox>
+			</Button>
+		</StackPanel>
+	</StackPanel>
+</UserControl>

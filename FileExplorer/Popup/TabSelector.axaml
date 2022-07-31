@@ -1,0 +1,61 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+						 xmlns:converters="using:FileExplorer.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="FileExplorer.Popup.TabSelector">
+	<UserControl.Resources>
+		<converters:PathToImageConverter x:Key="imageConverter" />
+		<converters:EditedOnConverter x:Key="editedOnConverter" />
+		<converters:ExtensionConverter x:Key="extensionConverter" />
+		<converters:SizeConverter x:Key="sizeConverter" />
+		<converters:FileNameConverter x:Key="fileNameConverter" />
+		<converters:PathToFoldersConverter x:Key="pathToFoldersConverter" />
+	</UserControl.Resources>
+	
+		<ListBox Items="{Binding Tabs}"
+						 SelectedItem="{Binding CurrentTab}"
+						 HorizontalAlignment="Stretch"
+						 Margin="4"
+						 SelectionMode="Single"
+						 Background="Transparent">
+			<ListBox.Styles>
+				<Style Selector="ListBoxItem">
+					<Setter Property="Cursor" Value="Hand" />
+					<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+					<Setter Property="VerticalContentAlignment" Value="Stretch" />
+					<Setter Property="CornerRadius" Value="10" />
+					<Setter Property="Margin" Value="0" />
+				</Style>
+			</ListBox.Styles>
+			
+			<ListBox.ItemsPanel>
+				<ItemsPanelTemplate>
+					<UniformGrid />
+				</ItemsPanelTemplate>
+			</ListBox.ItemsPanel>
+			
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<StackPanel HorizontalAlignment="Left"
+											VerticalAlignment="Center" >
+						<StackPanel Orientation="Horizontal"
+												Margin="1">
+							<Viewbox VerticalAlignment="Center"
+											 Margin="0 0 4 0"
+											 Width="48"
+											 Height="48">
+								<Image Source="{Binding Path, Converter={StaticResource imageConverter}}" />
+							</Viewbox>							
+
+							<TextBlock Text="{Binding Path, Converter={StaticResource fileNameConverter}}"
+												 TextTrimming="CharacterEllipsis"
+												 VerticalAlignment="Center" />
+						</StackPanel>
+					</StackPanel>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+</UserControl>
+ 
