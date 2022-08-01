@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="FileExplorerCore/App.axaml" value="FileExplorerCore/FileExplorerCore.csproj" />
+        <entry key="FileExplorerCore/DisplayViews/AnalyzerView.axaml" value="FileExplorerCore/FileExplorerCore.csproj" />
+        <entry key="FileExplorerCore/DisplayViews/FileDataGrid.axaml" value="FileExplorerCore/FileExplorerCore.csproj" />
+        <entry key="FileExplorerCore/DisplayViews/FileGrid.axaml" value="FileExplorerCore/FileExplorerCore.csproj" />
+        <entry key="FileExplorerCore/DisplayViews/FileTreeGrid.axaml" value="FileExplorerCore/FileExplorerCore.csproj" />
+        <entry key="FileExplorerCore/DisplayViews/Quickstart.axaml" value="FileExplorerCore/FileExplorerCore.csproj" />
+        <entry key="FileExplorerCore/Popup/Properties.axaml" value="FileExplorerCore/FileExplorerCore.csproj" />
+        <entry key="FileExplorerCore/Popup/Rename.axaml" value="FileExplorerCore/FileExplorerCore.csproj" />
+        <entry key="FileExplorerCore/Popup/Zip.axaml" value="FileExplorerCore/FileExplorerCore.csproj" />
+        <entry key="FileExplorerCore/Views/MainWindow.axaml" value="FileExplorerCore/FileExplorerCore.csproj" />
+      </map>
+    </option>
+  </component>
+</project>
