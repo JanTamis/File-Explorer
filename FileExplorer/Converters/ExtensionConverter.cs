@@ -1,10 +1,10 @@
 ﻿using System;
 using Avalonia.Data.Converters;
+using FileExplorerCore.Models;
 using System.Globalization;
 using System.IO;
-using FileExplorer.Models;
 
-namespace FileExplorer.Converters;
+namespace FileExplorerCore.Converters;
 
 public class ExtensionConverter : IValueConverter
 {
@@ -12,7 +12,7 @@ public class ExtensionConverter : IValueConverter
 {
 return value switch
 {
-			FileModel model when OperatingSystem.IsWindows() && !model.IsFolder => model.ExtensionName ??= NativeMethods.GetShellFileType(model.TreeItem.Value),
+			FileModel model when OperatingSystem.IsWindows() && !model.IsFolder => model.ExtensionName ??= "", // NativeMethods.GetShellFileType(model.TreeItem.DynamicString),
 			FileModel model => !model.IsFolder
 				? model.TreeItem.GetPath(path =>
 					{

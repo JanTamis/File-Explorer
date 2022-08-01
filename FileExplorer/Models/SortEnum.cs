@@ -6,5 +6,5 @@ public enum SortEnum
 	Name,
 	Extension,
 	Size,
-	Edited
+	Edited,
 }

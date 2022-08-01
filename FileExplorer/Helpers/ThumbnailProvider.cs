@@ -9,10 +9,11 @@ using Avalonia.Threading;
 using System.Threading;
 using Avalonia.Media.Imaging;
 using System.Diagnostics.CodeAnalysis;
-using FileExplorer.Core.Interfaces;
-using FileExplorer.Models;
+using System.Linq;
+using FileExplorerCore.Interfaces;
+using FileExplorerCore.Models;
 
-namespace FileExplorer.Helpers;
+namespace FileExplorerCore.Helpers;
 #pragma warning disable CA1416
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
@@ -30,7 +31,7 @@ public static class ThumbnailProvider
 		var assembly = Assembly.GetExecutingAssembly();
 		var files = assembly.GetManifestResourceNames();
 
-		const string basePathMapping = "FileExplorer.Assets.Lookup.";
+		const string basePathMapping = "FileExplorerCore.Assets.Lookup.";
 
 		foreach (var file in files)
 		{
@@ -50,16 +51,16 @@ public static class ThumbnailProvider
 		}
 	}
 
-	public static async Task<IImage?> GetFileImage(FileSystemTreeItem? treeItem, int size, Func<bool>? shouldReturnImage = null)
+	public static async Task<IImage?> GetFileImage(IItem model, int size, Func<bool>? shouldReturnImage = null)
 	{
-		if (treeItem is null || shouldReturnImage is not null && !shouldReturnImage())
+		if (model is null || shouldReturnImage is not null && !shouldReturnImage())
 		{
 			return null;
 		}
 
 		if (OperatingSystem.IsWindows())
 		{
-			return await Task.Factory.StartNew(() => treeItem?.GetPath((path, imageSize) =>
+			return await Task.Factory.StartNew(() => model?.GetPath((path, imageSize) =>
 			{
 				Bitmap? image = null!;
 
@@ -76,11 +77,11 @@ public static class ThumbnailProvider
 			}, size), CancellationToken.None, TaskCreationOptions.DenyChildAttach, concurrentExclusiveScheduler.ConcurrentScheduler).ConfigureAwait(false);
 		}
 
-		return await await Task.Factory.StartNew(() => treeItem?.GetPath((path, imageSize) =>
+		return await await Task.Factory.StartNew(() => model?.GetPath((path, imageSize) =>
 		{
 			var name = String.Empty;
 
-			if (treeItem.IsFolder)
+			if (model.IsFolder)
 			{
 				if (OperatingSystem.IsWindows())
 				{
@@ -88,7 +89,7 @@ public static class ThumbnailProvider
 					{
 						var folderText = Enum.GetName(folder);
 
-						if (folderText is not null && treeItem.GetPath((path, knownFolder) => path.SequenceEqual(KnownFolders.GetPath(knownFolder)), folder))
+						if (folderText is not null && model.GetPath((path, knownFolder) => path.SequenceEqual(KnownFolders.GetPath(knownFolder)), folder))
 						{
 							name = folderText;
 							break;
@@ -96,9 +97,9 @@ public static class ThumbnailProvider
 					}
 				}
 
-				if (!treeItem.HasParent && name == String.Empty)
+				if (!model.IsRoot && name == String.Empty)
 				{
-					var driveInfo = new DriveInfo(new string(treeItem.Value[0], 1));
+					var driveInfo = new DriveInfo(new string(model.Name[0], 1));
 
 					if (driveInfo.IsReady)
 					{
@@ -108,7 +109,7 @@ public static class ThumbnailProvider
 
 				if (name == String.Empty)
 				{
-					name = treeItem.HasChildren
+					name = model.Children.Any()
 						? "FolderFiles"
 						: "Folder";
 				}
@@ -117,7 +118,7 @@ public static class ThumbnailProvider
 			{
 				name = "File";
 
-				var extension = Path.GetExtension(treeItem.Value).ToLower();
+				var extension = Path.GetExtension(model.Name).ToLower();
 
 				if (extension.Length > 1)
 				{
@@ -147,16 +148,16 @@ public static class ThumbnailProvider
 		}, size) ?? Task.FromResult<SvgImage?>(null), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
 	}
 
-	public static async Task<IImage?> GetFileImage(IFileItem? item, int size, Func<bool>? shouldReturnImage = null)
+	public static async Task<IImage?> GetFileImage(FileSystemTreeItem model, int size, Func<bool>? shouldReturnImage = null)
 	{
-		if (item is null || shouldReturnImage is not null && !shouldReturnImage())
+		if (model is null || shouldReturnImage is not null && !shouldReturnImage())
 		{
-			return await Task.FromResult<IImage?>(null);
+			return null;
 		}
 
 		if (OperatingSystem.IsWindows())
 		{
-			return await Task.Factory.StartNew(() => item?.GetPath((path, imageSize) =>
+			return await Task.Factory.StartNew(() => model?.GetPath((path, imageSize) =>
 			{
 				Bitmap? image = null!;
 
@@ -173,11 +174,11 @@ public static class ThumbnailProvider
 			}, size), CancellationToken.None, TaskCreationOptions.DenyChildAttach, concurrentExclusiveScheduler.ConcurrentScheduler).ConfigureAwait(false);
 		}
 
-		return await await Task.Factory.StartNew(() => item?.GetPath((path, imageSize) =>
+		return await await Task.Factory.StartNew(() => model?.GetPath((path, imageSize) =>
 		{
 			var name = String.Empty;
 
-			if (item.IsFolder)
+			if (model.IsFolder)
 			{
 				if (OperatingSystem.IsWindows())
 				{
@@ -185,7 +186,7 @@ public static class ThumbnailProvider
 					{
 						var folderText = Enum.GetName(folder);
 
-						if (folderText is not null && item.GetPath((path, knownFolder) => path.SequenceEqual(KnownFolders.GetPath(knownFolder)), folder))
+						if (folderText is not null && model.GetPath((path, knownFolder) => path.SequenceEqual(KnownFolders.GetPath(knownFolder)), folder))
 						{
 							name = folderText;
 							break;
@@ -193,9 +194,9 @@ public static class ThumbnailProvider
 					}
 				}
 
-				if (!item.HasParent && name == String.Empty)
+				if (!model.HasParent && name == String.Empty)
 				{
-					var driveInfo = new DriveInfo(new string(item.Name[0], 1));
+					var driveInfo = new DriveInfo(new string(model.Value[0], 1));
 
 					if (driveInfo.IsReady)
 					{
@@ -205,7 +206,7 @@ public static class ThumbnailProvider
 
 				if (name == String.Empty)
 				{
-					name = item.HasChildren
+					name = model.Children.Any()
 						? "FolderFiles"
 						: "Folder";
 				}
@@ -214,7 +215,7 @@ public static class ThumbnailProvider
 			{
 				name = "File";
 
-				var extension = Path.GetExtension(item.Name).ToLower();
+				var extension = Path.GetExtension(model.Value).ToLower();
 
 				if (extension.Length > 1)
 				{
@@ -253,7 +254,7 @@ public static class ThumbnailProvider
 
 		if (!Images.TryGetValue(key, out var image) && image is null)
 		{
-			var source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/{key}.svg", null);
+			var source = SvgSource.Load<SvgSource>($"avares://FileExplorerCore/Assets/Icons/{key}.svg", null);
 
 			if (source is not null)
 			{

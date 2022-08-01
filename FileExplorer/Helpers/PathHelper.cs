@@ -1,4 +1,8 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using Avalonia.Controls.Shapes;
+using FileExplorerCore.Models;
 
 namespace FileExplorer.Helpers;
 
@@ -11,5 +15,27 @@ public static class PathHelper
 		DirectorySeparator = OperatingSystem.IsWindows()
 			? '\\'
 			: '/';
+	}
+
+	public static FileSystemTreeItem? FromPath([NotNullIfNotNull(nameof(path))] string? path)
+	{
+		if (path is null)
+		{
+			return null;
+		}
+
+		var directory = new DirectoryInfo(path);
+
+		var result = new FileSystemTreeItem(directory.Name, true);
+		var temp = result;
+
+		while (directory.Parent is not null)
+		{
+			directory = directory.Parent;
+			temp.Parent = new FileSystemTreeItem(directory.Name, true);
+			temp = temp.Parent;
+		}
+
+		return result;
 	}
 }

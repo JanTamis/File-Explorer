@@ -1,24 +1,30 @@
 using System;
+using System.Collections.Generic;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using FileExplorerCore.Helpers;
+using FileExplorerCore.Models;
 using System.Linq;
-using FileExplorer.Core.Interfaces;
-using FileExplorer.Helpers;
-using FileExplorer.Interfaces;
-using FileExplorer.Models;
+using System.Threading.Tasks;
+using DynamicData;
+using FileExplorerCore.Interfaces;
 
-namespace FileExplorer.DisplayViews;
+namespace FileExplorerCore.DisplayViews;
 
-public partial class FileDataGrid : UserControl, ISelectableControl
+public partial class FileDataGrid : UserControl, ISelectableControl, IFileViewer
 {
 	private int anchorIndex = 0;
-	public event Action<FileSystemTreeItem> PathChanged = delegate { };
-	public event Action<int> SelectionChanged = delegate { };
+	public event Action<string> PathChanged = delegate { };
+	public event Action SelectionChanged = delegate { };
 
-	public ObservableRangeCollection<IFileItem> Files
+	public Action SelectAll { get; }
+	public Action SelectNone { get; }
+	public Action SelectInvert { get; }
+
+	public IEnumerable<IItem> Items
 	{
 		set
 		{
@@ -30,9 +36,11 @@ public partial class FileDataGrid : UserControl, ISelectableControl
 		{
 			var grid = this.FindControl<ItemsRepeater>("fileList");
 
-			return grid.Items as ObservableRangeCollection<IFileItem>;
+			return grid.Items as IEnumerable<IItem>;
 		}
 	}
+
+	public Task<int> ItemCount { get; set; }
 
 	public FileDataGrid() : base()
 	{
@@ -50,12 +58,12 @@ public partial class FileDataGrid : UserControl, ISelectableControl
 	{
 		if (e.Key is Key.A && e.KeyModifiers is KeyModifiers.Control)
 		{
-			foreach (var file in Files.Where(x => !x.IsSelected))
+			foreach (var file in Items.Where(x => !x.IsSelected))
 			{
 				file.IsSelected = true;
 			}
 
-			SelectionChanged?.Invoke(Files.Count);
+			SelectionChanged?.Invoke();
 		}
 	}
 
@@ -70,7 +78,7 @@ public partial class FileDataGrid : UserControl, ISelectableControl
 		}
 	}
 
-	private void Item_PointerPressed(object? sender, PointerPressedEventArgs e)
+	private async void Item_PointerPressed(object? sender, PointerPressedEventArgs e)
 	{
 		if (sender is ListBoxItem { DataContext: FileModel model } item)
 		{
@@ -78,13 +86,15 @@ public partial class FileDataGrid : UserControl, ISelectableControl
 
 			if (point.Properties.IsLeftButtonPressed || point.Properties.IsRightButtonPressed)
 			{
-				var index = Files.IndexOf(model);
+				var index = Items.IndexOf(model);
 
-				UpdateSelection(
-					index,
-					true,
-					e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
-					e.KeyModifiers.HasAllFlags(KeyModifiers.Control));
+				// anchorIndex = await IFileViewer.UpdateSelection(
+				// 	this,
+				// 	anchorIndex,
+				// 	index,
+				// 	true,
+				// 	e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
+				// 	e.KeyModifiers.HasAllFlags(KeyModifiers.Control));
 			}
 		}
 	}
@@ -104,94 +114,7 @@ public partial class FileDataGrid : UserControl, ISelectableControl
 	{
 		if (sender is ListBoxItem { DataContext: FileModel model })
 		{
-			PathChanged(model.TreeItem);
+			PathChanged(model.TreeItem.GetPath(path => path.ToString()));
 		}
-	}
-
-	/// <summary>
-	/// Updates the selection for an item based on user interaction.
-	/// </summary>
-	/// <param name="index">The index of the item.</param>
-	/// <param name="select">Whether the item should be selected or unselected.</param>
-	/// <param name="rangeModifier">Whether the range modifier is enabled (i.e. shift key).</param>
-	/// <param name="toggleModifier">Whether the toggle modifier is enabled (i.e. ctrl key).</param>
-	/// <param name="rightButton">Whether the event is a right-click.</param>
-	protected void UpdateSelection(
-		int index,
-		bool select = true,
-		bool rangeModifier = false,
-		bool toggleModifier = false)
-	{
-		var files = Files;
-
-		if (index < 0 || index >= files.Count)
-		{
-			return;
-		}
-
-		var mode = SelectionMode.Multiple;
-		var multi = mode.HasAllFlags(SelectionMode.Multiple);
-		var toggle = toggleModifier || mode.HasAllFlags(SelectionMode.Toggle);
-		var range = multi && rangeModifier;
-
-		var count = 0;
-
-		if (!select)
-		{
-			files[index].IsSelected = false;
-		}
-		else if (range)
-		{
-			for (var i = 0; i < files.Count; i++)
-			{
-				files[i].IsSelected = false;
-			}
-
-			if (index > anchorIndex)
-			{
-				for (var i = anchorIndex; i <= index; i++)
-				{
-					files[i].IsSelected = true;
-					count++;
-				}
-			}
-			else
-			{
-				for (var i = index; i <= anchorIndex; i++)
-				{
-					files[i].IsSelected = true;
-					count++;
-				}
-			}
-		}
-		else if (multi && toggle)
-		{
-			if (files[index].IsSelected)
-			{
-				files[index].IsSelected = false;
-			}
-			else
-			{
-				files[index].IsSelected = true;
-				count++;
-			}
-		}
-		else
-		{
-			for (var i = 0; i < files.Count; i++)
-			{
-				files[i].IsSelected = false;
-			}
-
-			files[index].IsSelected = true;
-			count++;
-		}
-
-		if (!range)
-		{
-			anchorIndex = index;
-		}
-
-		SelectionChanged?.Invoke(count);
 	}
 }

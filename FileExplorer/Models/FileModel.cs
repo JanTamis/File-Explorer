@@ -1,4 +1,5 @@
 ﻿using Avalonia.Media;
+using FileExplorerCore.Helpers;
 using Humanizer;
 using System;
 using System.Collections.Concurrent;
@@ -10,12 +11,11 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using Avalonia.Threading;
 using System.Runtime.CompilerServices;
-using FileExplorer.Core.Interfaces;
-using FileExplorer.Helpers;
+using FileExplorerCore.Interfaces;
 
-namespace FileExplorer.Models;
+namespace FileExplorerCore.Models;
 
-public class FileModel : INotifyPropertyChanged, IFileItem
+public class FileModel : INotifyPropertyChanged, IItem
 {
   public static readonly ConcurrentBag<FileModel> FileImageQueue = new();
 
@@ -48,13 +48,7 @@ public class FileModel : INotifyPropertyChanged, IFileItem
     }
   }
 
-  public Task<IImage?> Image
-  {
-    get
-    {
-      return ThumbnailProvider.GetFileImage(TreeItem, App.MainViewModel.CurrentTab.CurrentViewMode is ViewTypes.Grid ? 100 : 24, () => IsVisible);
-    }
-  }
+  public Task<IImage?> Image => ThumbnailProvider.GetFileImage(this, App.MainViewModel?.CurrentTab.CurrentViewMode is ViewTypes.Grid ? 100 : 24, () => IsVisible);
 
   public bool IsSelected
   {
@@ -68,10 +62,12 @@ public class FileModel : INotifyPropertyChanged, IFileItem
     }
   }
 
-  public bool HasParent => TreeItem.HasParent;
-  public bool HasChildren => TreeItem.HasChildren;
+  public bool IsRoot => TreeItem.HasParent;
 
-  public IEnumerable<IFileItem> Children => TreeItem.Children.Select(s => new FileModel(s));
+  public IEnumerable<IItem> Children => TreeItem.Children
+	  .OrderBy(o => !o.IsFolder)
+	  .ThenBy(t => t.Value)
+	  .Select(s => new FileModel(s));
 
   public string Path => TreeItem.GetPath(path => path.ToString());
 
@@ -151,7 +147,7 @@ public class FileModel : INotifyPropertyChanged, IFileItem
       {
         result = state.Size;
       }
-      else if (path[^1] is '\\' && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
+      else if (path[^1] == PathHelper.DirectorySeparator && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
       {
         result = info.TotalSize - info.TotalFreeSpace;
       }
