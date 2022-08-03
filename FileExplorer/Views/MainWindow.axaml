@@ -26,7 +26,7 @@
                     Height="800"
                     BorderThickness="0"
                     WindowStartupLocation="CenterScreen"
-                    xmlns:dialogHost="clr-namespace:DialogHost;assembly=DialogHost.Avalonia"
+                    xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
                     Title="FileExplorer">
   <Window.Resources>
     <system:Int32 x:Key="ImageSize">24</system:Int32>
