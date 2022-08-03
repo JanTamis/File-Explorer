@@ -9,7 +9,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using DialogHostAvalonia;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Interfaces;
 using FileExplorer.Models;
@@ -132,9 +131,9 @@ public partial class Zip : UserControl, IPopup, INotifyPropertyChanged
     _source?.Cancel();
     OnClose?.Invoke();
 
-    if (DialogHost.IsDialogOpen(null))
+    if (DialogHost.DialogHost.IsDialogOpen(null))
     {
-      DialogHost.Close(null);
+	    DialogHost.DialogHost.Close(null);
     }
   }
 

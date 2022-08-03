@@ -10,7 +10,6 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Media;
-using DialogHostAvalonia;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
@@ -138,7 +137,7 @@ public partial class Properties : UserControl, IPopup, INotifyPropertyChanged
 	public void Close()
 	{
 		_source?.Cancel();
-		DialogHost.Close(null);
+		DialogHost.DialogHost.Close(null);
 		OnClose();
 	}
 

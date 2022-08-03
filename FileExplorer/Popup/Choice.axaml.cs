@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using DialogHostAvalonia;
+using DialogHost;
 using FileExplorer.Interfaces;
 
 namespace FileExplorer.Popup;
@@ -58,7 +58,7 @@ public partial class Choice : UserControl, IPopup, INotifyPropertyChanged
 	public void Close()
 	{
 		OnClose();
-		DialogHost.Close(null);
+		DialogHost.DialogHost.Close(null);
 	}
 
 	private void InitializeComponent()
