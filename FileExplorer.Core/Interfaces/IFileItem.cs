@@ -2,24 +2,22 @@ namespace FileExplorer.Core.Interfaces;
 
 public interface IFileItem
 {
-	string Name { get; }
+	bool IsSelected { get; set; }
+	bool IsFolder { get; }
+	bool IsRoot { get; }
+
+	IEnumerable<IFileItem> Children { get; }
+
 	string Extension { get; }
+	string Name { get; set; }
 
 	long Size { get; }
 
-	DateTime EditedOn { get; }
-
-	bool IsSelected { get; set; }
-	bool IsFolder { get; }
-	bool HasChildren { get; }
-	bool HasParent { get; }
-
-	IEnumerable<IFileItem> Children { get; }
+	public DateTime EditedOn { get; }
 
 	T GetPath<T>(ReadOnlySpanFunc<char, T> action);
 	T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter);
 }
 
-public delegate TResult ReadOnlySpanFunc<T, out TResult>(ReadOnlySpan<T> span);
-
-public delegate TResult ReadOnlySpanFunc<T, in TParameter, out TResult>(ReadOnlySpan<T> span, TParameter parameter);
+public delegate T ReadOnlySpanFunc<TSpan, out T>(ReadOnlySpan<TSpan> data);
+public delegate T ReadOnlySpanFunc<TSpan, in TParameter, out T>(ReadOnlySpan<TSpan> data, TParameter parameter);

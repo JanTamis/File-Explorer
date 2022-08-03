@@ -6,28 +6,27 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
 using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Selection;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
-using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using Avalonia.Reactive;
-using FileExplorerCore.Interfaces;
-using FileExplorerCore.Models;
+using FileExplorer.Converters;
+using FileExplorer.Core.Interfaces;
+using FileExplorer.Helpers;
+using FileExplorer.Interfaces;
+using FileExplorer.Models;
 using Humanizer;
-using ReactiveUI;
 
-namespace FileExplorerCore.DisplayViews;
+namespace FileExplorer.DisplayViews;
 
 public class FileTreeGrid : UserControl, IFileViewer
 {
-	public IEnumerable<IItem> Items
+	public IEnumerable<IFileItem> Items
 	{
 		get
 		{
-			if (this.FindControl<TreeDataGrid>("TreeDataGrid") is { Source: HierarchicalTreeDataGridSource<IItem> source })
+			if (this.FindControl<TreeDataGrid>("TreeDataGrid") is { Source: HierarchicalTreeDataGridSource<IFileItem> source })
 			{
 				return source.Items;
 			}
@@ -38,12 +37,12 @@ public class FileTreeGrid : UserControl, IFileViewer
 		{
 			var grid = this.FindControl<TreeDataGrid>("TreeDataGrid");
 
-			var source = new HierarchicalTreeDataGridSource<IItem>(value)
+			var source = new HierarchicalTreeDataGridSource<IFileItem>(value)
 			{
 				Columns =
 				{
-					new HierarchicalExpanderColumn<IItem>(
-						new TemplateColumn<IItem>("Name", new FuncDataTemplate<FileModel>((x, scope) =>
+					new HierarchicalExpanderColumn<IFileItem>(
+						new TemplateColumn<IFileItem>("Name", new FuncDataTemplate<IFileItem>((x, scope) =>
 							new StackPanel
 							{
 								Orientation = Orientation.Horizontal,
@@ -52,9 +51,15 @@ public class FileTreeGrid : UserControl, IFileViewer
 								{
 									new Image
 									{
+										[!DataContextProperty] = new Binding("TreeItem")
+										{
+											Source = x,
+											Converter = PathToImageConverter.Instance,
+											ConverterParameter = 64,
+										},
 										Width = 24,
 										Height = 24,
-										[!Image.SourceProperty] = new Binding("Image^"),
+										[!Image.SourceProperty] = new Binding("Result"),
 									},
 									new TextBlock
 									{
@@ -63,16 +68,16 @@ public class FileTreeGrid : UserControl, IFileViewer
 										[!TextBlock.TextProperty] = new Binding("Name"),
 									},
 								},
-							}), GridLength.Auto, new ColumnOptions<IItem>
+							}), GridLength.Auto, new ColumnOptions<IFileItem>
 						{
 							CompareAscending = (x, y) => String.Compare(x?.Name, y?.Name, StringComparison.CurrentCulture),
 							CompareDescending = (x, y) => String.Compare(y?.Name, x?.Name, StringComparison.CurrentCulture),
 						}),
 						x => x.Children,
 						x => x.IsFolder && x.Children.Any()),
-					new TextColumn<IItem, DateTime>("Edit Date", item => item.EditedOn, GridLength.Auto),
-					new TextColumn<IItem, string>("Type", item => item.Extension, GridLength.Auto),
-					new TextColumn<IItem, string>("Size", item => item.IsFolder ? null : item.Size.Bytes().ToString(), GridLength.Auto, new TextColumnOptions<IItem>()
+					new TextColumn<IFileItem, DateTime>("Edit Date", item => item.EditedOn, GridLength.Auto),
+					new TextColumn<IFileItem, string>("Type", item => item.Extension, GridLength.Auto),
+					new TextColumn<IFileItem, string>("Size", item => item.IsFolder ? null : item.Size.Bytes().ToString(), GridLength.Auto, new TextColumnOptions<IFileItem>()
 					{
 						CompareAscending = (x, y) => x.Size.CompareTo(y.Size),
 						CompareDescending = (x, y) => y.Size.CompareTo(x.Size),
@@ -82,11 +87,11 @@ public class FileTreeGrid : UserControl, IFileViewer
 
 			grid.Source = source;
 
-			IItem? previousModel = null;
+			IFileItem? previousModel = null;
 
 			TreeDataGridRow.IsSelectedProperty.Changed.Subscribe(args =>
 			{
-				if (args.Sender is TreeDataGridRow { DataContext: IItem item })
+				if (args.Sender is TreeDataGridRow { DataContext: IFileItem item })
 				{
 					item.IsSelected = args.NewValue.Value;
 				}
@@ -96,13 +101,13 @@ public class FileTreeGrid : UserControl, IFileViewer
 			{
 				if (args.Sender is TreeDataGridRow row)
 				{
-					row.IsSelected = args.NewValue.Value is IItem { IsSelected: true };
+					row.IsSelected = args.NewValue.Value is IFileItem { IsSelected: true };
 				}
 			});
 
 			DoubleTappedEvent.AddClassHandler<TreeDataGridRow>((sender, args) =>
 			{
-				if (sender is { DataContext: IItem item } && item != previousModel)
+				if (sender is { DataContext: IFileItem item } && item != previousModel)
 				{
 					PathChanged(item.GetPath(path => path.ToString()));
 

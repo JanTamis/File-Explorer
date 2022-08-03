@@ -6,7 +6,6 @@ using System.Runtime.CompilerServices;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
-using FileExplorer.Models;
 
 namespace FileExplorer.Popup;
 

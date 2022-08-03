@@ -12,8 +12,6 @@
   </Application.DataTemplates>
 
   <Application.Resources>
-	  <themes:BundledTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Blue" />
-    
     <converters:PathToImageConverter x:Key="imageConverter" />
     <converters:EditedOnConverter x:Key="editedOnConverter" />
     <converters:ExtensionConverter x:Key="extensionConverter" />
@@ -30,11 +28,11 @@
   </Application.Resources>
 
   <Application.Styles>
-    <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml" />
-    <StyleInclude Source="avares://Material.Avalonia/Material.Avalonia.Templates.xaml" />
+	  <FluentTheme Mode="Dark" />
+	  <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Blue" />
     <StyleInclude Source="avares://Material.Icons.Avalonia/App.xaml" />
     <StyleInclude Source="avares://DialogHost.Avalonia/Styles.xaml"/>
-    <FluentTheme Mode="Dark" />
+
     <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml" />
     
     <Style Selector="TabStrip > TabStripItem">
@@ -258,10 +256,6 @@
       <Setter Property="Cursor" Value="Arrow" />
     </Style>
 
-    <!-- <Style Selector="ListBoxItem"> -->
-    <!--   <Setter Property="Cursor" Value="Arrow" /> -->
-    <!-- </Style> -->
-
     <Style Selector="TextBlock">
 	    <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
@@ -289,83 +283,5 @@
         </ControlTemplate>
       </Setter>
     </Style>
-
-    <!-- <Style Selector="SplitButton"> -->
-    <!--   <Setter Property="Background" Value="{DynamicResource SplitButtonBackground}" /> -->
-    <!--   <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBodyLight}" /> -->
-    <!--   <Setter Property="BorderBrush" Value="{DynamicResource SplitButtonBorderBrush}" /> -->
-    <!--   <Setter Property="BorderThickness" Value="{DynamicResource SplitButtonBorderThemeThickness}" /> -->
-    <!--   <Setter Property="HorizontalAlignment" Value="Left" /> -->
-    <!--   <Setter Property="VerticalAlignment" Value="Center" /> -->
-    <!--	 <Setter Property="UseSystemFocusVisuals" Value="True" /> -->
-    <!-- <Setter Property="FocusVisualMargin" Value="-3" />-->
-    <!--   <Setter Property="KeyboardNavigation.IsTabStop" Value="True" /> -->
-    <!--   <Setter Property="Focusable" Value="True" /> -->
-    <!--   <Setter Property="Padding" Value="0" /> -->
-    <!--   <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" /> -->
-    <!--   <Setter Property="Template"> -->
-    <!--     <Setter.Value> -->
-    <!--       <ControlTemplate> -->
-    <!--         <Grid> -->
-    <!--           <Grid.ColumnDefinitions> -->
-    <!--             <ColumnDefinition Width="*" /> -->
-    <!--             <ColumnDefinition Width="Auto" /> -->
-    <!--             <ColumnDefinition Width="Auto" /> -->
-    <!--           </Grid.ColumnDefinitions> -->
-    <!-- -->
-    <!--           <Button x:Name="PART_PrimaryButton" -->
-    <!--                   Grid.Column="0" -->
-    <!--                   MinWidth="0" -->
-    <!--                   Foreground="{TemplateBinding Foreground}" -->
-    <!--                   Background="{TemplateBinding Background}" -->
-    <!--                   BorderThickness="{TemplateBinding BorderThickness, Converter={StaticResource PrimaryButtonBorderMultiplier}}" -->
-    <!--                   BorderBrush="{TemplateBinding BorderBrush}" -->
-    <!--                   Content="{TemplateBinding Content}" -->
-    <!--                   ContentTemplate="{TemplateBinding ContentTemplate}" -->
-    <!--                   Command="{TemplateBinding Command}" -->
-    <!--                   CommandParameter="{TemplateBinding CommandParameter}" -->
-    <!--                   FontFamily="{TemplateBinding FontFamily}" -->
-    <!--                   FontSize="{TemplateBinding FontSize}" -->
-    <!--                   FontWeight="{TemplateBinding FontWeight}" -->
-    <!--                   HorizontalAlignment="Stretch" -->
-    <!--                   VerticalAlignment="Stretch" -->
-    <!--                   HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" -->
-    <!--                   VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" -->
-    <!--                   Padding="{TemplateBinding Padding}" -->
-    <!--                   Focusable="False" -->
-    <!--                   KeyboardNavigation.IsTabStop="False" /> -->
-    <!-- -->
-    <!--           <Border x:Name="SeparatorBorder" -->
-    <!--                   Grid.Column="1" -->
-    <!--                   Background="Transparent" -->
-    <!--                   Width="{DynamicResource SplitButtonSeparatorWidth}" -->
-    <!--                   BorderThickness="{TemplateBinding BorderThickness, Converter={StaticResource SeparatorBorderMultiplier}}" -->
-    <!--                   BorderBrush="{TemplateBinding BorderBrush}" /> -->
-    <!-- -->
-    <!--           <Button x:Name="PART_SecondaryButton" -->
-    <!--                   Grid.Column="2" -->
-    <!--                   Width="20" -->
-    <!--                   Padding="0" -->
-    <!--                   MinWidth="20" -->
-    <!--                   BorderBrush="{TemplateBinding BorderBrush}" -->
-    <!--                   Foreground="{TemplateBinding Foreground}" -->
-    <!--                   Background="{TemplateBinding Background}" -->
-    <!--                   BorderThickness="{TemplateBinding BorderThickness, Converter={StaticResource SecondaryButtonBorderMultiplier}}" -->
-    <!--                   HorizontalContentAlignment="Center" -->
-    <!--                   VerticalContentAlignment="Center" -->
-    <!--                   HorizontalAlignment="Stretch" -->
-    <!--                   VerticalAlignment="Stretch" -->
-    <!--                   Focusable="False" -->
-    <!--                   KeyboardNavigation.IsTabStop="False" > -->
-    <!--             <PathIcon Height="12" -->
-    <!--                       Width="12" -->
-    <!--                       Foreground="{DynamicResource MaterialDesignBodyLight}" -->
-    <!--                       Data="M1939 486L2029 576L1024 1581L19 576L109 486L1024 1401L1939 486Z" /> -->
-    <!--           </Button> -->
-    <!--         </Grid> -->
-    <!--       </ControlTemplate> -->
-    <!--     </Setter.Value> -->
-    <!--   </Setter> -->
-    <!-- </Style> -->
   </Application.Styles>
 </Application>

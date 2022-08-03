@@ -1,13 +1,14 @@
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using FileExplorerCore.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FileExplorerCore.Interfaces;
+using FileExplorer.Core.Interfaces;
+using FileExplorer.Interfaces;
+using FileExplorer.Models;
 
-namespace FileExplorerCore.DisplayViews;
+namespace FileExplorer.DisplayViews;
 
 public partial class Quickstart : UserControl, IFileViewer
 {
@@ -56,7 +57,7 @@ public partial class Quickstart : UserControl, IFileViewer
 		AvaloniaXamlLoader.Load(this);
 	}
 
-	public IEnumerable<IItem> Items { get; set; }
+	public IEnumerable<IFileItem> Items { get; set; }
 	public Task<int> ItemCount => Task.FromResult(0);
 
 	public event Action<string>? PathChanged;

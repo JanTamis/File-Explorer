@@ -6,7 +6,7 @@
              x:Class="FileExplorer.Popup.Properties">
 	<Grid ColumnDefinitions="Auto, *"
 	      MinWidth="400"
-	      Margin="5 0"
+	      Margin="10"
 	      RowDefinitions="Auto, Auto, 30, Auto, 30, 30, Auto, 30, Auto, Auto" >
 
     <StackPanel Orientation="Horizontal"
@@ -95,7 +95,7 @@
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
       <Button Content="Cancel"
-              Width="75"
+              Width="80"
               HorizontalContentAlignment="Center"
               Classes="Flat"
               Cursor="Hand"

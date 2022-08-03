@@ -40,7 +40,7 @@ public sealed class TaskCompletionNotifier<TResult> : INotifyPropertyChanged
 
 		if (!task.IsCompleted)
 		{
-			var scheduler = (SynchronizationContext.Current is null)
+			var scheduler = SynchronizationContext.Current is null
 				? TaskScheduler.Current
 				: TaskScheduler.FromCurrentSynchronizationContext();
 

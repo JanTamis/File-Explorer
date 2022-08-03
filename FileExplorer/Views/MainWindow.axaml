@@ -9,6 +9,7 @@
                     xmlns:controls="using:FileExplorer.Controls"
                     xmlns:styles="clr-namespace:Material.Styles;assembly=Material.Styles"
                     xmlns:models="clr-namespace:FileExplorer.Models"
+                    xmlns:interfaces="clr-namespace:FileExplorer.Core.Interfaces;assembly=FileExplorer.Core"
                     xmlns:viewmodels="clr-namespace:FileExplorer.ViewModels"
                     xmlns:views="clr-namespace:FileExplorer.Views"
                     xmlns:assist="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
@@ -25,7 +26,7 @@
                     Height="800"
                     BorderThickness="0"
                     WindowStartupLocation="CenterScreen"
-                    xmlns:dialogHost="clr-namespace:DialogHost;assembly=DialogHost.Avalonia"
+                    xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
                     Title="FileExplorer">
   <Window.Resources>
     <system:Int32 x:Key="ImageSize">24</system:Int32>
@@ -47,9 +48,10 @@
                        ClipToBounds="False">
             <ContentPresenter Name="PART_ContentPresenter"
                               Background="{TemplateBinding Background}"
+                              Margin="0"
                               ContentTemplate="{TemplateBinding ContentTemplate}"
                               Content="{TemplateBinding Content}"
-                              Padding="{TemplateBinding Padding}" />
+                              Padding="0" />
           </styles:Card>
           <!--<styles:Card VerticalAlignment="Center"
                        Name="PART_ContentBackground"
@@ -359,10 +361,10 @@
                       </Style>
                     </TreeView.Styles>
                     <TreeView.DataTemplates>
-                      <TreeDataTemplate DataType="{x:Type models:FolderModel}">
+                      <TreeDataTemplate DataType="{x:Type interfaces:IPathSegment}">
                         <StackPanel Orientation="Horizontal">
                           <Image Source="{Binding Image^}"
-                                 x:DataType="models:FolderModel"
+                                 x:DataType="interfaces:IPathSegment"
                                  Width="24"
                                  Height="24"
                                  Margin="0 0 3 0" />

@@ -5,7 +5,6 @@ using System.Globalization;
 using System.Linq;
 using FileExplorer.Helpers;
 using FileExplorer.Models;
-using Microsoft.Toolkit.HighPerformance;
 
 namespace FileExplorer.Converters;
 

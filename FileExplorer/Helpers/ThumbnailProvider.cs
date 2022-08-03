@@ -10,10 +10,11 @@ using System.Threading;
 using Avalonia.Media.Imaging;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using FileExplorerCore.Interfaces;
-using FileExplorerCore.Models;
+using FileExplorer.Core.Interfaces;
+using FileExplorer.Models;
 
-namespace FileExplorerCore.Helpers;
+
+namespace FileExplorer.Helpers;
 #pragma warning disable CA1416
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
@@ -31,7 +32,7 @@ public static class ThumbnailProvider
 		var assembly = Assembly.GetExecutingAssembly();
 		var files = assembly.GetManifestResourceNames();
 
-		const string basePathMapping = "FileExplorerCore.Assets.Lookup.";
+		const string basePathMapping = "FileExplorer.Assets.Lookup.";
 
 		foreach (var file in files)
 		{
@@ -51,7 +52,7 @@ public static class ThumbnailProvider
 		}
 	}
 
-	public static async Task<IImage?> GetFileImage(IItem model, int size, Func<bool>? shouldReturnImage = null)
+	public static async Task<IImage?> GetFileImage(IFileItem model, int size, Func<bool>? shouldReturnImage = null)
 	{
 		if (model is null || shouldReturnImage is not null && !shouldReturnImage())
 		{
@@ -254,7 +255,7 @@ public static class ThumbnailProvider
 
 		if (!Images.TryGetValue(key, out var image) && image is null)
 		{
-			var source = SvgSource.Load<SvgSource>($"avares://FileExplorerCore/Assets/Icons/{key}.svg", null);
+			var source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/{key}.svg", null);
 
 			if (source is not null)
 			{
@@ -280,7 +281,7 @@ public static class ThumbnailProvider
 					{
 						await Dispatcher.UIThread.InvokeAsync(() =>
 						{
-							image = new SvgImage()
+							image = new SvgImage
 							{
 								Source = source,
 							};

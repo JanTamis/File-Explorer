@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using FileExplorer.Core.Interfaces;
 
 namespace FileExplorer.Models;
 
-public struct FileModelComparer : IComparer<IFileItem>
+public readonly struct FileModelComparer : IComparer<IFileItem>
 {
 	private readonly SortEnum sortMember;
 

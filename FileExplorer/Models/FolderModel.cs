@@ -11,7 +11,7 @@ namespace FileExplorer.Models;
 public class FolderModel : IPathSegment
 {
 	private readonly string? _name;
-	private readonly IEnumerable<FolderModel>? _folders;
+	private readonly IEnumerable<IPathSegment>? _folders;
 
 	public FileSystemTreeItem? TreeItem { get; }
 
@@ -24,7 +24,7 @@ public class FolderModel : IPathSegment
 	public IEnumerable<IPathSegment> SubSegments => _folders ?? TreeItem?
 		.EnumerateChildren(0)
 		.Where(w => w.IsFolder)
-		.Select(s => new FolderModel(s)) ?? Enumerable.Empty<FolderModel>();
+		.Select(s => new FolderModel(s)) ?? Enumerable.Empty<IPathSegment>();
 
 	public FolderModel(FileSystemTreeItem item)
 	{
@@ -40,7 +40,7 @@ public class FolderModel : IPathSegment
 
 	public FolderModel(FileSystemTreeItem item, ReadOnlySpan<char> name, IEnumerable<FolderModel>? children)
 	{
-		_name = name.ToString();
+		//_name = name.ToString();
 		_folders = children;
 		TreeItem = item;
 	}
@@ -52,6 +52,6 @@ public class FolderModel : IPathSegment
 
 	public override string ToString()
 	{
-		return Name.ToString();
+		return Name;
 	}
 }

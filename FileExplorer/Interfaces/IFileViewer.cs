@@ -4,12 +4,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using FileExplorer.Core.Interfaces;
 
-namespace FileExplorerCore.Interfaces;
+namespace FileExplorer.Interfaces;
 
 public interface IFileViewer
 {
-	public IEnumerable<IItem> Items { get; set; }
+	public IEnumerable<IFileItem> Items { get; set; }
 
 	public Task<int> ItemCount { get; }
 
@@ -41,8 +42,6 @@ public interface IFileViewer
 		var multi = mode.HasAllFlags(SelectionMode.Multiple);
 		var toggle = toggleModifier || mode.HasAllFlags(SelectionMode.Toggle);
 		var range = multi && rangeModifier;
-
-
 
 		if (!select)
 		{

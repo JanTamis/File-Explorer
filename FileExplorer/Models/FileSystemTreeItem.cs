@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
-using System.Text.Unicode;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 using FileExplorer.Interfaces;

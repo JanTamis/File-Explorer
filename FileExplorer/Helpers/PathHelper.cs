@@ -1,8 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using Avalonia.Controls.Shapes;
-using FileExplorerCore.Models;
+using FileExplorer.Models;
 
 namespace FileExplorer.Helpers;
 

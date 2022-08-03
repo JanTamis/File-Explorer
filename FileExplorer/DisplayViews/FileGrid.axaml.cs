@@ -8,11 +8,11 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using DynamicData;
-using FileExplorerCore.Helpers;
-using FileExplorerCore.Interfaces;
-using FileExplorerCore.Models;
+using FileExplorer.Core.Interfaces;
+using FileExplorer.Interfaces;
+using FileExplorer.Models;
 
-namespace FileExplorerCore.DisplayViews;
+namespace FileExplorer.DisplayViews;
 
 public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 {
@@ -25,7 +25,7 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 	public Action SelectNone { get; }
 	public Action SelectInvert { get; }
 
-	public IEnumerable<IItem> Items
+	public IEnumerable<IFileItem> Items
 	{
 		set
 		{
@@ -37,7 +37,7 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 		{
 			var grid = this.FindControl<ItemsRepeater>("fileList");
 
-			return grid.Items as IEnumerable<IItem>;
+			return grid.Items as IEnumerable<IFileItem>;
 		}
 	}
 

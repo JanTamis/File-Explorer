@@ -1,6 +1,4 @@
-﻿using Avalonia.Media;
-using FileExplorerCore.Helpers;
-using Humanizer;
+﻿using Humanizer;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,11 +9,12 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using Avalonia.Threading;
 using System.Runtime.CompilerServices;
-using FileExplorerCore.Interfaces;
+using FileExplorer.Core.Interfaces;
+using FileExplorer.Helpers;
 
-namespace FileExplorerCore.Models;
+namespace FileExplorer.Models;
 
-public class FileModel : INotifyPropertyChanged, IItem
+public class FileModel : INotifyPropertyChanged, IFileItem
 {
   public static readonly ConcurrentBag<FileModel> FileImageQueue = new();
 
@@ -40,15 +39,8 @@ public class FileModel : INotifyPropertyChanged, IItem
     set
     {
       OnPropertyChanged(ref isVisible, value);
-
-      if (IsVisible)
-      {
-        OnPropertyChanged(nameof(Image));
-      }
     }
   }
-
-  public Task<IImage?> Image => ThumbnailProvider.GetFileImage(this, App.MainViewModel?.CurrentTab.CurrentViewMode is ViewTypes.Grid ? 100 : 24, () => IsVisible);
 
   public bool IsSelected
   {
@@ -64,7 +56,7 @@ public class FileModel : INotifyPropertyChanged, IItem
 
   public bool IsRoot => TreeItem.HasParent;
 
-  public IEnumerable<IItem> Children => TreeItem.Children
+  public IEnumerable<IFileItem> Children => TreeItem.Children
 	  .OrderBy(o => !o.IsFolder)
 	  .ThenBy(t => t.Value)
 	  .Select(s => new FileModel(s));

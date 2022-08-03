@@ -1,10 +1,10 @@
 ﻿using System;
 using Avalonia.Data.Converters;
-using FileExplorerCore.Models;
 using System.Globalization;
 using System.IO;
+using FileExplorer.Models;
 
-namespace FileExplorerCore.Converters;
+namespace FileExplorer.Converters;
 
 public class ExtensionConverter : IValueConverter
 {

@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using Avalonia.Controls.Notifications;
 using Avalonia.Input;
 using Avalonia.Threading;
-using FileExplorerCore.DisplayViews;
-using FileExplorerCore.Helpers;
-using FileExplorerCore.Models;
-using FileExplorerCore.Popup;
+using FileExplorer.Helpers;
+using FileExplorer.Popup;
 using Microsoft.VisualBasic.FileIO;
 using System.Globalization;
 using System.IO;
@@ -15,10 +13,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
-using FileExplorerCore.Interfaces;
-using FileExplorerCore.Providers;
+using FileExplorer.Core.Interfaces;
+using FileExplorer.DisplayViews;
+using FileExplorer.Models;
+using FileExplorer.Providers;
 
-namespace FileExplorerCore.ViewModels
+namespace FileExplorer.ViewModels
 {
 	public class MainWindowViewModel : ViewModelBase
 	{
@@ -29,9 +29,9 @@ namespace FileExplorerCore.ViewModels
 
 		public static IEnumerable<SortEnum> SortValues => Enum.GetValues<SortEnum>();
 
-		public IEnumerable<FolderModel> Folders { get; set; }
+		public IEnumerable<IPathSegment> Folders { get; set; }
 
-		public IEnumerable<IItem> Files => CurrentTab.Files;
+		public IEnumerable<IFileItem> Files => CurrentTab.Files;
 
 		public ObservableRangeCollection<TabItemViewModel> Tabs { get; set; } = new();
 
@@ -81,7 +81,7 @@ namespace FileExplorerCore.ViewModels
 
 			var drives = from drive in DriveInfo.GetDrives()
 				where drive.IsReady
-				select new FolderModel(PathHelper.FromPath(drive.RootDirectory.FullName), $"{drive.VolumeLabel} ({drive.Name})", null);
+				select new FolderModel(PathHelper.FromPath(drive.RootDirectory.FullName), String.Empty, null);
 
 			// var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
 			// 	select new FolderModel(PathHelper.FromPath(KnownFolders.GetPath(specialFolder).ToString()));
@@ -229,7 +229,7 @@ namespace FileExplorerCore.ViewModels
 		{
 			var data = new DataObject();
 			data.Set(DataFormats.FileNames, CurrentTab.Files.Where(x => x.IsSelected)
-				.Select(s => s.Path)
+				.Select(s => s.GetPath(path => path.ToString()))
 				.ToArray());
 
 			await App.Current.Clipboard.SetDataObjectAsync(data);
@@ -260,19 +260,21 @@ namespace FileExplorerCore.ViewModels
 
 				choice.OnSubmit += () =>
 				{
-					var deletedFiles = new List<IItem>(SelectedFileCount);
+					var deletedFiles = new List<IFileItem>(SelectedFileCount);
 
 					foreach (var file in selectedFiles)
 					{
+						var path = file.GetPath(path => path.ToString());
+
 						try
 						{
-							if (File.Exists(file.Path))
+							if (File.Exists(path))
 							{
-								FileSystem.DeleteFile(file.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+								FileSystem.DeleteFile(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
 							}
-							else if (Directory.Exists(file.Path))
+							else if (Directory.Exists(path))
 							{
-								FileSystem.DeleteDirectory(file.Path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+								FileSystem.DeleteDirectory(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
 							}
 
 							deletedFiles.Add(file);

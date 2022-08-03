@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using FileExplorerCore.Helpers;
-using FileExplorerCore.Interfaces;
-using FileExplorerCore.Models;
+using FileExplorer.Core.Interfaces;
+using FileExplorer.Interfaces;
+using FileExplorer.Helpers;
+using FileExplorer.Models;
 
-namespace FileExplorerCore.DisplayViews;
+namespace FileExplorer.DisplayViews;
 
 public partial class AnalyzerView : UserControl, IFileViewer
 {
-	public IEnumerable<IItem> Items { get; set; }
+	public IEnumerable<IFileItem> Items { get; set; }
 	public Task<int> ItemCount => Task.FromResult(0);
 	public event Action<string>? PathChanged;
 	public event Action? SelectionChanged;

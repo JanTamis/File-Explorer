@@ -3,6 +3,11 @@
   <component name="AvaloniaProject">
     <option name="projectPerEditor">
       <map>
+        <entry key="FileExplorer/App.axaml" value="FileExplorer/FileExplorer.csproj" />
+        <entry key="FileExplorer/DisplayViews/FileTreeGrid.axaml" value="FileExplorer/FileExplorer.csproj" />
+        <entry key="FileExplorer/Popup/Properties.axaml" value="FileExplorer/FileExplorer.csproj" />
+        <entry key="FileExplorer/Popup/Settings.axaml" value="FileExplorer/FileExplorer.csproj" />
+        <entry key="FileExplorer/Views/MainWindow.axaml" value="FileExplorer/FileExplorer.csproj" />
         <entry key="FileExplorerCore/App.axaml" value="FileExplorerCore/FileExplorerCore.csproj" />
         <entry key="FileExplorerCore/DisplayViews/AnalyzerView.axaml" value="FileExplorerCore/FileExplorerCore.csproj" />
         <entry key="FileExplorerCore/DisplayViews/FileDataGrid.axaml" value="FileExplorerCore/FileExplorerCore.csproj" />

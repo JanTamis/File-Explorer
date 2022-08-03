@@ -2,21 +2,25 @@
 using Avalonia.Data.Converters;
 using System.Globalization;
 using Avalonia.Media;
+using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
+using FileExplorer.Interfaces;
 using FileExplorer.Models;
 
 namespace FileExplorer.Converters;
 
-public class PathToImageConverter : IValueConverter
+public class PathToImageConverter : IValueConverter, ISingleton<PathToImageConverter>
 {
+	public static PathToImageConverter Instance = new();
+
 	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
 		if (parameter is int size)
 		{
 			var task = value switch
 			{
-				FileModel model => ThumbnailProvider.GetFileImage(model, size, () => model.IsVisible),
-				//FileSystemTreeItem treeItem => ThumbnailProvider.GetFileImage(treeItem, size),
+				FileModel model => ThumbnailProvider.GetFileImage(model, size, () => true),
+				FileSystemTreeItem treeItem => ThumbnailProvider.GetFileImage(treeItem, size),
 				_ => null,
 			};
 

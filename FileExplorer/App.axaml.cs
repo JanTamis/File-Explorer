@@ -1,12 +1,17 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Notifications;
 using Avalonia.Markup.Xaml;
 using Avalonia.Themes.Fluent;
+using FileExplorer.Helpers;
 using FileExplorer.Injection;
+using FileExplorer.Models;
 using FileExplorer.ViewModels;
 using FileExplorer.Views;
+using Microsoft.Extensions.Configuration;
 
 namespace FileExplorer;
 
@@ -15,20 +20,27 @@ public class App : Application
 	public static MainWindowViewModel? MainViewModel { get; set; }
 	public static Container Container { get; } = new Container();
 
-	public override void Initialize()
+	private IConfiguration configuration;
+
+	public override async void Initialize()
 	{
 		AvaloniaXamlLoader.Load(this);
+
+		// configuration = new ConfigurationBuilder()
+		// 	.AddJsonFile("appsettings.json")
+		// 	.Build();
+		//
+		// var value = await SettingsHelpers.GetSettings<AppSettings>();
+		//
+		// await SettingsHelpers.UpdateSettings(value);
+		//
+		// value = await SettingsHelpers.GetSettings<AppSettings>();
 	}
 
 	public override void OnFrameworkInitializationCompleted()
 	{
     if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
-			Current!.Styles[0] = new FluentTheme(new Uri(@"avares://FileExplorer"))
-			{
-				Mode = FluentThemeMode.Dark,
-			};
-			
 			desktop.MainWindow = new MainWindow();
 			desktop.MainWindow.DataContext = MainViewModel = new MainWindowViewModel(new WindowNotificationManager(desktop.MainWindow)
 			{

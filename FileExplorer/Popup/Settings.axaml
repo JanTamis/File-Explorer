@@ -18,13 +18,5 @@
 											Cursor="Hand" />
 			</StackPanel>
 		</TabItem>
-    <TabItem Header="Index">
-      <StackPanel>
-        <Button Content="ReIndex"
-                Command="{Binding ReIndex}"
-                Cursor="Hand"
-                Margin="0 0 0 5"/>
-      </StackPanel>
-    </TabItem>
 	</TabControl>
 </UserControl>

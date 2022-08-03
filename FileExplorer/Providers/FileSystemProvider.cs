@@ -3,21 +3,21 @@ using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
 using System.Threading.Tasks;
-using FileExplorerCore.Helpers;
-using FileExplorerCore.Interfaces;
-using FileExplorerCore.Models;
+using FileExplorer.Core.Interfaces;
+using FileExplorer.Models;
+using FileExplorer.Helpers;
 
-namespace FileExplorerCore.Providers;
+namespace FileExplorer.Providers;
 
 public class FileSystemProvider : IItemProvider
 {
-	public IEnumerable<IItem> GetItems(string path, string filter, bool recursive)
+	public IEnumerable<IFileItem> GetItems(string path, string filter, bool recursive)
 	{
 		var treeItem = PathHelper.FromPath(path);
 
 		if (treeItem is null)
 		{
-			return Enumerable.Empty<IItem>();
+			return Enumerable.Empty<IFileItem>();
 		}
 
 		if (recursive)
@@ -50,7 +50,7 @@ public class FileSystemProvider : IItemProvider
 		});
 	}
 
-	public IEnumerable<FolderModel> GetPath(string path)
+	public IEnumerable<IPathSegment> GetPath(string path)
 	{
 		var treeItem = PathHelper.FromPath(path);
 

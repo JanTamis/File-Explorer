@@ -6,20 +6,21 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
-using FileExplorerCore.DisplayViews;
-using FileExplorerCore.Helpers;
-using FileExplorerCore.Interfaces;
-using FileExplorerCore.Models;
-using FileExplorerCore.Providers;
+using FileExplorer.DisplayViews;
+using FileExplorer.Interfaces;
+using FileExplorer.Providers;
+using FileExplorer.Helpers;
+using FileExplorer.Models;
+using FileExplorer.Core.Interfaces;
 
-namespace FileExplorerCore.ViewModels;
+namespace FileExplorer.ViewModels;
 
 public class TabItemViewModel : ViewModelBase
 {
 	private string _search = String.Empty;
 	private string? _path;
 
-	private ObservableRangeCollection<IItem> _files = new();
+	private ObservableRangeCollection<IFileItem> _files = new();
 
 	private bool _isUserEntered = true;
 	private bool _isLoading;
@@ -54,7 +55,7 @@ public class TabItemViewModel : ViewModelBase
 
 	public int SelectionCount => Files.Count(file => file.IsSelected);
 
-	public IEnumerable<FolderModel> Folders => Provider.GetPath(Path);
+	public IEnumerable<IPathSegment> Folders => Provider.GetPath(Path);
 
 	public bool IsSelected
 	{
@@ -76,7 +77,7 @@ public class TabItemViewModel : ViewModelBase
 
 	public bool SearchFailed => !IsLoading && !Files.Any() && DisplayControl is not Quickstart;
 
-	public ObservableRangeCollection<IItem> Files
+	public ObservableRangeCollection<IFileItem> Files
 	{
 		get => _files;
 		set
@@ -240,11 +241,11 @@ public class TabItemViewModel : ViewModelBase
 
 			if (recursive)
 			{
-				await Files.AddRange<IComparer<IItem>>(items, default, true, null, TokenSource.Token);
+				await Files.AddRange<IComparer<IFileItem>>(items, default, true, null, TokenSource.Token);
 			}
 			else
 			{
-				await Files.AddRange<IComparer<IItem>>(items, Comparer<IItem>.Create((x, y) =>
+				await Files.AddRange<IComparer<IFileItem>>(items, Comparer<IFileItem>.Create((x, y) =>
 				{
 					var result = y.IsFolder.CompareTo(x.IsFolder);
 
