@@ -12,6 +12,8 @@
   </Application.DataTemplates>
 
   <Application.Resources>
+	  <themes:BundledTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Blue" />
+
     <converters:PathToImageConverter x:Key="imageConverter" />
     <converters:EditedOnConverter x:Key="editedOnConverter" />
     <converters:ExtensionConverter x:Key="extensionConverter" />
@@ -28,13 +30,13 @@
   </Application.Resources>
 
   <Application.Styles>
-	  <FluentTheme Mode="Dark" />
-	  <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Blue" />
+
+	  <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml" />
+	  <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml" />
+	  <StyleInclude Source="avares://Material.Avalonia/Material.Avalonia.Templates.xaml" />
     <StyleInclude Source="avares://Material.Icons.Avalonia/App.xaml" />
     <StyleInclude Source="avares://DialogHost.Avalonia/Styles.xaml"/>
 
-    <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml" />
-    
     <Style Selector="TabStrip > TabStripItem">
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="MaxWidth" Value="2000" />

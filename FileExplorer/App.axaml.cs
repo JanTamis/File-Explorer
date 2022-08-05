@@ -41,6 +41,11 @@ public class App : Application
 	{
     if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
+			// Current!.Styles[0] = new FluentTheme(new Uri(@"avares://FileExplorer"))
+			// {
+			// 	Mode = FluentThemeMode.Dark,
+			// };
+
 			desktop.MainWindow = new MainWindow();
 			desktop.MainWindow.DataContext = MainViewModel = new MainWindowViewModel(new WindowNotificationManager(desktop.MainWindow)
 			{
