@@ -6,7 +6,6 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using System.Linq;
 using System.Threading.Tasks;
-using DynamicData;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Interfaces;
 using FileExplorer.Models;
@@ -85,7 +84,7 @@ public partial class FileDataGrid : UserControl, ISelectableControl, IFileViewer
 
 			if (point.Properties.IsLeftButtonPressed || point.Properties.IsRightButtonPressed)
 			{
-				var index = Items.IndexOf(model);
+				// var index = Items.IndexOf(model);
 
 				// anchorIndex = await IFileViewer.UpdateSelection(
 				// 	this,

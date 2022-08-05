@@ -1,53 +1,56 @@
 using System;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.Themes.Fluent;
-using Avalonia.Threading;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using Avalonia;
+using Avalonia.Media;
 using FileExplorer.Interfaces;
+using Material.Styles.Themes;
+using Material.Styles.Themes.Base;
 
 namespace FileExplorer.Popup;
 
-public partial class Settings : UserControl, IPopup, INotifyPropertyChanged
+public partial class Settings : UserControl, IPopup
 {
-	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
-
-	private bool isDarkMode;
+	private bool _isDarkMode;
 
 	public bool HasShadow => true;
 	public bool HasToBeCanceled => false;
+
+	public bool IsDarkMode
+	{
+		get => Application.Current?.Styles is [MaterialTheme { BaseTheme: BaseThemeMode.Dark }, ..];
+		set
+		{
+			if (Application.Current?.Styles is [MaterialTheme theme, ..])
+			{
+				theme.BaseTheme = value
+					? BaseThemeMode.Dark
+					: BaseThemeMode.Light;
+
+				Application.Current.Resources["WindowBackground"] = theme.BaseTheme switch
+				{
+					BaseThemeMode.Light => new SolidColorBrush(Color.Parse("#efeff5")),
+					BaseThemeMode.Dark => new SolidColorBrush(Color.Parse("#333337")),
+				};
+
+				Application.Current.Resources["WindowBorder"] = theme.BaseTheme switch
+				{
+					BaseThemeMode.Light => new SolidColorBrush(Color.Parse("#bfbfbf")),
+					BaseThemeMode.Dark => new SolidColorBrush(Color.Parse("#1a212e")),
+				};
+			}
+		}
+	}
 
 	public string Title => "Settings";
 
 	public event Action OnClose = delegate { };
 
-	public bool IsDarkMode
-	{
-		get => isDarkMode;
-		set
-		{
-			OnPropertyChanged(ref isDarkMode, value);
-
-			ThreadPool.QueueUserWorkItem(x =>
-			{
-				var fluentTheme = new FluentTheme(new Uri(@"avares://FileExplorer"))
-				{
-					Mode = IsDarkMode ? FluentThemeMode.Dark : FluentThemeMode.Light,
-				};
-
-				Dispatcher.UIThread.Post(() => Application.Current.Styles[0] = fluentTheme);
-			});
-		}
-	}
-
 	public Settings()
 	{
-		InitializeComponent();
-
 		DataContext = this;
+
+		InitializeComponent();
 	}
 
 	private void InitializeComponent()
@@ -58,11 +61,5 @@ public partial class Settings : UserControl, IPopup, INotifyPropertyChanged
 	public void Close()
 	{
 		OnClose();
-	}
-
-	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
-	{
-		property = value;
-		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 	}
 }

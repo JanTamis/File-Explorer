@@ -12,9 +12,11 @@
   </Application.DataTemplates>
 
   <Application.Resources>
-	  <themes:BundledTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Blue" />
+	  <!-- fields are filled in code behind -->
+	  <SolidColorBrush Color="Transparent" x:Key="WindowBackground" />
+	  <SolidColorBrush Color="Transparent" x:Key="WindowBorder" />
 
-    <converters:PathToImageConverter x:Key="imageConverter" />
+	  <converters:PathToImageConverter x:Key="imageConverter" />
     <converters:EditedOnConverter x:Key="editedOnConverter" />
     <converters:ExtensionConverter x:Key="extensionConverter" />
     <converters:SizeConverter x:Key="sizeConverter" />
@@ -30,12 +32,13 @@
   </Application.Resources>
 
   <Application.Styles>
+	  <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Orange" SecondaryColor="Orange" />
 
-	  <StyleInclude Source="avares://Avalonia.Themes.Default/DefaultTheme.xaml" />
-	  <StyleInclude Source="avares://Avalonia.Themes.Default/Accents/BaseLight.xaml" />
-	  <StyleInclude Source="avares://Material.Avalonia/Material.Avalonia.Templates.xaml" />
-    <StyleInclude Source="avares://Material.Icons.Avalonia/App.xaml" />
-    <StyleInclude Source="avares://DialogHost.Avalonia/Styles.xaml"/>
+	  <StyleInclude Source="avares://Material.Icons.Avalonia/App.xaml" />
+	  <StyleInclude Source="avares://DialogHost.Avalonia/Styles.xaml" />
+	  <StyleInclude Source="avares://FileExplorer/Styles/TreeDataGrid.axaml" />
+	  <!-- <FluentTheme Mode="Dark" /> -->
+	  <!-- <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml" /> -->
 
     <Style Selector="TabStrip > TabStripItem">
       <Setter Property="Background" Value="Transparent" />

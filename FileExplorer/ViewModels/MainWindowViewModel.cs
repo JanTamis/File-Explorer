@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using CommunityToolkit.Mvvm.ComponentModel;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.DisplayViews;
 using FileExplorer.Models;
@@ -20,38 +21,23 @@ using FileExplorer.Providers;
 
 namespace FileExplorer.ViewModels
 {
-	public class MainWindowViewModel : ViewModelBase
+	[INotifyPropertyChanged]
+	public partial class MainWindowViewModel
 	{
 		public readonly WindowNotificationManager notificationManager;
 
+		[ObservableProperty]
+		[NotifyPropertyChangedFor(nameof(Path))]
 		private TabItemViewModel _currentTab;
-		private IEnumerable<string> searchHistory;
+
+		[ObservableProperty] private IEnumerable<string> _searchHistory;
 
 		public static IEnumerable<SortEnum> SortValues => Enum.GetValues<SortEnum>();
 
 		public IEnumerable<IPathSegment> Folders { get; set; }
 
-		public IEnumerable<IFileItem> Files => CurrentTab.Files;
+		public ObservableRangeCollection<TabItemViewModel> Tabs { get; } = new();
 
-		public ObservableRangeCollection<TabItemViewModel> Tabs { get; set; } = new();
-
-		public IEnumerable<string> SearchHistory
-		{
-			get => searchHistory;
-			set => this.OnPropertyChanged(ref searchHistory, value);
-		}
-
-		public TabItemViewModel CurrentTab
-		{
-			get => _currentTab;
-			set
-			{
-				this.OnPropertyChanged(ref _currentTab, value);
-
-				this.OnPropertyChanged(nameof(Files));
-				this.OnPropertyChanged(nameof(Path));
-			}
-		}
 
 		public string Path
 		{
@@ -356,42 +342,37 @@ namespace FileExplorer.ViewModels
 				{
 					IgnoreInaccessible = true,
 					AttributesToSkip = FileAttributes.System,
-					RecurseSubdirectories = true
+					RecurseSubdirectories = true,
 				};
 
 				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = true);
 
-				var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(Path, (ref FileSystemEntry x) => (System.IO.Path.GetExtension(x.FileName).ToString(), x.Length), options)
+				var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(Path, (ref FileSystemEntry y) => (System.IO.Path.GetExtension(y.FileName).ToString(), y.Length), options)
 					{
-						ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory
+						ShouldIncludePredicate = (ref FileSystemEntry z) => !z.IsDirectory,
 					}
 					.Where(w => !String.IsNullOrEmpty(w.Extension))
-					.GroupBy(g => g.Extension);
+					.GroupBy(g => g.Extension)
+					.Where(w => CurrentTab.TokenSource?.IsCancellationRequested != true);
 
 				var comparer = new ExtensionModelComparer();
 
 				foreach (var extension in extensionQuery)
 				{
-					if (CurrentTab.TokenSource.IsCancellationRequested)
-						break;
-
-					if (!String.IsNullOrEmpty(extension.Key))
+					var model = new ExtensionModel(extension.Key, extension.Sum(s => s.Size))
 					{
-						var model = new ExtensionModel(extension.Key, extension.Sum(s => s.Size))
-						{
-							TotalFiles = extension.Count()
-						};
+						TotalFiles = extension.Count(),
+					};
 
-						var index = view.Extensions.BinarySearch(model, comparer);
+					var index = view.Extensions.BinarySearch(model, comparer);
 
-						if (index >= 0)
-						{
-							await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(index, model));
-						}
-						else
-						{
-							await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(~index, model));
-						}
+					if (index >= 0)
+					{
+						await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(index, model));
+					}
+					else
+					{
+						await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(~index, model));
 					}
 				}
 

@@ -12,9 +12,8 @@
 			</StackPanel>
 		</TabItem>
 		<TabItem Header="View">
-			<StackPanel>
-				<ToggleSwitch OnContent="Default Icons"
-											OffContent="Windows Icons"
+			<StackPanel Margin="5">
+				<ToggleSwitch IsChecked="{Binding IsDarkMode}"
 											Cursor="Hand" />
 			</StackPanel>
 		</TabItem>

@@ -4,10 +4,11 @@ using Avalonia.Controls.Generators;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using ReactiveUI;
 using System.Runtime;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia;
+using CommunityToolkit.Mvvm.Input;
 using FileExplorer.Models;
 using FileExplorer.ViewModels;
 
@@ -19,7 +20,7 @@ public class MainWindow : FluentWindow
 	{
 		InitializeComponent();
 #if DEBUG
-		// this.AttachDevTools();
+		 this.AttachDevTools();
 #endif
 	}
 
@@ -47,7 +48,7 @@ public class MainWindow : FluentWindow
 				{
 					tree.Items = viewModel.Folders;
 
-					this.KeyUp += (sender, args) =>
+					KeyUp += (_, args) =>
 					{
 						if (args.KeyModifiers is KeyModifiers.Control && args.Key is Key.A)
 						{
@@ -129,7 +130,7 @@ public class MainWindow : FluentWindow
 		{
 			if (info.ContainerControl is MenuItem { DataContext: FolderModel folder, ContextMenu: not null } item && DataContext is MainWindowViewModel model)
 			{
-				item.Command = ReactiveCommand.Create(() =>
+				item.Command = new RelayCommand(() =>
 				{
 					model.CurrentTab.Path = folder.TreeItem.GetPath(path => path.ToString());
 				});

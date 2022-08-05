@@ -1,17 +1,13 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Notifications;
 using Avalonia.Markup.Xaml;
-using Avalonia.Themes.Fluent;
-using FileExplorer.Helpers;
+using Avalonia.Media;
 using FileExplorer.Injection;
-using FileExplorer.Models;
 using FileExplorer.ViewModels;
 using FileExplorer.Views;
-using Microsoft.Extensions.Configuration;
+using Material.Styles.Themes;
+using Material.Styles.Themes.Base;
 
 namespace FileExplorer;
 
@@ -20,9 +16,7 @@ public class App : Application
 	public static MainWindowViewModel? MainViewModel { get; set; }
 	public static Container Container { get; } = new Container();
 
-	private IConfiguration configuration;
-
-	public override async void Initialize()
+	public override void Initialize()
 	{
 		AvaloniaXamlLoader.Load(this);
 
@@ -41,10 +35,20 @@ public class App : Application
 	{
     if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
-			// Current!.Styles[0] = new FluentTheme(new Uri(@"avares://FileExplorer"))
-			// {
-			// 	Mode = FluentThemeMode.Dark,
-			// };
+			if (Styles is [MaterialTheme theme, ..])
+			{
+				Resources["WindowBackground"] = theme.BaseTheme switch
+				{
+					BaseThemeMode.Light => new SolidColorBrush(Color.Parse("#efeff5")),
+					BaseThemeMode.Dark => new SolidColorBrush(Color.Parse("#333337")),
+				};
+
+				Resources["WindowBorder"] = theme.BaseTheme switch
+				{
+					BaseThemeMode.Light => new SolidColorBrush(Color.Parse("#bfbfbf")),
+					BaseThemeMode.Dark => new SolidColorBrush(Color.Parse("#1a212e")),
+				};
+			}
 
 			desktop.MainWindow = new MainWindow();
 			desktop.MainWindow.DataContext = MainViewModel = new MainWindowViewModel(new WindowNotificationManager(desktop.MainWindow)

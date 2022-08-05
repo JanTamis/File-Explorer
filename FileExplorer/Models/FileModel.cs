@@ -6,53 +6,32 @@ using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
 using System.Threading.Tasks;
-using System.ComponentModel;
-using Avalonia.Threading;
-using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.ComponentModel;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 
 namespace FileExplorer.Models;
 
-public class FileModel : INotifyPropertyChanged, IFileItem
+[INotifyPropertyChanged]
+public partial class FileModel : IFileItem
 {
   public static readonly ConcurrentBag<FileModel> FileImageQueue = new();
 
-  public event PropertyChangedEventHandler PropertyChanged = delegate { };
-
   public FileSystemTreeItem TreeItem { get; }
 
-  private bool _isSelected;
   private string? _name;
   private string? _extension;
   private long _size = -1;
 
   private DateTime _editedOn;
 
-  private bool isVisible = true;
+  [ObservableProperty]
+  private bool _isVisible = true;
+
+  [ObservableProperty]
+  private bool _isSelected;
 
   public string? ExtensionName { get; set; }
-
-  public bool IsVisible
-  {
-    get => isVisible;
-    set
-    {
-      OnPropertyChanged(ref isVisible, value);
-    }
-  }
-
-  public bool IsSelected
-  {
-    get => _isSelected;
-    set
-    {
-      if (_isSelected != value)
-      {
-        OnPropertyChanged(ref _isSelected, value);
-      }
-    }
-  }
 
   public bool IsRoot => TreeItem.HasParent;
 
@@ -97,7 +76,7 @@ public class FileModel : INotifyPropertyChanged, IFileItem
         // ignored
       }
 
-      OnPropertyChanged(ref _name, value);
+      SetProperty(ref _name, value);
     }
   }
 
@@ -193,23 +172,5 @@ public class FileModel : INotifyPropertyChanged, IFileItem
   public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
   {
 	  return TreeItem.GetPath(action, parameter);
-  }
-
-  public void OnPropertyChanged([CallerMemberName] string? name = null)
-  {
-    if (Dispatcher.UIThread.CheckAccess())
-    {
-      PropertyChanged(this, new PropertyChangedEventArgs(name));
-    }
-    else
-    {
-      Dispatcher.UIThread.InvokeAsync(() => PropertyChanged(this, new PropertyChangedEventArgs(name)));
-    }
-  }
-
-  public void OnPropertyChanged<T>(ref T field, T value, [CallerMemberName] string? name = null)
-  {
-    field = value;
-    OnPropertyChanged(name);
   }
 }

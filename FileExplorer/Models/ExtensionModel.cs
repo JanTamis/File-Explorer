@@ -1,40 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace FileExplorer.Models;
 
-public class ExtensionModel : INotifyPropertyChanged, IComparable<ExtensionModel>
+[INotifyPropertyChanged]
+public partial class ExtensionModel : IComparable<ExtensionModel>
 {
+	[ObservableProperty]
 	private long _totalSize;
-	private long _totalFiles = 1;
+
+	[ObservableProperty]
+	private long _totalFiles;
+
+	[ObservableProperty]
 	private string _extension;
-
-	public event PropertyChangedEventHandler? PropertyChanged = delegate { };
-
-	public long TotalSize
-	{
-		get => _totalSize;
-		set => OnPropertyChanged(ref _totalSize, value);
-	}
-
-	public long TotalFiles
-	{
-		get => _totalFiles;
-		set => OnPropertyChanged(ref _totalFiles, value);
-	}
-
-	public string Extension
-	{
-		get => _extension;
-		set => OnPropertyChanged(ref _extension, value);
-	}
 
 	public ExtensionModel(string extension, long totalSize)
 	{
-		TotalSize = totalSize;
-		Extension = extension;
+		_totalSize = totalSize;
+		_extension = extension;
+		_totalFiles = 1;
 	}
 
 	public override string ToString()
@@ -42,21 +28,9 @@ public class ExtensionModel : INotifyPropertyChanged, IComparable<ExtensionModel
 		return Extension;
 	}
 
-	public void OnPropertyChanged<T>(ref T field, T value, [CallerMemberName] string name = null)
-	{
-		field = value;
-
-		OnPropertyChanged(name);
-	}
-
-	public void OnPropertyChanged([CallerMemberName] string name = null)
-	{
-		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-	}
-
 	public int CompareTo(ExtensionModel? other)
 	{
-		return Extension.CompareTo(other.Extension);
+		return String.Compare(Extension, other?.Extension, StringComparison.CurrentCulture);
 	}
 }
 

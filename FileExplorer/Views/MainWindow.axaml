@@ -22,11 +22,11 @@
                     MinWidth="800"
                     MinHeight="600"
                     Width="1000"
-                    Background="#333337"
+                    Background="{DynamicResource WindowBackground}"
                     Height="800"
                     BorderThickness="0"
                     WindowStartupLocation="CenterScreen"
-                    xmlns:dialogHost="clr-namespace:DialogHost;assembly=DialogHost.Avalonia"
+                    xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
                     Title="FileExplorer">
   <Window.Resources>
     <system:Int32 x:Key="ImageSize">24</system:Int32>
@@ -53,53 +53,6 @@
                               Content="{TemplateBinding Content}"
                               Padding="0" />
           </styles:Card>
-          <!--<styles:Card VerticalAlignment="Center"
-                       Name="PART_ContentBackground"
-                   HorizontalAlignment="Center"
-                   assist:ShadowAssist.ShadowDepth="CenterDepth5"
-                   Padding="0"
-                   
-                   CornerRadius="10"
-                   IsVisible="{Binding CurrentTab.PopupVisible}">
-            <Grid RowDefinitions="Auto, *">
-
-              <Border CornerRadius="10 10 0 0"
-                      Background="#333337"
-                      BorderBrush="#1a212e"
-                      BorderThickness="0 0 0 1">
-                <Grid Margin="4"
-                      ColumnDefinitions="* Auto">
-                  <Label Content="{Binding CurrentTab.PopupContent.Title}"
-                         FontSize="21"
-                         Margin="10 0"
-                         FontWeight="Bold"
-                         VerticalAlignment="Center"
-                         HorizontalAlignment="Center" />
-
-                  <Button Width="30"
-                          Height="30"
-                          Classes="Flat"
-                          assist:ShadowAssist.ShadowDepth="Depth0"
-                          Grid.Column="1"
-                          IsDefault="True"
-                          Command="{Binding CurrentTab.PopupContent.Close}"
-                          VerticalAlignment="Top"
-                          HorizontalAlignment="Right"
-                          Background="Transparent"
-                          Cursor="Hand"
-                          Padding="0">
-                    <Viewbox Margin="2.5">
-                      <Image Source="{SvgImage /Assets/UIIcons/Close.svg}" />
-                    </Viewbox>
-                  </Button>
-                </Grid>
-              </Border>
-
-              <ContentControl Name="PART_ContentPresenter"
-                              Content="{TemplateBinding Content}"
-                              ContentTemplate="{TemplateBinding ContentTemplate}" />
-            </Grid>
-          </styles:Card>-->
         </VisualLayerManager>
       </ControlTemplate>
     </dialogHost:DialogHost.PopupTemplate>
@@ -342,7 +295,7 @@
 
           <Border Grid.Row="2"
                   BorderThickness="0 1 0 0"
-                  BorderBrush="#1a212e">
+                  BorderBrush="{DynamicResource WindowBorder}">
             <Grid ColumnDefinitions="200, 5, *">
 
               <Grid RowDefinitions="Auto, *, Auto"
@@ -562,7 +515,7 @@
                         <Border Grid.Row="1"
                                 VerticalAlignment="Center"
                                 HorizontalAlignment="Center"
-                                Background="{DynamicResource MaterialDesignCardBackground}"
+                                Background="transparent"
                                 IsVisible="{Binding CurrentTab.SearchFailed}"
                                 Padding="10 5 10 10">
                           <Viewbox MaxWidth="300"
