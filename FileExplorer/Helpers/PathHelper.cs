@@ -16,7 +16,7 @@ public static class PathHelper
 			: '/';
 	}
 
-	public static FileSystemTreeItem? FromPath([NotNullIfNotNull(nameof(path))] string? path)
+	public static FileSystemTreeItem? FromPath([NotNullIfNotNull("path")]string? path)
 	{
 		if (path is null)
 		{

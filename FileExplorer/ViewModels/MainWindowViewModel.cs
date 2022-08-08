@@ -18,6 +18,7 @@ using FileExplorer.Core.Interfaces;
 using FileExplorer.DisplayViews;
 using FileExplorer.Models;
 using FileExplorer.Providers;
+using Avalonia.Controls.ApplicationLifetimes;
 
 namespace FileExplorer.ViewModels
 {
@@ -78,8 +79,8 @@ namespace FileExplorer.ViewModels
 			notificationManager = manager;
 
 			var drives = from drive in DriveInfo.GetDrives()
-				where drive.IsReady
-				select new FolderModel(PathHelper.FromPath(drive.RootDirectory.FullName), String.Empty, null);
+									 where drive.IsReady
+									 select new FolderModel(PathHelper.FromPath(drive.RootDirectory.FullName), String.Empty, null);
 
 			// var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
 			// 	select new FolderModel(PathHelper.FromPath(KnownFolders.GetPath(specialFolder).ToString()));
@@ -360,9 +361,9 @@ namespace FileExplorer.ViewModels
 				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = true);
 
 				var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(Path, (ref FileSystemEntry y) => (System.IO.Path.GetExtension(y.FileName).ToString(), y.Length), options)
-					{
-						ShouldIncludePredicate = (ref FileSystemEntry z) => !z.IsDirectory,
-					}
+				{
+					ShouldIncludePredicate = (ref FileSystemEntry z) => !z.IsDirectory,
+				}
 					.Where(w => !String.IsNullOrEmpty(w.Extension))
 					.GroupBy(g => g.Extension)
 					.Where(w => CurrentTab.TokenSource?.IsCancellationRequested != true);
@@ -394,9 +395,9 @@ namespace FileExplorer.ViewModels
 
 		public void ShowProperties()
 		{
-			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && Path is not null)
 			{
-				var model = CurrentTab.Files.FirstOrDefault(x => x.IsSelected) ?? new FileModel(PathHelper.FromPath(Path));
+				var model = CurrentTab.Files.FirstOrDefault(x => x.IsSelected) ?? new FileModel(PathHelper.FromPath(Path)!);
 
 				var properties = new Properties
 				{

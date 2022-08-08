@@ -29,6 +29,7 @@
     <converters:MinSizeConverter x:Key="minSizeConverter" />
     <converters:MoreThanConverter x:Key="moreThanConverter" />
     <converters:EnumToValuesConverter x:Key="enumToValuesConverter" />
+	<converters:WindowStateToIconConverter x:Key="windowStateToIconConverter" />
   </Application.Resources>
 
   <Application.Styles>

@@ -56,132 +56,180 @@
 			</ControlTemplate>
 		</dialogHost:DialogHost.PopupTemplate>
 
-		<Grid RowDefinitions="Auto, *">
+		<Grid RowDefinitions="Auto, *, Auto">
 			<Grid ColumnDefinitions="*, Auto"
 			      Grid.Row="0"
-			      HorizontalAlignment="Left"
 			      Margin="{Binding #MainWindow.TitleBarMargin}">
+			  <StackPanel Orientation="Horizontal">
 				<TabStrip Items="{Binding Tabs}"
 				          SelectedItem="{Binding CurrentTab}">
-					<TabStrip.ItemsPanel>
-						<ItemsPanelTemplate>
-							<UniformGrid Rows="1" />
-						</ItemsPanelTemplate>
-					</TabStrip.ItemsPanel>
+				  <TabStrip.ItemsPanel>
+					<ItemsPanelTemplate>
+					  <UniformGrid Rows="1" />
+					</ItemsPanelTemplate>
+				  </TabStrip.ItemsPanel>
 
-					<TabStrip.Styles>
-						<Style Selector="TabStrip > TabStripItem">
-							<Setter Property="Background" Value="Transparent" />
-							<Setter Property="MaxWidth" Value="2000" />
-							<Setter Property="assists:TabControlAssist.TabHeaderForeground"
-							        Value="{Binding Path=(assists:TabControlAssist.TabHeaderInactiveBrush), RelativeSource={RelativeSource AncestorType=TabStrip}}" />
-							<Setter Property="assists:ShadowAssist.ShadowDepth" Value="CenterDepth1"></Setter>
-							<Setter Property="Template">
-								<Setter.Value>
-									<ControlTemplate>
-										<Border Padding="7.5">
-											<styles:Card Padding="0"
-											             Background="{TemplateBinding Background}"
-											             assists:ShadowAssist.ShadowDepth="{Binding Path=(assists:ShadowAssist.ShadowDepth), RelativeSource={RelativeSource TemplatedParent}}">
-												<Grid Name="ItemContent"
-												      HorizontalAlignment="Stretch"
-												      VerticalAlignment="Stretch" MinWidth="200">
-													<ContentPresenter Name="headerContent"
-													                  Margin="0"
-													                  HorizontalAlignment="Stretch"
-													                  VerticalAlignment="Center"
-													                  BorderBrush="{TemplateBinding BorderBrush}"
-													                  BorderThickness="{TemplateBinding BorderThickness}"
-													                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-													                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-													                  Content="{TemplateBinding Content}"
-													                  TextBlock.Foreground="{Binding Path=(assists:TabControlAssist.TabHeaderForeground), RelativeSource={RelativeSource TemplatedParent}}" />
-												</Grid>
-											</styles:Card>
-										</Border>
-									</ControlTemplate>
-								</Setter.Value>
-							</Setter>
-						</Style>
+				  <TabStrip.Styles>
+					<Style Selector="TabStrip > TabStripItem">
+					  <Setter Property="Background" Value="Transparent" />
+					  <Setter Property="MaxWidth" Value="2000" />
+					  <Setter Property="assists:TabControlAssist.TabHeaderForeground"
+							  Value="{Binding Path=(assists:TabControlAssist.TabHeaderInactiveBrush), RelativeSource={RelativeSource AncestorType=TabStrip}}" />
+					  <Setter Property="assists:ShadowAssist.ShadowDepth" Value="CenterDepth1"></Setter>
+					  <Setter Property="Template">
+						<Setter.Value>
+						  <ControlTemplate>
+							<Border Padding="7.5">
+							  <styles:Card Padding="0"
+										   Background="{TemplateBinding Background}"
+										   assists:ShadowAssist.ShadowDepth="{Binding Path=(assists:ShadowAssist.ShadowDepth), RelativeSource={RelativeSource TemplatedParent}}">
+								<Grid Name="ItemContent"
+									  HorizontalAlignment="Stretch"
+									  VerticalAlignment="Stretch" MinWidth="200">
+								  <ContentPresenter Name="headerContent"
+													Margin="0"
+													HorizontalAlignment="Stretch"
+													VerticalAlignment="Center"
+													BorderBrush="{TemplateBinding BorderBrush}"
+													BorderThickness="{TemplateBinding BorderThickness}"
+													HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+													VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+													Content="{TemplateBinding Content}"
+													TextBlock.Foreground="{Binding Path=(assists:TabControlAssist.TabHeaderForeground), RelativeSource={RelativeSource TemplatedParent}}" />
+								</Grid>
+							  </styles:Card>
+							</Border>
+						  </ControlTemplate>
+						</Setter.Value>
+					  </Setter>
+					</Style>
 
-						<Style Selector="TabStrip > TabStripItem:selected">
-							<Setter Property="Background" Value="{DynamicResource MaterialDesignCardBackground}" />
-							<Setter Property="assists:ShadowAssist.ShadowDepth" Value="CenterDepth2"></Setter>
-						</Style>
-					</TabStrip.Styles>
+					<Style Selector="TabStrip > TabStripItem:selected">
+					  <Setter Property="Background" Value="{DynamicResource MaterialDesignCardBackground}" />
+					  <Setter Property="assists:ShadowAssist.ShadowDepth" Value="CenterDepth2"></Setter>
+					</Style>
+				  </TabStrip.Styles>
 
-					<TabStrip.DataTemplates>
-						<DataTemplate DataType="{x:Type viewmodels:TabItemViewModel}">
-							<Grid ColumnDefinitions="Auto, *, Auto, Auto"
-							      Margin="5">
-								<Image Grid.Column="0"
-								       DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
-								       Source="{Binding Result}"
-								       Height="24"
-								       Margin="0 0 4 0"
-								       VerticalAlignment="Center" />
+				  <TabStrip.DataTemplates>
+					<DataTemplate DataType="{x:Type viewmodels:TabItemViewModel}">
+					  <Grid ColumnDefinitions="Auto, *, Auto, Auto"
+							Margin="5">
+						<Image Grid.Column="0"
+							   DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
+							   Source="{Binding Result}"
+							   Height="24"
+							   Margin="0 0 4 0"
+							   VerticalAlignment="Center" />
 
-								<TextBlock Text="{Binding Path, Converter={StaticResource fileNameConverter}}"
-								           Foreground="{DynamicResource MaterialDesignBody}"
-								           FontWeight="{Binding IsSelected, Converter={x:Static converters:BoolToBoldConverter.Instance}}"
-								           TextTrimming="CharacterEllipsis"
-								           FontSize="14"
-								           VerticalAlignment="Center"
-								           HorizontalAlignment="Stretch"
-								           Grid.Column="1"
-								           IsVisible="{Binding $self.DesiredSize.Width, Mode=TwoWay, Converter={StaticResource minSizeConverter}, ConverterParameter=100}" />
+						<TextBlock Text="{Binding Path, Converter={StaticResource fileNameConverter}}"
+								   Foreground="{DynamicResource MaterialDesignBody}"
+								   FontWeight="{Binding IsSelected, Converter={x:Static converters:BoolToBoldConverter.Instance}}"
+								   TextTrimming="CharacterEllipsis"
+								   FontSize="14"
+								   VerticalAlignment="Center"
+								   HorizontalAlignment="Stretch"
+								   Grid.Column="1"
+								   IsVisible="{Binding $self.DesiredSize.Width, Mode=TwoWay, Converter={StaticResource minSizeConverter}, ConverterParameter=100}" />
 
-								<ProgressBar Classes="Circle"
-								             Grid.Column="2"
-								             Margin="5 0"
-								             IsIndeterminate="False"
-								             Value="{Binding Count}"
-								             Maximum="{Binding FileCount}"
-								             Foreground="{DynamicResource PrimaryHueMidBrush}"
-								             IsVisible="{Binding IsLoading}" />
+						<ProgressBar Classes="Circle"
+									 Grid.Column="2"
+									 Margin="5 0"
+									 IsIndeterminate="False"
+									 Value="{Binding Count}"
+									 Maximum="{Binding FileCount}"
+									 Foreground="{DynamicResource PrimaryHueMidBrush}"
+									 IsVisible="{Binding IsLoading}" />
 
-								<Button Background="Transparent"
-								        Width="20"
-								        Height="20"
-								        Padding="0"
-								        assist:ShadowAssist.ShadowDepth="Depth0"
-								        Grid.Column="3"
-								        Click="OnTabCloseClick"
-								        IsVisible="{Binding $parent[Window].DataContext.Tabs.Count, Converter={StaticResource moreThanConverter}, ConverterParameter=1}">
-									<material:MaterialIcon Kind="Close"
-									                       Height="15"
-									                       Width="15"
-									                       Foreground="{DynamicResource MaterialDesignBody}" />
-								</Button>
-							</Grid>
-						</DataTemplate>
-					</TabStrip.DataTemplates>
+						<Button Background="Transparent"
+								Width="20"
+								Height="20"
+								Padding="0"
+								assist:ShadowAssist.ShadowDepth="Depth0"
+								Grid.Column="3"
+								Click="OnTabCloseClick"
+								IsVisible="{Binding $parent[Window].DataContext.Tabs.Count, Converter={StaticResource moreThanConverter}, ConverterParameter=1}">
+						  <material:MaterialIcon Kind="Close"
+												 Height="15"
+												 Width="15"
+												 Foreground="{DynamicResource MaterialDesignBody}" />
+						</Button>
+					  </Grid>
+					</DataTemplate>
+				  </TabStrip.DataTemplates>
 
-					<TabStrip.Styles>
-						<Style Selector="TabStripItem">
-							<Setter Property="Padding" Value="10 0" />
-							<Setter Property="MinHeight" Value="25" />
-							<Setter Property="Cursor" Value="Hand" />
-							<Setter Property="ToolTip.Tip" Value="{Binding Path}" />
-						</Style>
-					</TabStrip.Styles>
+				  <TabStrip.Styles>
+					<Style Selector="TabStripItem">
+					  <Setter Property="Padding" Value="10 0" />
+					  <Setter Property="MinHeight" Value="25" />
+					  <Setter Property="Cursor" Value="Hand" />
+					  <Setter Property="ToolTip.Tip" Value="{Binding Path}" />
+					</Style>
+				  </TabStrip.Styles>
 				</TabStrip>
 
 				<Viewbox Margin="0"
-				         Grid.Column="1"
 				         Padding="2">
-					<Button Cursor="Hand"
-					        assist:ShadowAssist.ShadowDepth="Depth0"
-					        Padding="0"
-					        Command="{Binding AddTab}"
-					        Background="Transparent"
-					        Margin="0 0 5 0">
-						<material:MaterialIcon Kind="Add"
-						                       Height="25"
-						                       Width="25"
-						                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
-					</Button>
+				  <Button Cursor="Hand"
+						  assist:ShadowAssist.ShadowDepth="Depth0"
+						  Padding="0"
+						  Command="{Binding AddTab}"
+						  Background="Transparent"
+						  Margin="0 0 5 0">
+					<material:MaterialIcon Kind="Add"
+										   Height="25"
+										   Width="25"
+										   Margin="0"
+										   Foreground="{DynamicResource MaterialDesignBodyLight}" />
+				  </Button>
 				</Viewbox>
+			  </StackPanel>
+				
+			  <StackPanel Grid.Column="1"
+						  Orientation="Horizontal">
+				  <Button Classes="Flat"
+						  Width="40"
+						  Command="{Binding ElementName=MainWindow, Path=Minimize}"
+					      assist:ShadowAssist.ShadowDepth="Depth0"
+					      Padding="0"
+					      Background="Transparent"
+					      Margin="0">
+					<material:MaterialIcon Kind="Minimize"
+										   Height="25"
+										   Width="25"
+										   Margin="0"
+										   Foreground="{DynamicResource MaterialDesignBody}" />
+				  </Button>
+
+				<Button Width="40"
+						Classes="Flat"
+						Command="{Binding ElementName=MainWindow, Path=ChangeState}"
+						assist:ShadowAssist.ShadowDepth="Depth0"
+						Padding="0"
+						Background="Transparent"
+						Margin="0">
+				  <Panel>
+					<material:MaterialIcon Kind="{Binding ElementName=MainWindow, Path=WindowState, Converter={StaticResource windowStateToIconConverter}}"
+										   Height="25"
+										   Width="25"
+										   Margin="0"
+										   Foreground="{DynamicResource MaterialDesignBody}" />
+				  </Panel>
+				</Button>
+
+				<Button Width="40"
+						Classes="Flat"
+						Command="{Binding ElementName=MainWindow, Path=Close}"
+						assists:ButtonAssist.ClickFeedbackColor="Red"
+					    assist:ShadowAssist.ShadowDepth="Depth0"
+					    Padding="0"
+				        Background="Transparent"
+				        Margin="0">
+				  <material:MaterialIcon Kind="Close"
+										 Height="25"
+										 Width="25"
+										 Foreground="{DynamicResource MaterialDesignBody}" />
+				</Button>
+			  </StackPanel>
 			</Grid>
 
 			<Border Background="Transparent"
@@ -247,54 +295,55 @@
 						             Padding="0"
 						             Height="30"
 						             Grid.Column="1">
-							<TabStrip Items="{Binding CurrentTab.Folders}">
-								<TabStrip.ItemsPanel>
-									<ItemsPanelTemplate>
-										<UniformGrid Rows="1" HorizontalAlignment="Left" />
-									</ItemsPanelTemplate>
-								</TabStrip.ItemsPanel>
+							<ListBox Items="{Binding CurrentTab.Folders}"
+									 >
+							  <ListBox.ItemsPanel>
+								<ItemsPanelTemplate>
+								  <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" />
+								</ItemsPanelTemplate>
+							  </ListBox.ItemsPanel>
 
-								<TabStrip.Styles>
-									<Style Selector="TabStrip > TabStripItem">
-										<Setter Property="Background" Value="Transparent" />
-										<Setter Property="assists:TabControlAssist.TabHeaderForeground"
-										        Value="{Binding Path=(assists:TabControlAssist.TabHeaderInactiveBrush), RelativeSource={RelativeSource AncestorType=TabStrip}}" />
-										<Setter Property="Template">
-											<Setter.Value>
-												<ControlTemplate>
-													<Grid Name="ItemContent" Background="{TemplateBinding Background}"
-													      HorizontalAlignment="Stretch"
-													      VerticalAlignment="Stretch">
-														<ripple:RippleEffect RippleFill="{Binding Path=(assists:TabControlAssist.TabHeaderHighlightBrush), RelativeSource={RelativeSource AncestorType=TabStrip}}">
-															<ContentPresenter Name="headerContent"
-															                  Margin="10,0" HorizontalAlignment="Center"
-															                  VerticalAlignment="Center"
-															                  Background="{TemplateBinding Background}"
-															                  BorderBrush="{TemplateBinding BorderBrush}"
-															                  BorderThickness="{TemplateBinding BorderThickness}"
-															                  ContentTemplate="{TemplateBinding ContentTemplate}"
-															                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-															                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-															                  Content="{TemplateBinding Content}"
-															                  TextBlock.Foreground="{Binding Path=(assists:TabControlAssist.TabHeaderForeground), RelativeSource={RelativeSource TemplatedParent}}" />
-														</ripple:RippleEffect>
-													</Grid>
-												</ControlTemplate>
-											</Setter.Value>
-										</Setter>
-									</Style>
-								</TabStrip.Styles>
+							  <ListBox.Styles>
+								<Style Selector="ListBox > ListBoxItem">
+								  <Setter Property="Background" Value="Transparent" />
+								  <Setter Property="assists:TabControlAssist.TabHeaderForeground"
+										  Value="{Binding Path=(assists:TabControlAssist.TabHeaderInactiveBrush), RelativeSource={RelativeSource AncestorType=TabStrip}}" />
+								  <Setter Property="Template">
+									<Setter.Value>
+									  <ControlTemplate>
+										<Grid Name="ItemContent" Background="{TemplateBinding Background}"
+											  HorizontalAlignment="Stretch"
+											  VerticalAlignment="Stretch">
+										  <ripple:RippleEffect RippleFill="{DynamicResource PrimaryHueMidBrush}">
+											<ContentPresenter Name="headerContent"
+															  Margin="10,0" HorizontalAlignment="Center"
+															  VerticalAlignment="Center"
+															  Background="{TemplateBinding Background}"
+															  BorderBrush="{TemplateBinding BorderBrush}"
+															  BorderThickness="{TemplateBinding BorderThickness}"
+															  ContentTemplate="{TemplateBinding ContentTemplate}"
+															  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+															  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+															  Content="{TemplateBinding Content}"
+															  TextBlock.Foreground="{Binding Path=(assists:TabControlAssist.TabHeaderForeground), RelativeSource={RelativeSource TemplatedParent}}" />
+										  </ripple:RippleEffect>
+										</Grid>
+									  </ControlTemplate>
+									</Setter.Value>
+								  </Setter>
+								</Style>
+							  </ListBox.Styles>
 
-								<TabStrip.ItemTemplate>
-									<DataTemplate DataType="models:FolderModel">
-										<TextBlock Text="{Binding Name}"
-										           FontWeight="Normal"
-										           TextTrimming="CharacterEllipsis"
-										           Foreground="{DynamicResource MaterialDesignBody}"
-										           HorizontalAlignment="Stretch" />
-									</DataTemplate>
-								</TabStrip.ItemTemplate>
-							</TabStrip>
+							  <ListBox.ItemTemplate>
+								<DataTemplate DataType="models:FolderModel">
+								  <TextBlock Text="{Binding Name}"
+											 FontWeight="Normal"
+											 TextTrimming="CharacterEllipsis"
+											 Foreground="{DynamicResource MaterialDesignBody}"
+											 HorizontalAlignment="Stretch" />
+								</DataTemplate>
+							  </ListBox.ItemTemplate>
+							</ListBox>
 						</styles:Card>
 
 						<styles:Card assist:ShadowAssist.ShadowDepth="Depth1"
