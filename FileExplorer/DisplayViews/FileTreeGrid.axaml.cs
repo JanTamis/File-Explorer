@@ -22,11 +22,13 @@ namespace FileExplorer.DisplayViews;
 
 public class FileTreeGrid : UserControl, IFileViewer
 {
+	const string controlName = "TreeDataGrid";
+
 	public ObservableRangeCollection<IFileItem> Items
 	{
 		get
 		{
-			if (this.FindControl<TreeDataGrid>("TreeDataGrid") is { Source: HierarchicalTreeDataGridSource<IFileItem> source })
+			if (this.FindControl<TreeDataGrid>(controlName) is { Source: HierarchicalTreeDataGridSource<IFileItem> source })
 			{
 				return source.Items as ObservableRangeCollection<IFileItem>;
 			}
@@ -35,14 +37,14 @@ public class FileTreeGrid : UserControl, IFileViewer
 		}
 		set
 		{
-			var grid = this.FindControl<TreeDataGrid>("TreeDataGrid");
+			var grid = this.FindControl<TreeDataGrid>(controlName);
 
 			var source = new HierarchicalTreeDataGridSource<IFileItem>(value)
 			{
 				Columns =
 				{
 					new HierarchicalExpanderColumn<IFileItem>(
-						new TemplateColumn<IFileItem>("Name", new FuncDataTemplate<IFileItem>((x, scope) =>
+						new TemplateColumn<IFileItem>("Name", new FuncDataTemplate<IFileItem>((x, _) =>
 							new StackPanel
 							{
 								Orientation = Orientation.Horizontal,
@@ -128,7 +130,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 
 	public Action SelectAll => () =>
 	{
-		if (this.FindControl<TreeDataGrid>("TreeDataGrid") is { RowSelection: { } selection })
+		if (this.FindControl<TreeDataGrid>(controlName) is { RowSelection: { } selection })
 		{
 			selection.BeginBatchUpdate();
 
@@ -147,7 +149,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 
 	public Action SelectNone => () =>
 	{
-		if (this.FindControl<TreeDataGrid>("TreeDataGrid") is { RowSelection: { } selection })
+		if (this.FindControl<TreeDataGrid>(controlName) is { RowSelection: { } selection })
 		{
 			selection.BeginBatchUpdate();
 
@@ -166,7 +168,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 
 	public Action SelectInvert => () =>
 	{
-		if (this.FindControl<TreeDataGrid>("TreeDataGrid") is { RowSelection: { } selection })
+		if (this.FindControl<TreeDataGrid>(controlName) is { RowSelection: var selection })
 		{
 			selection.BeginBatchUpdate();
 

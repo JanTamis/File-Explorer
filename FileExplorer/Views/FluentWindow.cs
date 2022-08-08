@@ -35,7 +35,7 @@ public partial class FluentWindow : Window, IStyleable
 
 	public void ChangeState()
 	{
-		WindowState = WindowState == WindowState.Normal
+		WindowState = WindowState is WindowState.Normal
 			? WindowState.Maximized
 			: WindowState.Normal;
 	}

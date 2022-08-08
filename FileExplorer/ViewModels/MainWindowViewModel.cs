@@ -19,6 +19,7 @@ using FileExplorer.DisplayViews;
 using FileExplorer.Models;
 using FileExplorer.Providers;
 using Avalonia.Controls.ApplicationLifetimes;
+using Humanizer;
 
 namespace FileExplorer.ViewModels
 {
@@ -79,15 +80,26 @@ namespace FileExplorer.ViewModels
 			notificationManager = manager;
 
 			var drives = from drive in DriveInfo.GetDrives()
-									 where drive.IsReady
-									 select new FolderModel(PathHelper.FromPath(drive.RootDirectory.FullName), String.Empty, null);
+									 where drive.IsReady && drive.DriveType is DriveType.Removable or DriveType.Unknown
+									 select new FolderModel(PathHelper.FromPath(drive.RootDirectory.FullName), null, null);
 
-			// var quickAccess = from specialFolder in Enum.GetValues<KnownFolder>()
-			// 	select new FolderModel(PathHelper.FromPath(KnownFolders.GetPath(specialFolder).ToString()));
+			var quickAccess = from specialFolder in KnownFolders()
+												let path = Environment.GetFolderPath(specialFolder)
+												where !String.IsNullOrEmpty(path)
+												select new FolderModel(PathHelper.FromPath(path), Enum.GetName(specialFolder).Humanize(), null);
 
-			Folders = drives;
+			Folders = quickAccess.Concat(drives);
 
 			AddTab();
+
+			IEnumerable<Environment.SpecialFolder> KnownFolders()
+			{
+				yield return Environment.SpecialFolder.Desktop;
+				yield return Environment.SpecialFolder.MyDocuments;
+				yield return Environment.SpecialFolder.MyMusic;
+				yield return Environment.SpecialFolder.MyPictures;
+				yield return Environment.SpecialFolder.MyVideos;
+			}
 		}
 
 		private void Timer_Elapsed(object sender, ElapsedEventArgs e)

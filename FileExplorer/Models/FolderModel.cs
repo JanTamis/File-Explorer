@@ -38,9 +38,9 @@ public class FolderModel : IPathSegment
 		_folders = children;
 	}
 
-	public FolderModel(FileSystemTreeItem item, ReadOnlySpan<char> name, IEnumerable<FolderModel>? children)
+	public FolderModel(FileSystemTreeItem item, string name, IEnumerable<FolderModel>? children)
 	{
-		//_name = name.ToString();
+		_name = name;
 		_folders = children;
 		TreeItem = item;
 	}

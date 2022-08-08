@@ -69,6 +69,7 @@ public static class ThumbnailProvider
 				{
 					image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly, () => size is < 64 and >= 32);
 				}
+
 				if (image is null && (shouldReturnImage is null || shouldReturnImage?.Invoke() == true))
 				{
 					image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly, () => true);
@@ -166,6 +167,7 @@ public static class ThumbnailProvider
 				{
 					image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly, () => size is < 64 and >= 32);
 				}
+
 				if (image is null && (shouldReturnImage is null || shouldReturnImage?.Invoke() == true))
 				{
 					image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly, () => true);
@@ -181,17 +183,14 @@ public static class ThumbnailProvider
 
 			if (model.IsFolder)
 			{
-				if (OperatingSystem.IsWindows())
+				foreach (var folder in Enum.GetValues<Environment.SpecialFolder>())
 				{
-					foreach (var folder in Enum.GetValues<KnownFolder>())
-					{
-						var folderText = Enum.GetName(folder);
+					var folderText = Enum.GetName(folder);
 
-						if (folderText is not null && model.GetPath((path, knownFolder) => path.SequenceEqual(KnownFolders.GetPath(knownFolder)), folder))
-						{
-							name = folderText;
-							break;
-						}
+					if (folderText is not null && model.GetPath((path, knownFolder) => path.SequenceEqual(Environment.GetFolderPath(knownFolder)), folder))
+					{
+						name = folderText;
+						break;
 					}
 				}
 
@@ -207,7 +206,7 @@ public static class ThumbnailProvider
 
 				if (name == String.Empty)
 				{
-					name = model.Children.Any()
+					name = model.HasChildren
 						? "FolderFiles"
 						: "Folder";
 				}
