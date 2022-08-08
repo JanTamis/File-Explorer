@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using FileExplorer.Core.Interfaces;
+using FileExplorer.Helpers;
 
 namespace FileExplorer.Interfaces;
 
 public interface IFileViewer
 {
-	public IEnumerable<IFileItem> Items { get; set; }
+	public ObservableRangeCollection<IFileItem> Items { get; set; }
 
 	public Task<int> ItemCount { get; }
 

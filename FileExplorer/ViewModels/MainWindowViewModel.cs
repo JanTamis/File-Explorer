@@ -36,6 +36,18 @@ namespace FileExplorer.ViewModels
 
 		public IEnumerable<IPathSegment> Folders { get; set; }
 
+		public IPathSegment CurrentFolder
+		{
+			get => Folders.FirstOrDefault();
+			set
+			{
+				if (value is FolderModel { TreeItem: var treeItem })
+				{
+					SetPath(treeItem);
+				}
+			}
+		}
+
 		public ObservableRangeCollection<TabItemViewModel> Tabs { get; } = new();
 
 
@@ -53,7 +65,7 @@ namespace FileExplorer.ViewModels
 
 				this.OnPropertyChanged();
 
-				CurrentTab.UpdateFiles(false, "*").AsTask().ContinueWith(x =>
+				CurrentTab.UpdateFiles(false, "*").ContinueWith(x =>
 				{
 					var categories = Enum.GetValues<Categories>().Select(s => s + ":");
 					SearchHistory = categories.Concat(CurrentTab.Files.Select(s => "*" + s.Extension).Distinct());

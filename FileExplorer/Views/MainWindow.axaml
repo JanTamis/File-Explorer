@@ -1,19 +1,18 @@
 <views:FluentWindow xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:vm="using:FileExplorer.ViewModels"
                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                    xmlns:sys="using:System"
                     xmlns:system="clr-namespace:System;assembly=mscorlib"
                     xmlns:converters="using:FileExplorer.Converters"
-                    xmlns:controls="using:FileExplorer.Controls"
                     xmlns:styles="clr-namespace:Material.Styles;assembly=Material.Styles"
                     xmlns:models="clr-namespace:FileExplorer.Models"
                     xmlns:interfaces="clr-namespace:FileExplorer.Core.Interfaces;assembly=FileExplorer.Core"
                     xmlns:viewmodels="clr-namespace:FileExplorer.ViewModels"
                     xmlns:views="clr-namespace:FileExplorer.Views"
                     xmlns:assist="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+                    xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
                     xmlns:material="using:Material.Icons.Avalonia"
+                    xmlns:ripple="clr-namespace:Material.Ripple;assembly=Material.Ripple"
                     mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
                     x:Class="FileExplorer.Views.MainWindow"
                     x:Name="MainWindow"
@@ -28,555 +27,603 @@
                     WindowStartupLocation="CenterScreen"
                     xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
                     Title="FileExplorer">
-  <Window.Resources>
-    <system:Int32 x:Key="ImageSize">24</system:Int32>
-  </Window.Resources>
+	<Window.Resources>
+		<system:Int32 x:Key="ImageSize">24</system:Int32>
+	</Window.Resources>
 
-  <dialogHost:DialogHost CloseOnClickAway="True"
-                         OverlayBackground="Black"
-                         DialogContent="{Binding CurrentTab.PopupContent}"
-                         IsOpen="{Binding CurrentTab.PopupVisible}"
-                         Margin="{Binding #MainWindow.OffScreenMargin}">
-    <dialogHost:DialogHost.PopupTemplate>
-      <ControlTemplate>
-        <VisualLayerManager IsPopup="True" Name="PART_DialogPopupRoot" ClipToBounds="False">
-          <styles:Card Name="PART_ContentBackground"
-                       MinWidth="300"
-                       assist:ShadowAssist.ShadowDepth="CenterDepth5"
-                       Padding="0"
-                       CornerRadius="10"                            
-                       ClipToBounds="False">
-            <ContentPresenter Name="PART_ContentPresenter"
-                              Background="{TemplateBinding Background}"
-                              Margin="0"
-                              ContentTemplate="{TemplateBinding ContentTemplate}"
-                              Content="{TemplateBinding Content}"
-                              Padding="0" />
-          </styles:Card>
-        </VisualLayerManager>
-      </ControlTemplate>
-    </dialogHost:DialogHost.PopupTemplate>
+	<dialogHost:DialogHost CloseOnClickAway="True"
+	                       OverlayBackground="Black"
+	                       DialogContent="{Binding CurrentTab.PopupContent}"
+	                       IsOpen="{Binding CurrentTab.PopupVisible}"
+	                       Margin="{Binding #MainWindow.OffScreenMargin}">
+		<dialogHost:DialogHost.PopupTemplate>
+			<ControlTemplate>
+				<VisualLayerManager IsPopup="True" Name="PART_DialogPopupRoot" ClipToBounds="False">
+					<styles:Card Name="PART_ContentBackground"
+					             MinWidth="300"
+					             assist:ShadowAssist.ShadowDepth="CenterDepth5"
+					             Padding="0"
+					             CornerRadius="10"
+					             ClipToBounds="False">
+						<ContentPresenter Name="PART_ContentPresenter"
+						                  Background="{TemplateBinding Background}"
+						                  Margin="0"
+						                  ContentTemplate="{TemplateBinding ContentTemplate}"
+						                  Content="{TemplateBinding Content}"
+						                  Padding="0" />
+					</styles:Card>
+				</VisualLayerManager>
+			</ControlTemplate>
+		</dialogHost:DialogHost.PopupTemplate>
 
-    <Grid RowDefinitions="Auto, *">
-      <Grid ColumnDefinitions="*, Auto"
-            Grid.Row="0"
-            HorizontalAlignment="Left"
-            Margin="{Binding #MainWindow.TitleBarMargin}">
-        <TabStrip Items="{Binding Tabs}"
-                  SelectedItem="{Binding CurrentTab}">
-          <TabStrip.ItemsPanel>
-            <ItemsPanelTemplate>
-              <UniformGrid Rows="1" />
-            </ItemsPanelTemplate>
-          </TabStrip.ItemsPanel>
-          <TabStrip.DataTemplates>
-            <DataTemplate DataType="{x:Type viewmodels:TabItemViewModel}">
-              <Grid ColumnDefinitions="Auto, *, Auto, Auto"
-                    Margin="5">
-                <Image Grid.Column="0"
-		                   DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
-		                   Source="{Binding Result}"
-		                   Height="24"
-		                   Margin="0 0 4 0"
-		                   VerticalAlignment="Center" />
+		<Grid RowDefinitions="Auto, *">
+			<Grid ColumnDefinitions="*, Auto"
+			      Grid.Row="0"
+			      HorizontalAlignment="Left"
+			      Margin="{Binding #MainWindow.TitleBarMargin}">
+				<TabStrip Items="{Binding Tabs}"
+				          SelectedItem="{Binding CurrentTab}">
+					<TabStrip.ItemsPanel>
+						<ItemsPanelTemplate>
+							<UniformGrid Rows="1" />
+						</ItemsPanelTemplate>
+					</TabStrip.ItemsPanel>
 
-                <TextBlock Text="{Binding Path, Converter={StaticResource fileNameConverter}}"
-                  				 Foreground="{DynamicResource MaterialDesignBody}"
-                  				 FontWeight="{Binding IsSelected, Converter={x:Static converters:BoolToBoldConverter.Instance}}"
-                  				 TextTrimming="CharacterEllipsis"
-                  				 FontSize="14"
-                  				 VerticalAlignment="Center"
-                  				 HorizontalAlignment="Stretch"
-                  				 Grid.Column="1"
-                  				 IsVisible="{Binding $self.DesiredSize.Width, Mode=TwoWay, Converter={StaticResource minSizeConverter}, ConverterParameter=100}" />
+					<TabStrip.Styles>
+						<Style Selector="TabStrip > TabStripItem">
+							<Setter Property="Background" Value="Transparent" />
+							<Setter Property="MaxWidth" Value="2000" />
+							<Setter Property="assists:TabControlAssist.TabHeaderForeground"
+							        Value="{Binding Path=(assists:TabControlAssist.TabHeaderInactiveBrush), RelativeSource={RelativeSource AncestorType=TabStrip}}" />
+							<Setter Property="assists:ShadowAssist.ShadowDepth" Value="CenterDepth1"></Setter>
+							<Setter Property="Template">
+								<Setter.Value>
+									<ControlTemplate>
+										<Border Padding="7.5">
+											<styles:Card Padding="0"
+											             Background="{TemplateBinding Background}"
+											             assists:ShadowAssist.ShadowDepth="{Binding Path=(assists:ShadowAssist.ShadowDepth), RelativeSource={RelativeSource TemplatedParent}}">
+												<Grid Name="ItemContent"
+												      HorizontalAlignment="Stretch"
+												      VerticalAlignment="Stretch" MinWidth="200">
+													<ContentPresenter Name="headerContent"
+													                  Margin="0"
+													                  HorizontalAlignment="Stretch"
+													                  VerticalAlignment="Center"
+													                  BorderBrush="{TemplateBinding BorderBrush}"
+													                  BorderThickness="{TemplateBinding BorderThickness}"
+													                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+													                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+													                  Content="{TemplateBinding Content}"
+													                  TextBlock.Foreground="{Binding Path=(assists:TabControlAssist.TabHeaderForeground), RelativeSource={RelativeSource TemplatedParent}}" />
+												</Grid>
+											</styles:Card>
+										</Border>
+									</ControlTemplate>
+								</Setter.Value>
+							</Setter>
+						</Style>
 
-                <ProgressBar Classes="Circle"
-                             Grid.Column="2"
-                             Margin="5 0"
-                             IsIndeterminate="False"
-                             Value="{Binding Count}"
-                             Maximum="{Binding FileCount}"
-                             Foreground="{DynamicResource PrimaryHueMidBrush}"
-                             IsVisible="{Binding IsLoading}" />
+						<Style Selector="TabStrip > TabStripItem:selected">
+							<Setter Property="Background" Value="{DynamicResource MaterialDesignCardBackground}" />
+							<Setter Property="assists:ShadowAssist.ShadowDepth" Value="CenterDepth2"></Setter>
+						</Style>
+					</TabStrip.Styles>
 
-                <Button Background="Transparent"
-                        Width="20"
-                        Height="20"
-                        Padding="0"
-                        assist:ShadowAssist.ShadowDepth="Depth0"
-                        Grid.Column="3"
-                        Click="OnTabCloseClick"
-                        IsVisible="{Binding $parent[Window].DataContext.Tabs.Count, Converter={StaticResource moreThanConverter}, ConverterParameter=1}">
-                  <material:MaterialIcon Kind="Close"
-                                         Height="15"
-                                         Width="15"
-                                         Foreground="{DynamicResource MaterialDesignBody}" />
-                </Button>
-              </Grid>
-            </DataTemplate>
-          </TabStrip.DataTemplates>
+					<TabStrip.DataTemplates>
+						<DataTemplate DataType="{x:Type viewmodels:TabItemViewModel}">
+							<Grid ColumnDefinitions="Auto, *, Auto, Auto"
+							      Margin="5">
+								<Image Grid.Column="0"
+								       DataContext="{Binding TreeItem, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
+								       Source="{Binding Result}"
+								       Height="24"
+								       Margin="0 0 4 0"
+								       VerticalAlignment="Center" />
 
-          <TabStrip.Styles>
-            <Style Selector="TabStripItem">
-              <Setter Property="Padding" Value="10 0" />
-              <Setter Property="MinHeight" Value="25" />
-              <Setter Property="Cursor" Value="Hand" />
-              <Setter Property="ToolTip.Tip" Value="{Binding Path}" />
-            </Style>
-          </TabStrip.Styles>
-        </TabStrip>
+								<TextBlock Text="{Binding Path, Converter={StaticResource fileNameConverter}}"
+								           Foreground="{DynamicResource MaterialDesignBody}"
+								           FontWeight="{Binding IsSelected, Converter={x:Static converters:BoolToBoldConverter.Instance}}"
+								           TextTrimming="CharacterEllipsis"
+								           FontSize="14"
+								           VerticalAlignment="Center"
+								           HorizontalAlignment="Stretch"
+								           Grid.Column="1"
+								           IsVisible="{Binding $self.DesiredSize.Width, Mode=TwoWay, Converter={StaticResource minSizeConverter}, ConverterParameter=100}" />
 
-        <Viewbox Margin="0"
-                 Grid.Column="1"
-                 Padding="2">
-          <Button Cursor="Hand"
-                  assist:ShadowAssist.ShadowDepth="Depth0"
-                  Padding="0"
-                  Command="{Binding AddTab}"
-                  Background="Transparent"
-                  Margin="0 0 5 0">
-            <material:MaterialIcon Kind="Add"
-                                   Height="25"
-                                   Width="25"
-                                   Foreground="{DynamicResource MaterialDesignBodyLight}" />
-          </Button>
-        </Viewbox>
-      </Grid>
+								<ProgressBar Classes="Circle"
+								             Grid.Column="2"
+								             Margin="5 0"
+								             IsIndeterminate="False"
+								             Value="{Binding Count}"
+								             Maximum="{Binding FileCount}"
+								             Foreground="{DynamicResource PrimaryHueMidBrush}"
+								             IsVisible="{Binding IsLoading}" />
 
-      <Border Background="Transparent"
-              Grid.Row="1"
-              IsHitTestVisible="True">
-        <Grid RowDefinitions="Auto Auto *">
-          <Grid Grid.Row="1"
-                IsHitTestVisible="True"
-                ColumnDefinitions="Auto * Auto Auto"
-                Margin="5 0 5 5">
-            <StackPanel Orientation="Horizontal"
-                        Grid.Column="0">
-              <Button Classes="Flat"
-                      Command="{Binding Undo}"
-                      Padding="5">
-                <material:MaterialIcon Kind="ArrowBack"
-                                       Height="25"
-                                       Width="25"
-                                       Foreground="{DynamicResource MaterialDesignBody}" />
-              </Button>
-              <Button Classes="Flat"
-                      Command="{Binding Redo}"
-                      Padding="5">
-                <material:MaterialIcon Kind="ArrowForward"
-                                       Height="25"
-                                       Width="25"
-                                       Foreground="{DynamicResource MaterialDesignBody}" />
-              </Button>
+								<Button Background="Transparent"
+								        Width="20"
+								        Height="20"
+								        Padding="0"
+								        assist:ShadowAssist.ShadowDepth="Depth0"
+								        Grid.Column="3"
+								        Click="OnTabCloseClick"
+								        IsVisible="{Binding $parent[Window].DataContext.Tabs.Count, Converter={StaticResource moreThanConverter}, ConverterParameter=1}">
+									<material:MaterialIcon Kind="Close"
+									                       Height="15"
+									                       Width="15"
+									                       Foreground="{DynamicResource MaterialDesignBody}" />
+								</Button>
+							</Grid>
+						</DataTemplate>
+					</TabStrip.DataTemplates>
 
-              <Button Classes="Flat"
-                      Command="{Binding GoUp}"
-                      Padding="5">
-                <material:MaterialIcon Kind="ArrowUp"
-                                       Height="25"
-                                       Width="25"
-                                       Foreground="{DynamicResource MaterialDesignBody}" />
-              </Button>
+					<TabStrip.Styles>
+						<Style Selector="TabStripItem">
+							<Setter Property="Padding" Value="10 0" />
+							<Setter Property="MinHeight" Value="25" />
+							<Setter Property="Cursor" Value="Hand" />
+							<Setter Property="ToolTip.Tip" Value="{Binding Path}" />
+						</Style>
+					</TabStrip.Styles>
+				</TabStrip>
 
-              <Panel>
-                <Button Classes="Flat"
-                        IsVisible="{Binding !CurrentTab.IsLoading}"
-                        Command="{Binding Refresh}"
-                        Padding="5">
-                  <material:MaterialIcon Kind="Refresh"
-                                         Height="25"
-                                         Width="25"
-                                         Foreground="{DynamicResource MaterialDesignBody}" />
-                </Button>
+				<Viewbox Margin="0"
+				         Grid.Column="1"
+				         Padding="2">
+					<Button Cursor="Hand"
+					        assist:ShadowAssist.ShadowDepth="Depth0"
+					        Padding="0"
+					        Command="{Binding AddTab}"
+					        Background="Transparent"
+					        Margin="0 0 5 0">
+						<material:MaterialIcon Kind="Add"
+						                       Height="25"
+						                       Width="25"
+						                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
+					</Button>
+				</Viewbox>
+			</Grid>
 
-                <Button Classes="Flat"
-                        IsVisible="{Binding CurrentTab.IsLoading}"
-                        Command="{Binding CancelUpdateFiles}"
-                        Padding="5">
-                  <material:MaterialIcon Kind="SquareOutline"
-                                         Height="25"
-                                         Width="25"
-                                         Foreground="{DynamicResource MaterialDesignBody}" />
-                </Button>
-              </Panel>
-            </StackPanel>
+			<Border Background="Transparent"
+			        Grid.Row="1"
+			        IsHitTestVisible="True">
+				<Grid RowDefinitions="Auto Auto *">
+					<Grid Grid.Row="1"
+					      IsHitTestVisible="True"
+					      ColumnDefinitions="Auto * Auto Auto"
+					      Margin="5 0 5 5">
+						<StackPanel Orientation="Horizontal"
+						            Grid.Column="0">
+							<Button Classes="Flat"
+							        Command="{Binding Undo}"
+							        Padding="5">
+								<material:MaterialIcon Kind="ArrowBack"
+								                       Height="25"
+								                       Width="25"
+								                       Foreground="{DynamicResource MaterialDesignBody}" />
+							</Button>
+							<Button Classes="Flat"
+							        Command="{Binding Redo}"
+							        Padding="5">
+								<material:MaterialIcon Kind="ArrowForward"
+								                       Height="25"
+								                       Width="25"
+								                       Foreground="{DynamicResource MaterialDesignBody}" />
+							</Button>
 
-            <styles:Card assist:ShadowAssist.ShadowDepth="Depth1"
-                         Padding="0"
-                         Height="30"
-                         Margin="5 0"
-                         Grid.Column="1">
-              <ItemsRepeater Items="{Binding CurrentTab.Folders}">
-                <ItemsRepeater.Layout>
-                  <StackLayout Orientation="Horizontal" />
-                </ItemsRepeater.Layout>
-                <ItemsRepeater.ItemTemplate>
-                  <DataTemplate DataType="models:FolderModel">
-                    <StackPanel Orientation="Horizontal">
-                      <Button Classes="Flat"
-                              Command="{Binding $parent[Window].DataContext.SetPath}"
-                              CommandParameter="{Binding TreeItem}"
-                              VerticalAlignment="Stretch"
-                              Padding="10 0">
-                        <Button.ContextMenu>
-                          <ContextMenu Foreground="{DynamicResource MaterialDesignBody}"
-                                       MaxHeight="500"
-                                       Items="{Binding SubSegments}">
-                            <ContextMenu.Styles>
-                              <Style Selector="MenuItem">
-                                <Setter Property="Command" Value="{Binding $parent[Window].DataContext.SetPath}" />
-                                <Setter Property="CommandParameter" Value="{Binding TreeItem}" />
-                              </Style>
-                            </ContextMenu.Styles>
-                            <ContextMenu.ItemTemplate>
-                              <DataTemplate>
-                                <TextBlock Text="{Binding Name}"
-                                           FontWeight="Normal"
-                                           TextTrimming="CharacterEllipsis"
-                                           HorizontalAlignment="Stretch" />
-                              </DataTemplate>
-                            </ContextMenu.ItemTemplate>
-                          </ContextMenu>
-                        </Button.ContextMenu>
-                        <TextBlock Text="{Binding Name}"
-                                   FontWeight="Normal"
-                                   Foreground="{DynamicResource MaterialDesignBody}"
-                                   HorizontalAlignment="Stretch" />
-                      </Button>
-                    </StackPanel>
-                  </DataTemplate>
-                </ItemsRepeater.ItemTemplate>
-              </ItemsRepeater>
-            </styles:Card>
+							<Button Classes="Flat"
+							        Command="{Binding GoUp}"
+							        Padding="5">
+								<material:MaterialIcon Kind="ArrowUp"
+								                       Height="25"
+								                       Width="25"
+								                       Foreground="{DynamicResource MaterialDesignBody}" />
+							</Button>
 
-            <styles:Card assist:ShadowAssist.ShadowDepth="Depth1"
-                         MinWidth="150"
-                         Height="30"
-                         Padding="0"
-                         Margin="5 0"
-                         Grid.Column="2">
-              <TextBox Watermark="Search"
-                       x:Name="searchBar"
-                       Text="{Binding CurrentTab.Search}"
-                       VerticalAlignment="Stretch"
-                       Padding="0"
-                       Foreground="{DynamicResource MaterialDesignBody}"
-                       FontWeight="Normal"
-                       Margin="0"
-                       VerticalContentAlignment="Center">
-                <TextBox.InnerLeftContent>
-                  <Button Classes="Flat"
-                          Margin="0 0 2.5 0"
-                          Command="{Binding StartSearch}"
-                          Padding="5">
-                    <material:MaterialIcon Kind="Search"
-                                           Height="20"
-                                           Width="20"
-                                           Foreground="{DynamicResource MaterialDesignBodyLight}" />
-                  </Button>
+							<Panel>
+								<Button Classes="Flat"
+								        IsVisible="{Binding !CurrentTab.IsLoading}"
+								        Command="{Binding Refresh}"
+								        Padding="5">
+									<material:MaterialIcon Kind="Refresh"
+									                       Height="25"
+									                       Width="25"
+									                       Foreground="{DynamicResource MaterialDesignBody}" />
+								</Button>
 
-                </TextBox.InnerLeftContent>
-              </TextBox>
-            </styles:Card>
+								<Button Classes="Flat"
+								        IsVisible="{Binding CurrentTab.IsLoading}"
+								        Command="{Binding CancelUpdateFiles}"
+								        Padding="5">
+									<material:MaterialIcon Kind="SquareOutline"
+									                       Height="25"
+									                       Width="25"
+									                       Foreground="{DynamicResource MaterialDesignBody}" />
+								</Button>
+							</Panel>
+						</StackPanel>
 
-            <StackPanel Grid.Column="3"
-                        Orientation="Horizontal">
-              <Button Classes="Flat"
-                      Command="{Binding ShowSettings}"
-                      Padding="5">
-                <material:MaterialIcon Kind="Settings"
-                                       Height="25"
-                                       Width="25"
-                                       Foreground="{DynamicResource MaterialDesignBody}" />
-              </Button>
-            </StackPanel>
-          </Grid>
+						<styles:Card assist:ShadowAssist.ShadowDepth="Depth1"
+						             Padding="0"
+						             Height="30"
+						             Grid.Column="1">
+							<TabStrip Items="{Binding CurrentTab.Folders}">
+								<TabStrip.ItemsPanel>
+									<ItemsPanelTemplate>
+										<UniformGrid Rows="1" HorizontalAlignment="Left" />
+									</ItemsPanelTemplate>
+								</TabStrip.ItemsPanel>
 
-          <Border Grid.Row="2"
-                  BorderThickness="0 1 0 0"
-                  BorderBrush="{DynamicResource WindowBorder}">
-            <Grid ColumnDefinitions="200, 5, *">
+								<TabStrip.Styles>
+									<Style Selector="TabStrip > TabStripItem">
+										<Setter Property="Background" Value="Transparent" />
+										<Setter Property="assists:TabControlAssist.TabHeaderForeground"
+										        Value="{Binding Path=(assists:TabControlAssist.TabHeaderInactiveBrush), RelativeSource={RelativeSource AncestorType=TabStrip}}" />
+										<Setter Property="Template">
+											<Setter.Value>
+												<ControlTemplate>
+													<Grid Name="ItemContent" Background="{TemplateBinding Background}"
+													      HorizontalAlignment="Stretch"
+													      VerticalAlignment="Stretch">
+														<ripple:RippleEffect RippleFill="{Binding Path=(assists:TabControlAssist.TabHeaderHighlightBrush), RelativeSource={RelativeSource AncestorType=TabStrip}}">
+															<ContentPresenter Name="headerContent"
+															                  Margin="10,0" HorizontalAlignment="Center"
+															                  VerticalAlignment="Center"
+															                  Background="{TemplateBinding Background}"
+															                  BorderBrush="{TemplateBinding BorderBrush}"
+															                  BorderThickness="{TemplateBinding BorderThickness}"
+															                  ContentTemplate="{TemplateBinding ContentTemplate}"
+															                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+															                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+															                  Content="{TemplateBinding Content}"
+															                  TextBlock.Foreground="{Binding Path=(assists:TabControlAssist.TabHeaderForeground), RelativeSource={RelativeSource TemplatedParent}}" />
+														</ripple:RippleEffect>
+													</Grid>
+												</ControlTemplate>
+											</Setter.Value>
+										</Setter>
+									</Style>
+								</TabStrip.Styles>
 
-              <Grid RowDefinitions="Auto, *, Auto"
-                    Grid.ColumnSpan="2">
+								<TabStrip.ItemTemplate>
+									<DataTemplate DataType="models:FolderModel">
+										<TextBlock Text="{Binding Name}"
+										           FontWeight="Normal"
+										           TextTrimming="CharacterEllipsis"
+										           Foreground="{DynamicResource MaterialDesignBody}"
+										           HorizontalAlignment="Stretch" />
+									</DataTemplate>
+								</TabStrip.ItemTemplate>
+							</TabStrip>
+						</styles:Card>
 
-                <Border Grid.ColumnSpan="2"
-                        Background="{DynamicResource MaterialDesignCardBackground}"
-                        Grid.Row="1">
-                  <TreeView x:Name="FolderTree"
-                            Items="{Binding Folders}"
-                            ClipToBounds="True">
-                    <TreeView.Styles>
-                      <Style Selector="TreeViewItem">
-                        <Setter Property="Padding" Value="4" />
-                        <Setter Property="FocusAdorner" Value="{x:Null}" />
-                      </Style>
-                    </TreeView.Styles>
-                    <TreeView.DataTemplates>
-                      <TreeDataTemplate DataType="{x:Type interfaces:IPathSegment}">
-                        <StackPanel Orientation="Horizontal">
-                          <Image Source="{Binding Image^}"
-                                 x:DataType="interfaces:IPathSegment"
-                                 Width="24"
-                                 Height="24"
-                                 Margin="0 0 3 0" />
+						<styles:Card assist:ShadowAssist.ShadowDepth="Depth1"
+						             MinWidth="150"
+						             Height="30"
+						             Padding="0"
+						             Margin="5 0"
+						             Grid.Column="2">
+							<TextBox Watermark="Search"
+							         x:Name="searchBar"
+							         Text="{Binding CurrentTab.Search}"
+							         VerticalAlignment="Stretch"
+							         Padding="0"
+							         Foreground="{DynamicResource MaterialDesignBody}"
+							         FontWeight="Normal"
+							         Margin="0"
+							         VerticalContentAlignment="Center">
+								<TextBox.InnerLeftContent>
+									<Button Classes="Flat"
+									        Margin="0 0 2.5 0"
+									        Command="{Binding StartSearch}"
+									        Padding="5">
+										<material:MaterialIcon Kind="Search"
+										                       Height="20"
+										                       Width="20"
+										                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
+									</Button>
 
-                          <TextBlock Text="{Binding Name}"
-                                     Foreground="{DynamicResource MaterialDesignBody}"
-                                     VerticalAlignment="Center"
-                                     TextTrimming="CharacterEllipsis" />
-                        </StackPanel>
-                      </TreeDataTemplate>
-                    </TreeView.DataTemplates>
+								</TextBox.InnerLeftContent>
+							</TextBox>
+						</styles:Card>
 
-                    <TreeView.ItemsPanel>
-                      <ItemsPanelTemplate>
-                        <VirtualizingStackPanel Orientation="Vertical" />
-                      </ItemsPanelTemplate>
-                    </TreeView.ItemsPanel>
-                  </TreeView>
-                </Border>
-              </Grid>
+						<StackPanel Grid.Column="3"
+						            Orientation="Horizontal">
+							<Button Classes="Flat"
+							        Command="{Binding ShowSettings}"
+							        Padding="5">
+								<material:MaterialIcon Kind="Settings"
+								                       Height="25"
+								                       Width="25"
+								                       Foreground="{DynamicResource MaterialDesignBody}" />
+							</Button>
+						</StackPanel>
+					</Grid>
 
-              <GridSplitter ResizeDirection="Columns"
-                            ShowsPreview="False"
-                            Margin="0 0 -5 0"
-                            Background="Transparent"
-                            Grid.Column="1" />
+					<Border Grid.Row="2"
+					        BorderThickness="0 1 0 0"
+					        BorderBrush="{DynamicResource WindowBorder}">
+						<Grid ColumnDefinitions="200, 5, *">
 
-              <Border CornerRadius="0 0 0 0"
-                      Margin="2 0 0 0"
-                      Grid.Column="2">
-                <Grid RowDefinitions="Auto, *">
-                  <DockPanel ClipToBounds="True"
-                             Grid.Row="1">
-                    <Border>
-                      <Grid RowDefinitions="Auto, *, Auto">
+							<Grid RowDefinitions="Auto, *, Auto"
+							      Grid.ColumnSpan="2">
 
-                        <Border Margin="0 0 0 2"
-                                Grid.Row="0"
-                                Background="{DynamicResource MaterialDesignCardBackground}">
-                          <Grid ColumnDefinitions="Auto, *">
-                            <StackPanel Orientation="Horizontal">
-                              <Button Width="40"
-                                      Height="40"
-                                      ToolTip.Tip="Cut"
-                                      Classes="Flat">
-                                <Image Source="{SvgImage /Assets/UIIcons/Cut.svg}"
-                                       Width="30"
-                                       Height="30" />
-                              </Button>
-                              <Button Width="40"
-                                      Height="40"
-                                      ToolTip.Tip="Copy"
-                                      Classes="Flat">
-                                <Image Source="{SvgImage /Assets/UIIcons/Copy.svg}"
-                                       Width="30"
-                                       Height="30" />
-                              </Button>
+								<Border Grid.ColumnSpan="2"
+								        Background="{DynamicResource MaterialDesignCardBackground}"
+								        Grid.Row="1">
+									<TreeView x:Name="FolderTree"
+									          Items="{Binding Folders}"
+									          ClipToBounds="True">
+										<TreeView.Styles>
+											<Style Selector="TreeViewItem">
+												<Setter Property="Padding" Value="4" />
+												<Setter Property="FocusAdorner" Value="{x:Null}" />
+											</Style>
+										</TreeView.Styles>
+										<TreeView.DataTemplates>
+											<TreeDataTemplate DataType="{x:Type interfaces:IPathSegment}">
+												<StackPanel Orientation="Horizontal">
+													<Image Source="{Binding Image^}"
+													       x:DataType="interfaces:IPathSegment"
+													       Width="24"
+													       Height="24"
+													       Margin="0 0 3 0" />
 
-                              <Button Width="40"
-                                      Height="40"
-                                      ToolTip.Tip="Paste"
-                                      Classes="Flat">
-                                <Image Source="{SvgImage /Assets/UIIcons/Paste.svg}"
-                                       Width="30"
-                                       Height="30" />
-                              </Button>
-                              <Button Width="40"
-                                      Height="40"
-																			Command="{Binding DeleteFiles}"
-                                      ToolTip.Tip="Remove"
-                                      Classes="Flat">
-                                <Image Source="{SvgImage /Assets/UIIcons/Remove.svg}"
-                                       Width="30"
-                                       Height="30" />
-                              </Button>
+													<TextBlock Text="{Binding Name}"
+													           Foreground="{DynamicResource MaterialDesignBody}"
+													           VerticalAlignment="Center"
+													           TextTrimming="CharacterEllipsis" />
+												</StackPanel>
+											</TreeDataTemplate>
+										</TreeView.DataTemplates>
 
-                              <Border Width="1"
-                                      Margin="4 8"
-                                      Background="{DynamicResource MaterialDesignBodyLight}" />
+										<TreeView.ItemsPanel>
+											<ItemsPanelTemplate>
+												<VirtualizingStackPanel Orientation="Vertical" />
+											</ItemsPanelTemplate>
+										</TreeView.ItemsPanel>
+									</TreeView>
+								</Border>
+							</Grid>
 
-                              <Button Width="40"
-                                      Height="40"
-                                      IsVisible="{Binding CurrentTab.HasSelection}"
-                                      ToolTip.Tip="Properties"
-                                      Command="{Binding ShowProperties}"
-                                      Classes="Flat">
-                                <Image Source="{SvgImage /Assets/UIIcons/Properties.svg}"
-                                       Width="30"
-                                       Height="30" />
-                              </Button>
+							<GridSplitter ResizeDirection="Columns"
+							              ShowsPreview="False"
+							              Margin="0 0 -5 0"
+							              Background="Transparent"
+							              Grid.Column="1" />
 
-                              <Button Width="40"
-                                      Height="40"
-                                      IsVisible="{Binding CurrentTab.HasSelection}"
-                                      ToolTip.Tip="Zip Selected Files"
-                                      Command="{Binding ZipFiles}"
-                                      Classes="Flat">
-                                <Image Source="{SvgImage /Assets/UIIcons/Zip.svg}"
-                                       Width="30"
-                                       Height="30" />
-                              </Button>
+							<Border CornerRadius="0 0 0 0"
+							        Margin="2 0 0 0"
+							        Grid.Column="2">
+								<Grid RowDefinitions="Auto, *">
+									<DockPanel ClipToBounds="True"
+									           Grid.Row="1">
+										<Border>
+											<Grid RowDefinitions="Auto, *, Auto">
 
-                              <Border Width="1"
-                                      IsVisible="{Binding CurrentTab.HasSelection}"
-                                      Margin="4 8"
-                                      Background="{DynamicResource MaterialDesignBodyLight}" />
-                            </StackPanel>
+												<Border Margin="0 0 0 2"
+												        Grid.Row="0"
+												        Background="{DynamicResource MaterialDesignCardBackground}">
+													<Grid ColumnDefinitions="Auto, *">
+														<StackPanel Orientation="Horizontal">
+															<Button Width="40"
+															        Height="40"
+															        ToolTip.Tip="Cut"
+															        Classes="Flat">
+																<Image Source="{SvgImage /Assets/UIIcons/Cut.svg}"
+																       Width="30"
+																       Height="30" />
+															</Button>
+															<Button Width="40"
+															        Height="40"
+															        ToolTip.Tip="Copy"
+															        Classes="Flat">
+																<Image Source="{SvgImage /Assets/UIIcons/Copy.svg}"
+																       Width="30"
+																       Height="30" />
+															</Button>
 
-                            <!-- <StackPanel Orientation="Horizontal" -->
-                            <!--             Grid.Column="1" -->
-                            <!--             HorizontalAlignment="Right"> -->
-                            <!-- <material:MaterialIcon Kind="FilterVariant" -->
-														              <!--          Height="25" -->
-														              <!--          Width="25" -->
-														              <!--          Foreground="{DynamicResource MaterialDesignBodyLight}" />-->
-                            <!-- -->
-                            <!--   <Border Width="1" -->
-                            <!--           Margin="4 8" -->
-                            <!--           Background="{DynamicResource MaterialDesignBodyLight}" /> -->
-                            <!-- -->
-                            <!--   <Image Source="{SvgImage /Assets/UIIcons/Filter.svg}" -->
-                            <!--          Width="21" -->
-                            <!--          Margin="0 0 5 0" -->
-                            <!--          Height="21" /> -->
-                            <!-- -->
-                            <!--   <ComboBox BorderThickness="0" -->
-                            <!--             Padding="0 0 6 0" -->
-                            <!--             Margin="0" -->
-                            <!--             Background="Transparent" -->
-                            <!--             Foreground="{DynamicResource MaterialDesignBody}" -->
-                            <!--             VerticalAlignment="Stretch" -->
-                            <!--             PlaceholderForeground="red" -->
-                            <!--             SelectedItem="{Binding CurrentTab.Sort}" -->
-                            <!--             Items="{Binding SortValues}" /> -->
-                            <!-- -->
-                            <!--   <ComboBox Items="{Binding Converter={StaticResource enumToValuesConverter}, ConverterParameter={x:Type models:ViewTypes}}" -->
-                            <!--             Background="Transparent" -->
-                            <!--             SelectedItem="{Binding CurrentTab.CurrentViewMode}" -->
-                            <!--             Foreground="{DynamicResource MaterialDesignBody}"> -->
-                            <!--     <ComboBox.ItemTemplate> -->
-                            <!--       <DataTemplate> -->
-                            <!--         <StackPanel Orientation="Horizontal"> -->
-                            <!--           <Image Source="{Binding Converter={x:Static converters:EnumToIconConverter.Instance}, ConverterParameter={x:Type models:ViewTypes}}" -->
-                            <!--                  Width="21" -->
-                            <!--                  Height="21" -->
-                            <!--                  Margin="0 0 5 0" /> -->
-                            <!--           <TextBlock Text="{Binding Converter={x:Static converters:EnumToTextConverter.Instance}}" -->
-                            <!--                      Foreground="{DynamicResource MaterialDesignBody}" /> -->
-                            <!--         </StackPanel> -->
-                            <!--       </DataTemplate> -->
-                            <!--     </ComboBox.ItemTemplate> -->
-                            <!--   </ComboBox> -->
-                            <!-- -->
-                            <!--   ~1~ <ListBox HorizontalAlignment="Right" @1@ -->
-                            <!--   ~1~          Background="Transparent" > @1@ -->
-                            <!--   ~1~   <ListBox.ItemsPanel> @1@ -->
-                            <!--   ~1~     <ItemsPanelTemplate> @1@ -->
-                            <!--   ~1~       <StackPanel Orientation="Horizontal" /> @1@ -->
-                            <!--   ~1~     </ItemsPanelTemplate> @1@ -->
-                            <!--   ~1~   </ListBox.ItemsPanel> @1@ -->
-                            <!--   ~1~   <ListBoxItem Padding="7.5" @1@ -->
-                            <!--   ~1~                Background="Transparent" @1@ -->
-                            <!--   ~1~                Foreground="{DynamicResource MaterialDesignBody}" @1@ -->
-                            <!--   ~1~                IsSelected="{Binding !CurrentTab.IsGrid, Mode=TwoWay}"> @1@ -->
-                            <!--   ~1~     <material:MaterialIcon Kind="FormatListText" @1@ -->
-                            <!--   ~1~          Height="25" @1@ -->
-                            <!--   ~1~          Width="25" @1@ -->
-                            <!--   ~1~          Foreground="{DynamicResource MaterialDesignBodyLight}" />@1@ -->
-                            <!--   ~1~     <Image Source="{SvgImage /Assets/UIIcons/List.svg}" @1@ -->
-                            <!--   ~1~            Width="25" @1@ -->
-                            <!--   ~1~            Height="25" /> @1@ -->
-                            <!--   ~1~   </ListBoxItem> @1@ -->
-                            <!--   ~1~   <ListBoxItem Padding="7.5" @1@ -->
-                            <!--   ~1~                Background="Transparent" @1@ -->
-                            <!--   ~1~                Foreground="{DynamicResource MaterialDesignBody}" @1@ -->
-                            <!--   ~1~                IsSelected="{Binding CurrentTab.IsGrid, Mode=TwoWay}"> @1@ -->
-                            <!--   ~1~     <material:MaterialIcon Kind="Grid" @1@ -->
-                            <!--   ~1~          Height="25" @1@ -->
-                            <!--   ~1~          Width="25" @1@ -->
-                            <!--   ~1~          Foreground="{DynamicResource MaterialDesignBodyLight}" />@1@ -->
-                            <!--   ~1~     <Image Source="{SvgImage /Assets/UIIcons/Grid.svg}" @1@ -->
-                            <!--   ~1~            Width="25" @1@ -->
-                            <!--   ~1~            Height="25" /> @1@ -->
-                            <!--   ~1~   </ListBoxItem> @1@ -->
-                            <!--   ~1~ </ListBox> @1@ -->
-                            <!-- </StackPanel> -->
-                          </Grid>
-                        </Border>
+															<Button Width="40"
+															        Height="40"
+															        ToolTip.Tip="Paste"
+															        Classes="Flat">
+																<Image Source="{SvgImage /Assets/UIIcons/Paste.svg}"
+																       Width="30"
+																       Height="30" />
+															</Button>
+															<Button Width="40"
+															        Height="40"
+															        Command="{Binding DeleteFiles}"
+															        ToolTip.Tip="Remove"
+															        Classes="Flat">
+																<Image Source="{SvgImage /Assets/UIIcons/Remove.svg}"
+																       Width="30"
+																       Height="30" />
+															</Button>
 
-                        <ContentControl Content="{Binding CurrentTab.DisplayControl}"
-                                        Grid.Row="1"
-                                        Background="{DynamicResource MaterialDesignCardBackground}" />
+															<Border Width="1"
+															        Margin="4 8"
+															        Background="{DynamicResource MaterialDesignBodyLight}" />
 
-                        <!-- Failed Search -->
-                        <Border Grid.Row="1"
-                                VerticalAlignment="Center"
-                                HorizontalAlignment="Center"
-                                Background="transparent"
-                                IsVisible="{Binding CurrentTab.SearchFailed}"
-                                Padding="10 5 10 10">
-                          <Viewbox MaxWidth="300"
-                                   MaxHeight="300">
-                            <StackPanel>
-                              <Image Source="{SvgImage /Assets/UIIcons/FailedSearch.svg}"
-                                     Width="200"
-                                     Height="200" />
+															<Button Width="40"
+															        Height="40"
+															        IsVisible="{Binding CurrentTab.HasSelection}"
+															        ToolTip.Tip="Properties"
+															        Command="{Binding ShowProperties}"
+															        Classes="Flat">
+																<Image Source="{SvgImage /Assets/UIIcons/Properties.svg}"
+																       Width="30"
+																       Height="30" />
+															</Button>
 
-                              <TextBlock Text="No Files or Directories found..."
-                                         FontWeight="SemiBold"
-                                         FontSize="21" />
-                            </StackPanel>
-                          </Viewbox>
-                        </Border>
+															<Button Width="40"
+															        Height="40"
+															        IsVisible="{Binding CurrentTab.HasSelection}"
+															        ToolTip.Tip="Zip Selected Files"
+															        Command="{Binding ZipFiles}"
+															        Classes="Flat">
+																<Image Source="{SvgImage /Assets/UIIcons/Zip.svg}"
+																       Width="30"
+																       Height="30" />
+															</Button>
 
-                        <Border Grid.Row="2"
-                                Margin="0 2 0 0"
-                                Background="{DynamicResource MaterialDesignCardBackground}"
-                                Height="35">
-                          <Grid ColumnDefinitions="*, Auto">
-                            <StackPanel Orientation="Horizontal"
-                                        Margin="5 0 0 0">
-                              <Label Content="{Binding CurrentTab.FileCount, StringFormat={}{0:N0} items}"
-                                     FontWeight="Normal"
-                                     FontSize="14"
-                                     Foreground="{DynamicResource MaterialDesignBody}"
-                                     VerticalAlignment="Center" />
+															<Border Width="1"
+															        IsVisible="{Binding CurrentTab.HasSelection}"
+															        Margin="4 8"
+															        Background="{DynamicResource MaterialDesignBodyLight}" />
+														</StackPanel>
 
-                              <Border Width="1"
-                                      Margin="4 8" />
+														<!-- <StackPanel Orientation="Horizontal" -->
+														<!--             Grid.Column="1" -->
+														<!--             HorizontalAlignment="Right"> -->
+														<!-- <material:MaterialIcon Kind="FilterVariant" -->
+														<!--          Height="25" -->
+														<!--          Width="25" -->
+														<!--          Foreground="{DynamicResource MaterialDesignBodyLight}" />-->
+														<!-- -->
+														<!--   <Border Width="1" -->
+														<!--           Margin="4 8" -->
+														<!--           Background="{DynamicResource MaterialDesignBodyLight}" /> -->
+														<!-- -->
+														<!--   <Image Source="{SvgImage /Assets/UIIcons/Filter.svg}" -->
+														<!--          Width="21" -->
+														<!--          Margin="0 0 5 0" -->
+														<!--          Height="21" /> -->
+														<!-- -->
+														<!--   <ComboBox BorderThickness="0" -->
+														<!--             Padding="0 0 6 0" -->
+														<!--             Margin="0" -->
+														<!--             Background="Transparent" -->
+														<!--             Foreground="{DynamicResource MaterialDesignBody}" -->
+														<!--             VerticalAlignment="Stretch" -->
+														<!--             PlaceholderForeground="red" -->
+														<!--             SelectedItem="{Binding CurrentTab.Sort}" -->
+														<!--             Items="{Binding SortValues}" /> -->
+														<!-- -->
+														<!--   <ComboBox Items="{Binding Converter={StaticResource enumToValuesConverter}, ConverterParameter={x:Type models:ViewTypes}}" -->
+														<!--             Background="Transparent" -->
+														<!--             SelectedItem="{Binding CurrentTab.CurrentViewMode}" -->
+														<!--             Foreground="{DynamicResource MaterialDesignBody}"> -->
+														<!--     <ComboBox.ItemTemplate> -->
+														<!--       <DataTemplate> -->
+														<!--         <StackPanel Orientation="Horizontal"> -->
+														<!--           <Image Source="{Binding Converter={x:Static converters:EnumToIconConverter.Instance}, ConverterParameter={x:Type models:ViewTypes}}" -->
+														<!--                  Width="21" -->
+														<!--                  Height="21" -->
+														<!--                  Margin="0 0 5 0" /> -->
+														<!--           <TextBlock Text="{Binding Converter={x:Static converters:EnumToTextConverter.Instance}}" -->
+														<!--                      Foreground="{DynamicResource MaterialDesignBody}" /> -->
+														<!--         </StackPanel> -->
+														<!--       </DataTemplate> -->
+														<!--     </ComboBox.ItemTemplate> -->
+														<!--   </ComboBox> -->
+														<!-- -->
+														<!--   ~1~ <ListBox HorizontalAlignment="Right" @1@ -->
+														<!--   ~1~          Background="Transparent" > @1@ -->
+														<!--   ~1~   <ListBox.ItemsPanel> @1@ -->
+														<!--   ~1~     <ItemsPanelTemplate> @1@ -->
+														<!--   ~1~       <StackPanel Orientation="Horizontal" /> @1@ -->
+														<!--   ~1~     </ItemsPanelTemplate> @1@ -->
+														<!--   ~1~   </ListBox.ItemsPanel> @1@ -->
+														<!--   ~1~   <ListBoxItem Padding="7.5" @1@ -->
+														<!--   ~1~                Background="Transparent" @1@ -->
+														<!--   ~1~                Foreground="{DynamicResource MaterialDesignBody}" @1@ -->
+														<!--   ~1~                IsSelected="{Binding !CurrentTab.IsGrid, Mode=TwoWay}"> @1@ -->
+														<!--   ~1~     <material:MaterialIcon Kind="FormatListText" @1@ -->
+														<!--   ~1~          Height="25" @1@ -->
+														<!--   ~1~          Width="25" @1@ -->
+														<!--   ~1~          Foreground="{DynamicResource MaterialDesignBodyLight}" />@1@ -->
+														<!--   ~1~     <Image Source="{SvgImage /Assets/UIIcons/List.svg}" @1@ -->
+														<!--   ~1~            Width="25" @1@ -->
+														<!--   ~1~            Height="25" /> @1@ -->
+														<!--   ~1~   </ListBoxItem> @1@ -->
+														<!--   ~1~   <ListBoxItem Padding="7.5" @1@ -->
+														<!--   ~1~                Background="Transparent" @1@ -->
+														<!--   ~1~                Foreground="{DynamicResource MaterialDesignBody}" @1@ -->
+														<!--   ~1~                IsSelected="{Binding CurrentTab.IsGrid, Mode=TwoWay}"> @1@ -->
+														<!--   ~1~     <material:MaterialIcon Kind="Grid" @1@ -->
+														<!--   ~1~          Height="25" @1@ -->
+														<!--   ~1~          Width="25" @1@ -->
+														<!--   ~1~          Foreground="{DynamicResource MaterialDesignBodyLight}" />@1@ -->
+														<!--   ~1~     <Image Source="{SvgImage /Assets/UIIcons/Grid.svg}" @1@ -->
+														<!--   ~1~            Width="25" @1@ -->
+														<!--   ~1~            Height="25" /> @1@ -->
+														<!--   ~1~   </ListBoxItem> @1@ -->
+														<!--   ~1~ </ListBox> @1@ -->
+														<!-- </StackPanel> -->
+													</Grid>
+												</Border>
 
-                              <Label Content="{Binding CurrentTab.SelectionText^}"
-                                     DataContext=""
-                                     FontWeight="Normal"
-                                     Margin="0"
-                                     FontSize="14"
-                                     Foreground="{DynamicResource MaterialDesignBody}"
-                                     VerticalAlignment="Center" />
+												<ContentControl Content="{Binding CurrentTab.DisplayControl}"
+												                Grid.Row="1"
+												                Background="{DynamicResource MaterialDesignCardBackground}" />
 
-                              <Label Content="{Binding CurrentTab.SearchText}"
-                                     FontWeight="Normal"
-                                     Margin="0"
-                                     FontSize="14"
-                                     Foreground="{DynamicResource MaterialDesignBody}"
-                                     VerticalAlignment="Center" />
-                            </StackPanel>
-                          </Grid>
-                        </Border>
-                      </Grid>
-                    </Border>
-                  </DockPanel>
-                </Grid>
-              </Border>
-            </Grid>
-          </Border>
-        </Grid>
-      </Border>
+												<!-- Failed Search -->
+												<Border Grid.Row="1"
+												        VerticalAlignment="Center"
+												        HorizontalAlignment="Center"
+												        Background="transparent"
+												        IsVisible="{Binding CurrentTab.SearchFailed}"
+												        Padding="10 5 10 10">
+													<Viewbox MaxWidth="300"
+													         MaxHeight="300">
+														<StackPanel>
+															<Image Source="{SvgImage /Assets/UIIcons/FailedSearch.svg}"
+															       Width="200"
+															       Height="200" />
 
-      <!-- popup -->
+															<TextBlock Text="No Files or Directories found..."
+															           FontWeight="SemiBold"
+															           FontSize="21" />
+														</StackPanel>
+													</Viewbox>
+												</Border>
 
-    </Grid>
-  </dialogHost:DialogHost>
+												<Border Grid.Row="2"
+												        Margin="0 2 0 0"
+												        Background="{DynamicResource MaterialDesignCardBackground}"
+												        Height="35">
+													<Grid ColumnDefinitions="*, Auto">
+														<StackPanel Orientation="Horizontal"
+														            Margin="5 0 0 0">
+															<Label Content="{Binding CurrentTab.FileCount, StringFormat={}{0:N0} items}"
+															       FontWeight="Normal"
+															       FontSize="14"
+															       Foreground="{DynamicResource MaterialDesignBody}"
+															       VerticalAlignment="Center" />
+
+															<Border Width="1"
+															        Margin="4 8" />
+
+															<Label Content="{Binding CurrentTab.SelectionText^}"
+															       DataContext=""
+															       FontWeight="Normal"
+															       Margin="0"
+															       FontSize="14"
+															       Foreground="{DynamicResource MaterialDesignBody}"
+															       VerticalAlignment="Center" />
+
+															<Label Content="{Binding CurrentTab.SearchText}"
+															       FontWeight="Normal"
+															       Margin="0"
+															       FontSize="14"
+															       Foreground="{DynamicResource MaterialDesignBody}"
+															       VerticalAlignment="Center" />
+														</StackPanel>
+													</Grid>
+												</Border>
+											</Grid>
+										</Border>
+									</DockPanel>
+								</Grid>
+							</Border>
+						</Grid>
+					</Border>
+				</Grid>
+			</Border>
+
+			<!-- popup -->
+
+		</Grid>
+	</dialogHost:DialogHost>
 </views:FluentWindow>

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using FileExplorer.DisplayViews;
 using FileExplorer.Interfaces;
 using FileExplorer.Providers;
@@ -15,180 +16,72 @@ using FileExplorer.Core.Interfaces;
 
 namespace FileExplorer.ViewModels;
 
-public class TabItemViewModel : ViewModelBase
+[INotifyPropertyChanged]
+public partial class TabItemViewModel
 {
-	private string _search = String.Empty;
-	private string? _path;
-
-	private ObservableRangeCollection<IFileItem> _files = new();
-
-	private bool _isUserEntered = true;
-	private bool _isLoading;
-	private bool _isSelected;
-
-	private ViewTypes _currentViewMode = ViewTypes.Tree;
-
 	private readonly Stack<string?> _undoStack = new();
 	private readonly Stack<string?> _redoStack = new();
 
 	public CancellationTokenSource? TokenSource;
+
+	private bool _isUserEntered = true;
+
+	[ObservableProperty]
+	private string _search = String.Empty;
+
+	[ObservableProperty]
+	[NotifyPropertyChangedFor(nameof(FolderName))]
+	[NotifyPropertyChangedFor(nameof(Folders))]
+	private string? _path;
+
+	[ObservableProperty]
+	[NotifyPropertyChangedFor(nameof(SearchFailed))]
+	private ObservableRangeCollection<IFileItem> _files = new();
+
+	[ObservableProperty]
+	[NotifyPropertyChangedFor(nameof(SearchFailed))]
+	private bool _isLoading;
+
+	[ObservableProperty]
+	private bool _isSelected;
+
+	[ObservableProperty]
+	private int _fileCount;
+
+	[ObservableProperty]
+	private ViewTypes _currentViewMode = ViewTypes.Tree;
+
+	[ObservableProperty]
 	private IFileViewer _displayControl = new Quickstart();
 
+	[ObservableProperty]
+	[NotifyPropertyChangedFor(nameof(PopupVisible))]
 	private IPopup? _popupContent;
 
+	[ObservableProperty]
 	private SortEnum _sort = SortEnum.None;
+
+	[ObservableProperty]
 	private IItemProvider _provider = new FileSystemProvider();
 
 	public event Action? PathChanged;
-
-	public IItemProvider Provider
-	{
-		get => _provider;
-		set => OnPropertyChanged(ref _provider, value);
-	}
-
-	public SortEnum Sort
-	{
-		get => _sort;
-		set => OnPropertyChanged(ref _sort, value);
-	}
 
 	public int SelectionCount => Files.Count(file => file.IsSelected);
 
 	public IEnumerable<IPathSegment> Folders => Provider.GetPath(Path);
 
-	public bool IsSelected
-	{
-		get => _isSelected;
-		set => OnPropertyChanged(ref _isSelected, value);
-	}
-
-	public int FileCount => Files.Count;
-
-	public bool IsLoading
-	{
-		get => _isLoading;
-		set
-		{
-			OnPropertyChanged(ref _isLoading, value);
-			OnPropertyChanged(nameof(SearchFailed));
-		}
-	}
 
 	public bool SearchFailed => !IsLoading && !Files.Any() && DisplayControl is not Quickstart;
 
-	public ObservableRangeCollection<IFileItem> Files
-	{
-		get => _files;
-		set
-		{
-			OnPropertyChanged(ref _files, value);
-			OnPropertyChanged(nameof(SearchFailed));
-
-			Dispatcher.UIThread.InvokeAsync(() => DisplayControl.Items = value);
-		}
-	}
-
-	public string? Path
-	{
-		get => _path;
-		set
-		{
-			OnPropertyChanged(ref _path, value);
-
-			PathChanged?.Invoke();
-
-			OnPropertyChanged(nameof(FolderName));
-
-			if (value is null && DisplayControl is not Quickstart)
-			{
-				DisplayControl = new Quickstart();
-			}
-			else
-			{
-				CurrentViewMode = CurrentViewMode;
-			}
-
-			if (_isUserEntered && (!_undoStack.TryPeek(out var tempPath) || tempPath != Path))
-			{
-				_undoStack.Push(Path);
-				_redoStack.Clear();
-			}
-
-			OnPropertyChanged(nameof(FolderName));
-			OnPropertyChanged(nameof(Folders));
-
-			IsSearching = false;
-		}
-	}
-
 	public string? FolderName => System.IO.Path.GetDirectoryName(Path);
 
-	public string Search
-	{
-		get => _search;
-		set => OnPropertyChanged(ref _search, value);
-	}
-
-	public IFileViewer DisplayControl
-	{
-		get => _displayControl;
-		set
-		{
-			OnPropertyChanged(ref _displayControl, value);
-
-			value.PathChanged += async path => await SetPath(path);
-			value.SelectionChanged += () => OnPropertyChanged(nameof(SelectionCount));
-
-			value.Items = Files;
-		}
-	}
-
 	public bool IsSearching { get; set; }
-
-	public ViewTypes CurrentViewMode
-	{
-		get => _currentViewMode;
-		set
-		{
-			OnPropertyChanged(ref _currentViewMode, value);
-
-			DisplayControl = value switch
-			{
-				ViewTypes.Grid => new FileGrid(),
-				ViewTypes.List => new FileDataGrid(),
-				ViewTypes.Tree => new FileTreeGrid(),
-				_ => new FileDataGrid(),
-			};
-		}
-	}
-
-	public IPopup? PopupContent
-	{
-		get => _popupContent;
-		set
-		{
-			OnPropertyChanged(ref _popupContent, value);
-
-			if (PopupContent is not null)
-			{
-				PopupContent.OnClose += () =>
-				{
-					_popupContent = null;
-					OnPropertyChanged(nameof(PopupVisible));
-				};
-			}
-
-			OnPropertyChanged(nameof(PopupVisible));
-		}
-	}
 
 	public bool PopupVisible => _popupContent is not null;
 
 	public TabItemViewModel()
 	{
-		CurrentViewMode = ViewTypes.Tree;
-		Files.CountChanged += i => OnPropertyChanged(nameof(FileCount));
+		Files.CountChanged += count => FileCount = count;
 	}
 
 	public string? Undo()
@@ -224,7 +117,7 @@ public class TabItemViewModel : ViewModelBase
 		}
 	}
 
-	public async ValueTask UpdateFiles(bool recursive, string search)
+	public async Task UpdateFiles(bool recursive, string search)
 	{
 		TokenSource?.Cancel();
 		TokenSource = new CancellationTokenSource();
@@ -251,7 +144,7 @@ public class TabItemViewModel : ViewModelBase
 
 					if (result is 0)
 					{
-						result = x.Name.CompareTo(y.Name);
+						result = String.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
 					}
 
 					return result;
@@ -264,12 +157,7 @@ public class TabItemViewModel : ViewModelBase
 
 	public async ValueTask SetPath(string? path)
 	{
-		if (path is null)
-		{
-			Path = path;
-			DisplayControl = new Quickstart();
-		}
-		else if (!Directory.Exists(path))
+		if (!Directory.Exists(path))
 		{
 			await Task.Run(() =>
 			{
@@ -293,5 +181,70 @@ public class TabItemViewModel : ViewModelBase
 			Path = path;
 			await UpdateFiles(false, "*");
 		}
+	}
+
+	async partial void OnFilesChanged(ObservableRangeCollection<IFileItem> value)
+	{
+		if (Dispatcher.UIThread.CheckAccess())
+		{
+			DisplayControl.Items = value;
+		}
+		else
+		{
+			await Dispatcher.UIThread.InvokeAsync(() => DisplayControl.Items = value);
+		}
+	}
+
+	partial void OnDisplayControlChanged(IFileViewer value)
+	{
+		value.PathChanged += async path => await SetPath(path);
+		value.SelectionChanged += () => OnPropertyChanged(nameof(SelectionCount));
+
+		value.Items = Files;
+	}
+
+	partial void OnCurrentViewModeChanged(ViewTypes value)
+	{
+		DisplayControl = value switch
+		{
+			ViewTypes.Grid => new FileGrid(),
+			ViewTypes.List => new FileDataGrid(),
+			ViewTypes.Tree => new FileTreeGrid(),
+			_ => new FileDataGrid(),
+		};
+	}
+
+	partial void OnPopupContentChanged(IPopup? value)
+	{
+		if (value is not null)
+		{
+			value.OnClose += () =>
+			{
+				_popupContent = null;
+				OnPropertyChanged(nameof(PopupVisible));
+			};
+		}
+	}
+
+	partial void OnPathChanged(string? value)
+	{
+		PathChanged?.Invoke();
+
+		if (value is null && DisplayControl is not Quickstart)
+		{
+			DisplayControl = new Quickstart();
+		}
+		else
+		{
+			OnCurrentViewModeChanged(CurrentViewMode);
+		}
+
+		if (_isUserEntered && (!_undoStack.TryPeek(out var tempPath) || tempPath != Path))
+		{
+			_undoStack.Push(Path);
+			_redoStack.Clear();
+		}
+
+		IsSearching = false;
 	}
 }

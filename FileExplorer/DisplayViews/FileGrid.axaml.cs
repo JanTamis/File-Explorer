@@ -1,13 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using CommunityToolkit.Mvvm.ComponentModel;
 using FileExplorer.Core.Interfaces;
+using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
 using FileExplorer.Models;
 
@@ -16,35 +20,30 @@ namespace FileExplorer.DisplayViews;
 public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 {
 	private int anchorIndex = 0;
-		
+	new event PropertyChangedEventHandler? PropertyChanged = delegate { };
+
 	public event Action<string> PathChanged = delegate { };
 	public event Action SelectionChanged = delegate { };
+
+	private ObservableRangeCollection<IFileItem> _items;
 
 	public Action SelectAll { get; }
 	public Action SelectNone { get; }
 	public Action SelectInvert { get; }
 
-	public IEnumerable<IFileItem> Items
-	{
-		set
-		{
-			var grid = this.FindControl<ItemsRepeater>("fileList");
-
-			grid.Items = value;
-		}
-		get
-		{
-			var grid = this.FindControl<ItemsRepeater>("fileList");
-
-			return grid.Items as IEnumerable<IFileItem>;
-		}
-	}
-
 	public Task<int> ItemCount { get; set; }
+
+	public ObservableRangeCollection<IFileItem> Items
+	{
+		get => _items;
+		set => OnPropertyChanged(ref _items, value);
+	}
 
 	public FileGrid()
 	{
 		AvaloniaXamlLoader.Load(this);
+
+		DataContext = this;
 
 		var grid = this.FindControl<ItemsRepeater>("fileList");
 
@@ -133,5 +132,11 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 		{
 			PathChanged(model.TreeItem.GetPath(path => path.ToString()));
 		}
+	}
+
+	public void OnPropertyChanged<T>(ref T field, T value, [CallerMemberName] string? name = null)
+	{
+		field = value;
+		PropertyChanged.Invoke(this, new PropertyChangedEventArgs(name));
 	}
 }

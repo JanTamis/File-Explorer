@@ -32,7 +32,7 @@
   </Application.Resources>
 
   <Application.Styles>
-	  <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Orange" SecondaryColor="Orange" />
+	  <themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Blue" />
 
 	  <StyleInclude Source="avares://Material.Icons.Avalonia/App.xaml" />
 	  <StyleInclude Source="avares://DialogHost.Avalonia/Styles.xaml" />
@@ -40,46 +40,7 @@
 	  <!-- <FluentTheme Mode="Dark" /> -->
 	  <!-- <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml" /> -->
 
-    <Style Selector="TabStrip > TabStripItem">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="MaxWidth" Value="2000" />
-      <Setter Property="assists:TabControlAssist.TabHeaderForeground"
-			        Value="{Binding Path=(assists:TabControlAssist.TabHeaderInactiveBrush), RelativeSource={RelativeSource AncestorType=TabStrip}}" />
-      <Setter Property="assists:ShadowAssist.ShadowDepth" Value="CenterDepth1"></Setter>
-      <Setter Property="Template">
-        <Setter.Value>
-          <ControlTemplate>
-            <Border Padding="7.5">
-              <styles:Card Padding="0"
-							             Background="{TemplateBinding Background}"
-							             assists:ShadowAssist.ShadowDepth="{Binding Path=(assists:ShadowAssist.ShadowDepth), RelativeSource={RelativeSource TemplatedParent}}">
-                <Grid Name="ItemContent"
-								      HorizontalAlignment="Stretch"
-								      VerticalAlignment="Stretch" MinWidth="200">
-                  <ContentPresenter Name="headerContent"
-									                  Margin="0"
-									                  HorizontalAlignment="Stretch"
-									                  VerticalAlignment="Center"
-									                  BorderBrush="{TemplateBinding BorderBrush}"
-									                  BorderThickness="{TemplateBinding BorderThickness}"
-									                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
-									                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-									                  Content="{TemplateBinding Content}"
-									                  TextBlock.Foreground="{Binding Path=(assists:TabControlAssist.TabHeaderForeground), RelativeSource={RelativeSource TemplatedParent}}" />
-                </Grid>
-              </styles:Card>
-            </Border>
-          </ControlTemplate>
-        </Setter.Value>
-      </Setter>
-    </Style>
-
-    <Style Selector="TabStrip > TabStripItem:selected">
-      <Setter Property="Background" Value="{DynamicResource MaterialDesignCardBackground}" />
-      <Setter Property="assists:ShadowAssist.ShadowDepth" Value="CenterDepth2"></Setter>
-    </Style>
-
-    <Style Selector="MenuItem">
+	  <Style Selector="MenuItem">
       <Setter Property="Height" Value="30" />
     </Style>
 

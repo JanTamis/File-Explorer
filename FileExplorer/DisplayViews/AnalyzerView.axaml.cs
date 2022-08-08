@@ -12,7 +12,7 @@ namespace FileExplorer.DisplayViews;
 
 public partial class AnalyzerView : UserControl, IFileViewer
 {
-	public IEnumerable<IFileItem> Items { get; set; }
+	public ObservableRangeCollection<IFileItem> Items { get; set; }
 	public Task<int> ItemCount => Task.FromResult(0);
 	public event Action<string>? PathChanged;
 	public event Action? SelectionChanged;

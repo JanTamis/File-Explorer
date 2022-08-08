@@ -2,14 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-						 xmlns:models="clr-namespace:FileExplorer.Models"
-             xmlns:system="clr-namespace:System;assembly=mscorlib"
-						 xmlns:converters="using:FileExplorer.Converters"
+						 xmlns:models="clr-namespace:FileExplorer.Core.Interfaces;assembly=FileExplorer.Core"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FileExplorer.DisplayViews.FileGrid">
 
 	<ScrollViewer>
-		<ItemsRepeater Items="{Binding Files}"
+		<ItemsRepeater Items="{Binding Items}"
 		               VerticalCacheLength="0"
 		               Margin="0 0 0 5"
 		               x:Name="fileList">
@@ -27,14 +25,14 @@
 														  Background="Transparent"
 														  Margin="10">
 								<ContentPresenter ClipToBounds="true"
-																					Background="{TemplateBinding Background}"
-																					BorderBrush="{TemplateBinding BorderBrush}"
-																					BorderThickness="{TemplateBinding BorderThickness}"
-																					ContentTemplate="{TemplateBinding ContentTemplate}"
-																					Content="{TemplateBinding Content}"
-																					Padding="{TemplateBinding Padding}"
-																					VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-																					HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
+																	Background="{TemplateBinding Background}"
+																	BorderBrush="{TemplateBinding BorderBrush}"
+																	BorderThickness="{TemplateBinding BorderThickness}"
+																	ContentTemplate="{TemplateBinding ContentTemplate}"
+																	Content="{TemplateBinding Content}"
+																	Padding="{TemplateBinding Padding}"
+																	VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+																	HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
 							</Border>
 						</ControlTemplate>
 					</Setter>
@@ -42,13 +40,13 @@
 			</ItemsRepeater.Styles>
 
 			<ItemsRepeater.ItemTemplate>
-				<DataTemplate DataType="models:FileModel">
+				<DataTemplate DataType="models:IFileItem">
 					<ListBoxItem Margin="0"
-													   MaxWidth="400"
-								 x:Name="container"
-													   IsSelected="{Binding IsSelected}"
-													   VerticalContentAlignment="Stretch"
-													   HorizontalContentAlignment="Stretch">
+					             MaxWidth="400"
+											 x:Name="container"
+										   IsSelected="{Binding IsSelected}"
+										   VerticalContentAlignment="Stretch"
+										   HorizontalContentAlignment="Stretch">
 						<ToolTip.Tip>
 							<Grid ColumnDefinitions="Auto Auto"
 								  RowDefinitions="Auto Auto Auto Auto">
@@ -87,10 +85,11 @@
 										   Grid.Column="1" />
 							</Grid>
 						</ToolTip.Tip>
+
 						<StackPanel Margin="0 0 0 5"
 									HorizontalAlignment="Center"
 									VerticalAlignment="Center">
-							<Image x:DataType="models:FileModel"
+							<Image x:DataType="models:IFileItem"
 								   Source="{Binding Image^}"
 								   Margin="4"
 								   Width="100"

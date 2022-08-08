@@ -22,16 +22,16 @@ namespace FileExplorer.DisplayViews;
 
 public class FileTreeGrid : UserControl, IFileViewer
 {
-	public IEnumerable<IFileItem> Items
+	public ObservableRangeCollection<IFileItem> Items
 	{
 		get
 		{
 			if (this.FindControl<TreeDataGrid>("TreeDataGrid") is { Source: HierarchicalTreeDataGridSource<IFileItem> source })
 			{
-				return source.Items;
+				return source.Items as ObservableRangeCollection<IFileItem>;
 			}
 
-			return Enumerable.Empty<FileModel>();
+			return default;
 		}
 		set
 		{

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FileExplorer.Core.Interfaces;
+using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
 using FileExplorer.Models;
 
@@ -57,7 +58,7 @@ public partial class Quickstart : UserControl, IFileViewer
 		AvaloniaXamlLoader.Load(this);
 	}
 
-	public IEnumerable<IFileItem> Items { get; set; }
+	public ObservableRangeCollection<IFileItem> Items { get; set; }
 	public Task<int> ItemCount => Task.FromResult(0);
 
 	public event Action<string>? PathChanged;

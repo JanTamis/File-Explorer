@@ -7,6 +7,7 @@ using Avalonia.Markup.Xaml;
 using System.Linq;
 using System.Threading.Tasks;
 using FileExplorer.Core.Interfaces;
+using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
 using FileExplorer.Models;
 
@@ -22,7 +23,7 @@ public partial class FileDataGrid : UserControl, ISelectableControl, IFileViewer
 	public Action SelectNone { get; }
 	public Action SelectInvert { get; }
 
-	public IEnumerable<IFileItem> Items
+	public ObservableRangeCollection<IFileItem> Items
 	{
 		set
 		{
@@ -34,7 +35,7 @@ public partial class FileDataGrid : UserControl, ISelectableControl, IFileViewer
 		{
 			var grid = this.FindControl<ItemsRepeater>("fileList");
 
-			return grid.Items as IEnumerable<IFileItem>;
+			return grid.Items as ObservableRangeCollection<IFileItem>;
 		}
 	}
 

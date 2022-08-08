@@ -11,8 +11,6 @@ namespace FileExplorer.Popup;
 
 public partial class Settings : UserControl, IPopup
 {
-	private bool _isDarkMode;
-
 	public bool HasShadow => true;
 	public bool HasToBeCanceled => false;
 

@@ -1,6 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:converters="clr-namespace:Avalonia.Controls.Converters;assembly=Avalonia.Controls.TreeDataGrid">
+        xmlns:converters="clr-namespace:Avalonia.Controls.Converters;assembly=Avalonia.Controls.TreeDataGrid"
+        xmlns:ripple="clr-namespace:Material.Ripple;assembly=Material.Ripple">
   <Styles.Resources>
     <StreamGeometry x:Key="TreeDataGridGridSortIconDescendingPath">M1875 1011l-787 787v-1798h-128v1798l-787 -787l-90 90l941 941l941 -941z</StreamGeometry>
     <StreamGeometry x:Key="TreeDataGridGridSortIconAscendingPath">M1965 947l-941 -941l-941 941l90 90l787 -787v1798h128v-1798l787 787z</StreamGeometry>
@@ -155,16 +156,17 @@
   <Style Selector="TreeDataGridRow">
     <Setter Property="Template">
       <ControlTemplate>
-        <Border x:Name="RowBorder"
-                Background="{TemplateBinding Background}"
-                BorderBrush="{TemplateBinding BorderBrush}"
-                BorderThickness="{TemplateBinding BorderThickness}"
-                CornerRadius="{TemplateBinding CornerRadius}">
+        <ripple:RippleEffect x:Name="RowBorder"
+							               Background="{TemplateBinding Background}"
+							               RippleFill="{TemplateBinding Foreground}"
+							               BorderBrush="{TemplateBinding BorderBrush}"
+							               BorderThickness="{TemplateBinding BorderThickness}"
+							               CornerRadius="{TemplateBinding CornerRadius}">
           <TreeDataGridCellsPresenter Name="PART_CellsPresenter"
                                       ElementFactory="{TemplateBinding ElementFactory}"
                                       Items="{TemplateBinding Columns}"
                                       Rows="{TemplateBinding Rows}"/>
-        </Border>
+        </ripple:RippleEffect>
       </ControlTemplate>
     </Setter>
   </Style>
