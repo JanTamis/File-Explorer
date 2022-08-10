@@ -28,28 +28,6 @@ public class FileSystemProvider : IItemProvider
 		return GetFileSystemEntries(treeItem, filter);
 	}
 
-	public async Task<int> GetItemCountAsync(string path, string filter, bool recursive)
-	{
-		return await Task.Run(() =>
-		{
-			var options = new EnumerationOptions
-			{
-				IgnoreInaccessible = true,
-				AttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
-				RecurseSubdirectories = recursive,
-			};
-
-			var query = Directory.Exists(path)
-				? new FileSystemEnumerable<bool>(path, (ref FileSystemEntry _) => false, options)
-					{
-						ShouldIncludePredicate = (ref FileSystemEntry entry) => FileSystemName.MatchesSimpleExpression(filter, entry.FileName),
-					}
-				: Enumerable.Empty<bool>();
-
-			return query.Count();
-		});
-	}
-
 	public IEnumerable<IPathSegment> GetPath(string path)
 	{
 		var treeItem = PathHelper.FromPath(path);

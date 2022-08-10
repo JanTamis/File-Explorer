@@ -194,13 +194,17 @@ public static class ThumbnailProvider
 					}
 				}
 
-				if (!model.HasParent && name == String.Empty)
+				if (name == String.Empty)
 				{
-					var driveInfo = new DriveInfo(new string(model.Value[0], 1));
+					var drives = DriveInfo.GetDrives();
 
-					if (driveInfo.IsReady)
+					foreach (var drive in drives)
 					{
-						name = Enum.GetName(driveInfo.DriveType);
+						if (drive.IsReady && drive.RootDirectory.FullName == path)
+						{
+							name = "Fixed";
+							break;
+						}
 					}
 				}
 
@@ -247,9 +251,9 @@ public static class ThumbnailProvider
 
 	private static async Task<SvgImage?> GetImage(string key)
 	{
-		if (key is null or "")
+		if (String.IsNullOrEmpty(key))
 		{
-			return null;
+			return await Task.FromResult<SvgImage?>(null);
 		}
 
 		if (!Images.TryGetValue(key, out var image) && image is null)
@@ -266,30 +270,30 @@ public static class ThumbnailProvider
 
 					if (Dispatcher.UIThread.CheckAccess())
 					{
-						image = new SvgImage()
-						{
-							Source = source,
-						};
-
 						if (!Images.ContainsKey(key))
-						{
-							Images.Add(key, image);
-						}
-					}
-					else
-					{
-						await Dispatcher.UIThread.InvokeAsync(() =>
 						{
 							image = new SvgImage
 							{
 								Source = source,
 							};
 
-							if (!Images.ContainsKey(key))
+							Images.Add(key, image);
+						}
+					}
+					else
+					{
+							await Dispatcher.UIThread.InvokeAsync(() =>
 							{
-								Images.Add(key, image);
-							}
-						});
+								if (!Images.ContainsKey(key))
+								{
+									image = new SvgImage
+									{
+										Source = source,
+									};
+
+									Images.Add(key, image);
+								}
+							});
 					}
 				}
 			}

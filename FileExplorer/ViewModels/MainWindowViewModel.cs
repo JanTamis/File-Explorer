@@ -19,6 +19,8 @@ using FileExplorer.DisplayViews;
 using FileExplorer.Models;
 using FileExplorer.Providers;
 using Avalonia.Controls.ApplicationLifetimes;
+using ExCSS;
+using FileExplorer.Graph;
 using Humanizer;
 
 namespace FileExplorer.ViewModels
@@ -418,6 +420,33 @@ namespace FileExplorer.ViewModels
 
 				CurrentTab.PopupContent = properties;
 			}
+		}
+
+		public async Task OneDrive()
+		{
+			var provider = new GraphItemProvider((code, url, token) =>
+			{
+				if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+				{
+					return Dispatcher.UIThread.InvokeAsync(() =>
+					{
+						var login = new OneDriveLogin
+						{
+							Code = code,
+							RedirectUri = url,
+						};
+
+						CurrentTab.PopupContent = login;
+						token.UnsafeRegister(_ => CurrentTab.PopupContent = null, null);
+					});
+				}
+
+				return Task.CompletedTask;
+			});
+
+			var name = await provider.GetNameAsync();
+
+			CurrentTab.PopupContent?.Close();
 		}
 	}
 }

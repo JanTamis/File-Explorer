@@ -289,5 +289,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FileExplorer.Core\FileExplorer.Core.csproj" />
+    <ProjectReference Include="..\FileExplorer.Graph\FileExplorer.Graph.csproj" />
   </ItemGroup>
 </Project>

@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="FileExplorer.Popup.OneDriveLogin">
+	<StackPanel Margin="10">
+		<TextBlock Text="Open the following url in you browser:"
+		           FontWeight="Bold"
+		           HorizontalAlignment="Center"
+		           FontSize="21" />
+
+		<TextBox Text="{Binding RedirectUri}"
+		         HorizontalAlignment="Center"
+		         IsReadOnly="True"/>
+
+		<TextBlock Text="Then enter the code:"
+		           FontWeight="Bold"
+		           HorizontalAlignment="Center"
+		           FontSize="21" />
+
+		<TextBox Text="{Binding Code}"
+		         HorizontalAlignment="Center"
+		         IsReadOnly="True" />
+	</StackPanel>
+
+</UserControl>

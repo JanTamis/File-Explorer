@@ -9,7 +9,10 @@
         <entry key="FileExplorer/DisplayViews/FileGrid.axaml" value="FileExplorer/FileExplorer.csproj" />
         <entry key="FileExplorer/DisplayViews/FileTreeGrid.axaml" value="FileExplorer/FileExplorer.csproj" />
         <entry key="FileExplorer/DisplayViews/Quickstart.axaml" value="FileExplorer/FileExplorer.csproj" />
+        <entry key="FileExplorer/Popup/Choice.axaml" value="FileExplorer/FileExplorer.csproj" />
+        <entry key="FileExplorer/Popup/OneDriveLogin.axaml" value="FileExplorer/FileExplorer.csproj" />
         <entry key="FileExplorer/Popup/Properties.axaml" value="FileExplorer/FileExplorer.csproj" />
+        <entry key="FileExplorer/Popup/Rename.axaml" value="FileExplorer/FileExplorer.csproj" />
         <entry key="FileExplorer/Popup/Settings.axaml" value="FileExplorer/FileExplorer.csproj" />
         <entry key="FileExplorer/Styles/TreeDataGrid.axaml" value="FileExplorer/FileExplorer.csproj" />
         <entry key="FileExplorer/Views/MainWindow.axaml" value="FileExplorer/FileExplorer.csproj" />
