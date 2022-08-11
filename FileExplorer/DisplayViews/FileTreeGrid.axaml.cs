@@ -17,6 +17,7 @@ using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
 using FileExplorer.Models;
 using Humanizer;
+using Microsoft.IdentityModel.Abstractions;
 
 namespace FileExplorer.DisplayViews;
 
@@ -53,7 +54,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 								{
 									new Image
 									{
-										[!DataContextProperty] = new Binding("TreeItem")
+										[!DataContextProperty] = new Binding("")
 										{
 											Source = x,
 											Converter = PathToImageConverter.Instance,
@@ -76,7 +77,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 							CompareDescending = (x, y) => String.Compare(y?.Name, x?.Name, StringComparison.CurrentCulture),
 						}),
 						x => x.Children,
-						x => x.IsFolder && x.Children.Any()),
+						x => x is { IsFolder: true } && x.Children.Any()),
 					new TextColumn<IFileItem, DateTime>("Edit Date", item => item.EditedOn, GridLength.Auto),
 					new TextColumn<IFileItem, string>("Type", item => item.Extension, GridLength.Auto),
 					new TextColumn<IFileItem, string>("Size", item => item.IsFolder ? null : item.Size.Bytes().ToString(), GridLength.Auto, new TextColumnOptions<IFileItem>()
@@ -122,7 +123,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 		}
 	}
 
-	public Task<int> ItemCount => Task.FromResult(Items.Count());
+	public Task<int> ItemCount => Task.FromResult(Items.Count);
 
 	public event Action<string> PathChanged = delegate { };
 	public event Action SelectionChanged = delegate { };

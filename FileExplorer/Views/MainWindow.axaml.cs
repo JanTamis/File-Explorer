@@ -50,7 +50,7 @@ public class MainWindow : FluentWindow
 
 					KeyUp += (_, args) =>
 					{
-						if (args.KeyModifiers is KeyModifiers.Control && args.Key is Key.A)
+						if (args.KeyModifiers is KeyModifiers.Control && args.Key is Key.A && !viewModel.CurrentTab.PopupVisible)
 						{
 							viewModel.CurrentTab.DisplayControl.SelectAll();
 						}
@@ -93,7 +93,7 @@ public class MainWindow : FluentWindow
 					
 				if (OperatingSystem.IsWindows() && treeItem.Parent is TreeView)
 				{
-					treeItem.Margin = new Avalonia.Thickness(0, 0, 0, 15);
+					treeItem.Margin = new Thickness(0, 0, 0, 15);
 					treeItem.IsExpanded = true;
 					await Task.Delay(100);
 				}

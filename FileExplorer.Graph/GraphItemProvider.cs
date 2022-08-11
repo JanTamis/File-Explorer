@@ -1,5 +1,6 @@
 using Azure.Identity;
 using FileExplorer.Core.Interfaces;
+using FileExplorer.Graph.Models;
 using Microsoft.Graph;
 using Microsoft.Identity.Client;
 
@@ -11,7 +12,7 @@ public class GraphItemProvider : IItemProvider
 
 	public GraphItemProvider(Func<string, Uri, CancellationToken, Task> getCode)
 	{
-		var scopes = new[] { "User.Read", "Files.ReadWrite.All", "profile" };
+		var scopes = new[] { "User.Read", "Files.ReadWrite.All", "Files.Read", "Files.Read.All", "profile" };
 
 		// Multi-tenant apps can use "common",
 		// single-tenant apps must use the tenant ID from the Azure portal
@@ -19,28 +20,6 @@ public class GraphItemProvider : IItemProvider
 
 		// Value from app registration
 		var clientId = "6d445cbd-4ec8-4bb4-b405-49d8735f5b36";
-
-		if (OperatingSystem.IsWindows())
-		{
-			var pca = PublicClientApplicationBuilder
-				.Create(clientId)
-				.WithTenantId(tenantId)
-				.Build();
-
-			// DelegateAuthenticationProvider is a simple auth provider implementation
-			// that allows you to define an async function to retrieve a token
-			// Alternatively, you can create a class that implements IAuthenticationProvider
-			// for more complex scenarios
-			var authProvider = new DelegateAuthenticationProvider(async (request) =>
-			{
-				// Use Microsoft.Identity.Client to retrieve token
-				var result = await pca.AcquireTokenByIntegratedWindowsAuth(scopes).ExecuteAsync();
-
-				request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", result.AccessToken);
-			});
-
-			Client = new GraphServiceClient(authProvider);
-		}
 
 		// using Azure.Identity;
 		var options = new TokenCredentialOptions
@@ -64,18 +43,27 @@ public class GraphItemProvider : IItemProvider
 
 	public async Task<string> GetNameAsync()
 	{
-		var response = await Client.Me.Request().GetAsync();
+		var user = await Client.Me.Request().GetAsync();
 
-		return response.DisplayName;
+		return user.DisplayName;
 	}
 
-	public IEnumerable<IFileItem> GetItems(string path, string filter, bool recursive)
+	public async ValueTask<IEnumerable<IFileItem>> GetItems(string path, string filter, bool recursive, CancellationToken token)
 	{
-		throw new NotImplementedException();
+		try
+		{
+			var files = await Client.Me.Drive.Root.Children.Request().GetAsync(token);
+
+			return files.Select(s => new GraphFileModel(s));
+		}
+		catch (Exception)
+		{
+			return Enumerable.Empty<IFileItem>();
+		}
 	}
 
 	public IEnumerable<IPathSegment> GetPath(string? path)
 	{
-		throw new NotImplementedException();
+		return Enumerable.Empty<IPathSegment>();
 	}
 }

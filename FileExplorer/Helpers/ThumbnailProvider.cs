@@ -59,7 +59,7 @@ public static class ThumbnailProvider
 			return null;
 		}
 
-		if (OperatingSystem.IsWindows())
+		if (OperatingSystem.IsWindows() && model is FileModel)
 		{
 			return await Task.Factory.StartNew(() => model?.GetPath((path, imageSize) =>
 			{
@@ -85,7 +85,7 @@ public static class ThumbnailProvider
 
 			if (model.IsFolder)
 			{
-				if (OperatingSystem.IsWindows())
+				if (OperatingSystem.IsWindows() && model is FileModel)
 				{
 					foreach (var folder in Enum.GetValues<KnownFolder>())
 					{
@@ -99,7 +99,7 @@ public static class ThumbnailProvider
 					}
 				}
 
-				if (!model.IsRoot && name == String.Empty)
+				if (!model.IsRoot && name == String.Empty && model is FileModel)
 				{
 					var driveInfo = new DriveInfo(new string(model.Name[0], 1));
 

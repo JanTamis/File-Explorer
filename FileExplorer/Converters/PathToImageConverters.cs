@@ -19,7 +19,7 @@ public class PathToImageConverter : IValueConverter, ISingleton<PathToImageConve
 		{
 			var task = value switch
 			{
-				FileModel model => ThumbnailProvider.GetFileImage(model, size, () => true),
+				IFileItem model => ThumbnailProvider.GetFileImage(model, size, () => true),
 				FileSystemTreeItem treeItem => ThumbnailProvider.GetFileImage(treeItem, size),
 				string path => ThumbnailProvider.GetFileImage(PathHelper.FromPath(path), size),
 				_ => null,

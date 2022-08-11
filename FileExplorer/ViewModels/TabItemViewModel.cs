@@ -62,6 +62,7 @@ public partial class TabItemViewModel
 	private SortEnum _sort = SortEnum.None;
 
 	[ObservableProperty]
+	[NotifyPropertyChangedFor(nameof(Files))]
 	private IItemProvider _provider = new FileSystemProvider();
 
 	public event Action? PathChanged;
@@ -130,7 +131,7 @@ public partial class TabItemViewModel
 
 			OnPropertyChanged(nameof(FileCount));
 
-			var items = Provider.GetItems(Path, search, recursive);
+			var items = await Provider.GetItems(Path, search, recursive, TokenSource.Token);
 
 			if (recursive)
 			{
@@ -140,6 +141,21 @@ public partial class TabItemViewModel
 			{
 				await Files.AddRange<IComparer<IFileItem>>(items, Comparer<IFileItem>.Create((x, y) =>
 				{
+					if (x is null && y is null)
+					{
+						return 0;
+					}
+
+					if (x is null)
+					{
+						return -1;
+					}
+
+					if (y is null)
+					{
+						return 1;
+					}
+
 					var result = y.IsFolder.CompareTo(x.IsFolder);
 
 					if (result is 0)
@@ -193,6 +209,11 @@ public partial class TabItemViewModel
 		{
 			await Dispatcher.UIThread.InvokeAsync(() => DisplayControl.Items = value);
 		}
+	}
+
+	partial void OnProviderChanged(IItemProvider value)
+	{
+		UpdateFiles(false, "");
 	}
 
 	partial void OnDisplayControlChanged(IFileViewer value)

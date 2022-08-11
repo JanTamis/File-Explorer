@@ -159,10 +159,10 @@ namespace FileExplorer.ViewModels
 		{
 			if (CurrentTab is not null)
 			{
-				if (CurrentTab.Provider is not FileSystemProvider)
-				{
-					CurrentTab.Provider = new FileSystemProvider();
-				}
+				//if (CurrentTab.Provider is not FileSystemProvider)
+				//{
+				//	CurrentTab.Provider = new FileSystemProvider();
+				//}
 
 				await CurrentTab.SetPath(path.GetPath(path => path.ToString()));
 			}
@@ -375,9 +375,9 @@ namespace FileExplorer.ViewModels
 				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = true);
 
 				var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(Path, (ref FileSystemEntry y) => (System.IO.Path.GetExtension(y.FileName).ToString(), y.Length), options)
-				{
-					ShouldIncludePredicate = (ref FileSystemEntry z) => !z.IsDirectory,
-				}
+					{
+						ShouldIncludePredicate = (ref FileSystemEntry z) => !z.IsDirectory,
+					}
 					.Where(w => !String.IsNullOrEmpty(w.Extension))
 					.GroupBy(g => g.Extension)
 					.Where(w => CurrentTab.TokenSource?.IsCancellationRequested != true);
@@ -447,6 +447,8 @@ namespace FileExplorer.ViewModels
 			var name = await provider.GetNameAsync();
 
 			CurrentTab.PopupContent?.Close();
+
+			CurrentTab.Provider = provider;
 		}
 	}
 }

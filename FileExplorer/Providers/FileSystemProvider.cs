@@ -6,26 +6,27 @@ using System.Threading.Tasks;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Models;
 using FileExplorer.Helpers;
+using System.Threading;
 
 namespace FileExplorer.Providers;
 
 public class FileSystemProvider : IItemProvider
 {
-	public IEnumerable<IFileItem> GetItems(string path, string filter, bool recursive)
+	public ValueTask<IEnumerable<IFileItem>> GetItems(string path, string filter, bool recursive, CancellationToken token)
 	{
 		var treeItem = PathHelper.FromPath(path);
 
 		if (treeItem is null)
 		{
-			return Enumerable.Empty<IFileItem>();
+			return ValueTask.FromResult(Enumerable.Empty<IFileItem>());
 		}
 
 		if (recursive)
 		{
-			return GetFileSystemEntriesRecursive(treeItem, filter);
+			return ValueTask.FromResult(GetFileSystemEntriesRecursive(treeItem, filter).Cast<IFileItem>());
 		}
 
-		return GetFileSystemEntries(treeItem, filter);
+		return ValueTask.FromResult(GetFileSystemEntries(treeItem, filter).Cast<IFileItem>());
 	}
 
 	public IEnumerable<IPathSegment> GetPath(string path)
