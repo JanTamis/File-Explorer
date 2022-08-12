@@ -17,9 +17,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.DisplayViews;
 using FileExplorer.Models;
-using FileExplorer.Providers;
-using Avalonia.Controls.ApplicationLifetimes;
-using ExCSS;
 using FileExplorer.Graph;
 using Humanizer;
 
@@ -34,7 +31,8 @@ namespace FileExplorer.ViewModels
 		[NotifyPropertyChangedFor(nameof(Path))]
 		private TabItemViewModel _currentTab;
 
-		[ObservableProperty] private IEnumerable<string> _searchHistory;
+		[ObservableProperty]
+		private IEnumerable<string> _searchHistory;
 
 		public static IEnumerable<SortEnum> SortValues => Enum.GetValues<SortEnum>();
 
@@ -82,13 +80,13 @@ namespace FileExplorer.ViewModels
 			notificationManager = manager;
 
 			var drives = from drive in DriveInfo.GetDrives()
-									 where drive.IsReady && drive.DriveType is DriveType.Removable or DriveType.Unknown
-									 select new FolderModel(PathHelper.FromPath(drive.RootDirectory.FullName), null, null);
+				where drive.IsReady && drive.DriveType is DriveType.Removable or DriveType.Unknown
+				select new FolderModel(PathHelper.FromPath(drive.RootDirectory.FullName), null, null);
 
 			var quickAccess = from specialFolder in KnownFolders()
-												let path = Environment.GetFolderPath(specialFolder)
-												where !String.IsNullOrEmpty(path)
-												select new FolderModel(PathHelper.FromPath(path), Enum.GetName(specialFolder).Humanize(), null);
+				let path = Environment.GetFolderPath(specialFolder)
+				where !String.IsNullOrEmpty(path)
+				select new FolderModel(PathHelper.FromPath(path), Enum.GetName(specialFolder).Humanize(), null);
 
 			Folders = quickAccess.Concat(drives);
 
@@ -424,7 +422,7 @@ namespace FileExplorer.ViewModels
 
 		public async Task OneDrive()
 		{
-			var provider = new GraphItemProvider((code, url, token) =>
+			CurrentTab.Provider = new GraphItemProvider((code, url, token) =>
 			{
 				if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
 				{
@@ -436,19 +434,14 @@ namespace FileExplorer.ViewModels
 							RedirectUri = url,
 						};
 
+						token.UnsafeRegister(_ => Console.WriteLine(token), null);
+
 						CurrentTab.PopupContent = login;
-						token.UnsafeRegister(_ => CurrentTab.PopupContent = null, null);
 					});
 				}
 
 				return Task.CompletedTask;
 			});
-
-			var name = await provider.GetNameAsync();
-
-			CurrentTab.PopupContent?.Close();
-
-			CurrentTab.Provider = provider;
 		}
 	}
 }

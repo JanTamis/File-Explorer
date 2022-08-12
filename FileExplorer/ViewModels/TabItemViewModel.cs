@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia.Controls;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FileExplorer.DisplayViews;
@@ -52,7 +53,7 @@ public partial class TabItemViewModel
 	private ViewTypes _currentViewMode = ViewTypes.Tree;
 
 	[ObservableProperty]
-	private IFileViewer _displayControl = new Quickstart();
+	private IFileViewer _displayControl;
 
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(PopupVisible))]
@@ -62,7 +63,6 @@ public partial class TabItemViewModel
 	private SortEnum _sort = SortEnum.None;
 
 	[ObservableProperty]
-	[NotifyPropertyChangedFor(nameof(Files))]
 	private IItemProvider _provider = new FileSystemProvider();
 
 	public event Action? PathChanged;
@@ -83,6 +83,11 @@ public partial class TabItemViewModel
 	public TabItemViewModel()
 	{
 		Files.CountChanged += count => FileCount = count;
+
+		DisplayControl = new FileTreeGrid
+		{
+			Items = Files,
+		};
 	}
 
 	public string? Undo()
@@ -131,7 +136,7 @@ public partial class TabItemViewModel
 
 			OnPropertyChanged(nameof(FileCount));
 
-			var items = await Provider.GetItems(Path, search, recursive, TokenSource.Token);
+			var items = await Provider.GetItemsAsync(Path, search, recursive, TokenSource.Token);
 
 			if (recursive)
 			{

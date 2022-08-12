@@ -2,7 +2,7 @@ namespace FileExplorer.Core.Interfaces;
 
 public interface IItemProvider
 {
-	ValueTask<IEnumerable<IFileItem>> GetItems(string path, string filter, bool recursive, CancellationToken token);
+	ValueTask<IEnumerable<IFileItem>> GetItemsAsync(string path, string filter, bool recursive, CancellationToken token);
 
 	IEnumerable<IPathSegment> GetPath(string? path);
 }

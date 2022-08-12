@@ -14,7 +14,7 @@ public partial class OneDriveLogin : UserControl, IPopup, INotifyPropertyChanged
 	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
 
 	public bool HasShadow => true;
-	public bool HasToBeCanceled => false;
+	public bool HasToBeCanceled => true;
 	public string Title => "OneDrive Login";
 
 	private Uri _redirectUri;

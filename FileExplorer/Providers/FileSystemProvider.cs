@@ -12,7 +12,7 @@ namespace FileExplorer.Providers;
 
 public class FileSystemProvider : IItemProvider
 {
-	public ValueTask<IEnumerable<IFileItem>> GetItems(string path, string filter, bool recursive, CancellationToken token)
+	public ValueTask<IEnumerable<IFileItem>> GetItemsAsync(string path, string filter, bool recursive, CancellationToken token)
 	{
 		var treeItem = PathHelper.FromPath(path);
 

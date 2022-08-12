@@ -48,7 +48,7 @@ public class GraphItemProvider : IItemProvider
 		return user.DisplayName;
 	}
 
-	public async ValueTask<IEnumerable<IFileItem>> GetItems(string path, string filter, bool recursive, CancellationToken token)
+	public async ValueTask<IEnumerable<IFileItem>> GetItemsAsync(string path, string filter, bool recursive, CancellationToken token)
 	{
 		try
 		{
