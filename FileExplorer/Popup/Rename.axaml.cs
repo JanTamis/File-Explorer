@@ -1,10 +1,9 @@
-using System;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
-using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
 
 namespace FileExplorer.Popup;

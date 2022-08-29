@@ -1,12 +1,9 @@
-using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Generators;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using System.Runtime;
-using System.Linq;
-using System.Threading.Tasks;
 using Avalonia;
 using CommunityToolkit.Mvvm.Input;
 using FileExplorer.Models;
@@ -132,7 +129,7 @@ public class MainWindow : FluentWindow
 			{
 				item.Command = new RelayCommand(() =>
 				{
-					model.CurrentTab.Path = folder.TreeItem.GetPath(path => path.ToString());
+					model.CurrentTab.CurrentFolder = new FileModel(folder.TreeItem);
 				});
 
 				item.ContextMenu.ItemContainerGenerator.Materialized += (_, ee) =>
@@ -143,7 +140,7 @@ public class MainWindow : FluentWindow
 						{
 							menuItem.Tapped += delegate
 							{
-								model.CurrentTab.Path = folder.TreeItem.GetPath(path => path.ToString());
+								model.CurrentTab.CurrentFolder = new FileModel(folder.TreeItem);
 							};
 						}
 					}

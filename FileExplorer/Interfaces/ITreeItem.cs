@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace FileExplorer.Interfaces;
+﻿namespace FileExplorer.Interfaces;
 
 public interface ITreeItem<TValue, TChildren> where TChildren : class, ITreeItem<TValue, TChildren>
 {

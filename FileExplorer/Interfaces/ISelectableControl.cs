@@ -1,5 +1,3 @@
-using System;
-
 namespace FileExplorer.Interfaces;
 
 public interface ISelectableControl

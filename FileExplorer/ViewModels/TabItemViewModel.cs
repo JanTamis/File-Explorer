@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Avalonia.Controls;
-using Avalonia.Threading;
+﻿using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
+using FileExplorer.Core.Helpers;
 using FileExplorer.DisplayViews;
 using FileExplorer.Interfaces;
 using FileExplorer.Providers;
-using FileExplorer.Helpers;
 using FileExplorer.Models;
 using FileExplorer.Core.Interfaces;
 
@@ -20,8 +12,8 @@ namespace FileExplorer.ViewModels;
 [INotifyPropertyChanged]
 public partial class TabItemViewModel
 {
-	private readonly Stack<string?> _undoStack = new();
-	private readonly Stack<string?> _redoStack = new();
+	private readonly Stack<IFileItem?> _undoStack = new();
+	private readonly Stack<IFileItem?> _redoStack = new();
 
 	public CancellationTokenSource? TokenSource;
 
@@ -33,7 +25,7 @@ public partial class TabItemViewModel
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(FolderName))]
 	[NotifyPropertyChangedFor(nameof(Folders))]
-	private string? _path;
+	private IFileItem? _currentFolder;
 
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(SearchFailed))]
@@ -65,16 +57,13 @@ public partial class TabItemViewModel
 	[ObservableProperty]
 	private IItemProvider _provider = new FileSystemProvider();
 
-	public event Action? PathChanged;
+	public int SelectionCount => Files.Count(c => c.IsSelected);
 
-	public int SelectionCount => Files.Count(file => file.IsSelected);
-
-	public IEnumerable<IPathSegment> Folders => Provider.GetPath(Path);
-
+	public Task<IEnumerable<IPathSegment>> Folders => Provider.GetPathAsync(CurrentFolder).AsTask();
 
 	public bool SearchFailed => !IsLoading && !Files.Any() && DisplayControl is not Quickstart;
 
-	public string? FolderName => System.IO.Path.GetDirectoryName(Path);
+	public string? FolderName => CurrentFolder?.Name;
 
 	public bool IsSearching { get; set; }
 
@@ -86,29 +75,30 @@ public partial class TabItemViewModel
 
 		DisplayControl = new FileTreeGrid
 		{
+			Provider = Provider,
 			Items = Files,
 		};
 	}
 
-	public string? Undo()
+	public IFileItem? Undo()
 	{
 		if (_undoStack.TryPop(out var path))
 		{
 			_isUserEntered = false;
 
-			_redoStack.Push(Path);
+			_redoStack.Push(CurrentFolder);
 		}
 
 		return path;
 	}
 
-	public string? Redo()
+	public IFileItem? Redo()
 	{
 		if (_redoStack.TryPop(out var path))
 		{
 			_isUserEntered = false;
 
-			_undoStack.Push(Path);
+			_undoStack.Push(CurrentFolder);
 		}
 
 		return path;
@@ -130,76 +120,45 @@ public partial class TabItemViewModel
 
 		IsLoading = true;
 
-		await Task.Run(async () =>
+		await await Task.Run<Task>(async () =>
 		{
 			Files.Clear();
 
 			OnPropertyChanged(nameof(FileCount));
 
-			var items = await Provider.GetItemsAsync(Path, search, recursive, TokenSource.Token);
+			var items = Provider.GetItemsAsync(CurrentFolder, search, recursive, TokenSource.Token);
 
-			if (recursive)
-			{
-				await Files.AddRange<IComparer<IFileItem>>(items, default, true, null, TokenSource.Token);
-			}
-			else
-			{
-				await Files.AddRange<IComparer<IFileItem>>(items, Comparer<IFileItem>.Create((x, y) =>
+			await Files.AddRangeAsync(items, !recursive
+				? Comparer<IFileItem>.Create((x, y) =>
 				{
-					if (x is null && y is null)
+					switch (x, y)
 					{
-						return 0;
-					}
-
-					if (x is null)
-					{
-						return -1;
-					}
-
-					if (y is null)
-					{
-						return 1;
+						case (null, null): return 0;
+						case (null, _): return -1;
+						case (_, null): return 1;
 					}
 
 					var result = y.IsFolder.CompareTo(x.IsFolder);
 
-					if (result is 0)
+					if (result == 0)
 					{
 						result = String.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
 					}
 
 					return result;
-				}), true, null, TokenSource.Token);
-			}
+				})
+				: default, true
+				, null, TokenSource.Token);
 		});
 
 		IsLoading = false;
 	}
 
-	public async ValueTask SetPath(string? path)
+	public async ValueTask SetPath(IFileItem? path)
 	{
-		if (!Directory.Exists(path))
+		if (path is { IsFolder: true })
 		{
-			await Task.Run(() =>
-			{
-				try
-				{
-					var info = new ProcessStartInfo
-					{
-						FileName = path,
-						UseShellExecute = true,
-					};
-
-					Process.Start(info);
-				}
-				catch (Exception)
-				{
-				}
-			});
-		}
-		else
-		{
-			Path = path;
+			CurrentFolder = path;
 			await UpdateFiles(false, "*");
 		}
 	}
@@ -216,9 +175,22 @@ public partial class TabItemViewModel
 		}
 	}
 
+	partial void OnProviderChanging(IItemProvider value)
+	{
+		if (DisplayControl is FileTreeGrid treeGrid)
+		{
+			treeGrid.Provider = value;
+		}
+	}
+
 	partial void OnProviderChanged(IItemProvider value)
 	{
-		UpdateFiles(false, "");
+		if (DisplayControl is FileTreeGrid treeGrid)
+		{
+			treeGrid.Provider = value;
+		}
+
+		UpdateFiles(false, String.Empty);
 	}
 
 	partial void OnDisplayControlChanged(IFileViewer value)
@@ -235,7 +207,10 @@ public partial class TabItemViewModel
 		{
 			ViewTypes.Grid => new FileGrid(),
 			ViewTypes.List => new FileDataGrid(),
-			ViewTypes.Tree => new FileTreeGrid(),
+			ViewTypes.Tree => new FileTreeGrid
+			{
+				Provider = Provider,
+			},
 			_ => new FileDataGrid(),
 		};
 	}
@@ -252,22 +227,16 @@ public partial class TabItemViewModel
 		}
 	}
 
-	partial void OnPathChanged(string? value)
+	partial void OnCurrentFolderChanged(IFileItem? value)
 	{
-		PathChanged?.Invoke();
-
 		if (value is null && DisplayControl is not Quickstart)
 		{
 			DisplayControl = new Quickstart();
 		}
-		else
-		{
-			OnCurrentViewModeChanged(CurrentViewMode);
-		}
 
-		if (_isUserEntered && (!_undoStack.TryPeek(out var tempPath) || tempPath != Path))
+		if (_isUserEntered && (!_undoStack.TryPeek(out var tempPath) || tempPath != CurrentFolder))
 		{
-			_undoStack.Push(Path);
+			_undoStack.Push(CurrentFolder);
 			_redoStack.Clear();
 		}
 

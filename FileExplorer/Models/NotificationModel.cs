@@ -1,5 +1,4 @@
-﻿using System;
-using Avalonia.Controls.Notifications;
+﻿using Avalonia.Controls.Notifications;
 
 namespace FileExplorer.Models;
 

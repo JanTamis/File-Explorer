@@ -115,13 +115,13 @@
 								<Grid ColumnDefinitions="Auto, *, Auto, Auto"
 								      Margin="5">
 									<Image Grid.Column="0"
-									       DataContext="{Binding Path, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
+									       DataContext="{Binding CurrentFolder, Converter={StaticResource imageConverter}, ConverterParameter={StaticResource ImageSize}}"
 									       Source="{Binding Result}"
 									       Height="24"
 									       Margin="0 0 4 0"
 									       VerticalAlignment="Center" />
 
-									<TextBlock Text="{Binding Path, Converter={StaticResource fileNameConverter}}"
+									<TextBlock Text="{Binding CurrentFolder.Name}"
 									           Foreground="{DynamicResource MaterialDesignBody}"
 									           FontWeight="{Binding IsSelected, Converter={x:Static converters:BoolToBoldConverter.Instance}}"
 									           TextTrimming="CharacterEllipsis"
@@ -307,7 +307,7 @@
 						             Padding="0"
 						             Height="30"
 						             Grid.Column="1">
-							<ListBox Items="{Binding CurrentTab.Folders}">
+							<ListBox Items="{Binding CurrentTab.Folders^}">
 								<ListBox.ItemsPanel>
 									<ItemsPanelTemplate>
 										<StackPanel Orientation="Horizontal" HorizontalAlignment="Left" />
@@ -346,7 +346,7 @@
 								</ListBox.Styles>
 
 								<ListBox.ItemTemplate>
-									<DataTemplate DataType="models:FolderModel">
+									<DataTemplate DataType="interfaces:IPathSegment">
 										<TextBlock Text="{Binding Name}"
 										           FontWeight="Normal"
 										           TextTrimming="CharacterEllipsis"
@@ -407,10 +407,10 @@
 										</Style>
 									</TreeView.Styles>
 									<TreeView.DataTemplates>
-										<TreeDataTemplate DataType="{x:Type interfaces:IPathSegment}">
+										<TreeDataTemplate DataType="{x:Type models:FolderModel}">
 											<StackPanel Orientation="Horizontal">
 												<Image Source="{Binding Image^}"
-												       x:DataType="interfaces:IPathSegment"
+												       x:DataType="models:FolderModel"
 												       Width="24"
 												       Height="24"
 												       Margin="0 0 3 0" />

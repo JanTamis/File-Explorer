@@ -5,31 +5,29 @@ namespace FileExplorer.Graph.Models
 {
 	public class GraphFileModel : IFileItem
 	{
-		private readonly DriveItem file;
+		internal readonly DriveItem item;
 
 		public bool IsSelected { get; set; }
 
-		public bool IsFolder => file.Folder is not null;
+		public bool IsFolder => item.Folder != null;
 
 		public bool IsRoot => false;
-
-		public IEnumerable<IFileItem> Children => IsFolder && file.Children is not null ? file.Children.Select(s => new GraphFileModel(s)) : Enumerable.Empty<IFileItem>();
 
 		public string Extension => IsFolder ? Path.GetExtension(Name) : String.Empty;
 
 		public string Name
 		{
-			get => file.Name;
-			set => file.Name = value;
+			get => item.Name;
+			set => item.Name = value;
 		}
 
-		public long Size => file.Size.GetValueOrDefault();
+		public long Size => item.Size.GetValueOrDefault();
 
-		public DateTime EditedOn => file.LastModifiedDateTime.GetValueOrDefault().DateTime;
+		public DateTime EditedOn => item.LastModifiedDateTime.GetValueOrDefault().DateTime;
 
-		public GraphFileModel(DriveItem file)
+		public GraphFileModel(DriveItem item)
 		{
-			this.file = file;
+			this.item = item;
 		}
 
 		public T GetPath<T>(ReadOnlySpanFunc<char, T> action)
@@ -40,6 +38,11 @@ namespace FileExplorer.Graph.Models
 		public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
 		{
 			return action(Name, parameter);
+		}
+
+		public override string ToString()
+		{
+			return Name;
 		}
 	}
 }

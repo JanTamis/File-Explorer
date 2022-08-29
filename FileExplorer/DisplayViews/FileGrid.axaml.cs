@@ -1,17 +1,12 @@
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using CommunityToolkit.Mvvm.ComponentModel;
+using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
-using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
 using FileExplorer.Models;
 
@@ -22,7 +17,7 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 	private int anchorIndex = 0;
 	new event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
-	public event Action<string> PathChanged = delegate { };
+	public event Action<IFileItem> PathChanged = delegate { };
 	public event Action SelectionChanged = delegate { };
 
 	private ObservableRangeCollection<IFileItem> _items;
@@ -31,7 +26,18 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 	public Action SelectNone { get; }
 	public Action SelectInvert { get; }
 
-	public Task<int> ItemCount { get; set; }
+	public ValueTask<int> ItemCount
+	{
+		get
+		{
+			if (this.FindControl<ItemsRepeater>("fileList") is var itemsRepeater && itemsRepeater.TryGetTotalCount(out var count))
+			{
+				return ValueTask.FromResult(count);
+			}
+
+			return ValueTask.FromResult(0);
+		}
+	}
 
 	public ObservableRangeCollection<IFileItem> Items
 	{
@@ -128,9 +134,9 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 
 	private void Item_DoubleTapped(object? sender, RoutedEventArgs e)
 	{
-		if (sender is ListBoxItem { DataContext: FileModel model })
+		if (sender is ListBoxItem { DataContext: IFileItem model })
 		{
-			PathChanged(model.TreeItem.GetPath(path => path.ToString()));
+			PathChanged(model);
 		}
 	}
 

@@ -1,5 +1,4 @@
-﻿using System;
-using Avalonia.Animation;
+﻿using Avalonia.Animation;
 using Avalonia.Media;
 using System.Reactive.Linq;
 using System.Runtime.Intrinsics;

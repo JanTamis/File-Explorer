@@ -1,5 +1,4 @@
-﻿using System;
-using Avalonia.Data.Converters;
+﻿using Avalonia.Data.Converters;
 using System.Globalization;
 using System.IO;
 using FileExplorer.Models;

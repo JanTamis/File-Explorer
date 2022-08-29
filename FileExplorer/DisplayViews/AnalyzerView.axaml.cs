@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Interfaces;
-using FileExplorer.Helpers;
 using FileExplorer.Models;
 
 namespace FileExplorer.DisplayViews;
@@ -13,8 +10,8 @@ namespace FileExplorer.DisplayViews;
 public partial class AnalyzerView : UserControl, IFileViewer
 {
 	public ObservableRangeCollection<IFileItem> Items { get; set; }
-	public Task<int> ItemCount => Task.FromResult(0);
-	public event Action<string>? PathChanged;
+	public ValueTask<int> ItemCount => ValueTask.FromResult(0);
+	public event Action<IFileItem>? PathChanged;
 	public event Action? SelectionChanged;
 
 	public Action SelectAll { get; }

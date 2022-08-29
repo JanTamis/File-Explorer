@@ -1,23 +1,17 @@
-using System;
-using System.Collections.Generic;
 using Avalonia.Controls.Notifications;
-using Avalonia.Input;
 using Avalonia.Threading;
 using FileExplorer.Helpers;
 using FileExplorer.Popup;
 using Microsoft.VisualBasic.FileIO;
 using System.Globalization;
 using System.IO;
-using System.IO.Enumeration;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Timers;
 using CommunityToolkit.Mvvm.ComponentModel;
+using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
-using FileExplorer.DisplayViews;
 using FileExplorer.Models;
 using FileExplorer.Graph;
+using FileExplorer.Providers;
 using Humanizer;
 
 namespace FileExplorer.ViewModels
@@ -28,7 +22,6 @@ namespace FileExplorer.ViewModels
 		public readonly WindowNotificationManager notificationManager;
 
 		[ObservableProperty]
-		[NotifyPropertyChangedFor(nameof(Path))]
 		private TabItemViewModel _currentTab;
 
 		[ObservableProperty]
@@ -53,40 +46,18 @@ namespace FileExplorer.ViewModels
 		public ObservableRangeCollection<TabItemViewModel> Tabs { get; } = new();
 
 
-		public string Path
-		{
-			get => CurrentTab.Path;
-			set
-			{
-				if (value == Path)
-				{
-					return;
-				}
-
-				CurrentTab.SetPath(value);
-
-				this.OnPropertyChanged();
-
-				CurrentTab.UpdateFiles(false, "*").ContinueWith(x =>
-				{
-					var categories = Enum.GetValues<Categories>().Select(s => s + ":");
-					SearchHistory = categories.Concat(CurrentTab.Files.Select(s => "*" + s.Extension).Distinct());
-				});
-			}
-		}
-
 		public MainWindowViewModel(WindowNotificationManager manager)
 		{
 			notificationManager = manager;
 
 			var drives = from drive in DriveInfo.GetDrives()
-				where drive.IsReady && drive.DriveType is DriveType.Removable or DriveType.Unknown
-				select new FolderModel(PathHelper.FromPath(drive.RootDirectory.FullName), null, null);
+									 where drive.IsReady && drive.DriveType is DriveType.Removable or DriveType.Unknown
+									 select new FolderModel(PathHelper.FromPath(drive.RootDirectory.FullName), null, null);
 
 			var quickAccess = from specialFolder in KnownFolders()
-				let path = Environment.GetFolderPath(specialFolder)
-				where !String.IsNullOrEmpty(path)
-				select new FolderModel(PathHelper.FromPath(path), Enum.GetName(specialFolder).Humanize(), null);
+												let path = Environment.GetFolderPath(specialFolder)
+												where !String.IsNullOrEmpty(path)
+												select new FolderModel(PathHelper.FromPath(path), Enum.GetName(specialFolder).Humanize(), null);
 
 			Folders = quickAccess.Concat(drives);
 
@@ -115,19 +86,17 @@ namespace FileExplorer.ViewModels
 			CurrentTab = tab;
 		}
 
-		public void GoUp()
+		public async Task GoUp()
 		{
-			if (Path is { Length: > 0 })
+			if (CurrentTab.CurrentFolder is { IsRoot: false })
 			{
-				var directory = new DirectoryInfo(Path);
-
-				Path = directory.Parent?.FullName ?? String.Empty;
+				CurrentTab.SetPath(await CurrentTab.Provider.GetParentAsync(CurrentTab.CurrentFolder, default));
 			}
 		}
 
 		public async ValueTask StartSearch()
 		{
-			if (CurrentTab.Search is { Length: > 0 } && Path is { Length: > 0 })
+			if (CurrentTab.Search is { Length: > 0 })
 			{
 				CurrentTab.IsSearching = true;
 
@@ -153,25 +122,22 @@ namespace FileExplorer.ViewModels
 			CurrentTab.CancelUpdateFiles();
 		}
 
-		public async ValueTask SetPath(FileSystemTreeItem path)
+		public async ValueTask SetPath(FileSystemTreeItem? path)
 		{
-			if (CurrentTab is not null)
+			if (path is not null)
 			{
-				//if (CurrentTab.Provider is not FileSystemProvider)
-				//{
-				//	CurrentTab.Provider = new FileSystemProvider();
-				//}
+				if (CurrentTab.Provider is not FileSystemProvider)
+				{
+					CurrentTab.Provider = new FileSystemProvider();
+				}
 
-				await CurrentTab.SetPath(path.GetPath(path => path.ToString()));
+				await CurrentTab.SetPath(new FileModel(path));
 			}
 		}
 
 		public async void Refresh()
 		{
-			if (!String.IsNullOrWhiteSpace(Path))
-			{
-				await CurrentTab.UpdateFiles(CurrentTab.IsSearching, CurrentTab.IsSearching ? CurrentTab.Search : "*");
-			}
+			await CurrentTab.UpdateFiles(CurrentTab.IsSearching, CurrentTab.IsSearching ? CurrentTab.Search : "*");
 		}
 
 		public void SelectAll()
@@ -238,19 +204,19 @@ namespace FileExplorer.ViewModels
 
 		public async void CopyFiles()
 		{
-			var data = new DataObject();
-			data.Set(DataFormats.FileNames, CurrentTab.Files.Where(x => x.IsSelected)
-				.Select(s => s.GetPath(path => path.ToString()))
-				.ToArray());
-
-			await App.Current.Clipboard.SetDataObjectAsync(data);
-
-			notificationManager.Show(new Notification("Copy Files", "Files has been copied"));
+			// var data = new DataObject();
+			// data.Set(DataFormats.FileNames, CurrentTab.Files.Where(x => x.IsSelected)
+			// 	.Select(s => s.GetPath(path => path.ToString()))
+			// 	.ToArray());
+			//
+			// await App.Current.Clipboard.SetDataObjectAsync(data);
+			//
+			// notificationManager.Show(new Notification("Copy Files", "Files has been copied"));
 		}
 
 		public async void CopyPath()
 		{
-			await App.Current.Clipboard.SetTextAsync(CurrentTab.Path);
+			await App.Current.Clipboard.SetTextAsync(CurrentTab.CurrentFolder.GetPath(path => path.ToString()));
 
 			notificationManager.Show(new Notification("Copy Path", "The path has been copied"));
 		}
@@ -304,11 +270,11 @@ namespace FileExplorer.ViewModels
 
 		public void CopyTo()
 		{
-			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && Tabs.Count(x => !String.IsNullOrEmpty(x.Path)) > 1)
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && Tabs.Count(x => !String.IsNullOrEmpty(x.CurrentFolder.Name)) > 1)
 			{
 				var selector = new TabSelector()
 				{
-					Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab && !String.IsNullOrEmpty(x.Path))),
+					Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab && !String.IsNullOrEmpty(x.CurrentFolder.Name))),
 				};
 
 				selector.TabSelectionChanged += _ => { selector.Close(); };
@@ -319,100 +285,101 @@ namespace FileExplorer.ViewModels
 
 		public void AnalyzeFolder()
 		{
-			var view = new AnalyzerView();
-			CurrentTab.DisplayControl = view;
-
-			var drive = new DriveInfo(Path.Substring(0, 1));
-			var parent = new FileIndexModel(PathHelper.FromPath(Path));
-
-			if (drive.Name == Path)
-			{
-				parent = new FileIndexModel(PathHelper.FromPath(Path));
-			}
-
-			var options = new EnumerationOptions()
-			{
-				IgnoreInaccessible = true,
-				AttributesToSkip = FileAttributes.Temporary,
-			};
-
-			var folderQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(new FileSystemTreeItem(x.FileName, x.IsDirectory)), options)
-			{
-				ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
-			};
-
-			var fileQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(new FileSystemTreeItem(x.FileName, x.IsDirectory)), options)
-			{
-				ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
-			};
-
-			ThreadPool.QueueUserWorkItem(async x =>
-			{
-				var query = folderQuery.Concat(fileQuery);
-
-				var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
-				{
-					var resultX = await x.TaskSize;
-					var resultY = await y.TaskSize;
-
-					return resultY.CompareTo(resultX);
-				});
-
-				await view.Root.AddRangeAsync(query, comparer, token: CurrentTab.TokenSource.Token);
-			});
-
-			ThreadPool.QueueUserWorkItem(async x =>
-			{
-				var options = new EnumerationOptions()
-				{
-					IgnoreInaccessible = true,
-					AttributesToSkip = FileAttributes.System,
-					RecurseSubdirectories = true,
-				};
-
-				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = true);
-
-				var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(Path, (ref FileSystemEntry y) => (System.IO.Path.GetExtension(y.FileName).ToString(), y.Length), options)
-					{
-						ShouldIncludePredicate = (ref FileSystemEntry z) => !z.IsDirectory,
-					}
-					.Where(w => !String.IsNullOrEmpty(w.Extension))
-					.GroupBy(g => g.Extension)
-					.Where(w => CurrentTab.TokenSource?.IsCancellationRequested != true);
-
-				var comparer = new ExtensionModelComparer();
-
-				foreach (var extension in extensionQuery)
-				{
-					var model = new ExtensionModel(extension.Key, extension.Sum(s => s.Size))
-					{
-						TotalFiles = extension.Count(),
-					};
-
-					var index = view.Extensions.BinarySearch(model, comparer);
-
-					if (index >= 0)
-					{
-						await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(index, model));
-					}
-					else
-					{
-						await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(~index, model));
-					}
-				}
-
-				await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = false);
-			});
+			// var view = new AnalyzerView();
+			// CurrentTab.DisplayControl = view;
+			//
+			// var drive = new DriveInfo(Path.Substring(0, 1));
+			// var parent = new FileIndexModel(PathHelper.FromPath(Path));
+			//
+			// if (drive.Name == Path)
+			// {
+			// 	parent = new FileIndexModel(PathHelper.FromPath(Path));
+			// }
+			//
+			// var options = new EnumerationOptions()
+			// {
+			// 	IgnoreInaccessible = true,
+			// 	AttributesToSkip = FileAttributes.Temporary,
+			// };
+			//
+			// var folderQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(new FileSystemTreeItem(x.FileName, x.IsDirectory)), options)
+			// {
+			// 	ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
+			// };
+			//
+			// var fileQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(new FileSystemTreeItem(x.FileName, x.IsDirectory)), options)
+			// {
+			// 	ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
+			// };
+			//
+			// ThreadPool.QueueUserWorkItem(async x =>
+			// {
+			// 	var query = folderQuery.Concat(fileQuery);
+			//
+			// 	var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
+			// 	{
+			// 		var resultX = await x.TaskSize;
+			// 		var resultY = await y.TaskSize;
+			//
+			// 		return resultY.CompareTo(resultX);
+			// 	});
+			//
+			// 	await view.Root.AddRangeAsync(query, comparer, token: CurrentTab.TokenSource.Token);
+			// });
+			//
+			// ThreadPool.QueueUserWorkItem(async x =>
+			// {
+			// 	var options = new EnumerationOptions()
+			// 	{
+			// 		IgnoreInaccessible = true,
+			// 		AttributesToSkip = FileAttributes.System,
+			// 		RecurseSubdirectories = true,
+			// 	};
+			//
+			// 	await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = true);
+			//
+			// 	var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(Path, (ref FileSystemEntry y) => (System.IO.Path.GetExtension(y.FileName).ToString(), y.Length), options)
+			// 		{
+			// 			ShouldIncludePredicate = (ref FileSystemEntry z) => !z.IsDirectory,
+			// 		}
+			// 		.Where(w => !String.IsNullOrEmpty(w.Extension))
+			// 		.GroupBy(g => g.Extension)
+			// 		.Where(w => CurrentTab.TokenSource?.IsCancellationRequested != true);
+			//
+			// 	var comparer = new ExtensionModelComparer();
+			//
+			// 	foreach (var extension in extensionQuery)
+			// 	{
+			// 		var model = new ExtensionModel(extension.Key, extension.Sum(s => s.Size))
+			// 		{
+			// 			TotalFiles = extension.Count(),
+			// 		};
+			//
+			// 		var index = view.Extensions.BinarySearch(model, comparer);
+			//
+			// 		if (index >= 0)
+			// 		{
+			// 			await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(index, model));
+			// 		}
+			// 		else
+			// 		{
+			// 			await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(~index, model));
+			// 		}
+			// 	}
+			//
+			// 	await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = false);
+			// });
 		}
 
 		public void ShowProperties()
 		{
-			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && Path is not null)
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
 			{
-				var model = CurrentTab.Files.FirstOrDefault(x => x.IsSelected) ?? new FileModel(PathHelper.FromPath(Path)!);
+				var model = CurrentTab.Files.FirstOrDefault(x => x.IsSelected) ?? CurrentTab.CurrentFolder;
 
 				var properties = new Properties
 				{
+					Provider = CurrentTab.Provider,
 					Model = model,
 				};
 
@@ -422,7 +389,7 @@ namespace FileExplorer.ViewModels
 
 		public async Task OneDrive()
 		{
-			CurrentTab.Provider = new GraphItemProvider((code, url, token) =>
+			var provider = new GraphItemProvider((code, url, token) =>
 			{
 				if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
 				{
@@ -434,14 +401,18 @@ namespace FileExplorer.ViewModels
 							RedirectUri = url,
 						};
 
-						token.UnsafeRegister(_ => Console.WriteLine(token), null);
-
 						CurrentTab.PopupContent = login;
 					});
 				}
 
 				return Task.CompletedTask;
 			});
+
+			CurrentTab.Provider = provider;
+
+			await _currentTab.SetPath(await provider.GetRootAsync());
+
+			CurrentTab.PopupContent = null;
 		}
 	}
 }

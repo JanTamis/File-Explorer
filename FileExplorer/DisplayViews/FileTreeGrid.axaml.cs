@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
@@ -12,12 +8,10 @@ using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using FileExplorer.Converters;
+using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
-using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
-using FileExplorer.Models;
 using Humanizer;
-using Microsoft.IdentityModel.Abstractions;
 
 namespace FileExplorer.DisplayViews;
 
@@ -25,11 +19,13 @@ public class FileTreeGrid : UserControl, IFileViewer
 {
 	const string controlName = "TreeDataGrid";
 
+	public IItemProvider? Provider { get; set; }
+
 	public ObservableRangeCollection<IFileItem> Items
 	{
 		get
 		{
-			if (this.FindControl<TreeDataGrid>(controlName) is { Source: HierarchicalTreeDataGridSource<IFileItem> source })
+			if (this.FindControl< TreeDataGrid>(controlName) is { Source: HierarchicalTreeDataGridSource<IFileItem> source })
 			{
 				return source.Items as ObservableRangeCollection<IFileItem>;
 			}
@@ -56,9 +52,9 @@ public class FileTreeGrid : UserControl, IFileViewer
 									{
 										[!DataContextProperty] = new Binding("")
 										{
-											Source = x,
+											Source = Provider?.GetThumbnailAsync(x, 24, default) ?? Task<IImage?>.FromResult(null as IImage),
 											Converter = PathToImageConverter.Instance,
-											ConverterParameter = 64,
+											ConverterParameter = 24,
 										},
 										Width = 24,
 										Height = 24,
@@ -76,8 +72,8 @@ public class FileTreeGrid : UserControl, IFileViewer
 							CompareAscending = (x, y) => String.Compare(x?.Name, y?.Name, StringComparison.CurrentCulture),
 							CompareDescending = (x, y) => String.Compare(y?.Name, x?.Name, StringComparison.CurrentCulture),
 						}),
-						x => x.Children,
-						x => x is { IsFolder: true } && x.Children.Any()),
+						x => Provider.GetItems(x, "*", false, default),
+					x => x is { IsFolder: true } && Provider?.HasItems(x) is true),
 					new TextColumn<IFileItem, DateTime>("Edit Date", item => item.EditedOn, GridLength.Auto),
 					new TextColumn<IFileItem, string>("Type", item => item.Extension, GridLength.Auto),
 					new TextColumn<IFileItem, string>("Size", item => item.IsFolder ? null : item.Size.Bytes().ToString(), GridLength.Auto, new TextColumnOptions<IFileItem>()
@@ -100,7 +96,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 				}
 			});
 
-			TreeDataGridRow.DataContextProperty.Changed.Subscribe(args =>
+			DataContextProperty.Changed.Subscribe(args =>
 			{
 				if (args.Sender is TreeDataGridRow row)
 				{
@@ -108,26 +104,28 @@ public class FileTreeGrid : UserControl, IFileViewer
 				}
 			});
 
-			DoubleTappedEvent.AddClassHandler<TreeDataGridRow>((sender, args) =>
+			DoubleTappedEvent.AddClassHandler<TreeDataGridRow>((sender, _) =>
 			{
 				if (sender is { DataContext: IFileItem item } && item != previousModel)
 				{
-					PathChanged(item.GetPath(path => path.ToString()));
+					PathChanged(item);
 
 					previousModel = item;
 				}
 			});
 
-			grid.RowSelection!.SingleSelect = false;
-			grid.RowSelection.SelectionChanged += delegate { SelectionChanged(); };
+			if (grid.RowSelection is not null)
+			{
+				grid.RowSelection.SingleSelect = false;
+				grid.RowSelection.SelectionChanged += delegate { SelectionChanged(); };
+			}
 		}
 	}
 
-	public Task<int> ItemCount => Task.FromResult(Items.Count);
+	public ValueTask<int> ItemCount => ValueTask.FromResult(Items.Count);
 
-	public event Action<string> PathChanged = delegate { };
+	public event Action<IFileItem> PathChanged = delegate { };
 	public event Action SelectionChanged = delegate { };
-
 
 	public Action SelectAll => () =>
 	{
@@ -155,8 +153,9 @@ public class FileTreeGrid : UserControl, IFileViewer
 			selection.BeginBatchUpdate();
 
 			var index = 0;
+			using var enumerator = Items.GetEnumerator();
 
-			foreach (var _ in Items)
+			while (enumerator.MoveNext())
 			{
 				selection.Deselect(index);
 
@@ -169,7 +168,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 
 	public Action SelectInvert => () =>
 	{
-		if (this.FindControl<TreeDataGrid>(controlName) is { RowSelection: var selection })
+		if (this.FindControl<TreeDataGrid>(controlName) is { RowSelection: { } selection })
 		{
 			selection.BeginBatchUpdate();
 
@@ -194,11 +193,6 @@ public class FileTreeGrid : UserControl, IFileViewer
 	};
 
 	public FileTreeGrid()
-	{
-		InitializeComponent();
-	}
-
-	private void InitializeComponent()
 	{
 		AvaloniaXamlLoader.Load(this);
 	}

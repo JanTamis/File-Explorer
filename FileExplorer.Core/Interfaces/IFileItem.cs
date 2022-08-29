@@ -6,8 +6,6 @@ public interface IFileItem
 	bool IsFolder { get; }
 	bool IsRoot { get; }
 
-	IEnumerable<IFileItem> Children { get; }
-
 	string Extension { get; }
 	string Name { get; set; }
 

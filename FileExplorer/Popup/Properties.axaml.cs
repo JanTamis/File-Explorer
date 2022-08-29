@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using System.ComponentModel;
@@ -7,10 +5,9 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 using Avalonia.Media;
 using DialogHostAvalonia;
+using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
@@ -37,7 +34,7 @@ public partial class Properties : UserControl, IPopup, INotifyPropertyChanged
 
 	private CancellationTokenSource _source;
 
-	public Task<IImage?> Icon => ThumbnailProvider.GetFileImage(_model, 48);
+	public Task<IImage?> Icon => ThumbnailProvider.GetFileImage(Model, Provider, 48);
 
 	private ObservableRangeCollection<MetadataExtractor.Directory> MetaData { get; } = new();
 
@@ -128,6 +125,8 @@ public partial class Properties : UserControl, IPopup, INotifyPropertyChanged
 	public long Size => _size;
 
 	public string ItemName { get; set; }
+
+	public IItemProvider Provider { get; set; }
 
 	public Properties()
 	{

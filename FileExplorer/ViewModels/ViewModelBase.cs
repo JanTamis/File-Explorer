@@ -1,7 +1,6 @@
 using Avalonia.Threading;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 
 namespace FileExplorer.ViewModels;
 

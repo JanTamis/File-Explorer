@@ -1,65 +1,89 @@
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Enumeration;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Models;
+using Avalonia.Media;
 using FileExplorer.Helpers;
-using System.Threading;
 
 namespace FileExplorer.Providers;
 
 public class FileSystemProvider : IItemProvider
 {
-	public ValueTask<IEnumerable<IFileItem>> GetItemsAsync(string path, string filter, bool recursive, CancellationToken token)
+	public async IAsyncEnumerable<IFileItem> GetItemsAsync(IFileItem folder, string filter, bool recursive, [EnumeratorCancellation] CancellationToken token)
 	{
-		var treeItem = PathHelper.FromPath(path);
-
-		if (treeItem is null)
+		if (folder is FileModel model)
 		{
-			return ValueTask.FromResult(Enumerable.Empty<IFileItem>());
-		}
-
-		if (recursive)
-		{
-			return ValueTask.FromResult(GetFileSystemEntriesRecursive(treeItem, filter).Cast<IFileItem>());
-		}
-
-		return ValueTask.FromResult(GetFileSystemEntries(treeItem, filter).Cast<IFileItem>());
-	}
-
-	public IEnumerable<IPathSegment> GetPath(string path)
-	{
-		var treeItem = PathHelper.FromPath(path);
-
-		return treeItem?
-			.EnumerateToRoot()
-			.Reverse()
-			.Select(s => new FolderModel(s)) ?? Enumerable.Empty<FolderModel>();
-	}
-
-	private static IEnumerable<FileModel> GetFileSystemEntriesRecursive(FileSystemTreeItem path, string search)
-	{
-		if (search is "*" or "*.*")
-		{
-			return path
-				.EnumerateChildren((ref FileSystemEntry file) => !file.IsHidden)
+			var children = model.TreeItem
+				.EnumerateChildren(recursive ? uint.MaxValue : 0)
 				.Select(s => new FileModel(s));
-		}
 
-		return path
-			.EnumerateChildren((ref FileSystemEntry entry) => !entry.IsHidden)
-			.Where(w => FileSystemName.MatchesSimpleExpression(search, w.Value))
-			.Select(s => new FileModel(s));
+			foreach (var file in children)
+			{
+				yield return file;
+
+				if (file.IsFolder && recursive)
+				{
+					await foreach (var child in GetItemsAsync(file, filter, recursive, token))
+					{
+						yield return child;
+					}
+				}
+			}
+		}
 	}
 
-	private static IEnumerable<FileModel> GetFileSystemEntries(FileSystemTreeItem path, string search)
+	public IEnumerable<IFileItem> GetItems(IFileItem folder, string filter, bool recursive, [EnumeratorCancellation] CancellationToken token)
 	{
-		return path
-			.EnumerateChildren((ref FileSystemEntry file) => !file.IsHidden, 0)
-			.Where(w => FileSystemName.MatchesSimpleExpression(search, w.Value))
-			.Select(s => new FileModel(s));
+		if (folder is FileModel model)
+		{
+			var children = model.TreeItem
+				.EnumerateChildren(recursive ? uint.MaxValue : 0)
+				.Select(s => new FileModel(s));
 
+			foreach (var file in children)
+			{
+				yield return file;
+
+				if (file.IsFolder && recursive)
+				{
+					foreach (var child in GetItems(file, filter, recursive, token))
+					{
+						yield return child;
+					}
+				}
+			}
+		}
+	}
+
+	public bool HasItems(IFileItem folder)
+	{
+		return folder is FileModel { TreeItem.HasChildren: true };
+	}
+
+	public async ValueTask<IEnumerable<IPathSegment>> GetPathAsync(IFileItem folder)
+	{
+		if (folder is FileModel { TreeItem: not null } file)
+		{
+			return await ValueTask.FromResult(file.TreeItem
+				.EnumerateToRoot()
+				.Reverse()
+				.Select(s => new FolderModel(s)));
+		}
+
+		throw new ArgumentException("Provide a valid folder that is created from this provider");
+	}
+
+	public ValueTask<IFileItem?> GetParentAsync(IFileItem folder, CancellationToken token)
+	{
+		if (folder is FileModel { TreeItem.Parent: not null } file)
+		{
+			return new ValueTask<IFileItem?>(new FileModel(file.TreeItem.Parent));
+		}
+
+		return new ValueTask<IFileItem?>(null as IFileItem);
+	}
+
+	public Task<IImage?> GetThumbnailAsync(IFileItem item, int size, CancellationToken token)
+	{
+		return ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested);
 	}
 }

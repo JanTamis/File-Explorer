@@ -1,9 +1,5 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using FileExplorer.Helpers;
+﻿using System.IO;
+using FileExplorer.Core.Helpers;
 
 namespace FileExplorer.Models;
 
@@ -41,15 +37,15 @@ public class FileIndexModel
 
 				if (query is not null)
 				{
-					var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
+					var comparer = Comparer<FileIndexModel>.Create((x, y) =>
 					{
-						var resultX = await x.TaskSize;
-						var resultY = await y.TaskSize;
+						var resultX = x.Size;
+						var resultY = y.Size;
 
 						return resultY.CompareTo(resultX);
 					});
 
-					ThreadPool.QueueUserWorkItem(async x => await _items.AddRangeAsync(query, comparer));
+					ThreadPool.QueueUserWorkItem(async _ => await _items.AddRange(query, comparer));
 				}
 			}
 

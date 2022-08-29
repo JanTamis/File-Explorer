@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using Avalonia.Data.Converters;
+﻿using Avalonia.Data.Converters;
 using System.Globalization;
-using System.Linq;
 using FileExplorer.Helpers;
 using FileExplorer.Models;
 

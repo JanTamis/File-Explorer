@@ -1,7 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Material.Icons;
-using System;
 using System.Globalization;
 
 namespace FileExplorer.Converters

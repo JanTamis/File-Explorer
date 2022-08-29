@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
-using FileExplorer.Helpers;
 
 namespace FileExplorer.Interfaces;
 
@@ -13,9 +9,9 @@ public interface IFileViewer
 {
 	public ObservableRangeCollection<IFileItem> Items { get; set; }
 
-	public Task<int> ItemCount { get; }
+	public ValueTask<int> ItemCount { get; }
 
-	event Action<string> PathChanged;
+	event Action<IFileItem> PathChanged;
 	public event Action SelectionChanged;
 
 	Action SelectAll { get; }
@@ -29,7 +25,7 @@ public interface IFileViewer
 	/// <param name="select">Whether the item should be selected or unselected.</param>
 	/// <param name="rangeModifier">Whether the range modifier is enabled (i.e. shift key).</param>
 	/// <param name="toggleModifier">Whether the toggle modifier is enabled (i.e. ctrl key).</param>
-	public static async Task<int> UpdateSelection(IFileViewer viewer, int anchorIndex, int index, bool select = true, bool rangeModifier = false, bool toggleModifier = false)
+	public static async ValueTask<int> UpdateSelection(IFileViewer viewer, int anchorIndex, int index, bool select = true, bool rangeModifier = false, bool toggleModifier = false)
 	{
 		var count = await viewer.ItemCount;
 		var files = viewer.Items;

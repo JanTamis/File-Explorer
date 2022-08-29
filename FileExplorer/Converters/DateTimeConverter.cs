@@ -1,6 +1,5 @@
 ﻿using Avalonia.Data.Converters;
 using Humanizer;
-using System;
 using System.Globalization;
 
 namespace FileExplorer.Converters;

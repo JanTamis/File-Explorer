@@ -1,15 +1,10 @@
 ﻿using Avalonia.Media;
 using Avalonia.Svg.Skia;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Threading.Tasks;
 using Avalonia.Threading;
-using System.Threading;
 using Avalonia.Media.Imaging;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Models;
 
@@ -52,7 +47,7 @@ public static class ThumbnailProvider
 		}
 	}
 
-	public static async Task<IImage?> GetFileImage(IFileItem model, int size, Func<bool>? shouldReturnImage = null)
+	public static async Task<IImage?> GetFileImage(IFileItem? model, IItemProvider provider, int size, Func<bool>? shouldReturnImage = null)
 	{
 		if (model is null || shouldReturnImage is not null && !shouldReturnImage())
 		{
@@ -111,7 +106,7 @@ public static class ThumbnailProvider
 
 				if (name == String.Empty)
 				{
-					name = model.Children.Any()
+					name = provider.HasItems(model)
 						? "FolderFiles"
 						: "Folder";
 				}
@@ -150,7 +145,7 @@ public static class ThumbnailProvider
 		}, size) ?? Task.FromResult<SvgImage?>(null), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
 	}
 
-	public static async Task<IImage?> GetFileImage(FileSystemTreeItem model, int size, Func<bool>? shouldReturnImage = null)
+	public static async Task<IImage?> GetFileImage(FileSystemTreeItem? model, int size, Func<bool>? shouldReturnImage = null)
 	{
 		if (model is null || shouldReturnImage is not null && !shouldReturnImage())
 		{
@@ -282,18 +277,18 @@ public static class ThumbnailProvider
 					}
 					else
 					{
-							await Dispatcher.UIThread.InvokeAsync(() =>
+						await Dispatcher.UIThread.InvokeAsync(() =>
+						{
+							if (!Images.ContainsKey(key))
 							{
-								if (!Images.ContainsKey(key))
+								image = new SvgImage
 								{
-									image = new SvgImage
-									{
-										Source = source,
-									};
+									Source = source,
+								};
 
-									Images.Add(key, image);
-								}
-							});
+								Images.Add(key, image);
+							}
+						});
 					}
 				}
 			}

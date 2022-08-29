@@ -1,8 +1,6 @@
-﻿using System;
-using Avalonia.Data.Converters;
+﻿using Avalonia.Data.Converters;
 using System.Globalization;
 using Avalonia.Media;
-using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
 using FileExplorer.Models;
@@ -15,11 +13,16 @@ public class PathToImageConverter : IValueConverter, ISingleton<PathToImageConve
 
 	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
+		if (value is Task<IImage?> imageTask)
+		{
+			return new TaskCompletionNotifier<IImage?>(imageTask);
+		}
+
 		if (parameter is int size)
 		{
 			var task = value switch
 			{
-				IFileItem model => ThumbnailProvider.GetFileImage(model, size, () => true),
+				//IFileItem model => ThumbnailProvider.GetFileImage(model, size, () => true),
 				FileSystemTreeItem treeItem => ThumbnailProvider.GetFileImage(treeItem, size),
 				string path => ThumbnailProvider.GetFileImage(PathHelper.FromPath(path), size),
 				_ => null,

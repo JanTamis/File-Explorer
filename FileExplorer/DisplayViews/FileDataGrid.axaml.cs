@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
-using System.Linq;
-using System.Threading.Tasks;
+using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
-using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
 using FileExplorer.Models;
 
@@ -16,7 +12,7 @@ namespace FileExplorer.DisplayViews;
 public partial class FileDataGrid : UserControl, ISelectableControl, IFileViewer
 {
 	private int anchorIndex = 0;
-	public event Action<string> PathChanged = delegate { };
+	public event Action<IFileItem> PathChanged = delegate { };
 	public event Action SelectionChanged = delegate { };
 
 	public Action SelectAll { get; }
@@ -39,7 +35,7 @@ public partial class FileDataGrid : UserControl, ISelectableControl, IFileViewer
 		}
 	}
 
-	public Task<int> ItemCount { get; set; }
+	public ValueTask<int> ItemCount { get; set; }
 
 	public FileDataGrid() : base()
 	{
@@ -111,9 +107,9 @@ public partial class FileDataGrid : UserControl, ISelectableControl, IFileViewer
 
 	private void Item_DoubleTapped(object? sender, RoutedEventArgs e)
 	{
-		if (sender is ListBoxItem { DataContext: FileModel model })
+		if (sender is ListBoxItem { DataContext: IFileItem model })
 		{
-			PathChanged(model.TreeItem.GetPath(path => path.ToString()));
+			PathChanged(model);
 		}
 	}
 }

@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace FileExplorer.Interfaces;
+﻿namespace FileExplorer.Interfaces;
 
 public interface IAsyncComparer<in T>
 {

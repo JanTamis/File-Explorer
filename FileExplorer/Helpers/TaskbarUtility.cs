@@ -1,5 +1,4 @@
-﻿using System;
-using Avalonia.Controls.ApplicationLifetimes;
+﻿using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;

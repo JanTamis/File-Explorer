@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FileExplorer.Helpers;
 
@@ -31,9 +29,9 @@ public sealed class TaskCompletionNotifier<TResult> : INotifyPropertyChanged
 
 	public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
-	private TResult _defaultResult;
+	private readonly TResult? _defaultResult;
 
-	public TaskCompletionNotifier(Task<TResult> task, TResult defaultValue = default)
+	public TaskCompletionNotifier(Task<TResult> task, TResult? defaultValue = default)
 	{
 		Task = task;
 		_defaultResult = defaultValue;

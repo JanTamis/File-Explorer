@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using MetadataExtractor;
+﻿using MetadataExtractor;
 using Directory = MetadataExtractor.Directory;
 
 namespace FileExplorer.Helpers;
