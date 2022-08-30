@@ -3,11 +3,25 @@ using FileExplorer.Core.Interfaces;
 using FileExplorer.Models;
 using Avalonia.Media;
 using FileExplorer.Helpers;
+using Humanizer.Bytes;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace FileExplorer.Providers;
 
 public class FileSystemProvider : IItemProvider
 {
+	private readonly MemoryCache _imageCache;
+
+	public FileSystemProvider()
+	{
+		_imageCache = new MemoryCache(new MemoryCacheOptions()
+		{
+			ExpirationScanFrequency = TimeSpan.FromMinutes(1),
+			TrackStatistics = true,
+			SizeLimit = 536_870_912,
+		});
+	}
+
 	public async IAsyncEnumerable<IFileItem> GetItemsAsync(IFileItem folder, string filter, bool recursive, [EnumeratorCancellation] CancellationToken token)
 	{
 		if (folder is FileModel model)
@@ -43,7 +57,7 @@ public class FileSystemProvider : IItemProvider
 			{
 				yield return file;
 
-				if (file.IsFolder && recursive)
+				if (recursive && file.IsFolder)
 				{
 					foreach (var child in GetItems(file, filter, recursive, token))
 					{
@@ -82,8 +96,28 @@ public class FileSystemProvider : IItemProvider
 		return new ValueTask<IFileItem?>(null as IFileItem);
 	}
 
-	public Task<IImage?> GetThumbnailAsync(IFileItem item, int size, CancellationToken token)
+	public Task<IImage?> GetThumbnailAsync(IFileItem? item, int size, CancellationToken token)
 	{
-		return ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested);
+		if (item is null)
+		{
+			return Task.FromResult(null as IImage);
+		}
+
+		if (_imageCache.GetCurrentStatistics() is { CurrentEstimatedSize: { } byteSize })
+		{
+			Console.WriteLine(ByteSize.FromBytes(byteSize).ToString());
+		}
+
+		return _imageCache.GetOrCreateAsync(item.GetHashCode(), async entry =>
+		{
+			var image = await ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested);
+
+			if (image is not null)
+			{
+				entry.SetSize((long)image.Size.Width * (long)image.Size.Height * 4L);
+			}
+
+			return image;
+		});
 	}
 }

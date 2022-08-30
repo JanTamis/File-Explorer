@@ -126,29 +126,28 @@ public partial class TabItemViewModel
 
 			OnPropertyChanged(nameof(FileCount));
 
-			var items = Provider.GetItemsAsync(CurrentFolder, search, recursive, TokenSource.Token);
+			var items = Provider.GetItemsAsync(CurrentFolder!, search, recursive, TokenSource.Token);
 
 			await Files.AddRangeAsync(items, !recursive
 				? Comparer<IFileItem>.Create((x, y) =>
-				{
-					switch (x, y)
 					{
-						case (null, null): return 0;
-						case (null, _): return -1;
-						case (_, null): return 1;
-					}
+						switch (x, y)
+						{
+							case (null, null): return 0;
+							case (null, _): return -1;
+							case (_, null): return 1;
+						}
 
-					var result = y.IsFolder.CompareTo(x.IsFolder);
+						var result = y.IsFolder.CompareTo(x.IsFolder);
 
-					if (result == 0)
-					{
-						result = String.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
-					}
+						if (result is 0)
+						{
+							result = String.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
+						}
 
-					return result;
-				})
-				: default, true
-				, null, TokenSource.Token);
+						return result;
+					})
+				: default, true, null, TokenSource.Token);
 		});
 
 		IsLoading = false;

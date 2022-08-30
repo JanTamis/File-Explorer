@@ -40,6 +40,11 @@ namespace FileExplorer.Graph.Models
 			return action(Name, parameter);
 		}
 
+		public override int GetHashCode()
+		{
+			return item.Id.GetHashCode();
+		}
+
 		public override string ToString()
 		{
 			return Name;

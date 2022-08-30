@@ -13,5 +13,5 @@ public interface IItemProvider
 
 	ValueTask<IFileItem?> GetParentAsync(IFileItem folder, CancellationToken token);
 
-	Task<IImage?> GetThumbnailAsync(IFileItem item, int size, CancellationToken token);
+	Task<IImage?> GetThumbnailAsync(IFileItem? item, int size, CancellationToken token);
 }

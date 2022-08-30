@@ -156,13 +156,18 @@ public partial class FileModel : IFileItem
 	}
 
 
-public T GetPath<T>(ReadOnlySpanFunc<char, T> action)
-  {
-	  return TreeItem.GetPath(action);
-  }
+	public T GetPath<T>(ReadOnlySpanFunc<char, T> action)
+	{
+		return TreeItem.GetPath(action);
+	}
 
-  public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
-  {
-	  return TreeItem.GetPath(action, parameter);
-  }
+	public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
+	{
+		return TreeItem.GetPath(action, parameter);
+	}
+
+	public override int GetHashCode()
+	{
+		return GetPath(String.GetHashCode);
+	}
 }

@@ -72,7 +72,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 							CompareAscending = (x, y) => String.Compare(x?.Name, y?.Name, StringComparison.CurrentCulture),
 							CompareDescending = (x, y) => String.Compare(y?.Name, x?.Name, StringComparison.CurrentCulture),
 						}),
-						x => Provider.GetItems(x, "*", false, default),
+						x => Provider.GetItems(x, "*", false, default).OrderByDescending(o => o.IsFolder).ThenBy(t => t.Name),
 					x => x is { IsFolder: true } && Provider?.HasItems(x) is true),
 					new TextColumn<IFileItem, DateTime>("Edit Date", item => item.EditedOn, GridLength.Auto),
 					new TextColumn<IFileItem, string>("Type", item => item.Extension, GridLength.Auto),

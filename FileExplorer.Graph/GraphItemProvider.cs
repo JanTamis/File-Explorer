@@ -1,10 +1,10 @@
 using System.Runtime.CompilerServices;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.Platform;
 using Azure.Identity;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Graph.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Graph;
 
 namespace FileExplorer.Graph;
@@ -15,9 +15,18 @@ public class GraphItemProvider : IItemProvider
 
 	private readonly HttpClient _httpClient;
 
+	private readonly MemoryCache _imageCache;
+
 	public GraphItemProvider(Func<string, Uri, CancellationToken, Task> getCode)
 	{
 		_httpClient = new HttpClient();
+
+		_imageCache = new MemoryCache(new MemoryCacheOptions()
+		{
+			ExpirationScanFrequency = TimeSpan.FromMinutes(1),
+			TrackStatistics = true,
+			SizeLimit = 536_870_912,
+		});
 
 		var scopes = new[] { "User.Read", "Files.ReadWrite.All", "Files.Read", "Files.Read.All", "profile" };
 
@@ -80,19 +89,22 @@ public class GraphItemProvider : IItemProvider
 				? await Client.Me.Drive.Items[model.item.Id].Search(filter).Request().Expand("thumbnails").GetAsync()
 				: await Client.Me.Drive.Items[model.item.Id].Children.Request().Expand("thumbnails").GetAsync();
 
-			while (driveItem is { CurrentPage.Count: > 0 })
+			while (driveItem is { CurrentPage.Count: > 0 } && !token.IsCancellationRequested)
 			{
-				foreach (var item in driveItem.CurrentPage)
+				foreach (var item in driveItem.CurrentPage.Where(_ => !token.IsCancellationRequested))
 				{
 					yield return new GraphFileModel(item);
 				}
 
-				driveItem = driveItem switch
+				if (!token.IsCancellationRequested)
 				{
-					IDriveSearchCollectionPage { NextPageRequest: { } request } => await request.Expand("thumbnails").GetAsync(),
-					IDriveItemChildrenCollectionPage { NextPageRequest: { } request } => await request.Expand("thumbnails").GetAsync(),
-					_ => null,
-				};
+					driveItem = driveItem switch
+					{
+						IDriveSearchCollectionPage { NextPageRequest: { } request } => await request.Expand("thumbnails").GetAsync(),
+						IDriveItemChildrenCollectionPage { NextPageRequest: { } request } => await request.Expand("thumbnails").GetAsync(),
+						_ => null,
+					};
+				}
 			}
 		}
 	}
@@ -176,15 +188,20 @@ public class GraphItemProvider : IItemProvider
 		}
 	}
 
-	public async Task<IImage?> GetThumbnailAsync(IFileItem item, int size, CancellationToken token)
+	public Task<IImage?> GetThumbnailAsync(IFileItem? item, int size, CancellationToken token)
 	{
 		if (item is GraphFileModel { item.Thumbnails: [var thumbnail, ..] })
 		{
-			using var stream = new MemoryStream(await _httpClient.GetByteArrayAsync(thumbnail.Small.Url, token), false);
+			return _imageCache.GetOrCreateAsync(item.GetHashCode(), async entry =>
+			{
+				using var stream = new MemoryStream(await _httpClient.GetByteArrayAsync(thumbnail.Small.Url, token), false);
 
-			return new Bitmap(stream);
+				entry.SetSize(stream.Length);
+
+				return new Bitmap(stream) as IImage;
+			});
 		}
 
-		return await Task.FromResult(null as IImage);
+		return Task.FromResult(null as IImage);
 	}
 }
