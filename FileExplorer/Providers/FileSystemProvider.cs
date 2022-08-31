@@ -45,7 +45,7 @@ public class FileSystemProvider : IItemProvider
 		}
 	}
 
-	public IEnumerable<IFileItem> GetItems(IFileItem folder, string filter, bool recursive, [EnumeratorCancellation] CancellationToken token)
+	public IEnumerable<IFileItem> GetItems(IFileItem folder, string filter, bool recursive, CancellationToken token)
 	{
 		if (folder is FileModel model)
 		{
@@ -101,11 +101,6 @@ public class FileSystemProvider : IItemProvider
 		if (item is null)
 		{
 			return Task.FromResult(null as IImage);
-		}
-
-		if (_imageCache.GetCurrentStatistics() is { CurrentEstimatedSize: { } byteSize })
-		{
-			Console.WriteLine(ByteSize.FromBytes(byteSize).ToString());
 		}
 
 		return _imageCache.GetOrCreateAsync(item.GetHashCode(), async entry =>

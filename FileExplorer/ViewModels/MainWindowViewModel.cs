@@ -51,7 +51,7 @@ namespace FileExplorer.ViewModels
 			notificationManager = manager;
 
 			var drives = from drive in DriveInfo.GetDrives()
-									 where drive.IsReady && drive.DriveType is DriveType.Removable or DriveType.Unknown
+									 where drive.IsReady
 									 select new FolderModel(PathHelper.FromPath(drive.RootDirectory.FullName), null, null);
 
 			var quickAccess = from specialFolder in KnownFolders()

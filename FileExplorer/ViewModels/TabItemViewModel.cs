@@ -39,6 +39,7 @@ public partial class TabItemViewModel
 	private bool _isSelected;
 
 	[ObservableProperty]
+	[NotifyPropertyChangedFor(nameof(SearchFailed))]
 	private int _fileCount;
 
 	[ObservableProperty]
@@ -61,7 +62,7 @@ public partial class TabItemViewModel
 
 	public Task<IEnumerable<IPathSegment>> Folders => Provider.GetPathAsync(CurrentFolder).AsTask();
 
-	public bool SearchFailed => !IsLoading && !Files.Any() && DisplayControl is not Quickstart;
+	public bool SearchFailed => !IsLoading && FileCount == 0;
 
 	public string? FolderName => CurrentFolder?.Name;
 
@@ -128,26 +129,31 @@ public partial class TabItemViewModel
 
 			var items = Provider.GetItemsAsync(CurrentFolder!, search, recursive, TokenSource.Token);
 
-			await Files.AddRangeAsync(items, !recursive
-				? Comparer<IFileItem>.Create((x, y) =>
+			if (recursive)
+			{
+				await Files.AddRangeAsync(items, TokenSource.Token);
+			}
+			else
+			{
+				await Files.AddRangeAsync(items, Comparer<IFileItem>.Create((x, y) =>
+				{
+					switch (x, y)
 					{
-						switch (x, y)
-						{
-							case (null, null): return 0;
-							case (null, _): return -1;
-							case (_, null): return 1;
-						}
+						case (null, null): return 0;
+						case (null, _): return -1;
+						case (_, null): return 1;
+					}
 
-						var result = y.IsFolder.CompareTo(x.IsFolder);
+					var result = y.IsFolder.CompareTo(x.IsFolder);
 
-						if (result is 0)
-						{
-							result = String.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
-						}
+					if (result is 0)
+					{
+						result = String.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
+					}
 
-						return result;
-					})
-				: default, true, null, TokenSource.Token);
+					return result;
+				}), TokenSource.Token);
+			}
 		});
 
 		IsLoading = false;
