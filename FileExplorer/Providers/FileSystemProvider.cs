@@ -28,8 +28,7 @@ public class FileSystemProvider : IItemProvider
 		if (folder is FileModel model)
 		{
 			return model.TreeItem
-				.EnumerateChildren(recursive ? uint.MaxValue : 0)
-				.Where(w => !recursive || FileSystemName.MatchesSimpleExpression(filter, w.Value))
+				.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name), recursive ? uint.MaxValue : 0)
 				.Select(s => new FileModel(s))
 				.ToAsyncEnumerable();
 		}
@@ -41,23 +40,12 @@ public class FileSystemProvider : IItemProvider
 	{
 		if (folder is FileModel model)
 		{
-			var children = model.TreeItem
-				.EnumerateChildren(recursive ? uint.MaxValue : 0)
+			return model.TreeItem
+				.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name), recursive ? uint.MaxValue : 0)
 				.Select(s => new FileModel(s));
-
-			foreach (var file in children)
-			{
-				yield return file;
-
-				if (recursive && file.IsFolder)
-				{
-					foreach (var child in GetItems(file, filter, recursive, token))
-					{
-						yield return child;
-					}
-				}
-			}
 		}
+
+		return Enumerable.Empty<IFileItem>();
 	}
 
 	public bool HasItems(IFileItem folder)

@@ -29,7 +29,7 @@ namespace FileExplorer.Core.Helpers
 
 		public IEnumerator<T> GetEnumerator()
 		{
-			for (int i = _index; i < _endIndex; i++)
+			for (var i = _index; i <= _endIndex && i < _items.Count; i++)
 			{
 				yield return _items[i];
 			}
@@ -47,18 +47,7 @@ namespace FileExplorer.Core.Helpers
 
 		bool IList.Contains(object? value)
 		{
-			if (value is T search)
-			{
-				for (int i = _index; i <= _endIndex || i < _items.Count; i++)
-				{
-					if (search.Equals(_items[i]))
-					{
-						return true;
-					}
-				}
-			}
-
-			return false;
+			return value is T search && this.Contains(search);
 		}
 
 		void ICollection.CopyTo(Array array, int index)

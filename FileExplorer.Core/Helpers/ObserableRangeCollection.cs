@@ -216,7 +216,7 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 			{
 				CountChanged(Count);
 			}
-		}, token);
+		});
 
 		ValueTask task = default;
 

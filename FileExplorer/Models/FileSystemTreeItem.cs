@@ -182,62 +182,8 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, IEquata
 			yield break;
 		}
 
-		//var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(GetPath(x => x.ToString()), Options)
-		//{
-		//	Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
-		//};
-
-		if (layers is 0)
+		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(GetPath(x => x.ToString()), Options)
 		{
-			foreach (var child in Children)
-			{
-				yield return child;
-			}
-
-			yield break;
-		}
-
-		var children = new ArrayPoolList<FileSystemTreeItem>(128);
-
-		foreach (var child in Children)
-		{
-			yield return child;
-
-			if (child.IsFolder)
-			{
-				children.Add(child);
-			}
-		}
-
-		if (children.Count > 0)
-		{
-			foreach (var child in children)
-			{
-				if (child is not null)
-				{
-					foreach (var childOfChild in child.EnumerateChildren(layers - 1))
-					{
-						yield return childOfChild;
-					}
-				}
-			}
-		}
-
-		children.Dispose();
-	}
-
-	public IEnumerable<FileSystemTreeItem> EnumerateChildren(FileSystemEnumerable<FileSystemTreeItem>.FindPredicate findPredicate, uint layers = UInt32.MaxValue)
-	{
-		if (!IsFolder)
-		{
-			yield break;
-		}
-
-		var path = GetPath(x => x.ToString());
-
-		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(path, Options)
-		{
-			Find = findPredicate,
 			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
 		};
 
@@ -251,23 +197,53 @@ public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, IEquata
 			yield break;
 		}
 
-		var children = new List<FileSystemTreeItem>();
-			
 		while (enumerable.MoveNext())
 		{
 			yield return enumerable.Current;
 
 			if (enumerable.Current.IsFolder)
 			{
-				children.Add(enumerable.Current);
+				foreach (var childOfChild in enumerable.Current.EnumerateChildren(layers - 1))
+				{
+					yield return childOfChild;
+				}
 			}
 		}
+	}
 
-		foreach (var child in children)
+	public IEnumerable<FileSystemTreeItem> EnumerateChildren(ReadOnlySpanFunc<char, bool> include, uint layers = UInt32.MaxValue)
+	{
+		if (!IsFolder)
 		{
-			foreach (var childOfChild in child.EnumerateChildren(layers - 1))
+			yield break;
+		}
+
+		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(GetPath(x => x.ToString()), Options)
+		{
+			Find = (ref FileSystemEntry entry) => entry.IsDirectory || include(entry.FileName),
+			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
+		};
+
+		if (layers is 0)
+		{
+			while (enumerable.MoveNext() && (!enumerable.Current.IsFolder || include(enumerable.Current.Value)))
 			{
-				yield return childOfChild;
+				yield return enumerable.Current;
+			}
+
+			yield break;
+		}
+
+		while (enumerable.MoveNext() && (!enumerable.Current.IsFolder || include(enumerable.Current.Value)))
+		{
+			yield return enumerable.Current;
+
+			if (enumerable.Current.IsFolder)
+			{
+				foreach (var childOfChild in enumerable.Current.EnumerateChildren(layers - 1))
+				{
+					yield return childOfChild;
+				}
 			}
 		}
 	}
