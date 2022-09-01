@@ -17,7 +17,7 @@ public static class ThumbnailProvider
 {
 	// private static readonly Dictionary<string, string>? fileTypes = OperatingSystem.IsWindows() ? RegisteredFileType.GetFileTypeAndIcon() : new();
 
-	private static readonly Dictionary<string, SvgImage> Images = new();
+	private static readonly Dictionary<string, IImage> Images = new();
 	private static readonly Dictionary<string, string[]> TypeMap = new();
 
 	public static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default, Environment.ProcessorCount / 2); // BitOperations.Log2((uint)Environment.ProcessorCount));
@@ -80,13 +80,13 @@ public static class ThumbnailProvider
 
 			if (model.IsFolder)
 			{
-				if (OperatingSystem.IsWindows() && model is FileModel)
+				if (OperatingSystem.IsWindows())
 				{
 					foreach (var folder in Enum.GetValues<KnownFolder>())
 					{
 						var folderText = Enum.GetName(folder);
 
-						if (folderText is not null && model.GetPath((path, knownFolder) => path.SequenceEqual(KnownFolders.GetPath(knownFolder)), folder))
+						if (folderText is not null && path.SequenceEqual(KnownFolders.GetPath(folder)))
 						{
 							name = folderText;
 							break;
@@ -142,7 +142,7 @@ public static class ThumbnailProvider
 			}
 
 			return GetImage(name!);
-		}, size) ?? Task.FromResult<SvgImage?>(null), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
+		}, size) ?? Task.FromResult<IImage?>(null), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
 	}
 
 	public static async Task<IImage?> GetFileImage(FileSystemTreeItem? model, int size, Func<bool>? shouldReturnImage = null)
@@ -241,60 +241,31 @@ public static class ThumbnailProvider
 			}
 
 			return GetImage(name!);
-		}, size) ?? Task.FromResult<SvgImage?>(null), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
+		}, size) ?? Task.FromResult<IImage?>(null), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
 	}
 
-	private static async Task<SvgImage?> GetImage(string key)
+	private static Task<IImage?> GetImage(string? key)
 	{
 		if (String.IsNullOrEmpty(key))
 		{
-			return await Task.FromResult<SvgImage?>(null);
+			return Task.FromResult<IImage?>(null);
 		}
 
-		if (!Images.TryGetValue(key, out var image) && image is null)
+		return Dispatcher.UIThread.InvokeAsync(() =>
 		{
-			var source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/{key}.svg", null);
-
-			if (source is not null)
+			if (!Images.TryGetValue(key, out var image))
 			{
-				using var memoryStream = new MemoryStream();
-
-				if (source.Save(memoryStream, SkiaSharp.SKColors.Transparent))
+				image = new SvgImage
 				{
-					memoryStream.Seek(0, SeekOrigin.Begin);
+					Source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/{key}.svg", null),
+				};
 
-					if (Dispatcher.UIThread.CheckAccess())
-					{
-						if (!Images.ContainsKey(key))
-						{
-							image = new SvgImage
-							{
-								Source = source,
-							};
-
-							Images.Add(key, image);
-						}
-					}
-					else
-					{
-						await Dispatcher.UIThread.InvokeAsync(() =>
-						{
-							if (!Images.ContainsKey(key))
-							{
-								image = new SvgImage
-								{
-									Source = source,
-								};
-
-								Images.Add(key, image);
-							}
-						});
-					}
-				}
+				Images.TryAdd(key, image);
 			}
-		}
 
-		return image;
+			return image;
+		});
 	}
 }
+
 #pragma warning restore CA1416

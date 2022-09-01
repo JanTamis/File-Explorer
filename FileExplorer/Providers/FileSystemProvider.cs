@@ -10,16 +10,16 @@ namespace FileExplorer.Providers;
 
 public class FileSystemProvider : IItemProvider
 {
-	private readonly MemoryCache _imageCache;
+	private readonly MemoryCache? _imageCache;
 
 	public FileSystemProvider()
 	{
-		_imageCache = new MemoryCache(new MemoryCacheOptions()
-		{
-			ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-			TrackStatistics = true,
-			SizeLimit = 536_870_912,
-		});
+			_imageCache = new MemoryCache(new MemoryCacheOptions()
+			{
+				ExpirationScanFrequency = TimeSpan.FromMinutes(1),
+				TrackStatistics = true,
+				SizeLimit = 536_870_912,
+			});
 	}
 
 	public async IAsyncEnumerable<IFileItem> GetItemsAsync(IFileItem folder, string filter, bool recursive, [EnumeratorCancellation] CancellationToken token)
@@ -103,16 +103,21 @@ public class FileSystemProvider : IItemProvider
 			return Task.FromResult(null as IImage);
 		}
 
-		return _imageCache.GetOrCreateAsync(item.GetHashCode(), async entry =>
+		if (_imageCache is not null)
 		{
-			var image = await ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested);
-
-			if (image is not null)
+			return _imageCache.GetOrCreateAsync(item.GetHashCode(), async entry =>
 			{
-				entry.SetSize((long)image.Size.Width * (long)image.Size.Height * 4L);
-			}
+				var image = await ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested);
 
-			return image;
-		});
+				if (image is not null)
+				{
+					entry.SetSize((long)image.Size.Width * (long)image.Size.Height * 4L);
+				}
+
+				return image;
+			});
+		}
+
+		return ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested);
 	}
 }
