@@ -11,6 +11,7 @@
     <StartupObject>FileExplorer.Program</StartupObject>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TieredCompilation>true</TieredCompilation>
+	<TieredPGO>true</TieredPGO>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
 
     <IsWindows Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform($([System.Runtime.InteropServices.OSPlatform]::Windows)))' == 'true'">true</IsWindows>

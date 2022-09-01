@@ -137,7 +137,7 @@ namespace FileExplorer.ViewModels
 
 		public async void Refresh()
 		{
-			await CurrentTab.UpdateFiles(CurrentTab.IsSearching, CurrentTab.IsSearching ? CurrentTab.Search : "*");
+			await CurrentTab.UpdateFiles(false, "*");
 		}
 
 		public void SelectAll()

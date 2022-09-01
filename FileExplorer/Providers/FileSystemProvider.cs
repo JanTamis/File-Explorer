@@ -5,6 +5,7 @@ using Avalonia.Media;
 using FileExplorer.Helpers;
 using Humanizer.Bytes;
 using Microsoft.Extensions.Caching.Memory;
+using System.IO.Enumeration;
 
 namespace FileExplorer.Providers;
 
@@ -22,27 +23,18 @@ public class FileSystemProvider : IItemProvider
 			});
 	}
 
-	public async IAsyncEnumerable<IFileItem> GetItemsAsync(IFileItem folder, string filter, bool recursive, [EnumeratorCancellation] CancellationToken token)
+	public IAsyncEnumerable<IFileItem> GetItemsAsync(IFileItem folder, string filter, bool recursive, [EnumeratorCancellation] CancellationToken token)
 	{
 		if (folder is FileModel model)
 		{
-			var children = model.TreeItem
+			return model.TreeItem
 				.EnumerateChildren(recursive ? uint.MaxValue : 0)
-				.Select(s => new FileModel(s));
-
-			foreach (var file in children)
-			{
-				yield return file;
-
-				if (file.IsFolder && recursive)
-				{
-					await foreach (var child in GetItemsAsync(file, filter, recursive, token))
-					{
-						yield return child;
-					}
-				}
-			}
+				.Where(w => !recursive || FileSystemName.MatchesSimpleExpression(filter, w.Value))
+				.Select(s => new FileModel(s))
+				.ToAsyncEnumerable();
 		}
+
+		return AsyncEnumerable.Empty<IFileItem>();
 	}
 
 	public IEnumerable<IFileItem> GetItems(IFileItem folder, string filter, bool recursive, CancellationToken token)

@@ -63,7 +63,7 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 		}
 		else
 		{
-			ThreadPool.QueueUserWorkItem(async x => await AddRange<Comparer<T>>(items, needsReset: needsReset));
+			ThreadPool.QueueUserWorkItem(async x => await AddRange<Comparer<T>>(items));
 		}
 	}
 
@@ -88,16 +88,25 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 	/// <summary> 
 	/// Clears the current collection and replaces it with the specified collection. 
 	/// </summary> 
-	public async Task AddRange<TComparer>(IEnumerable<T> collection, TComparer? comparer = default, bool needsReset = false, CancellationToken token = default) where TComparer : IComparer<T>
+	public async Task AddRange<TComparer>(IEnumerable<T> collection, TComparer? comparer = default, CancellationToken token = default) where TComparer : IComparer<T>
 	{
 		ArgumentNullException.ThrowIfNull(collection);
 
-		var index = 0;
-
-		var watch = Stopwatch.StartNew();
-		var countWatch = Stopwatch.StartNew();
-
+		var watch = Stopwatch.GetTimestamp();
+		var isDone = false;
 		var buffer = new List<T>();
+
+		Task.Run(async () =>
+		{
+			var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(UpdateCountTime));
+
+			while (!isDone && await timer.WaitForNextTickAsync(token))
+			{
+				CountChanged(Count);
+			}
+		}, token);
+
+		ValueTask task = default;
 
 		foreach (var item in collection)
 		{
@@ -106,55 +115,85 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 				break;
 			}
 
-			if (comparer != null && _data.Count > 0)
+			buffer.Add(item);
+
+			if (task is { IsCompleted: true } && Stopwatch.GetElapsedTime(watch).TotalMilliseconds >= UpdateTime)
 			{
-				var i = BinarySearch(item, comparer);
+				UpdateList(buffer, comparer);
 
-				if (i >= 0)
-				{
-					_data.Insert(i, item);
-				}
-				else
-				{
-					_data.Insert(~i, item);
-				}
-			}
-			else
-			{
-				_data.Add(item);
-			}
+				buffer.Clear();
 
-			if (watch.ElapsedMilliseconds >= UpdateTime)
-			{
-				if (!needsReset && comparer is null)
-				{
-					await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, _data, index));
-				}
-				else
-				{
-					await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-				}
+				task = OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 
-				index = _data.Count;
-
-				watch.Restart();
-			}
-
-			if (countWatch.ElapsedMilliseconds >= UpdateCountTime)
-			{
-				CountChanged(_data.Count);
-
-				countWatch.Restart();
+				watch = Stopwatch.GetTimestamp();
 			}
 		}
 
-		if (!needsReset && comparer is null)
+		UpdateList(buffer, comparer);
+
+		await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+		CountChanged(Count);
+
+		isDone = true;
+
+		void UpdateList(List<T> buffer, TComparer comparer)
 		{
-			await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, index));
+			foreach (var bufferItem in buffer)
+			{
+				var index = BinarySearch(bufferItem, comparer);
+
+				if (index >= 0)
+				{
+					_data.Insert(index, bufferItem);
+				}
+				else
+				{
+					_data.Insert(~index, bufferItem);
+				}
+			}
 		}
-		else
+	}
+
+	/// <summary> 
+	/// Clears the current collection and replaces it with the specified collection. 
+	/// </summary> 
+	public async Task AddRange(IEnumerable<T> collection, CancellationToken token = default)
+	{
+		ArgumentNullException.ThrowIfNull(collection);
+
+		var watch = Stopwatch.GetTimestamp();
+
+		var isDone = false;
+		var index = Math.Max(0, Count - 1);
+
+		Task.Run(async () =>
 		{
-			await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+			using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(UpdateCountTime));
+
+			while (!isDone && await timer.WaitForNextTickAsync(token))
+			{
+				CountChanged(Count);
+			}
+		}, token);
+
+		ValueTask task = default;
+
+		foreach (var item in collection)
+		{
+			if (token.IsCancellationRequested)
+			{
+				break;
+			}
+
+			_data.Add(item);
+
+			if (task is { IsCompleted: true } && Stopwatch.GetElapsedTime(watch).TotalMilliseconds >= UpdateTime)
+			{
+				task = OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new ReadonlyPartialCollection<T>(_data, index, Count - index), index));
+				watch = Stopwatch.GetTimestamp();
+
+				index = Count;
+			}
 		}
 	}
 
