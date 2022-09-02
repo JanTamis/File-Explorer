@@ -24,7 +24,7 @@ public enum ThumbnailOptions
 
 [SupportedOSPlatform("Windows")]
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-public unsafe class WindowsThumbnailProvider
+public unsafe partial class WindowsThumbnailProvider
 {
 	private const string IShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
 
@@ -38,13 +38,13 @@ public unsafe class WindowsThumbnailProvider
 		ref Guid riid,
 		[MarshalAs(UnmanagedType.Interface)] out IShellItem shellItem);
 
-	[DllImport("gdi32.dll")]
+	[LibraryImport("gdi32.dll")]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	internal static extern bool DeleteObject(IntPtr hObject);
+	internal static partial bool DeleteObject(IntPtr hObject);
 
 	private static readonly int bitmapSize = Unsafe.SizeOf<NativeMethods.BITMAP>();
 
-	public static Bitmap GetThumbnail(ReadOnlySpan<char> fileName, int width, int height)
+	public static Bitmap? GetThumbnail(ReadOnlySpan<char> fileName, int width, int height)
 	{
 		return GetThumbnail(fileName, width, height, ThumbnailOptions.IconOnly, () => true);
 	}
@@ -226,7 +226,7 @@ public unsafe class WindowsThumbnailProvider
 }
 
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
-static class NativeMethods
+static partial class NativeMethods
 {
 	[StructLayout(LayoutKind.Sequential)]
 	public struct BITMAP
@@ -240,6 +240,6 @@ static class NativeMethods
 		public IntPtr bmBits;
 	}
 
-	[DllImport("gdi32", CharSet = CharSet.Auto, EntryPoint = "GetObject")]
+	[DllImport("gdi32", EntryPoint = "GetObject")]
 	public static extern int GetObjectBitmap(IntPtr hObject, int nCount, ref BITMAP lpObject);
 }
