@@ -17,7 +17,7 @@ namespace FileExplorer.DisplayViews;
 
 public class FileTreeGrid : UserControl, IFileViewer
 {
-	const string controlName = "TreeDataGrid";
+	private const string ControlName = "TreeDataGrid";
 
 	public IItemProvider? Provider { get; set; }
 
@@ -25,7 +25,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 	{
 		get
 		{
-			if (this.FindControl< TreeDataGrid>(controlName) is { Source: HierarchicalTreeDataGridSource<IFileItem> source })
+			if (this.FindControl<TreeDataGrid>(ControlName) is { Source: HierarchicalTreeDataGridSource<IFileItem> source })
 			{
 				return source.Items as ObservableRangeCollection<IFileItem>;
 			}
@@ -34,7 +34,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 		}
 		set
 		{
-			var grid = this.FindControl<TreeDataGrid>(controlName);
+			var grid = this.FindControl<TreeDataGrid>(ControlName);
 
 			var source = new HierarchicalTreeDataGridSource<IFileItem>(value)
 			{
@@ -73,7 +73,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 							CompareDescending = (x, y) => String.Compare(y?.Name, x?.Name, StringComparison.CurrentCulture),
 						}),
 						x => Provider.GetItems(x, "*", false, default).OrderByDescending(o => o.IsFolder).ThenBy(t => t.Name),
-					x => x is { IsFolder: true } && Provider?.HasItems(x) is true),
+						x => x is { IsFolder: true } && Provider?.HasItems(x) is true),
 					new TextColumn<IFileItem, DateTime>("Edit Date", item => item.EditedOn, GridLength.Auto),
 					new TextColumn<IFileItem, string>("Type", item => item.Extension, GridLength.Auto),
 					new TextColumn<IFileItem, string>("Size", item => item.IsFolder ? null : item.Size.Bytes().ToString(), GridLength.Auto, new TextColumnOptions<IFileItem>()
@@ -129,9 +129,9 @@ public class FileTreeGrid : UserControl, IFileViewer
 
 	public Action SelectAll => () =>
 	{
-		if (this.FindControl<TreeDataGrid>(controlName) is { RowSelection: { } selection })
+		if (this.FindControl<TreeDataGrid>(ControlName) is { RowSelection: { } selection })
 		{
-			selection.BeginBatchUpdate();
+			using var delegator = new DelegateExecutor(selection.BeginBatchUpdate, selection.EndBatchUpdate);
 
 			var index = 0;
 
@@ -141,16 +141,14 @@ public class FileTreeGrid : UserControl, IFileViewer
 
 				index++;
 			}
-
-			selection.EndBatchUpdate();
 		}
 	};
 
 	public Action SelectNone => () =>
 	{
-		if (this.FindControl<TreeDataGrid>(controlName) is { RowSelection: { } selection })
+		if (this.FindControl<TreeDataGrid>(ControlName) is { RowSelection: { } selection })
 		{
-			selection.BeginBatchUpdate();
+			using var delegator = new DelegateExecutor(selection.BeginBatchUpdate, selection.EndBatchUpdate);
 
 			var index = 0;
 			using var enumerator = Items.GetEnumerator();
@@ -161,16 +159,14 @@ public class FileTreeGrid : UserControl, IFileViewer
 
 				index++;
 			}
-
-			selection.EndBatchUpdate();
 		}
 	};
 
 	public Action SelectInvert => () =>
 	{
-		if (this.FindControl<TreeDataGrid>(controlName) is { RowSelection: { } selection })
+		if (this.FindControl<TreeDataGrid>(ControlName) is { RowSelection: { } selection })
 		{
-			selection.BeginBatchUpdate();
+			using var delegator = new DelegateExecutor(selection.BeginBatchUpdate, selection.EndBatchUpdate);
 
 			var index = 0;
 
@@ -187,8 +183,6 @@ public class FileTreeGrid : UserControl, IFileViewer
 
 				index++;
 			}
-
-			selection.EndBatchUpdate();
 		}
 	};
 

@@ -316,17 +316,25 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 
 	public async ValueTask OnCollectionChanged(NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
 	{
-		if (CollectionChanged is not null)
+		try
 		{
-			if (Dispatcher.UIThread.CheckAccess())
+			if (CollectionChanged is not null)
 			{
-				CollectionChanged(this, notifyCollectionChangedEventArgs);
-			}
-			else
-			{
-				await Dispatcher.UIThread.InvokeAsync(() => CollectionChanged(this, notifyCollectionChangedEventArgs));
+				if (Dispatcher.UIThread.CheckAccess())
+				{
+					CollectionChanged(this, notifyCollectionChangedEventArgs);
+				}
+				else
+				{
+					await Dispatcher.UIThread.InvokeAsync(() => CollectionChanged(this, notifyCollectionChangedEventArgs));
+				}
 			}
 		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+		}
+
 	}
 
 	public async ValueTask ClearTrim()

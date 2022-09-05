@@ -3,7 +3,6 @@ using FileExplorer.Core.Interfaces;
 using FileExplorer.Models;
 using Avalonia.Media;
 using FileExplorer.Helpers;
-using Humanizer.Bytes;
 using Microsoft.Extensions.Caching.Memory;
 using System.IO.Enumeration;
 

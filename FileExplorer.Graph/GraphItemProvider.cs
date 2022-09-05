@@ -11,10 +11,8 @@ namespace FileExplorer.Graph;
 
 public class GraphItemProvider : IItemProvider
 {
-	private readonly GraphServiceClient Client;
-
+	private readonly GraphServiceClient _client;
 	private readonly HttpClient _httpClient;
-
 	private readonly MemoryCache _imageCache;
 
 	public GraphItemProvider(Func<string, Uri, CancellationToken, Task> getCode)
@@ -46,7 +44,7 @@ public class GraphItemProvider : IItemProvider
 		// https://docs.microsoft.com/dotnet/api/azure.identity.devicecodecredential
 		var deviceCodeCredential = new DeviceCodeCredential(Callback, tenantId, clientId, options);
 
-		Client = new GraphServiceClient(deviceCodeCredential, scopes);
+		_client = new GraphServiceClient(deviceCodeCredential, scopes);
 
 		// Callback function that receives the user prompt
 		// Prompt contains the generated device code that you must
@@ -59,14 +57,14 @@ public class GraphItemProvider : IItemProvider
 
 	public async Task<string> GetNameAsync()
 	{
-		var user = await Client.Me.Request().GetAsync();
+		var user = await _client.Me.Request().GetAsync();
 
 		return user.DisplayName;
 	}
 
 	public async Task<IFileItem> GetRootAsync()
 	{
-		var item = await Client.Me.Drive.Root.Request().GetAsync();
+		var item = await _client.Me.Drive.Root.Request().GetAsync();
 
 		return new GraphFileModel(item);
 	}
@@ -75,7 +73,7 @@ public class GraphItemProvider : IItemProvider
 	{
 		if (folder is GraphFileModel { item.ParentReference: not null } fileItem)
 		{
-			return new GraphFileModel(await Client.Me.Drives[fileItem.item.ParentReference.DriveId].Items[fileItem.item.ParentReference.Id].Request().GetAsync(token));
+			return new GraphFileModel(await _client.Me.Drives[fileItem.item.ParentReference.DriveId].Items[fileItem.item.ParentReference.Id].Request().GetAsync(token));
 		}
 
 		return await new ValueTask<IFileItem?>(null as IFileItem);
@@ -86,25 +84,27 @@ public class GraphItemProvider : IItemProvider
 		if (folder is GraphFileModel model)
 		{
 			ICollectionPage<DriveItem>? driveItem = recursive
-				? await Client.Me.Drive.Items[model.item.Id].Search(filter).Request().Expand("thumbnails").GetAsync()
-				: await Client.Me.Drive.Items[model.item.Id].Children.Request().Expand("thumbnails").GetAsync();
+				? await _client.Me.Drive.Items[model.item.Id].Search(filter).Request().Expand("thumbnails").GetAsync(CancellationToken.None)
+				: await _client.Me.Drive.Items[model.item.Id].Children.Request().Expand("thumbnails").GetAsync(CancellationToken.None);
 
 			while (driveItem is { CurrentPage.Count: > 0 } && !token.IsCancellationRequested)
 			{
-				foreach (var item in driveItem.CurrentPage.Where(_ => !token.IsCancellationRequested))
+				foreach (var item in driveItem.CurrentPage)
 				{
+					if (token.IsCancellationRequested)
+					{
+						yield break;
+					}
+
 					yield return new GraphFileModel(item);
 				}
 
-				if (!token.IsCancellationRequested)
+				driveItem = driveItem switch
 				{
-					driveItem = driveItem switch
-					{
-						IDriveSearchCollectionPage { NextPageRequest: { } request } => await request.Expand("thumbnails").GetAsync(),
-						IDriveItemChildrenCollectionPage { NextPageRequest: { } request } => await request.Expand("thumbnails").GetAsync(),
-						_ => null,
-					};
-				}
+					IDriveSearchCollectionPage { NextPageRequest: { } request } => await request.Expand("thumbnails").GetAsync(CancellationToken.None),
+					IDriveItemChildrenCollectionPage { NextPageRequest: { } request } => await request.Expand("thumbnails").GetAsync(CancellationToken.None),
+					_ => null,
+				};
 			}
 		}
 	}
@@ -113,51 +113,57 @@ public class GraphItemProvider : IItemProvider
 	{
 		if (folder is GraphFileModel model)
 		{
+			ICollectionPage<DriveItem>? driveItem;
+
 			if (recursive)
 			{
-				var driveItem = Client.Me.Drive.Items[model.item.Id].Search(filter).Request().Expand("thumbnails").GetAsync();
+				var resultTask = _client.Me.Drive.Items[model.item.Id].Search(filter).Request().Expand("thumbnails").GetAsync(CancellationToken.None);
 
-				do
-				{
-					driveItem.Wait(token);
+				resultTask.Wait(CancellationToken.None);
 
-					if (driveItem?.Result is { CurrentPage.Count: > 0 })
-					{
-						foreach (var item in driveItem.Result.CurrentPage)
-						{
-							yield return new GraphFileModel(item);
-						}
-					}
-
-					driveItem = driveItem?.Result switch
-					{
-						{ NextPageRequest: { } request } => request.Expand("thumbnails").GetAsync(),
-						_ => null,
-					};
-				} while (driveItem is not null);
+				driveItem = resultTask.Result;
 			}
 			else
 			{
-				var driveItem = Client.Me.Drive.Items[model.item.Id].Children.Request().Expand("thumbnails").GetAsync();
+				var resultTask = _client.Me.Drive.Items[model.item.Id].Children.Request().Expand("thumbnails").GetAsync(CancellationToken.None);
 
-				do
+				resultTask.Wait(CancellationToken.None);
+
+				driveItem = resultTask.Result;
+			}
+
+			while (driveItem is { CurrentPage.Count: > 0 } && !token.IsCancellationRequested)
+			{
+				foreach (var item in driveItem.CurrentPage)
 				{
-					driveItem.Wait(token);
-
-					if (driveItem?.Result is { CurrentPage.Count: > 0 })
+					if (token.IsCancellationRequested)
 					{
-						foreach (var item in driveItem.Result.CurrentPage)
-						{
-							yield return new GraphFileModel(item);
-						}
+						yield break;
 					}
 
-					driveItem = driveItem?.Result switch
-					{
-						{ NextPageRequest: { } request } => request.Expand("thumbnails").GetAsync(),
-						_ => null,
-					};
-				} while (driveItem is not null);
+					yield return new GraphFileModel(item);
+				}
+
+				switch (driveItem)
+				{
+					case IDriveSearchCollectionPage { NextPageRequest: { } request }:
+						var searchResult = request.Expand("thumbnails").GetAsync(CancellationToken.None);
+
+						searchResult.Wait(CancellationToken.None);
+
+						driveItem = searchResult.Result;
+						break;
+					case IDriveItemChildrenCollectionPage { NextPageRequest: { } request }:
+						var childrenResult = request.Expand("thumbnails").GetAsync(CancellationToken.None);
+
+						childrenResult.Wait(CancellationToken.None);
+
+						driveItem = childrenResult.Result;
+						break;
+					default:
+						driveItem = null;
+						break;
+				}
 			}
 		}
 	}
