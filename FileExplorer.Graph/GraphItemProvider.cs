@@ -19,7 +19,7 @@ public class GraphItemProvider : IItemProvider
 	{
 		_httpClient = new HttpClient();
 
-		_imageCache = new MemoryCache(new MemoryCacheOptions()
+		_imageCache = new MemoryCache(new MemoryCacheOptions
 		{
 			ExpirationScanFrequency = TimeSpan.FromMinutes(1),
 			TrackStatistics = true,
@@ -84,10 +84,10 @@ public class GraphItemProvider : IItemProvider
 		if (folder is GraphFileModel model)
 		{
 			ICollectionPage<DriveItem>? driveItem = recursive
-				? await _client.Me.Drive.Items[model.item.Id].Search(filter).Request().Expand("thumbnails").GetAsync(CancellationToken.None)
-				: await _client.Me.Drive.Items[model.item.Id].Children.Request().Expand("thumbnails").GetAsync(CancellationToken.None);
+				? await _client.Me.Drive.Items[model.item.Id].Search(filter).Request().Expand("thumbnails").GetAsync(token)
+				: await _client.Me.Drive.Items[model.item.Id].Children.Request().Expand("thumbnails").GetAsync(token);
 
-			while (driveItem is { CurrentPage.Count: > 0 } && !token.IsCancellationRequested)
+			while (driveItem is { CurrentPage.Count: > 0 })
 			{
 				foreach (var item in driveItem.CurrentPage)
 				{
@@ -101,8 +101,8 @@ public class GraphItemProvider : IItemProvider
 
 				driveItem = driveItem switch
 				{
-					IDriveSearchCollectionPage { NextPageRequest: { } request } => await request.Expand("thumbnails").GetAsync(CancellationToken.None),
-					IDriveItemChildrenCollectionPage { NextPageRequest: { } request } => await request.Expand("thumbnails").GetAsync(CancellationToken.None),
+					IDriveSearchCollectionPage { NextPageRequest: { } request } => await request.Expand("thumbnails").GetAsync(token),
+					IDriveItemChildrenCollectionPage { NextPageRequest: { } request } => await request.Expand("thumbnails").GetAsync(token),
 					_ => null,
 				};
 			}
@@ -117,17 +117,17 @@ public class GraphItemProvider : IItemProvider
 
 			if (recursive)
 			{
-				var resultTask = _client.Me.Drive.Items[model.item.Id].Search(filter).Request().Expand("thumbnails").GetAsync(CancellationToken.None);
+				var resultTask = _client.Me.Drive.Items[model.item.Id].Search(filter).Request().Expand("thumbnails").GetAsync(token);
 
-				resultTask.Wait(CancellationToken.None);
+				resultTask.Wait(token);
 
 				driveItem = resultTask.Result;
 			}
 			else
 			{
-				var resultTask = _client.Me.Drive.Items[model.item.Id].Children.Request().Expand("thumbnails").GetAsync(CancellationToken.None);
+				var resultTask = _client.Me.Drive.Items[model.item.Id].Children.Request().Expand("thumbnails").GetAsync(token);
 
-				resultTask.Wait(CancellationToken.None);
+				resultTask.Wait(token);
 
 				driveItem = resultTask.Result;
 			}
@@ -147,16 +147,16 @@ public class GraphItemProvider : IItemProvider
 				switch (driveItem)
 				{
 					case IDriveSearchCollectionPage { NextPageRequest: { } request }:
-						var searchResult = request.Expand("thumbnails").GetAsync(CancellationToken.None);
+						var searchResult = request.Expand("thumbnails").GetAsync(token);
 
-						searchResult.Wait(CancellationToken.None);
+						searchResult.Wait(token);
 
 						driveItem = searchResult.Result;
 						break;
 					case IDriveItemChildrenCollectionPage { NextPageRequest: { } request }:
-						var childrenResult = request.Expand("thumbnails").GetAsync(CancellationToken.None);
+						var childrenResult = request.Expand("thumbnails").GetAsync(token);
 
-						childrenResult.Wait(CancellationToken.None);
+						childrenResult.Wait(token);
 
 						driveItem = childrenResult.Result;
 						break;

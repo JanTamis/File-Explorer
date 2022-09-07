@@ -2,7 +2,6 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Input;
@@ -14,7 +13,7 @@ using FileExplorer.Converters;
 using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Interfaces;
-using FileExplorer.Models;
+using Material.Ripple;
 
 namespace FileExplorer.DisplayViews;
 
@@ -28,7 +27,7 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 
 	private ObservableRangeCollection<IFileItem> _items;
 
-	public Action SelectAll => () =>
+	public void SelectAll()
 	{
 		BeginBatchUpdate();
 
@@ -38,10 +37,17 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 		}
 
 		EndBatchUpdate();
-	};
+	}
 
-	public Action SelectNone { get; }
-	public Action SelectInvert { get; }
+	public void SelectNone()
+	{
+
+	}
+
+	public void SelectInvert()
+	{
+
+	}
 
 	public ValueTask<int> ItemCount
 	{
@@ -80,8 +86,10 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 		var grid = this.FindControl<ItemsRepeater>("fileList");
 
 		grid.ItemTemplate = new FuncDataTemplate<IFileItem>((x, _) =>
-			new ListBoxItem
+		{
+			var box = new ListBoxItem
 			{
+				[!RippleEffect.RippleFillProperty] = new Binding("PrimaryHueMidForegroundBrush"),
 				[!ListBoxItem.IsSelectedProperty] = new Binding("IsSelected"),
 				Content = new StackPanel
 				{
@@ -108,8 +116,10 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 							[!TextBlock.TextProperty] = new Binding("Name"),
 						},
 					},
-				}
-			});
+				},
+			};
+			return box;
+		});
 
 		DataContextProperty.Changed.Subscribe(args =>
 		{
@@ -188,6 +198,8 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 		{
 			item.DoubleTapped += Item_DoubleTapped;
 			item.PointerPressed += Item_PointerPressed;
+
+			model.IsVisible = true;
 		}
 	}
 

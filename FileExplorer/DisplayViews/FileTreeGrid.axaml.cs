@@ -71,7 +71,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 							CompareAscending = (x, y) => String.Compare(x?.Name, y?.Name, StringComparison.CurrentCulture),
 							CompareDescending = (x, y) => String.Compare(y?.Name, x?.Name, StringComparison.CurrentCulture),
 						}),
-						x => Provider.GetItems(x, "*", false, default).OrderByDescending(o => o.IsFolder).ThenBy(t => t.Name),
+						x => Provider?.GetItems(x, "*", false, default).OrderByDescending(o => o.IsFolder).ThenBy(t => t.Name) ?? Enumerable.Empty<IFileItem>(),
 						x => x is { IsFolder: true } && Provider?.HasItems(x) is true),
 					new TextColumn<IFileItem, DateTime>("Edit Date", item => item.EditedOn, GridLength.Auto),
 					new TextColumn<IFileItem, string>("Type", item => item.Extension, GridLength.Auto),
@@ -136,24 +136,23 @@ public class FileTreeGrid : UserControl, IFileViewer
 	public event Action<IFileItem> PathChanged = delegate { };
 	public event Action SelectionChanged = delegate { };
 
-	public Action SelectAll => () =>
+	public void SelectAll()
 	{
 		if (this.FindControl<TreeDataGrid>(ControlName) is { RowSelection: { } selection })
 		{
 			using var delegator = new DelegateExecutor(selection.BeginBatchUpdate, selection.EndBatchUpdate);
 
 			var index = 0;
+			var enumerator = Items.GetEnumerator();
 
-			foreach (var _ in Items)
+			while (enumerator.MoveNext())
 			{
-				selection.Select(index);
-
-				index++;
+				selection.Select(index++);
 			}
 		}
-	};
+	}
 
-	public Action SelectNone => () =>
+	public void SelectNone()
 	{
 		if (this.FindControl<TreeDataGrid>(ControlName) is { RowSelection: { } selection })
 		{
@@ -169,9 +168,9 @@ public class FileTreeGrid : UserControl, IFileViewer
 				index++;
 			}
 		}
-	};
+	}
 
-	public Action SelectInvert => () =>
+	public void SelectInvert()
 	{
 		if (this.FindControl<TreeDataGrid>(ControlName) is { RowSelection: { } selection })
 		{
@@ -193,7 +192,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 				index++;
 			}
 		}
-	};
+	}
 
 	public FileTreeGrid()
 	{

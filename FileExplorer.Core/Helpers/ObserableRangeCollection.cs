@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace FileExplorer.Core.Helpers;
 
@@ -550,6 +551,11 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 		}
 
 		return value;
+	}
+
+	public ref T GetPinnableReference()
+	{
+		return ref CollectionsMarshal.AsSpan(_data).GetPinnableReference();
 	}
 
 	IEnumerator IEnumerable.GetEnumerator()

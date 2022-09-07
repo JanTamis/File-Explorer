@@ -14,9 +14,20 @@ public partial class AnalyzerView : UserControl, IFileViewer
 	public event Action<IFileItem>? PathChanged;
 	public event Action? SelectionChanged;
 
-	public Action SelectAll { get; }
-	public Action SelectNone { get; }
-	public Action SelectInvert { get; }
+	public void SelectAll()
+	{
+
+	}
+
+	public void SelectNone()
+	{
+
+	}
+
+	public void SelectInvert()
+	{
+
+	}
 
 	public ObservableRangeCollection<FileIndexModel> Root { get; private set; } = new();
 	public ObservableRangeCollection<ExtensionModel> Extensions { get; private set; } = new();

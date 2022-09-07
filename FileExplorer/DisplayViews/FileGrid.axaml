@@ -1,100 +1,100 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			 xmlns:models="clr-namespace:FileExplorer.Core.Interfaces;assembly=FileExplorer.Core"
-			 xmlns:afwp="clr-namespace:AvaloniaFixedWrapPanel;assembly=AvaloniaFixedWrapPanel"
-			 xmlns:controls="using:FileExplorer.Controls"
-			 xmlns:converters="using:FileExplorer.Converters"
-			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-			 x:Class="FileExplorer.DisplayViews.FileGrid">
-  <ScrollViewer>
-	  <ItemsRepeater Items="{Binding Items}"
-					  VerticalCacheLength="0"
-					  Margin="0 0 0 5"
-					  x:Name="fileList">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:models="clr-namespace:FileExplorer.Core.Interfaces;assembly=FileExplorer.Core"
+             xmlns:controls="using:FileExplorer.Controls"
+             xmlns:converters="using:FileExplorer.Converters"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="FileExplorer.DisplayViews.FileGrid">
+	<ScrollViewer>
+		<ItemsRepeater Items="{Binding Items}"
+		               VerticalCacheLength="0"
+		               Margin="0 0 0 5"
+		               x:Name="fileList">
 			<ItemsRepeater.Layout>
-				<controls:FixedWrapPanel  />
+				<controls:FixedWrapPanel />
 			</ItemsRepeater.Layout>
 
 			<ItemsRepeater.Styles>
 				<Style Selector="ListBoxItem:selected">
-				  <Setter Property="Background" Value="Red" />
+					<Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
 				</Style>
 			</ItemsRepeater.Styles>
 
-			<ItemsRepeater.ItemTemplate>
-				<DataTemplate DataType="models:IFileItem">
-					<ListBoxItem Margin="5"
-								 MaxWidth="400"
-								 x:Name="container"
-								 IsSelected="{Binding IsSelected}"
-								 VerticalContentAlignment="Stretch"
-								 HorizontalContentAlignment="Stretch">
-						<ToolTip.Tip>
-							<Grid ColumnDefinitions="Auto Auto"
-								  RowDefinitions="Auto Auto Auto Auto">
-								<TextBlock Text="Name: "
-										   Foreground="{DynamicResource MaterialDesignBody}" />
-								<TextBlock Text="{Binding Name}"
-										   Foreground="{DynamicResource MaterialDesignBody}"
-										   Margin="4 0 0 0"
-										   Grid.Column="1" />
+			<!-- <ItemsRepeater.ItemTemplate> -->
+			<!-- 	<DataTemplate DataType="models:IFileItem"> -->
+			<!-- 		<ListBoxItem Margin="5" -->
+			<!-- 					 MaxWidth="400" -->
+			<!-- 					 x:Name="container" -->
+			<!-- 					 IsSelected="{Binding IsSelected}" -->
+			<!-- 					 VerticalContentAlignment="Stretch" -->
+			<!-- 					 HorizontalContentAlignment="Stretch"> -->
+			<!-- 			<ToolTip.Tip> -->
+			<!-- 				<Grid ColumnDefinitions="Auto Auto" -->
+			<!-- 					  RowDefinitions="Auto Auto Auto Auto"> -->
+			<!-- 					<TextBlock Text="Name: " -->
+			<!-- 							   Foreground="{DynamicResource MaterialDesignBody}" /> -->
+			<!-- 					<TextBlock Text="{Binding Name}" -->
+			<!-- 							   Foreground="{DynamicResource MaterialDesignBody}" -->
+			<!-- 							   Margin="4 0 0 0" -->
+			<!-- 							   Grid.Column="1" /> -->
+			<!-- -->
+			<!-- 					<TextBlock Text="Type: " -->
+			<!-- 							   Foreground="{DynamicResource MaterialDesignBody}" -->
+			<!-- 							   Grid.Row="1" /> -->
+			<!-- 					<TextBlock Text="{Binding Converter={StaticResource extensionConverter}}" -->
+			<!-- 							   Foreground="{DynamicResource MaterialDesignBody}" -->
+			<!-- 							   Margin="4 0 0 0" -->
+			<!-- 							   Grid.Row="1" -->
+			<!-- 							   Grid.Column="1" /> -->
+			<!-- -->
+			<!-- 					<TextBlock Text="Size: " -->
+			<!-- 							   Grid.Row="2" -->
+			<!-- 							   IsVisible="{Binding !IsFolder}" /> -->
+			<!-- 					<TextBlock Text="{Binding Converter={StaticResource sizeConverter}}" -->
+			<!-- 							   Margin="4 0 0 0" -->
+			<!-- 							   Grid.Row="2" -->
+			<!-- 							   Grid.Column="1" -->
+			<!-- 							   IsVisible="{Binding !IsFolder}" /> -->
+			<!-- -->
+			<!-- 					<TextBlock Text="Edited: " -->
+			<!-- 							   Foreground="{DynamicResource MaterialDesignBody}" -->
+			<!-- 							   Grid.Row="3" /> -->
+			<!-- 					<TextBlock Text="{Binding Converter={StaticResource editedOnConverter}}" -->
+			<!-- 							   Foreground="{DynamicResource MaterialDesignBody}" -->
+			<!-- 							   Margin="4 0 0 0" -->
+			<!-- 							   Grid.Row="3" -->
+			<!-- 							   Grid.Column="1" /> -->
+			<!-- 				</Grid> -->
+			<!-- 			</ToolTip.Tip> -->
+			<!-- -->
+			<!-- 			<StackPanel Margin="0 0 0 5" -->
+			<!-- 						HorizontalAlignment="Center" -->
+			<!-- 						VerticalAlignment="Center"> -->
+			<!-- 				<Image x:DataType="models:IFileItem" -->
+			<!-- 					   DataContext="{Binding Path=$parent[UserControl].DataContext.Provider, Converter={x:Static converters:PathToImageConverter.Instance}}" -->
+			<!-- 					   Source="{Binding Result}" -->
+			<!-- 					   Margin="4" -->
+			<!-- 					   Width="100" -->
+			<!-- 					   Height="100" /> -->
+			<!-- -->
+			<!-- 				<TextBlock Text="{Binding Name}" -->
+			<!-- 						   Foreground="{DynamicResource MaterialDesignBody}" -->
+			<!-- 						   TextTrimming="CharacterEllipsis" -->
+			<!-- 						   HorizontalAlignment="Stretch" -->
+			<!-- 						   TextAlignment="Center" -->
+			<!-- 						   Margin="4 2" /> -->
+			<!-- -->
+			<!-- 				<TextBlock Text="{Binding Size, Converter={StaticResource sizeConverter}}" -->
+			<!-- 						   FontSize="12" -->
+			<!-- 						   Foreground="{DynamicResource MaterialDesignBody}" -->
+			<!-- 						   HorizontalAlignment="Center" /> -->
+			<!-- 			</StackPanel> -->
+			<!-- 		</ListBoxItem> -->
+			<!-- 	</DataTemplate> -->
+			<!-- </ItemsRepeater.ItemTemplate> -->
 
-								<TextBlock Text="Type: "
-										   Foreground="{DynamicResource MaterialDesignBody}"
-										   Grid.Row="1" />
-								<TextBlock Text="{Binding Converter={StaticResource extensionConverter}}"
-										   Foreground="{DynamicResource MaterialDesignBody}"
-										   Margin="4 0 0 0"
-										   Grid.Row="1"
-										   Grid.Column="1" />
-
-								<TextBlock Text="Size: "
-										   Grid.Row="2"
-										   IsVisible="{Binding !IsFolder}" />
-								<TextBlock Text="{Binding Converter={StaticResource sizeConverter}}"
-										   Margin="4 0 0 0"
-										   Grid.Row="2"
-										   Grid.Column="1"
-										   IsVisible="{Binding !IsFolder}" />
-
-								<TextBlock Text="Edited: "
-										   Foreground="{DynamicResource MaterialDesignBody}"
-										   Grid.Row="3" />
-								<TextBlock Text="{Binding Converter={StaticResource editedOnConverter}}"
-										   Foreground="{DynamicResource MaterialDesignBody}"
-										   Margin="4 0 0 0"
-										   Grid.Row="3"
-										   Grid.Column="1" />
-							</Grid>
-						</ToolTip.Tip>
-
-						<StackPanel Margin="0 0 0 5"
-									HorizontalAlignment="Center"
-									VerticalAlignment="Center">
-							<Image x:DataType="models:IFileItem"
-								   DataContext="{Binding Path=$parent[UserControl].DataContext.Provider, Converter={x:Static converters:PathToImageConverter.Instance}}"
-								   Source="{Binding Result}"
-								   Margin="4"
-								   Width="100"
-								   Height="100" />
-
-							<TextBlock Text="{Binding Name}"
-									   Foreground="{DynamicResource MaterialDesignBody}"
-									   TextTrimming="CharacterEllipsis"
-									   HorizontalAlignment="Stretch"
-									   TextAlignment="Center"
-									   Margin="4 2" />
-
-							<TextBlock Text="{Binding Size, Converter={StaticResource sizeConverter}}"
-									   FontSize="12"
-									   Foreground="{DynamicResource MaterialDesignBody}"
-									   HorizontalAlignment="Center" />
-						</StackPanel>
-					</ListBoxItem>
-				</DataTemplate>
-			</ItemsRepeater.ItemTemplate>
 		</ItemsRepeater>
 	</ScrollViewer>
 </UserControl>

@@ -15,9 +15,20 @@ public partial class FileDataGrid : UserControl, ISelectableControl, IFileViewer
 	public event Action<IFileItem> PathChanged = delegate { };
 	public event Action SelectionChanged = delegate { };
 
-	public Action SelectAll { get; }
-	public Action SelectNone { get; }
-	public Action SelectInvert { get; }
+	public void SelectAll()
+	{
+
+	}
+
+	public void SelectNone()
+	{
+
+	}
+
+	public void SelectInvert()
+	{
+
+	}
 
 	public ObservableRangeCollection<IFileItem> Items
 	{

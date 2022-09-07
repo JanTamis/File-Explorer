@@ -74,11 +74,7 @@ public partial class TabItemViewModel
 	{
 		Files.CountChanged += count => FileCount = count;
 
-		DisplayControl = new FileGrid
-		{
-			Provider = Provider,
-			Items = Files,
-		};
+		CurrentViewMode = ViewTypes.Grid;
 	}
 
 	public IFileItem? Undo()
@@ -131,28 +127,42 @@ public partial class TabItemViewModel
 
 			if (recursive)
 			{
-				await Files.AddRangeAsync(items, TokenSource.Token);
+				try
+				{
+					await Files.AddRangeAsync(items, TokenSource.Token);
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine(e);
+				}
 			}
 			else
 			{
-				await Files.AddRangeAsync(items, Comparer<IFileItem>.Create((x, y) =>
+				try
 				{
-					switch (x, y)
+					await Files.AddRangeAsync(items, Comparer<IFileItem>.Create((x, y) =>
 					{
-						case (null, null): return 0;
-						case (null, _): return -1;
-						case (_, null): return 1;
-					}
+						switch (x, y)
+						{
+							case (null, null): return 0;
+							case (null, _): return -1;
+							case (_, null): return 1;
+						}
 
-					var result = y.IsFolder.CompareTo(x.IsFolder);
+						var result = y.IsFolder.CompareTo(x.IsFolder);
 
-					if (result is 0)
-					{
-						result = String.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
-					}
+						if (result is 0)
+						{
+							result = String.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
+						}
 
-					return result;
-				}), TokenSource.Token);
+						return result;
+					}), TokenSource.Token);
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine(e);
+				}
 			}
 		});
 
@@ -210,7 +220,10 @@ public partial class TabItemViewModel
 	{
 		DisplayControl = value switch
 		{
-			ViewTypes.Grid => new FileGrid(),
+			ViewTypes.Grid => new FileGrid
+			{
+				Provider = Provider,
+			},
 			ViewTypes.List => new FileDataGrid(),
 			ViewTypes.Tree => new FileTreeGrid
 			{

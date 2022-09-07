@@ -14,9 +14,9 @@ public interface IFileViewer
 	event Action<IFileItem> PathChanged;
 	public event Action SelectionChanged;
 
-	Action SelectAll { get; }
-	Action SelectNone { get; }
-	Action SelectInvert { get; }
+	void SelectAll();
+	void SelectNone();
+	void SelectInvert();
 
 	/// <summary>
 	/// Updates the selection for an item based on user interaction.
@@ -42,33 +42,33 @@ public interface IFileViewer
 
 		if (!select)
 		{
-			files.ElementAt(index).IsSelected = false;
+			files[index].IsSelected = false;
 		}
 		else if (range)
 		{
 			for (var i = 0; i < count; i++)
 			{
-				files.ElementAt(i).IsSelected = false;
+				files[i].IsSelected = false;
 			}
 
 			if (index > anchorIndex)
 			{
 				for (var i = anchorIndex; i <= index; i++)
 				{
-					files.ElementAt(i).IsSelected = true;
+					files[i].IsSelected = true;
 				}
 			}
 			else
 			{
 				for (var i = index; i <= anchorIndex; i++)
 				{
-					files.ElementAt(i).IsSelected = true;
+					files[i].IsSelected = true;
 				}
 			}
 		}
 		else if (multi && toggle)
 		{
-			var file = files.ElementAt(index);
+			var file = files[index];
 
 			file.IsSelected ^= true;
 		}
@@ -76,10 +76,10 @@ public interface IFileViewer
 		{
 			for (var i = 0; i < count; i++)
 			{
-				files.ElementAt(i).IsSelected = false;
+				files[i].IsSelected = false;
 			}
 
-			files.ElementAt(index).IsSelected = true;
+			files[index].IsSelected = true;
 		}
 
 		if (!range)
