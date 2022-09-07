@@ -50,14 +50,13 @@ public class FileTreeGrid : UserControl, IFileViewer
 								{
 									new Image
 									{
-										[!DataContextProperty] = new Binding("")
-										{
-											Source = Provider?.GetThumbnailAsync(x, 24, default) ?? Task<IImage?>.FromResult(null as IImage),
-											Converter = PathToImageConverter.Instance,
-											ConverterParameter = 24,
-										},
 										Width = 24,
 										Height = 24,
+										[!Image.DataContextProperty] = new Binding()
+										{
+											ConverterParameter = Provider,
+											Converter = PathToImageConverter.Instance,
+										},
 										[!Image.SourceProperty] = new Binding("Result"),
 									},
 									new TextBlock
@@ -101,6 +100,16 @@ public class FileTreeGrid : UserControl, IFileViewer
 				if (args.Sender is TreeDataGridRow row)
 				{
 					row.IsSelected = args.NewValue.Value is IFileItem { IsSelected: true };
+				}
+
+				if (args.NewValue.GetValueOrDefault() is IFileItem newItem)
+				{
+					newItem.IsVisible = true;
+				}
+
+				if (args.OldValue.GetValueOrDefault() is IFileItem oldItem)
+				{
+					oldItem.IsVisible = false;
 				}
 			});
 

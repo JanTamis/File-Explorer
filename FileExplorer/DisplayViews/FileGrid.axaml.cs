@@ -2,9 +2,15 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Controls.Templates;
+using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
+using FileExplorer.Converters;
 using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Interfaces;
@@ -22,7 +28,18 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 
 	private ObservableRangeCollection<IFileItem> _items;
 
-	public Action SelectAll { get; }
+	public Action SelectAll => () =>
+	{
+		BeginBatchUpdate();
+
+		foreach (var item in Items)
+		{
+			item.IsSelected = true;
+		}
+
+		EndBatchUpdate();
+	};
+
 	public Action SelectNone { get; }
 	public Action SelectInvert { get; }
 
@@ -42,8 +59,17 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 	public ObservableRangeCollection<IFileItem> Items
 	{
 		get => _items;
-		set => OnPropertyChanged(ref _items, value);
+		set
+		{
+			OnPropertyChanged(ref _items, value);
+
+			var grid = this.FindControl<ItemsRepeater>("fileList");
+
+			grid.Items = value;
+		}
 	}
+
+	public IItemProvider Provider { get; set; }
 
 	public FileGrid()
 	{
@@ -52,6 +78,56 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 		DataContext = this;
 
 		var grid = this.FindControl<ItemsRepeater>("fileList");
+
+		grid.ItemTemplate = new FuncDataTemplate<IFileItem>((x, _) =>
+			new ListBoxItem
+			{
+				[!ListBoxItem.IsSelectedProperty] = new Binding("IsSelected"),
+				Content = new StackPanel
+				{
+					Orientation = Orientation.Vertical,
+					Margin = new Thickness(5),
+					Children =
+					{
+						new Image
+						{
+							Width = 100,
+							Height = 100,
+							[!Image.DataContextProperty] = new Binding()
+							{
+								ConverterParameter = Provider,
+								Converter = PathToImageConverter.Instance,
+							},
+							[!Image.SourceProperty] = new Binding("Result"),
+						},
+						new TextBlock
+						{
+							Margin = new Thickness(4, 2),
+							TextTrimming = TextTrimming.CharacterEllipsis,
+							TextAlignment = TextAlignment.Center,
+							[!TextBlock.TextProperty] = new Binding("Name"),
+						},
+					},
+				}
+			});
+
+		DataContextProperty.Changed.Subscribe(args =>
+		{
+			if (args.NewValue.GetValueOrDefault() is IFileItem newItem)
+			{
+				newItem.IsVisible = true;
+
+				if (args.Sender is ListBoxItem item)
+				{
+					item.IsSelected = newItem.IsSelected;
+				}
+			}
+
+			if (args.OldValue.GetValueOrDefault() is IFileItem oldItem)
+			{
+				oldItem.IsVisible = false;
+			}
+		});
 
 		grid.ElementPrepared += Grid_ElementPrepared;
 		grid.ElementClearing += Grid_ElementClearing;
@@ -74,24 +150,24 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 
 	private void Grid_ElementClearing(object? sender, ItemsRepeaterElementClearingEventArgs e)
 	{
-		if (e.Element is ListBoxItem { DataContext: FileModel model } item)
+		if (e.Element is ListBoxItem item)
 		{
 			item.DoubleTapped -= Item_DoubleTapped;
 			item.PointerPressed -= Item_PointerPressed;
-
-			model.IsVisible = false;
 		}
 	}
 
 	private async void Item_PointerPressed(object? sender, PointerPressedEventArgs e)
 	{
-		if (sender is ListBoxItem { DataContext: FileModel model } item)
+		if (sender is ListBoxItem { DataContext: IFileItem model } item)
 		{
 			var point = e.GetCurrentPoint(item);
 
 			if (point.Properties.IsLeftButtonPressed || point.Properties.IsRightButtonPressed)
 			{
-				var index = IndexOf(Items, model);
+				var index = Items.IndexOf(model);
+
+				BeginBatchUpdate();
 
 				anchorIndex = await IFileViewer.UpdateSelection(
 					this,
@@ -100,35 +176,18 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 					true,
 					e.KeyModifiers.HasAllFlags(KeyModifiers.Shift),
 					e.KeyModifiers.HasAllFlags(KeyModifiers.Control));
+
+				EndBatchUpdate();
 			}
-		}
-
-		static int IndexOf<T>(IEnumerable<T> items, T item)
-		{
-			var index = 0;
-
-			foreach (var data in items)
-			{
-				if (data?.Equals(item) == true)
-				{
-					return index;
-				}
-
-				index++;
-			}
-
-			return -1;
 		}
 	}
 
 	private void Grid_ElementPrepared(object? sender, ItemsRepeaterElementPreparedEventArgs e)
 	{
-		if (e.Element is ListBoxItem { DataContext: FileModel model } item)
+		if (e.Element is ListBoxItem { DataContext: IFileItem model } item)
 		{
 			item.DoubleTapped += Item_DoubleTapped;
 			item.PointerPressed += Item_PointerPressed;
-
-			model.IsVisible = true;
 		}
 	}
 

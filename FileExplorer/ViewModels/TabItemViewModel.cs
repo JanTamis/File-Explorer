@@ -74,7 +74,7 @@ public partial class TabItemViewModel
 	{
 		Files.CountChanged += count => FileCount = count;
 
-		DisplayControl = new FileTreeGrid
+		DisplayControl = new FileGrid
 		{
 			Provider = Provider,
 			Items = Files,

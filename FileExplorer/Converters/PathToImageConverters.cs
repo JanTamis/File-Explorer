@@ -4,6 +4,7 @@ using Avalonia.Media;
 using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
 using FileExplorer.Models;
+using FileExplorer.Core.Interfaces;
 
 namespace FileExplorer.Converters;
 
@@ -16,6 +17,11 @@ public class PathToImageConverter : IValueConverter, ISingleton<PathToImageConve
 		if (value is Task<IImage?> imageTask)
 		{
 			return new TaskCompletionNotifier<IImage?>(imageTask);
+		}
+
+		if (value is IFileItem item && parameter is IItemProvider provider)
+		{
+			return new TaskCompletionNotifier<IImage?>(provider.GetThumbnailAsync(item, 100, CancellationToken.None));
 		}
 
 		if (parameter is int size)

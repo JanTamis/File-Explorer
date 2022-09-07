@@ -25,6 +25,8 @@ namespace FileExplorer.Graph.Models
 
 		public DateTime EditedOn => item.LastModifiedDateTime.GetValueOrDefault().DateTime;
 
+		public bool IsVisible { get; set; }
+
 		public GraphFileModel(DriveItem item)
 		{
 			this.item = item;

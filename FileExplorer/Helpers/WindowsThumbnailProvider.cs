@@ -38,9 +38,9 @@ public unsafe partial class WindowsThumbnailProvider
 		ref Guid riid,
 		[MarshalAs(UnmanagedType.Interface)] out IShellItem shellItem);
 
-	[LibraryImport("gdi32.dll")]
+	[DllImport("gdi32.dll")]
 	[return: MarshalAs(UnmanagedType.Bool)]
-	internal static partial bool DeleteObject(IntPtr hObject);
+	internal static extern bool DeleteObject(IntPtr hObject);
 
 	private static readonly int bitmapSize = Unsafe.SizeOf<NativeMethods.BITMAP>();
 

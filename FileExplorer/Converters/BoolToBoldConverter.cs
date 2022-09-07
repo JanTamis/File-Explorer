@@ -7,7 +7,7 @@ namespace FileExplorer.Converters;
 
 public class BoolToBoldConverter : IValueConverter, ISingleton<BoolToBoldConverter>
 {
-	public static readonly BoolToBoldConverter Instance = new BoolToBoldConverter();
+	public static readonly BoolToBoldConverter Instance = new();
 
 	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{

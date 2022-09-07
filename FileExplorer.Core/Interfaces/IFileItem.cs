@@ -13,6 +13,8 @@ public interface IFileItem
 
 	public DateTime EditedOn { get; }
 
+	public bool IsVisible { get; set; }
+
 	T GetPath<T>(ReadOnlySpanFunc<char, T> action);
 	T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter);
 }

@@ -1,52 +1,36 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-						 xmlns:models="clr-namespace:FileExplorer.Core.Interfaces;assembly=FileExplorer.Core"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="FileExplorer.DisplayViews.FileGrid">
-
-	<ScrollViewer>
-		<ItemsRepeater Items="{Binding Items}"
-		               VerticalCacheLength="0"
-		               Margin="0 0 0 5"
-		               x:Name="fileList">
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:models="clr-namespace:FileExplorer.Core.Interfaces;assembly=FileExplorer.Core"
+			 xmlns:afwp="clr-namespace:AvaloniaFixedWrapPanel;assembly=AvaloniaFixedWrapPanel"
+			 xmlns:controls="using:FileExplorer.Controls"
+			 xmlns:converters="using:FileExplorer.Converters"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 x:Class="FileExplorer.DisplayViews.FileGrid">
+  <ScrollViewer>
+	  <ItemsRepeater Items="{Binding Items}"
+					  VerticalCacheLength="0"
+					  Margin="0 0 0 5"
+					  x:Name="fileList">
 			<ItemsRepeater.Layout>
-				<UniformGridLayout ItemsStretch="None"
-															 ItemsJustification="Center" />
+				<controls:FixedWrapPanel  />
 			</ItemsRepeater.Layout>
 
 			<ItemsRepeater.Styles>
-				<Style Selector="ListBoxItem">
-					<Setter Property="Template">
-						<ControlTemplate>
-							<Border CornerRadius="10"
-														  Name="PART_ContentPresenter"
-														  Background="Transparent"
-														  Margin="10">
-								<ContentPresenter ClipToBounds="true"
-																	Background="{TemplateBinding Background}"
-																	BorderBrush="{TemplateBinding BorderBrush}"
-																	BorderThickness="{TemplateBinding BorderThickness}"
-																	ContentTemplate="{TemplateBinding ContentTemplate}"
-																	Content="{TemplateBinding Content}"
-																	Padding="{TemplateBinding Padding}"
-																	VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-																	HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" />
-							</Border>
-						</ControlTemplate>
-					</Setter>
+				<Style Selector="ListBoxItem:selected">
+				  <Setter Property="Background" Value="Red" />
 				</Style>
 			</ItemsRepeater.Styles>
 
 			<ItemsRepeater.ItemTemplate>
 				<DataTemplate DataType="models:IFileItem">
-					<ListBoxItem Margin="0"
-					             MaxWidth="400"
-											 x:Name="container"
-										   IsSelected="{Binding IsSelected}"
-										   VerticalContentAlignment="Stretch"
-										   HorizontalContentAlignment="Stretch">
+					<ListBoxItem Margin="5"
+								 MaxWidth="400"
+								 x:Name="container"
+								 IsSelected="{Binding IsSelected}"
+								 VerticalContentAlignment="Stretch"
+								 HorizontalContentAlignment="Stretch">
 						<ToolTip.Tip>
 							<Grid ColumnDefinitions="Auto Auto"
 								  RowDefinitions="Auto Auto Auto Auto">
@@ -90,23 +74,23 @@
 									HorizontalAlignment="Center"
 									VerticalAlignment="Center">
 							<Image x:DataType="models:IFileItem"
-								   Source="{Binding Image^}"
+								   DataContext="{Binding Path=$parent[UserControl].DataContext.Provider, Converter={x:Static converters:PathToImageConverter.Instance}}"
+								   Source="{Binding Result}"
 								   Margin="4"
 								   Width="100"
-								   Height="100">
-							</Image>
+								   Height="100" />
 
 							<TextBlock Text="{Binding Name}"
-							           Foreground="{DynamicResource MaterialDesignBody}"
-												 TextTrimming="CharacterEllipsis"
-												 HorizontalAlignment="Stretch"
-												 TextAlignment="Center"
-												 Margin="4 2" />
+									   Foreground="{DynamicResource MaterialDesignBody}"
+									   TextTrimming="CharacterEllipsis"
+									   HorizontalAlignment="Stretch"
+									   TextAlignment="Center"
+									   Margin="4 2" />
 
 							<TextBlock Text="{Binding Size, Converter={StaticResource sizeConverter}}"
-															   FontSize="12"
-															   Foreground="{DynamicResource MaterialDesignBody}"
-															   HorizontalAlignment="Center" />
+									   FontSize="12"
+									   Foreground="{DynamicResource MaterialDesignBody}"
+									   HorizontalAlignment="Center" />
 						</StackPanel>
 					</ListBoxItem>
 				</DataTemplate>
