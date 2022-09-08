@@ -17,6 +17,8 @@ public partial class OneDriveLogin : UserControl, IPopup, INotifyPropertyChanged
 	private Uri _redirectUri;
 	private string _code;
 
+	public event Action? OnClose;
+
 	public Uri RedirectUri
 	{
 		get => _redirectUri;
@@ -40,7 +42,10 @@ public partial class OneDriveLogin : UserControl, IPopup, INotifyPropertyChanged
 		OnClose();
 	}
 
-	public event Action? OnClose;
+	public void CopyCode()
+	{
+		App.Current.Clipboard.SetTextAsync(Code);
+	}
 
 	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
 	{

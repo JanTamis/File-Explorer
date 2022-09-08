@@ -2,6 +2,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:link="clr-namespace:HyperText.Avalonia.Controls;assembly=HyperText.Avalonia"
+			 xmlns:material="using:Material.Icons.Avalonia"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FileExplorer.Popup.OneDriveLogin">
 	<StackPanel Margin="10">
@@ -10,18 +12,28 @@
 		           HorizontalAlignment="Center"
 		           FontSize="21" />
 
-		<TextBox Text="{Binding RedirectUri}"
-		         HorizontalAlignment="Center"
-		         IsReadOnly="True"/>
+		<link:Hyperlink Alias="{Binding RedirectUri}"
+						Url="{Binding RedirectUri}"
+						FontSize="16"
+						HorizontalAlignment="Center" />
 
 		<TextBlock Text="Then enter the code:"
 		           FontWeight="Bold"
 		           HorizontalAlignment="Center"
 		           FontSize="21" />
 
+	  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
 		<TextBox Text="{Binding Code}"
-		         HorizontalAlignment="Center"
+				 FontSize="16"
 		         IsReadOnly="True" />
+		<Button Command="{Binding CopyCode}"
+				Margin="4 0 0 0"
+				Padding="8 5"
+				ToolTip.Tip="Copy"
+				Classes="Flat"
+				Cursor="Hand">
+		  <material:MaterialIcon Kind="ClipboardOutline" Margin="0" />
+		</Button>
+	  </StackPanel>
 	</StackPanel>
-
 </UserControl>
