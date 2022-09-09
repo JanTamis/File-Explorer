@@ -3,6 +3,7 @@ using Avalonia.Platform;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
 using System.Runtime.Versioning;
 
 namespace FileExplorer.Helpers;
@@ -87,24 +88,38 @@ public unsafe partial class WindowsThumbnailProvider
 		var w = bitmap.bmWidth;
 		var h = bitmap.bmHeight;
 
-		Span<int> p = new(bitmap.bmBits.ToPointer(), bitmap.bmWidthBytes * bitmap.bmHeight / sizeof(int));
-		Span<int> pDest = stackalloc int[p.Length];
+		ref var p = ref Unsafe.AsRef<int>(bitmap.bmBits.ToPointer());
 
-		for (var i = 0; i < p.Length; i++)
+		for (int y = 0; y < h / 2; y++)
 		{
-			var x = i % w;
-			var y = i / w;
-			var yOffset = h - (y + 1);
+			var x = 0;
 
-			if (yOffset < 0 && yOffset >= h)
-				yOffset = 0;
+			for (; x < w && Vector256.IsHardwareAccelerated; x += Vector256<int>.Count)
+			{
+				var fromVector = Vector256.LoadUnsafe(ref Unsafe.Add(ref p, y * w + x));
+				var destinationVector = Vector256.LoadUnsafe(ref Unsafe.Add(ref p, (h - y) * w + x));
 
-			var val = yOffset * w + x;
+				fromVector.StoreUnsafe(ref Unsafe.Add(ref p, (h - y) * w + x));
+				destinationVector.StoreUnsafe(ref Unsafe.Add(ref p, y * w + x));
+			}
 
-			pDest[i] = p[val];
+			for (; x < w && Vector128.IsHardwareAccelerated; x += Vector128<int>.Count)
+			{
+				var fromVector = Vector128.LoadUnsafe(ref Unsafe.Add(ref p, y * w + x));
+				var destinationVector = Vector128.LoadUnsafe(ref Unsafe.Add(ref p, (h - y) * w + x));
+
+				fromVector.StoreUnsafe(ref Unsafe.Add(ref p, (h - y) * w + x));
+				destinationVector.StoreUnsafe(ref Unsafe.Add(ref p, y * w + x));
+			}
+
+			for (; x < w; x++)
+			{
+				ref var source = ref Unsafe.Add(ref p, y * w + x);
+				ref var destination = ref Unsafe.Add(ref p, (h - y) * w + x);
+
+				(source, destination) = (destination, source);
+			}
 		}
-
-		pDest.CopyTo(p);
 	}
 
 	private static IntPtr GetHBitmap(ReadOnlySpan<char> fileName, int width, int height, ThumbnailOptions options)

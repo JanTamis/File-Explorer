@@ -12,7 +12,7 @@ namespace FileExplorer.Controls
 
 		protected override Size ArrangeOverride(VirtualizingLayoutContext context, Size finalSize)
 		{
-			MinItemWidth = finalSize.Width / Math.Max(1, (int)(finalSize.Width / 200));
+			MinItemWidth = (int)(finalSize.Width / Math.Max(1, (int)(finalSize.Width / 200)));
 
 			return base.ArrangeOverride(context, finalSize);
 		}

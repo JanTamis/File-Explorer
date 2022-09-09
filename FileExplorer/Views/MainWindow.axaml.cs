@@ -87,13 +87,6 @@ public class MainWindow : FluentWindow
 				{
 					treeItem.Items = new[] { new FolderModel(new FileSystemTreeItem("Loading...", false)) };
 				}
-					
-				if (OperatingSystem.IsWindows() && treeItem.Parent is TreeView)
-				{
-					treeItem.Margin = new Thickness(0, 0, 0, 15);
-					treeItem.IsExpanded = true;
-					await Task.Delay(100);
-				}
 			}
 		}
 	}

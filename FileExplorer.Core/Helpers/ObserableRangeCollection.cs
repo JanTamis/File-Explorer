@@ -520,8 +520,8 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 
 	public void Clear()
 	{
-		_data.Clear();
-		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _data));
+		_data.Clear();		
 	}
 
 	public bool Contains(T item)

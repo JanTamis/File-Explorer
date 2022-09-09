@@ -33,7 +33,7 @@ namespace FileExplorer.ViewModels
 
 		public IPathSegment CurrentFolder
 		{
-			get => Folders.FirstOrDefault();
+			get => Folders?.FirstOrDefault();
 			set
 			{
 				if (value is FolderModel { TreeItem: var treeItem })

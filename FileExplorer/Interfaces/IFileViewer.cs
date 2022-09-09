@@ -27,8 +27,8 @@ public interface IFileViewer
 	/// <param name="toggleModifier">Whether the toggle modifier is enabled (i.e. ctrl key).</param>
 	public static async ValueTask<int> UpdateSelection(IFileViewer viewer, int anchorIndex, int index, bool select = true, bool rangeModifier = false, bool toggleModifier = false)
 	{
-		var count = await viewer.ItemCount;
 		var files = viewer.Items;
+		var count = files.Count;
 
 		if (index < 0 || index >= count)
 		{
