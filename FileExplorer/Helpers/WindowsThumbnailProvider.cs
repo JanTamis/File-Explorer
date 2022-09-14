@@ -33,7 +33,7 @@ public unsafe partial class WindowsThumbnailProvider
 
 	[DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
 	internal static extern int SHCreateItemFromParsingName(
-		char* path,
+		in char path,
 		// The following parameter is not used - binding context.
 		IntPtr pbc,
 		ref Guid riid,
@@ -124,42 +124,23 @@ public unsafe partial class WindowsThumbnailProvider
 
 	private static IntPtr GetHBitmap(ReadOnlySpan<char> fileName, int width, int height, ThumbnailOptions options)
 	{
-		fixed (char* data = &fileName[0])
+		var shellItem2Guid = new Guid(IShellItem2Guid);
+		var retCode = SHCreateItemFromParsingName(MemoryMarshal.GetReference(fileName), IntPtr.Zero, ref shellItem2Guid, out var nativeShellItem);
+
+		if (retCode != 0)
+			return IntPtr.Zero;
+
+		NativeSize nativeSize = new()
 		{
-			var shellItem2Guid = new Guid(IShellItem2Guid);
-			var retCode = SHCreateItemFromParsingName(data, IntPtr.Zero, ref shellItem2Guid, out var nativeShellItem);
+			Width = width,
+			Height = height
+		};
 
-			if (retCode != 0)
-				return IntPtr.Zero;
+		((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out var hBitmap);
 
-			NativeSize nativeSize = new()
-			{
-				Width = width,
-				Height = height
-			};
+		Marshal.ReleaseComObject(nativeShellItem);
 
-			//if (Dispatcher.UIThread.CheckAccess())
-			//{
-			var hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out var hBitmap);
-
-			Marshal.ReleaseComObject(nativeShellItem);
-
-			return hr == HResult.Ok
-				? hBitmap
-				: IntPtr.Zero;
-			//}
-
-			//return Dispatcher.UIThread.InvokeAsync(() =>
-			//{
-			//	var hr = ((IShellItemImageFactory)nativeShellItem).GetImage(nativeSize, options, out var hBitmap);
-
-			//	Marshal.ReleaseComObject(nativeShellItem);
-
-			//	return hr == HResult.Ok
-			//		? hBitmap
-			//		: IntPtr.Zero;
-			//}, DispatcherPriority.MinValue).Result;
-		}
+		return hBitmap;
 	}
 
 	[ComImport]

@@ -5,6 +5,7 @@ using Avalonia.Media;
 using FileExplorer.Helpers;
 using Microsoft.Extensions.Caching.Memory;
 using System.IO.Enumeration;
+using System.Text.RegularExpressions;
 
 namespace FileExplorer.Providers;
 
@@ -26,6 +27,8 @@ public class FileSystemProvider : IItemProvider
 	{
 		if (folder is FileModel model)
 		{
+			//var regex = new Regex(filter);
+
 			return model.TreeItem
 				.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name), recursive ? uint.MaxValue : 0)
 				.Select(s => new FileModel(s))

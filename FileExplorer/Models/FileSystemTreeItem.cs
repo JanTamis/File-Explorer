@@ -1,9 +1,14 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Enumeration;
 using System.Linq;
+using System.Reflection;
+using Avalonia.Controls;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
+using Material.Styles.Themes;
+using Microsoft.VisualBasic;
 
 namespace FileExplorer.Models;
 
@@ -22,7 +27,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		{
 			if (IsFolder)
 			{
-				var path = GetPath(x => x.ToString());
+				var path = GetPath();
 
 				if (Directory.Exists(path))
 				{
@@ -40,7 +45,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		{
 			if (IsFolder)
 			{
-				var path = GetPath(x => x.ToString());
+				var path = GetPath();
 
 				if (Directory.Exists(path))
 				{
@@ -73,7 +78,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		{
 			if (IsFolder)
 			{
-				var path = GetPath(x => x.ToString());
+				var path = GetPath();
 
 				if (Directory.Exists(path))
 				{
@@ -182,7 +187,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 			yield break;
 		}
 
-		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(GetPath(x => x.ToString()), Options)
+		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(GetPath(), Options)
 		{
 			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
 		};
@@ -218,7 +223,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 			yield break;
 		}
 
-		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(GetPath(x => x.ToString()), Options)
+		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(GetPath(), Options)
 		{
 			Find = (ref FileSystemEntry entry) => entry.IsDirectory || include(entry.FileName),
 			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
@@ -248,44 +253,36 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		}
 	}
 
+	private string GetPath()
+	{
+		var count = GetPathLength();
+
+		return String.Create(count, this, (span, item) =>
+		{
+			BuildPath(span, item);
+		});
+	}
+
 	public T GetPath<T>(ReadOnlySpanFunc<char, T> action)
 	{
-		var builder = new ValueBuilder<char>(stackalloc char[256]);
+		var count = GetPathLength();
 
-		GetPath(ref builder);
+		Span<char> buffer = stackalloc char[count];
 
-		var span = builder.AsSpan();
+		BuildPath(buffer, this);
 
-    return action(span);
+		return action(buffer);
 	}
 
 	public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
 	{
-		var builder = new ValueBuilder<char>(stackalloc char[256]);
+		var count = GetPathLength();
 
-		GetPath(ref builder);
+		Span<char> buffer = stackalloc char[count];
 
-		var span = builder.AsSpan();
+		BuildPath(buffer, this);
 
-		return action(span, parameter);
-	}
-
-	private void GetPath(ref ValueBuilder<char> builder)
-	{
-		var items = EnumerateToRoot().ToArray();
-		Array.Reverse(items);
-
-    for (var i = 0; i < items.Length; i++)
-    {
-			var item = items[i];
-
-			builder.Append(item.Value);
-
-			if (i != items.Length - 1 && builder[^1] != PathHelper.DirectorySeparator)
-			{
-				builder.Append(PathHelper.DirectorySeparator);
-			}
-		}
+		return action(buffer, parameter);
 	}
 
 	public override string ToString()
@@ -305,17 +302,59 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 			return false;
 		}
 
-		var thisBuilder = new ValueBuilder<char>();
-		var otherBuilder = new ValueBuilder<char>();
+		var count1 = GetPathLength();
+		var count2 = other.GetPathLength();
 
-		GetPath(ref thisBuilder);
-		other.GetPath(ref otherBuilder);
+		Span<char> buffer1 = stackalloc char[count1];
+		Span<char> buffer2 = stackalloc char[count1];
 
-		return thisBuilder.AsSpan().SequenceEqual(otherBuilder.AsSpan());
+		BuildPath(buffer1, this);
+		BuildPath(buffer2, other);
+
+		return buffer1.SequenceEqual(buffer2);
 	}
 
 	public override int GetHashCode()
 	{
 		return GetPath(String.GetHashCode);
+	}
+
+	private int GetPathLength()
+	{
+		var item = this;
+		var count = this.Value.Length;
+
+		while (item.Parent is not null)
+		{
+			item = item.Parent;
+
+			count += item.Value.Length;
+
+			if (!item.Value.EndsWith(PathHelper.DirectorySeparator))
+			{
+				count++;
+			}
+		}
+
+		return count;
+	}
+
+	private static void BuildPath(Span<char> buffer, FileSystemTreeItem item)
+	{
+		item.Value.CopyTo(buffer.Slice(buffer.Length - item.Value.Length));
+
+		while (item.Parent is not null)
+		{
+			item = item.Parent;
+
+			var index = buffer.LastIndexOf('\0');
+
+			if (item.IsFolder && !item.Value.EndsWith(PathHelper.DirectorySeparator))
+			{
+				buffer[index] = PathHelper.DirectorySeparator;
+			}
+
+			item.Value.CopyTo(buffer.Slice(Math.Max(index - item.Value.Length, 0)));
+		}
 	}
 }
