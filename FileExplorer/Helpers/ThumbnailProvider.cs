@@ -1,4 +1,5 @@
-﻿using Avalonia.Media;
+﻿using System.Collections.Concurrent;
+using Avalonia.Media;
 using Avalonia.Svg.Skia;
 using System.IO;
 using System.Reflection;
@@ -7,6 +8,7 @@ using Avalonia.Media.Imaging;
 using System.Diagnostics.CodeAnalysis;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Models;
+using SkiaSharp;
 
 
 namespace FileExplorer.Helpers;
@@ -17,7 +19,7 @@ public static class ThumbnailProvider
 {
 	// private static readonly Dictionary<string, string>? fileTypes = OperatingSystem.IsWindows() ? RegisteredFileType.GetFileTypeAndIcon() : new();
 
-	private static readonly Dictionary<string, IImage> Images = new();
+	private static readonly ConcurrentDictionary<string, IImage> Images = new();
 	private static readonly Dictionary<string, string[]> TypeMap = new();
 
 	public static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default, Environment.ProcessorCount / 2); // BitOperations.Log2((uint)Environment.ProcessorCount));
@@ -244,27 +246,26 @@ public static class ThumbnailProvider
 		}, size) ?? Task.FromResult<IImage?>(null), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
 	}
 
-	private static Task<IImage?> GetImage(string? key)
+	private static async Task<IImage?> GetImage(string? key)
 	{
 		if (String.IsNullOrEmpty(key))
 		{
-			return Task.FromResult<IImage?>(null);
+			return null;
 		}
 
-		return Dispatcher.UIThread.InvokeAsync(() =>
+		if (!Images.TryGetValue(key, out var image))
 		{
-			if (!Images.TryGetValue(key, out var image))
+			var source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/{key}.svg", null);
+
+			image = await Dispatcher.UIThread.InvokeAsync(() => new SvgImage
 			{
-				image = new SvgImage
-				{
-					Source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/{key}.svg", null),
-				};
+				Source = source,
+			}, DispatcherPriority.ContextIdle);
 
-				Images.TryAdd(key, image);
-			}
+			Images.TryAdd(key, image);
+		}
 
-			return image;
-		});
+		return image;
 	}
 }
 

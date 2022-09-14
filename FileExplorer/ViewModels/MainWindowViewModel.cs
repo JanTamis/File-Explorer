@@ -272,7 +272,7 @@ namespace FileExplorer.ViewModels
 		{
 			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && Tabs.Count(x => !String.IsNullOrEmpty(x.CurrentFolder.Name)) > 1)
 			{
-				var selector = new TabSelector()
+				var selector = new TabSelector
 				{
 					Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab && !String.IsNullOrEmpty(x.CurrentFolder.Name))),
 				};

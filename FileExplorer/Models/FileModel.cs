@@ -9,7 +9,7 @@ using FileExplorer.Helpers;
 namespace FileExplorer.Models;
 
 [INotifyPropertyChanged]
-public partial class FileModel : IFileItem
+public sealed partial class FileModel : IFileItem
 {
 	public static readonly ConcurrentBag<FileModel> FileImageQueue = new();
 

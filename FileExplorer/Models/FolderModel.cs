@@ -4,7 +4,7 @@ using FileExplorer.Helpers;
 
 namespace FileExplorer.Models;
 
-public class FolderModel : IPathSegment
+public sealed class FolderModel : IPathSegment
 {
 	private readonly string? _name;
 	private readonly IEnumerable<IPathSegment>? _folders;

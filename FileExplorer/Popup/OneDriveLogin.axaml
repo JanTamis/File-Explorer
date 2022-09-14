@@ -14,7 +14,8 @@
 
 		<link:Hyperlink Alias="{Binding RedirectUri}"
 						Url="{Binding RedirectUri}"
-						FontSize="16"
+						FontSize="18"
+						Margin="0 6"
 						HorizontalAlignment="Center" />
 
 		<TextBlock Text="Then enter the code:"

@@ -26,6 +26,7 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 	public event Action SelectionChanged = delegate { };
 
 	private ObservableRangeCollection<IFileItem> _items;
+	private IItemProvider _provider;
 
 	public void SelectAll()
 	{
@@ -41,25 +42,26 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 
 	public void SelectNone()
 	{
+		BeginBatchUpdate();
 
+		foreach (var item in Items)
+		{
+			item.IsSelected = false;
+		}
+
+		EndBatchUpdate();
 	}
 
 	public void SelectInvert()
 	{
+		BeginBatchUpdate();
 
-	}
-
-	public ValueTask<int> ItemCount
-	{
-		get
+		foreach (var item in Items)
 		{
-			if (this.FindControl<ItemsRepeater>("fileList") is var itemsRepeater && itemsRepeater.TryGetTotalCount(out var count))
-			{
-				return ValueTask.FromResult(count);
-			}
-
-			return ValueTask.FromResult(0);
+			item.IsSelected ^= true;
 		}
+
+		EndBatchUpdate();
 	}
 
 	public ObservableRangeCollection<IFileItem> Items
@@ -75,7 +77,52 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 		}
 	}
 
-	public IItemProvider Provider { get; set; }
+	public IItemProvider Provider
+	{
+		get => _provider;
+		set
+		{
+			_provider = value;
+
+			var grid = this.FindControl<ItemsRepeater>("fileList");
+
+			grid.ItemTemplate = new FuncDataTemplate<IFileItem>((x, _) =>
+			{
+				var box = new ListBoxItem
+				{
+					[!RippleEffect.RippleFillProperty] = new Binding("PrimaryHueMidForegroundBrush"),
+					[!ListBoxItem.IsSelectedProperty] = new Binding("IsSelected"),
+					Content = new StackPanel
+					{
+						Orientation = Orientation.Vertical,
+						Margin = new Thickness(5),
+						Children =
+						{
+							new Image
+							{
+								Width = 100,
+								Height = 100,
+								[!DataContextProperty] = new Binding
+								{
+									ConverterParameter = Provider,
+									Converter = PathToImageConverter.Instance,
+								},
+								[!Image.SourceProperty] = new Binding("Result"),
+							},
+							new TextBlock
+							{
+								Margin = new Thickness(4, 2),
+								TextTrimming = TextTrimming.CharacterEllipsis,
+								TextAlignment = TextAlignment.Center,
+								[!TextBlock.TextProperty] = new Binding("Name"),
+							},
+						},
+					},
+				};
+				return box;
+			});
+		}
+	}
 
 	public FileGrid()
 	{
@@ -101,7 +148,7 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 						{
 							Width = 100,
 							Height = 100,
-							[!Image.DataContextProperty] = new Binding()
+							[!DataContextProperty] = new Binding
 							{
 								ConverterParameter = Provider,
 								Converter = PathToImageConverter.Instance,
@@ -179,7 +226,7 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 
 				BeginBatchUpdate();
 
-				anchorIndex = await IFileViewer.UpdateSelection(
+				anchorIndex = IFileViewer.UpdateSelection(
 					this,
 					anchorIndex,
 					index,

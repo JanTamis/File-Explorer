@@ -10,18 +10,16 @@ namespace FileExplorer.Converters;
 
 public class PathToImageConverter : IValueConverter, ISingleton<PathToImageConverter>
 {
-	public static PathToImageConverter Instance = new();
+	public static readonly PathToImageConverter Instance = new();
 
 	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
-		if (value is Task<IImage?> imageTask)
+		switch (value)
 		{
-			return new TaskCompletionNotifier<IImage?>(imageTask);
-		}
-
-		if (value is IFileItem item && parameter is IItemProvider provider)
-		{
-			return new TaskCompletionNotifier<IImage?>(provider.GetThumbnailAsync(item, 100, CancellationToken.None));
+			case Task<IImage?> imageTask:
+				return new TaskCompletionNotifier<IImage?>(imageTask);
+			case IFileItem item when parameter is IItemProvider provider:
+				return new TaskCompletionNotifier<IImage?>(provider.GetThumbnailAsync(item, 100, CancellationToken.None));
 		}
 
 		if (parameter is int size)

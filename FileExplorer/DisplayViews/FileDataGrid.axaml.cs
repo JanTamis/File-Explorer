@@ -84,7 +84,7 @@ public partial class FileDataGrid : UserControl, ISelectableControl, IFileViewer
 		}
 	}
 
-	private async void Item_PointerPressed(object? sender, PointerPressedEventArgs e)
+	private void Item_PointerPressed(object? sender, PointerPressedEventArgs e)
 	{
 		if (sender is ListBoxItem { DataContext: FileModel model } item)
 		{

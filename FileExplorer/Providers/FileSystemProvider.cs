@@ -14,7 +14,7 @@ public class FileSystemProvider : IItemProvider
 
 	public FileSystemProvider()
 	{
-			_imageCache = new MemoryCache(new MemoryCacheOptions()
+			_imageCache = new MemoryCache(new MemoryCacheOptions
 			{
 				ExpirationScanFrequency = TimeSpan.FromMinutes(1),
 				TrackStatistics = true,

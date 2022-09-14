@@ -57,14 +57,19 @@ public class GraphItemProvider : IItemProvider
 
 	public async Task<string> GetNameAsync()
 	{
-		var user = await _client.Me.Request().GetAsync();
+		var user = await _client.Me
+			.Request()
+			.Select(s => s.DisplayName)
+			.GetAsync();
 
 		return user.DisplayName;
 	}
 
 	public async Task<IFileItem> GetRootAsync()
 	{
-		var item = await _client.Me.Drive.Root.Request().GetAsync();
+		var item = await _client.Me.Drive.Root
+			.Request()
+			.GetAsync();
 
 		return new GraphFileModel(item);
 	}
@@ -84,8 +89,15 @@ public class GraphItemProvider : IItemProvider
 		if (folder is GraphFileModel model)
 		{
 			ICollectionPage<DriveItem>? driveItem = recursive
-				? await _client.Me.Drive.Items[model.item.Id].Search(filter).Request().Expand("thumbnails").GetAsync(token)
-				: await _client.Me.Drive.Items[model.item.Id].Children.Request().Expand("thumbnails").GetAsync(token);
+				? await _client.Me.Drive.Items[model.item.Id]
+					.Search(filter)
+					.Request()
+					.Expand("thumbnails")
+					.GetAsync(token)
+				: await _client.Me.Drive.Items[model.item.Id].Children
+					.Request()
+					.Expand("thumbnails")
+					.GetAsync(token);
 
 			while (driveItem is { CurrentPage.Count: > 0 })
 			{
@@ -117,7 +129,11 @@ public class GraphItemProvider : IItemProvider
 
 			if (recursive)
 			{
-				var resultTask = _client.Me.Drive.Items[model.item.Id].Search(filter).Request().Expand("thumbnails").GetAsync(token);
+				var resultTask = _client.Me.Drive.Items[model.item.Id]
+					.Search(filter)
+					.Request()
+					.Expand("thumbnails")
+					.GetAsync(token);
 
 				resultTask.Wait(token);
 
@@ -125,7 +141,10 @@ public class GraphItemProvider : IItemProvider
 			}
 			else
 			{
-				var resultTask = _client.Me.Drive.Items[model.item.Id].Children.Request().Expand("thumbnails").GetAsync(token);
+				var resultTask = _client.Me.Drive.Items[model.item.Id].Children
+					.Request()
+					.Expand("thumbnails")
+					.GetAsync(token);
 
 				resultTask.Wait(token);
 
@@ -147,14 +166,16 @@ public class GraphItemProvider : IItemProvider
 				switch (driveItem)
 				{
 					case IDriveSearchCollectionPage { NextPageRequest: { } request }:
-						var searchResult = request.Expand("thumbnails").GetAsync(token);
+						var searchResult = request
+							.GetAsync(token);
 
 						searchResult.Wait(token);
 
 						driveItem = searchResult.Result;
 						break;
 					case IDriveItemChildrenCollectionPage { NextPageRequest: { } request }:
-						var childrenResult = request.Expand("thumbnails").GetAsync(token);
+						var childrenResult = request
+							.GetAsync(token);
 
 						childrenResult.Wait(token);
 
@@ -196,18 +217,22 @@ public class GraphItemProvider : IItemProvider
 
 	public Task<IImage?> GetThumbnailAsync(IFileItem? item, int size, CancellationToken token)
 	{
-		if (item is GraphFileModel { item.Thumbnails: [var thumbnail, ..] })
+		if (item is GraphFileModel model)
 		{
 			return _imageCache.GetOrCreateAsync(item.GetHashCode(), async entry =>
 			{
-				using var stream = new MemoryStream(await _httpClient.GetByteArrayAsync(thumbnail.Small.Url, token), false);
+				var thumbnail = await _client.Me.Drive.Items[model.item.Id].Thumbnails["0"]["medium"].Content
+					.Request()
+					.GetAsync(token);
 
-				entry.SetSize(stream.Length);
+				//using var stream = new MemoryStream(await _httpClient.GetByteArrayAsync(thumbnail.Small.Url, token), false);
 
-				return new Bitmap(stream) as IImage;
+				entry.SetSize(thumbnail.Length);
+
+				return new Bitmap(thumbnail) as IImage;
 			});
 		}
 
-		return Task.FromResult(null as IImage);
+		return Task.FromResult<IImage?>(null);
 	}
 }

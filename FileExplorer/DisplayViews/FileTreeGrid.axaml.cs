@@ -52,7 +52,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 									{
 										Width = 24,
 										Height = 24,
-										[!Image.DataContextProperty] = new Binding()
+										[!Image.DataContextProperty] = new Binding
 										{
 											ConverterParameter = Provider,
 											Converter = PathToImageConverter.Instance,
@@ -75,7 +75,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 						x => x is { IsFolder: true } && Provider?.HasItems(x) is true),
 					new TextColumn<IFileItem, DateTime>("Edit Date", item => item.EditedOn, GridLength.Auto),
 					new TextColumn<IFileItem, string>("Type", item => item.Extension, GridLength.Auto),
-					new TextColumn<IFileItem, string>("Size", item => item.IsFolder ? null : item.Size.Bytes().ToString(), GridLength.Auto, new TextColumnOptions<IFileItem>()
+					new TextColumn<IFileItem, string>("Size", item => item.IsFolder ? null : item.Size.Bytes().ToString(), GridLength.Auto, new TextColumnOptions<IFileItem>
 					{
 						CompareAscending = (x, y) => x.Size.CompareTo(y.Size),
 						CompareDescending = (x, y) => y.Size.CompareTo(x.Size),

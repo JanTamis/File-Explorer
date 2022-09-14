@@ -74,7 +74,13 @@ public partial class TabItemViewModel
 	{
 		Files.CountChanged += count => FileCount = count;
 
-		CurrentViewMode = ViewTypes.Grid;
+		DisplayControl = new FileGrid
+		{
+			Provider = Provider,
+			Items = Files,
+		};
+
+		CurrentViewMode = ViewTypes.Tree;
 	}
 
 	public IFileItem? Undo()
@@ -204,16 +210,20 @@ public partial class TabItemViewModel
 		{
 			treeGrid.Provider = value;
 		}
+		else if (DisplayControl is FileGrid grid)
+		{
+			grid.Provider = value;
+		}
 
-		UpdateFiles(false, String.Empty);
+		Files.Clear();
+
+		// UpdateFiles(false, String.Empty);
 	}
 
 	partial void OnDisplayControlChanged(IFileViewer value)
 	{
 		value.PathChanged += async path => await SetPath(path);
 		value.SelectionChanged += () => OnPropertyChanged(nameof(SelectionCount));
-
-		value.Items = Files;
 	}
 
 	partial void OnCurrentViewModeChanged(ViewTypes value)
@@ -223,13 +233,21 @@ public partial class TabItemViewModel
 			ViewTypes.Grid => new FileGrid
 			{
 				Provider = Provider,
+				Items = Files,
 			},
-			ViewTypes.List => new FileDataGrid(),
+			ViewTypes.List => new FileDataGrid
+			{
+				Items = Files,
+			},
 			ViewTypes.Tree => new FileTreeGrid
 			{
 				Provider = Provider,
+				Items = Files,
 			},
-			_ => new FileDataGrid(),
+			_ => new FileDataGrid
+			{
+				Items = Files,
+			},
 		};
 	}
 
@@ -247,7 +265,7 @@ public partial class TabItemViewModel
 
 	partial void OnIsLoadingChanged(bool value)
 	{
-		GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+		GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized, false, true);
 	}
 
 	partial void OnCurrentFolderChanged(IFileItem? value)

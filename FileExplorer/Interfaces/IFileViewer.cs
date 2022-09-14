@@ -9,8 +9,6 @@ public interface IFileViewer
 {
 	public ObservableRangeCollection<IFileItem> Items { get; set; }
 
-	public ValueTask<int> ItemCount { get; }
-
 	event Action<IFileItem> PathChanged;
 	public event Action SelectionChanged;
 
@@ -25,7 +23,7 @@ public interface IFileViewer
 	/// <param name="select">Whether the item should be selected or unselected.</param>
 	/// <param name="rangeModifier">Whether the range modifier is enabled (i.e. shift key).</param>
 	/// <param name="toggleModifier">Whether the toggle modifier is enabled (i.e. ctrl key).</param>
-	public static async ValueTask<int> UpdateSelection(IFileViewer viewer, int anchorIndex, int index, bool select = true, bool rangeModifier = false, bool toggleModifier = false)
+	public static int UpdateSelection(IFileViewer viewer, int anchorIndex, int index, bool select = true, bool rangeModifier = false, bool toggleModifier = false)
 	{
 		var files = viewer.Items;
 		var count = files.Count;

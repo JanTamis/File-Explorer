@@ -7,7 +7,7 @@ using FileExplorer.Interfaces;
 
 namespace FileExplorer.Models;
 
-public class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, IEquatable<FileSystemTreeItem>
+public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, IEquatable<FileSystemTreeItem>
 {
 	public static readonly EnumerationOptions Options = new()
 	{
