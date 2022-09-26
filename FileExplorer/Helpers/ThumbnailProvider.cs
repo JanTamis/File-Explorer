@@ -20,30 +20,36 @@ public static class ThumbnailProvider
 	// private static readonly Dictionary<string, string>? fileTypes = OperatingSystem.IsWindows() ? RegisteredFileType.GetFileTypeAndIcon() : new();
 
 	private static readonly ConcurrentDictionary<string, IImage> Images = new();
-	private static readonly Dictionary<string, string[]> TypeMap = new();
+	private static readonly ConcurrentDictionary<string, string[]> TypeMap = new();
 
 	public static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default, Environment.ProcessorCount / 2); // BitOperations.Log2((uint)Environment.ProcessorCount));
 
 	static ThumbnailProvider()
 	{
-		var assembly = Assembly.GetExecutingAssembly();
-		var files = assembly.GetManifestResourceNames();
-
-		const string basePathMapping = "FileExplorer.Assets.Lookup.";
-
-		foreach (var file in files)
+		if (!OperatingSystem.IsWindows())
 		{
-			if (file.StartsWith(basePathMapping))
+			var assembly = Assembly.GetExecutingAssembly();
+			var files = assembly.GetManifestResourceNames();
+
+			const string basePathMapping = "FileExplorer.Assets.Lookup.";
+
+			foreach (var file in files)
 			{
-				var name = file.Split('.')[^2];
-				var stream = assembly.GetManifestResourceStream(file);
-
-				if (stream is not null)
+				if (file.StartsWith(basePathMapping))
 				{
-					var reader = new StreamReader(stream);
+					var name = file.Split('.')[^2];
+					var stream = assembly.GetManifestResourceStream(file);
 
-					TypeMap.Add(name, reader.ReadToEnd()
-						.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+					if (stream is not null)
+					{
+						var reader = new StreamReader(stream);
+
+						reader.ReadToEndAsync().ContinueWith(c =>
+						{
+							TypeMap.TryAdd(name, reader.ReadToEnd()
+								.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+						});
+					}
 				}
 			}
 		}

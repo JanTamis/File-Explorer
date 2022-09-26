@@ -29,8 +29,6 @@ public unsafe partial class WindowsThumbnailProvider
 {
 	private const string IShellItem2Guid = "7E9FB0D3-919F-4307-AB2E-9B1860310C93";
 
-	private static readonly object lockObject = new();
-
 	[DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
 	internal static extern int SHCreateItemFromParsingName(
 		in char path,

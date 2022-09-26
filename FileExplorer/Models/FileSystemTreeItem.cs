@@ -9,6 +9,8 @@ namespace FileExplorer.Models;
 
 public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, IEquatable<FileSystemTreeItem>
 {
+	private string? _path;
+
 	public static readonly EnumerationOptions Options = new()
 	{
 		IgnoreInaccessible = true,
@@ -22,11 +24,9 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		{
 			if (IsFolder)
 			{
-				var path = GetPath();
-
-				if (Directory.Exists(path))
+				if (Directory.Exists(Path))
 				{
-					return new FileSystemEnumerable<FileSystemTreeItem>(path, (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName, x.IsDirectory, this), Options);
+					return new FileSystemEnumerable<FileSystemTreeItem>(Path, (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName, x.IsDirectory, this), Options);
 				}
 			}
 
@@ -40,11 +40,9 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		{
 			if (IsFolder)
 			{
-				var path = GetPath();
-
-				if (Directory.Exists(path))
+				if (Directory.Exists(Path))
 				{
-					var enumerable = new FileSystemEnumerable<byte>(path, (ref FileSystemEntry _) => 0, Options)
+					var enumerable = new FileSystemEnumerable<byte>(Path, (ref FileSystemEntry _) => 0, Options)
 					{
 						ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
 					};
@@ -67,17 +65,17 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 
 	public bool HasParent => Parent is not null;
 
+	public string Path => _path ??= GetPath();
+
 	public bool HasChildren
 	{
 		get
 		{
 			if (IsFolder)
 			{
-				var path = GetPath();
-
-				if (Directory.Exists(path))
+				if (Directory.Exists(Path))
 				{
-					var enumerable = new DelegateFileSystemEnumerator<byte>(path, Options);
+					var enumerable = new DelegateFileSystemEnumerator<byte>(Path, Options);
 
 					return enumerable.MoveNext();
 				}
@@ -161,15 +159,8 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 			RecurseSubdirectories = true,
 		};
 
-		var query = IsFolder
-			? GetPath((path, fileOptions) =>
-				{
-					var currentPath = path.ToString();
-
-					return Directory.Exists(currentPath)
-						? new FileSystemEnumerable<bool>(currentPath, (ref FileSystemEntry _) => false, fileOptions)
-						: Enumerable.Empty<bool>();
-				}, options)
+		var query = Directory.Exists(Path)
+			? new FileSystemEnumerable<bool>(Path, (ref FileSystemEntry _) => false, options)
 			: Enumerable.Empty<bool>();
 
 		return query.Count();
@@ -182,7 +173,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 			yield break;
 		}
 
-		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(GetPath(), Options)
+		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(Path, Options)
 		{
 			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
 		};
@@ -218,7 +209,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 			yield break;
 		}
 
-		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(GetPath(), Options)
+		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(Path, Options)
 		{
 			Find = (ref FileSystemEntry entry) => entry.IsDirectory || include(entry.FileName),
 			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
@@ -266,24 +257,12 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 
 	public T GetPath<T>(ReadOnlySpanFunc<char, T> action)
 	{
-		var count = GetPathLength();
-
-		Span<char> buffer = stackalloc char[count];
-
-		BuildPath(buffer, this);
-
-		return action(buffer);
+		return action(Path);
 	}
 
 	public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
 	{
-		var count = GetPathLength();
-
-		Span<char> buffer = stackalloc char[count];
-
-		BuildPath(buffer, this);
-
-		return action(buffer, parameter);
+		return action(Path, parameter);
 	}
 
 	public override string ToString()
@@ -298,26 +277,12 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 
 	public bool Equals(FileSystemTreeItem? other)
 	{
-		if (other is null)
-		{
-			return false;
-		}
-
-		var count1 = GetPathLength();
-		var count2 = other.GetPathLength();
-
-		Span<char> buffer1 = stackalloc char[count1];
-		Span<char> buffer2 = stackalloc char[count1];
-
-		BuildPath(buffer1, this);
-		BuildPath(buffer2, other);
-
-		return buffer1.SequenceEqual(buffer2);
+		return String.Equals(Path, other?.Path);
 	}
 
 	public override int GetHashCode()
 	{
-		return GetPath(String.GetHashCode);
+		return Path.GetHashCode();
 	}
 
 	private int GetPathLength()
