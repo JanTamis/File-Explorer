@@ -80,25 +80,25 @@ public class FileSystemProvider : IItemProvider
 
 	public Task<IImage?> GetThumbnailAsync(IFileItem? item, int size, CancellationToken token)
 	{
-		if (item is null)
+		if (item is null or not FileModel)
 		{
 			return Task.FromResult<IImage?>(null);
 		}
 
-		if (_imageCache is not null)
-		{
-			return _imageCache.GetOrCreateAsync(item.GetHashCode(), async entry =>
-			{
-				var image = await ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested && item.IsVisible);
+		//if (_imageCache is not null)
+		//{
+		//	return _imageCache.GetOrCreateAsync(item.GetHashCode(), async entry =>
+		//	{
+		//		var image = await ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested && item.IsVisible);
 
-				if (image is not null)
-				{
-					entry.SetSize((long)image.Size.Width * (long)image.Size.Height * 4L);
-				}
+		//		if (image is not null)
+		//		{
+		//			entry.SetSize((long)image.Size.Width * (long)image.Size.Height * 4L);
+		//		}
 
-				return image;
-			});
-		}
+		//		return image;
+		//	});
+		//}
 
 		return ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested && item.IsVisible);
 	}

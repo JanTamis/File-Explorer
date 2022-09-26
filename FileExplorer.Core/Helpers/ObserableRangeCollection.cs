@@ -502,6 +502,7 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 		_data.Insert(index, item);
 
 		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+		CountChanged.Invoke(_data.Count);
 	}
 
 	public void RemoveAt(int index)
@@ -509,6 +510,7 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 		_data.RemoveAt(index);
 
 		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+		CountChanged.Invoke(_data.Count);
 	}
 
 	public void Add(T item)
@@ -516,12 +518,15 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 		_data.Add(item);
 
 		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+		CountChanged.Invoke(_data.Count);
 	}
 
 	public void Clear()
 	{
-		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _data));
-		_data.Clear();		
+		_data.Clear();
+
+		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+		CountChanged.Invoke(_data.Count);
 	}
 
 	public bool Contains(T item)

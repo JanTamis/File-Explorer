@@ -1,14 +1,9 @@
-﻿using System;
-using System.IO;
-using System.IO.Enumeration;
-using System.Linq;
-using System.Reflection;
-using Avalonia.Controls;
-using FileExplorer.Core.Interfaces;
+﻿using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
-using Material.Styles.Themes;
-using Microsoft.VisualBasic;
+using System.IO;
+using System.IO.Enumeration;
+using System.Runtime.CompilerServices;
 
 namespace FileExplorer.Models;
 
@@ -231,25 +226,34 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 
 		if (layers is 0)
 		{
-			while (enumerable.MoveNext() && (!enumerable.Current.IsFolder || include(enumerable.Current.Value)))
+			while (enumerable.MoveNext())
 			{
-				yield return enumerable.Current;
+				if (!enumerable.Current.IsFolder || include(enumerable.Current.Value))
+				{
+					yield return enumerable.Current;
+				}
 			}
 
 			yield break;
 		}
 
-		while (enumerable.MoveNext() && (!enumerable.Current.IsFolder || include(enumerable.Current.Value)))
+		while (enumerable.MoveNext())
 		{
-			yield return enumerable.Current;
+			if (!enumerable.Current.IsFolder && include(enumerable.Current.Value))
+			{
+				yield return enumerable.Current;
+			}
 
 			if (enumerable.Current.IsFolder)
 			{
-				foreach (var childOfChild in enumerable.Current.EnumerateChildren(layers - 1))
+				RuntimeHelpers.EnsureSufficientExecutionStack();
+
+				foreach (var childOfChild in enumerable.Current.EnumerateChildren(include, layers - 1))
 				{
 					yield return childOfChild;
 				}
 			}
+
 		}
 	}
 
@@ -257,10 +261,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	{
 		var count = GetPathLength();
 
-		return String.Create(count, this, (span, item) =>
-		{
-			BuildPath(span, item);
-		});
+		return String.Create(count, this, BuildPath);
 	}
 
 	public T GetPath<T>(ReadOnlySpanFunc<char, T> action)

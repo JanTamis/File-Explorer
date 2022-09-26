@@ -11,7 +11,7 @@ using Material.Styles.Themes.Base;
 
 namespace FileExplorer;
 
-public class App : Application
+public partial class App : Application
 {
 	public static MainWindowViewModel? MainViewModel { get; set; }
 	public static Container Container { get; } = new Container();
@@ -35,7 +35,14 @@ public class App : Application
 	{
     if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
-			if (Styles is [MaterialTheme theme, ..])
+			var theme = this.LocateMaterialTheme<MaterialTheme>();
+
+			if (OperatingSystem.IsWindows() && SystemThemeProbe.GetSystemBaseThemeMode() is BaseThemeMode mode)
+			{
+				theme.BaseTheme = mode;
+			}
+
+			if (theme is not null)
 			{
 				Resources["WindowBackground"] = theme.BaseTheme switch
 				{
