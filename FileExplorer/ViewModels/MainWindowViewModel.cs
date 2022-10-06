@@ -6,6 +6,7 @@ using Microsoft.VisualBasic.FileIO;
 using System.Globalization;
 using System.IO;
 using System.Timers;
+using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
@@ -216,7 +217,7 @@ namespace FileExplorer.ViewModels
 
 		public async void CopyPath()
 		{
-			await App.Current.Clipboard.SetTextAsync(CurrentTab.CurrentFolder.GetPath(path => path.ToString()));
+			await Application.Current.Clipboard.SetTextAsync(CurrentTab.CurrentFolder.GetPath(path => path.ToString()));
 
 			notificationManager.Show(new Notification("Copy Path", "The path has been copied"));
 		}

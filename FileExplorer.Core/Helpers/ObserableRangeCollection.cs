@@ -32,7 +32,7 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 
 	public bool IsSynchronized => false;
 
-	public object SyncRoot => new();
+	public object SyncRoot => this;
 
 	object? IList.this[int index]
 	{
@@ -217,7 +217,7 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 			{
 				CountChanged(Count);
 			}
-		});
+		}, token);
 
 		ValueTask task = default;
 

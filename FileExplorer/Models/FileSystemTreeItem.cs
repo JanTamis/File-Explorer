@@ -235,16 +235,13 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 				yield return enumerable.Current;
 			}
 
-			if (enumerable.Current.IsFolder)
+			if (enumerable.Current.IsFolder && RuntimeHelpers.TryEnsureSufficientExecutionStack())
 			{
-				RuntimeHelpers.EnsureSufficientExecutionStack();
-
 				foreach (var childOfChild in enumerable.Current.EnumerateChildren(include, layers - 1))
 				{
 					yield return childOfChild;
 				}
 			}
-
 		}
 	}
 
@@ -288,7 +285,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	private int GetPathLength()
 	{
 		var item = this;
-		var count = this.Value.Length;
+		var count = Value.Length;
 
 		while (item.Parent is not null)
 		{

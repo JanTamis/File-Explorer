@@ -36,7 +36,7 @@ public class SolidColorBrushTransition : Transition<IBrush>
 			{
 				var vector = Sse.Add(Fma.MultiplyAdd(halfVector, eVector, Sse.Subtract(newVector, oldVector)), oldVector);
 
-				var vectorInt = Fma.ConvertToVector128Int32(vector);
+				var vectorInt = Sse2.ConvertToVector128Int32(vector);
 
 				return new SolidColorBrush(new Color(
 					(byte)vectorInt.GetElement(0), 

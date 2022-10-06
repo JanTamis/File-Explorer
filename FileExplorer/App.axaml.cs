@@ -33,7 +33,7 @@ public partial class App : Application
 
 	public override void OnFrameworkInitializationCompleted()
 	{
-    if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
 			var theme = this.LocateMaterialTheme<MaterialTheme>();
 
@@ -42,20 +42,17 @@ public partial class App : Application
 				theme.BaseTheme = mode;
 			}
 
-			if (theme is not null)
+			Resources["WindowBackground"] = theme.BaseTheme switch
 			{
-				Resources["WindowBackground"] = theme.BaseTheme switch
-				{
-					BaseThemeMode.Light => new SolidColorBrush(Color.Parse("#efeff5")),
-					BaseThemeMode.Dark => new SolidColorBrush(Color.Parse("#333337")),
-				};
+				BaseThemeMode.Light => new SolidColorBrush(Color.Parse("#efeff5")),
+				BaseThemeMode.Dark => new SolidColorBrush(Color.Parse("#333337")),
+			};
 
-				Resources["WindowBorder"] = theme.BaseTheme switch
-				{
-					BaseThemeMode.Light => new SolidColorBrush(Color.Parse("#bfbfbf")),
-					BaseThemeMode.Dark => new SolidColorBrush(Color.Parse("#1a212e")),
-				};
-			}
+			Resources["WindowBorder"] = theme.BaseTheme switch
+			{
+				BaseThemeMode.Light => new SolidColorBrush(Color.Parse("#bfbfbf")),
+				BaseThemeMode.Dark => new SolidColorBrush(Color.Parse("#1a212e")),
+			};
 
 			desktop.MainWindow = new MainWindow();
 			desktop.MainWindow.DataContext = MainViewModel = new MainWindowViewModel(new WindowNotificationManager(desktop.MainWindow)

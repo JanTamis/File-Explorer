@@ -1,3 +1,4 @@
+using System.Globalization;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
@@ -52,7 +53,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 									{
 										Width = 24,
 										Height = 24,
-										[!Image.DataContextProperty] = new Binding
+										[!DataContextProperty] = new Binding
 										{
 											ConverterParameter = Provider,
 											Converter = PathToImageConverter.Instance,
@@ -73,7 +74,11 @@ public class FileTreeGrid : UserControl, IFileViewer
 						}),
 						x => Provider?.GetItems(x, "*", false, default).OrderByDescending(o => o.IsFolder).ThenBy(t => t.Name) ?? Enumerable.Empty<IFileItem>(),
 						x => x is { IsFolder: true } && Provider?.HasItems(x) is true),
-					new TextColumn<IFileItem, DateTime>("Edit Date", item => item.EditedOn, GridLength.Auto),
+					new TextColumn<IFileItem, string>("Edit Date", item => item.EditedOn.Humanize(false, DateTime.Now, CultureInfo.CurrentCulture), GridLength.Auto, new TextColumnOptions<IFileItem>()
+					{
+						CompareAscending = (x, y) => x.EditedOn.CompareTo(y.EditedOn),
+						CompareDescending = (x, y) => y.EditedOn.CompareTo(x.EditedOn),
+					}),
 					new TextColumn<IFileItem, string>("Type", item => item.Extension, GridLength.Auto),
 					new TextColumn<IFileItem, string>("Size", item => item.IsFolder ? null : item.Size.Bytes().ToString(), GridLength.Auto, new TextColumnOptions<IFileItem>
 					{

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using FileExplorer.Interfaces;
@@ -44,7 +45,7 @@ public partial class OneDriveLogin : UserControl, IPopup, INotifyPropertyChanged
 
 	public void CopyCode()
 	{
-		App.Current.Clipboard.SetTextAsync(Code);
+		Application.Current.Clipboard.SetTextAsync(Code);
 	}
 
 	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)

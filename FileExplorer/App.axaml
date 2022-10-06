@@ -4,9 +4,9 @@
              xmlns:converters="using:FileExplorer.Converters"
              xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-			 xmlns:link="clr-namespace:HyperText.Avalonia;assembly=HyperText.Avalonia"
-             xmlns:styles="clr-namespace:Material.Styles;assembly=Material.Styles"
+             xmlns:link="clr-namespace:HyperText.Avalonia;assembly=HyperText.Avalonia"
              xmlns:ripple="clr-namespace:Material.Ripple;assembly=Material.Ripple"
+             xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              x:Class="FileExplorer.App">
   <Application.DataTemplates>
 	<local:ViewLocator />
@@ -34,7 +34,7 @@
   </Application.Resources>
 
   <Application.Styles>
-	<themes:MaterialTheme BaseTheme="Inherit" PrimaryColor="Blue" SecondaryColor="Blue" />
+	<themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Blue" />
 
 	<link:HyperLinkStyle/>
 
@@ -106,7 +106,6 @@
 		  <Border Name="PART_RootBorder" Cursor="Ibeam"
 					        Background="{TemplateBinding Background}"
 					        BorderBrush="{TemplateBinding BorderBrush}"
-					        CornerRadius="{TemplateBinding assists:TextFieldAssist.CornerRadius}"
 					        BorderThickness="{TemplateBinding BorderThickness}">
 			<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="{TemplateBinding Padding}">
 			  <DataValidationErrors Name="DataValidation">
@@ -188,11 +187,11 @@
                      IsLightDismissEnabled="True"
                      UseLayoutRounding="True"
                      ClipToBounds="False" >
-				<styles:Card assists:ShadowAssist.ShadowDepth="Depth1"
-                             Margin="4,0,4,4"
-                             Foreground="red"
-                             CornerRadius="0,0,4,4"
-                             Padding="0">
+				<controls:Card assists:ShadowAssist.ShadowDepth="Depth1"
+                     Margin="4,0,4,4"
+                     Foreground="red"
+                     CornerRadius="0,0,4,4"
+                     Padding="0">
 				  <ScrollViewer Background="{Binding Background, ElementName=PART_Popup}"
                                 MaxHeight="{TemplateBinding MaxDropDownHeight}"
                                 MinHeight="1" >
@@ -202,7 +201,7 @@
                             ItemTemplate="{TemplateBinding ItemTemplate}"
                             VirtualizationMode="{TemplateBinding VirtualizationMode}" />
 				  </ScrollViewer>
-				</styles:Card>
+				</controls:Card>
 			  </Popup>
 			</Grid>
 		  </Grid>
@@ -237,7 +236,7 @@
 	  <Setter Property="Padding" Value="5" />
 	  <Setter Property="Template">
 		<ControlTemplate>
-		  <styles:Card Name="PART_LayoutRoot"
+		  <controls:Card Name="PART_LayoutRoot"
                        Margin="10"
                        assists:ShadowAssist.ShadowDepth="CenterDepth2"
                        BorderThickness="{TemplateBinding BorderThickness}"
@@ -249,7 +248,7 @@
                               MaxWidth="{TemplateBinding MaxWidth}"
                               Content="{TemplateBinding Content}"
                               ContentTemplate="{TemplateBinding ContentTemplate}" />
-		  </styles:Card>
+		  </controls:Card>
 		</ControlTemplate>
 	  </Setter>
 	</Style>

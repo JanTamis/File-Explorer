@@ -74,7 +74,7 @@ public partial class TabItemViewModel
 	{
 		Files.CountChanged += count => FileCount = count;
 
-		DisplayControl = new FileTreeGrid
+		DisplayControl = new FileGrid
 		{
 			Provider = Provider,
 			Items = Files,
@@ -206,18 +206,17 @@ public partial class TabItemViewModel
 
 	partial void OnProviderChanged(IItemProvider value)
 	{
-		if (DisplayControl is FileTreeGrid treeGrid)
+		switch (DisplayControl)
 		{
-			treeGrid.Provider = value;
-		}
-		else if (DisplayControl is FileGrid grid)
-		{
-			grid.Provider = value;
+			case FileTreeGrid treeGrid:
+				treeGrid.Provider = value;
+				break;
+			case FileGrid grid:
+				grid.Provider = value;
+				break;
 		}
 
 		Files.Clear();
-
-		// UpdateFiles(false, String.Empty);
 	}
 
 	partial void OnDisplayControlChanged(IFileViewer value)

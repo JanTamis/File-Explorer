@@ -15,15 +15,15 @@ public class FileSystemProvider : IItemProvider
 
 	public FileSystemProvider()
 	{
-			_imageCache = new MemoryCache(new MemoryCacheOptions
-			{
-				ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-				TrackStatistics = true,
-				SizeLimit = 536_870_912,
-			});
+		_imageCache = new MemoryCache(new MemoryCacheOptions
+		{
+			ExpirationScanFrequency = TimeSpan.FromMinutes(1),
+			TrackStatistics = true,
+			SizeLimit = 536_870_912,
+		});
 	}
 
-	public IAsyncEnumerable<IFileItem> GetItemsAsync(IFileItem folder, string filter, bool recursive, [EnumeratorCancellation] CancellationToken token)
+	public IAsyncEnumerable<IFileItem> GetItemsAsync(IFileItem folder, string filter, bool recursive, CancellationToken token)
 	{
 		if (folder is FileModel model)
 		{

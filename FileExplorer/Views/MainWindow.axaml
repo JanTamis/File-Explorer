@@ -26,6 +26,7 @@
                     BorderThickness="0"
                     WindowStartupLocation="CenterScreen"
                     xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
+                    xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
                     Title="FileExplorer">
 	<Window.Resources>
 		<system:Int32 x:Key="ImageSize">24</system:Int32>
@@ -39,7 +40,7 @@
 		<dialogHost:DialogHost.PopupTemplate>
 			<ControlTemplate>
 				<VisualLayerManager IsPopup="True" Name="PART_DialogPopupRoot" ClipToBounds="False">
-					<styles:Card Name="PART_ContentBackground"
+					<controls:Card Name="PART_ContentBackground"
 					             MinWidth="300"
 					             assist:ShadowAssist.ShadowDepth="CenterDepth5"
 					             Padding="0"
@@ -51,7 +52,7 @@
 						                  ContentTemplate="{TemplateBinding ContentTemplate}"
 						                  Content="{TemplateBinding Content}"
 						                  Padding="0" />
-					</styles:Card>
+					</controls:Card>
 				</VisualLayerManager>
 			</ControlTemplate>
 		</dialogHost:DialogHost.PopupTemplate>
@@ -80,7 +81,7 @@
 									<Setter.Value>
 										<ControlTemplate>
 											<Border Padding="7.5">
-												<styles:Card Padding="0"
+												<controls:Card Padding="0"
 												             Background="{TemplateBinding Background}"
 												             assists:ShadowAssist.ShadowDepth="{Binding Path=(assists:ShadowAssist.ShadowDepth), RelativeSource={RelativeSource TemplatedParent}}">
 													<Grid Name="ItemContent"
@@ -97,7 +98,7 @@
 														                  Content="{TemplateBinding Content}"
 														                  TextBlock.Foreground="{Binding Path=(assists:TabControlAssist.TabHeaderForeground), RelativeSource={RelativeSource TemplatedParent}}" />
 													</Grid>
-												</styles:Card>
+												</controls:Card>
 											</Border>
 										</ControlTemplate>
 									</Setter.Value>
@@ -303,7 +304,7 @@
 							</Panel>
 						</StackPanel>
 
-						<styles:Card assist:ShadowAssist.ShadowDepth="Depth1"
+						<controls:Card assist:ShadowAssist.ShadowDepth="Depth1"
 						             Padding="0"
 						             Height="30"
 						             Grid.Column="1">
@@ -355,9 +356,9 @@
 									</DataTemplate>
 								</ListBox.ItemTemplate>
 							</ListBox>
-						</styles:Card>
+						</controls:Card>
 
-						<styles:Card assist:ShadowAssist.ShadowDepth="Depth1"
+						<controls:Card assist:ShadowAssist.ShadowDepth="Depth1"
 						             MinWidth="150"
 						             Height="30"
 						             Padding="0"
@@ -385,7 +386,7 @@
 
 								</TextBox.InnerLeftContent>
 							</TextBox>
-						</styles:Card>
+						</controls:Card>
 					</Grid>
 
 					<Border Grid.Row="2"
