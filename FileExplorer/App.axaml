@@ -7,6 +7,7 @@
              xmlns:link="clr-namespace:HyperText.Avalonia;assembly=HyperText.Avalonia"
              xmlns:ripple="clr-namespace:Material.Ripple;assembly=Material.Ripple"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
+             xmlns:naming="clr-namespace:Material.Styles.Resources.Naming;assembly=Material.Styles"
              x:Class="FileExplorer.App">
   <Application.DataTemplates>
 	<local:ViewLocator />
@@ -34,7 +35,7 @@
   </Application.Resources>
 
   <Application.Styles>
-	<themes:MaterialTheme BaseTheme="Light" PrimaryColor="Blue" SecondaryColor="Blue" />
+	<themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Blue" />
 
 	<link:HyperLinkStyle/>
 
@@ -48,55 +49,51 @@
 	  <Setter Property="Height" Value="30" />
 	</Style>
 
-	<!--<Style Selector="TreeViewItem">
-	  <Setter Property="Background" Value="Red" />
+	<Style Selector="TreeViewItem">
+	  <Setter Property="Background" Value="Transparent" />
 	  <Setter Property="BorderThickness" Value="0" />
 	  <Setter Property="Padding" Value="8" />
 	  <Setter Property="Foreground" Value="{Binding $parent[TreeView].Foreground}" />
 	  <Setter Property="Template">
-		<Setter.Value>
-		  <ControlTemplate>
-			<Grid ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto,*">
-			  <Rectangle Opacity="0" Fill="Red"
-							           Grid.RowSpan="3" Grid.ColumnSpan="3" />
-			  <ToggleButton Grid.Row="0" Grid.Column="0" Name="Expander" ClickMode="Press"
-							              IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"
-							              Classes="MaterialDesignExpandCollapseToggleStyle"
-							              Foreground="{TemplateBinding Foreground}"
-							              Margin="8 0 8 0"
-							              VerticalAlignment="Center" />
+			<Setter.Value>
+			  <ControlTemplate>
+					<Grid ColumnDefinitions="40,40,*" RowDefinitions="Auto,Auto,*" Name="{x:Static naming:PartNames.PartContentPanel}">
+					  <ToggleButton Grid.Row="0"
+					                Grid.Column="0"
+					                Name="{x:Static naming:PartNames.PartExpanderButton}"
+					                ClickMode="Press"
+									        IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"
+									        Classes="material-tree-view-item-expander"
+									        Foreground="{TemplateBinding Foreground}"
+									        Margin="8 0 8 0"
+									        VerticalAlignment="Center" />
 
-			  <Border Name="MouseOverBorder"
-							        Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2"
-							        IsHitTestVisible="False"
-							        Background="{DynamicResource MaterialDesignBodyLight}" />
+					  <Border Name="PART_BehaviourEffect"
+					          Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2"
+					          IsHitTestVisible="False"
+					          Background="{TemplateBinding Foreground}" />
 
-			  <Border Name="SelectedBorder"
-							        Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2"
-							        IsHitTestVisible="False"
-							        Background="{DynamicResource MaterialDesignBodyLight}" />
+					  <Grid Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Name="ContentGrid">
+							<ripple:RippleEffect RippleFill="{DynamicResource MaterialDesignBodyLight}"
+							                     Focusable="False">
+							  <ContentPresenter Name="PART_Header"
+							                    Margin="{Binding $parent[TreeViewItem].Padding}"
+												          Content="{TemplateBinding Header}" />
+							</ripple:RippleEffect>
+					  </Grid>
 
-			  <Grid Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Name="ContentGrid" Background="Transparent">
-				<ripple:RippleEffect
-									RippleFill="{DynamicResource MaterialDesignBodyLight}"
-									Focusable="False">
-				  <ContentPresenter Name="PART_Header" Margin="{Binding $parent[TreeViewItem].Padding}"
-									                  Content="{TemplateBinding Header}" />
-				</ripple:RippleEffect>
-			  </Grid>
-
-			  <ItemsPresenter Name="ItemsHost"
-							                Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2"
-							                Margin="-16 0 0 0"
-							                VerticalAlignment="Top"
-							                IsVisible="{TemplateBinding IsExpanded}"
-							                Items="{TemplateBinding Items}"
-							                ItemsPanel="{TemplateBinding ItemsPanel}" />
-			</Grid>
-		  </ControlTemplate>
-		</Setter.Value>
+					  <ItemsPresenter Name="ItemsHost"
+						                Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2"
+						                Margin="-16 0 0 0"
+						                VerticalAlignment="Top"
+						                IsVisible="{TemplateBinding IsExpanded}"
+						                Items="{TemplateBinding Items}"
+						                ItemsPanel="{TemplateBinding ItemsPanel}" />
+					</Grid>
+			  </ControlTemplate>
+			</Setter.Value>
 	  </Setter>
-	</Style>-->
+	</Style>
 
 	<Style Selector="TextBox">
 	  <Setter Property="Background" Value="Transparent" />
