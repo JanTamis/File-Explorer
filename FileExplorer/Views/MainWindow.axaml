@@ -463,7 +463,14 @@
 												        Grid.Row="0"
 												        Background="{DynamicResource MaterialDesignCardBackground}">
 													<Grid ColumnDefinitions="Auto, *">
-														<StackPanel Orientation="Horizontal">
+													  <ItemsControl Items="{Binding CurrentTab.MenuItems}">
+														<ItemsControl.ItemsPanel>
+														  <ItemsPanelTemplate>
+															<StackPanel Orientation="Horizontal"/>
+														  </ItemsPanelTemplate>
+														</ItemsControl.ItemsPanel>
+													  </ItemsControl>
+														<!--<StackPanel Orientation="Horizontal">
 															<Button Width="40"
 															        Height="40"
 															        ToolTip.Tip="Cut"
@@ -528,86 +535,86 @@
 															<Border Width="2"
 															        Margin="4 0"
 															        Background="{DynamicResource WindowBackground}" />
-														</StackPanel>
+														</StackPanel>-->
 
-														<!-- <StackPanel Orientation="Horizontal" -->
-														<!--             Grid.Column="1" -->
-														<!--             HorizontalAlignment="Right"> -->
-														<!-- <material:MaterialIcon Kind="FilterVariant" -->
-														<!--          Height="25" -->
-														<!--          Width="25" -->
-														<!--          Foreground="{DynamicResource MaterialDesignBodyLight}" />-->
-														<!-- -->
-														<!--   <Border Width="1" -->
-														<!--           Margin="4 8" -->
-														<!--           Background="{DynamicResource MaterialDesignBodyLight}" /> -->
-														<!-- -->
-														<!--   <Image Source="{SvgImage /Assets/UIIcons/Filter.svg}" -->
-														<!--          Width="21" -->
-														<!--          Margin="0 0 5 0" -->
-														<!--          Height="21" /> -->
-														<!-- -->
-														<!--   <ComboBox BorderThickness="0" -->
-														<!--             Padding="0 0 6 0" -->
-														<!--             Margin="0" -->
-														<!--             Background="Transparent" -->
-														<!--             Foreground="{DynamicResource MaterialDesignBody}" -->
-														<!--             VerticalAlignment="Stretch" -->
-														<!--             PlaceholderForeground="red" -->
-														<!--             SelectedItem="{Binding CurrentTab.Sort}" -->
-														<!--             Items="{Binding SortValues}" /> -->
-														<!-- -->
-														<!--   <ComboBox Items="{Binding Converter={StaticResource enumToValuesConverter}, ConverterParameter={x:Type models:ViewTypes}}" -->
-														<!--             Background="Transparent" -->
-														<!--             SelectedItem="{Binding CurrentTab.CurrentViewMode}" -->
-														<!--             Foreground="{DynamicResource MaterialDesignBody}"> -->
-														<!--     <ComboBox.ItemTemplate> -->
-														<!--       <DataTemplate> -->
-														<!--         <StackPanel Orientation="Horizontal"> -->
-														<!--           <Image Source="{Binding Converter={x:Static converters:EnumToIconConverter.Instance}, ConverterParameter={x:Type models:ViewTypes}}" -->
-														<!--                  Width="21" -->
-														<!--                  Height="21" -->
-														<!--                  Margin="0 0 5 0" /> -->
-														<!--           <TextBlock Text="{Binding Converter={x:Static converters:EnumToTextConverter.Instance}}" -->
-														<!--                      Foreground="{DynamicResource MaterialDesignBody}" /> -->
-														<!--         </StackPanel> -->
-														<!--       </DataTemplate> -->
-														<!--     </ComboBox.ItemTemplate> -->
-														<!--   </ComboBox> -->
-														<!-- -->
-														<!--   ~1~ <ListBox HorizontalAlignment="Right" @1@ -->
-														<!--   ~1~          Background="Transparent" > @1@ -->
-														<!--   ~1~   <ListBox.ItemsPanel> @1@ -->
-														<!--   ~1~     <ItemsPanelTemplate> @1@ -->
-														<!--   ~1~       <StackPanel Orientation="Horizontal" /> @1@ -->
-														<!--   ~1~     </ItemsPanelTemplate> @1@ -->
-														<!--   ~1~   </ListBox.ItemsPanel> @1@ -->
-														<!--   ~1~   <ListBoxItem Padding="7.5" @1@ -->
-														<!--   ~1~                Background="Transparent" @1@ -->
-														<!--   ~1~                Foreground="{DynamicResource MaterialDesignBody}" @1@ -->
-														<!--   ~1~                IsSelected="{Binding !CurrentTab.IsGrid, Mode=TwoWay}"> @1@ -->
-														<!--   ~1~     <material:MaterialIcon Kind="FormatListText" @1@ -->
-														<!--   ~1~          Height="25" @1@ -->
-														<!--   ~1~          Width="25" @1@ -->
-														<!--   ~1~          Foreground="{DynamicResource MaterialDesignBodyLight}" />@1@ -->
-														<!--   ~1~     <Image Source="{SvgImage /Assets/UIIcons/List.svg}" @1@ -->
-														<!--   ~1~            Width="25" @1@ -->
-														<!--   ~1~            Height="25" /> @1@ -->
-														<!--   ~1~   </ListBoxItem> @1@ -->
-														<!--   ~1~   <ListBoxItem Padding="7.5" @1@ -->
-														<!--   ~1~                Background="Transparent" @1@ -->
-														<!--   ~1~                Foreground="{DynamicResource MaterialDesignBody}" @1@ -->
-														<!--   ~1~                IsSelected="{Binding CurrentTab.IsGrid, Mode=TwoWay}"> @1@ -->
-														<!--   ~1~     <material:MaterialIcon Kind="Grid" @1@ -->
-														<!--   ~1~          Height="25" @1@ -->
-														<!--   ~1~          Width="25" @1@ -->
-														<!--   ~1~          Foreground="{DynamicResource MaterialDesignBodyLight}" />@1@ -->
-														<!--   ~1~     <Image Source="{SvgImage /Assets/UIIcons/Grid.svg}" @1@ -->
-														<!--   ~1~            Width="25" @1@ -->
-														<!--   ~1~            Height="25" /> @1@ -->
-														<!--   ~1~   </ListBoxItem> @1@ -->
-														<!--   ~1~ </ListBox> @1@ -->
-														<!-- </StackPanel> -->
+														 <!--<StackPanel Orientation="Horizontal" 
+														             Grid.Column="1" 
+														             HorizontalAlignment="Right"> 
+														 <material:MaterialIcon Kind="FilterVariant" 
+														          Height="25" 
+														          Width="25" 
+														          Foreground="{DynamicResource MaterialDesignBodyLight}" />
+														 
+														   <Border Width="1" 
+														           Margin="4 8" 
+														           Background="{DynamicResource MaterialDesignBodyLight}" /> 
+														 
+														   <Image Source="{SvgImage /Assets/UIIcons/Filter.svg}" 
+														          Width="21" 
+														          Margin="0 0 5 0" 
+														          Height="21" /> 
+														 
+														   <ComboBox BorderThickness="0" 
+														             Padding="0 0 6 0" 
+														             Margin="0" 
+														             Background="Transparent" 
+														             Foreground="{DynamicResource MaterialDesignBody}" 
+														             VerticalAlignment="Stretch" 
+														             PlaceholderForeground="red" 
+														             SelectedItem="{Binding CurrentTab.Sort}" 
+														             Items="{Binding SortValues}" /> 
+														 
+														   <ComboBox Items="{Binding Converter={StaticResource enumToValuesConverter}, ConverterParameter={x:Type models:ViewTypes}}" 
+														             Background="Transparent" 
+														             SelectedItem="{Binding CurrentTab.CurrentViewMode}" 
+														             Foreground="{DynamicResource MaterialDesignBody}"> 
+														     <ComboBox.ItemTemplate> 
+														       <DataTemplate> 
+														         <StackPanel Orientation="Horizontal"> 
+														           <Image Source="{Binding Converter={x:Static converters:EnumToIconConverter.Instance}, ConverterParameter={x:Type models:ViewTypes}}" 
+														                  Width="21" 
+														                  Height="21" 
+														                  Margin="0 0 5 0" /> 
+														           <TextBlock Text="{Binding Converter={x:Static converters:EnumToTextConverter.Instance}}" 
+														                      Foreground="{DynamicResource MaterialDesignBody}" /> 
+														         </StackPanel> 
+														       </DataTemplate> 
+														     </ComboBox.ItemTemplate> 
+														   </ComboBox>--> 
+														 
+														   <!--~1~ <ListBox HorizontalAlignment="Right" @1@ 
+														   ~1~          Background="Transparent" > @1@ 
+														   ~1~   <ListBox.ItemsPanel> @1@ 
+														   ~1~     <ItemsPanelTemplate> @1@ 
+														   ~1~       <StackPanel Orientation="Horizontal" /> @1@ 
+														   ~1~     </ItemsPanelTemplate> @1@ 
+														   ~1~   </ListBox.ItemsPanel> @1@ 
+														   ~1~   <ListBoxItem Padding="7.5" @1@ 
+														   ~1~                Background="Transparent" @1@ 
+														   ~1~                Foreground="{DynamicResource MaterialDesignBody}" @1@ 
+														   ~1~                IsSelected="{Binding !CurrentTab.IsGrid, Mode=TwoWay}"> @1@ 
+														   ~1~     <material:MaterialIcon Kind="FormatListText" @1@ 
+														   ~1~          Height="25" @1@ 
+														   ~1~          Width="25" @1@ 
+														   ~1~          Foreground="{DynamicResource MaterialDesignBodyLight}" />@1@ 
+														   ~1~     <Image Source="{SvgImage /Assets/UIIcons/List.svg}" @1@ 
+														   ~1~            Width="25" @1@ 
+														   ~1~            Height="25" /> @1@ 
+														   ~1~   </ListBoxItem> @1@ 
+														   ~1~   <ListBoxItem Padding="7.5" @1@ 
+														   ~1~                Background="Transparent" @1@ 
+														   ~1~                Foreground="{DynamicResource MaterialDesignBody}" @1@ 
+														   ~1~                IsSelected="{Binding CurrentTab.IsGrid, Mode=TwoWay}"> @1@ 
+														   ~1~     <material:MaterialIcon Kind="Grid" @1@ 
+														   ~1~          Height="25" @1@ 
+														   ~1~          Width="25" @1@ 
+														   ~1~          Foreground="{DynamicResource MaterialDesignBodyLight}" />@1@ 
+														   ~1~     <Image Source="{SvgImage /Assets/UIIcons/Grid.svg}" @1@ 
+														   ~1~            Width="25" @1@ 
+														   ~1~            Height="25" /> @1@ 
+														   ~1~   </ListBoxItem> @1@ 
+														   ~1~ </ListBox> @1@--> 
+														 <!--</StackPanel>--> 
 													</Grid>
 												</Border>
 

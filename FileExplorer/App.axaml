@@ -34,7 +34,7 @@
   </Application.Resources>
 
   <Application.Styles>
-	<themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Blue" />
+	<themes:MaterialTheme BaseTheme="Light" PrimaryColor="Blue" SecondaryColor="Blue" />
 
 	<link:HyperLinkStyle/>
 
@@ -48,8 +48,8 @@
 	  <Setter Property="Height" Value="30" />
 	</Style>
 
-	<Style Selector="TreeViewItem">
-	  <Setter Property="Background" Value="Transparent" />
+	<!--<Style Selector="TreeViewItem">
+	  <Setter Property="Background" Value="Red" />
 	  <Setter Property="BorderThickness" Value="0" />
 	  <Setter Property="Padding" Value="8" />
 	  <Setter Property="Foreground" Value="{Binding $parent[TreeView].Foreground}" />
@@ -96,7 +96,7 @@
 		  </ControlTemplate>
 		</Setter.Value>
 	  </Setter>
-	</Style>
+	</Style>-->
 
 	<Style Selector="TextBox">
 	  <Setter Property="Background" Value="Transparent" />

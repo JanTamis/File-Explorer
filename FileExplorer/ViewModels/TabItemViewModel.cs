@@ -6,6 +6,7 @@ using FileExplorer.Interfaces;
 using FileExplorer.Providers;
 using FileExplorer.Models;
 using FileExplorer.Core.Interfaces;
+using Avalonia.Controls;
 
 namespace FileExplorer.ViewModels;
 
@@ -61,6 +62,8 @@ public partial class TabItemViewModel
 	public int SelectionCount => Files.Count(c => c.IsSelected);
 
 	public Task<IEnumerable<IPathSegment>> Folders => Provider.GetPathAsync(CurrentFolder).AsTask();
+
+	public IEnumerable<IControl> MenuItems => Provider.GetMenuItems(CurrentFolder);
 
 	public bool SearchFailed => !IsLoading && FileCount == 0;
 
@@ -180,6 +183,8 @@ public partial class TabItemViewModel
 		if (path is { IsFolder: true })
 		{
 			CurrentFolder = path;
+			OnPropertyChanged(nameof(MenuItems));
+
 			await UpdateFiles(false, "*");
 		}
 	}
