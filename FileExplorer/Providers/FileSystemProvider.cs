@@ -1,9 +1,9 @@
-using System.Runtime.CompilerServices;
-using FileExplorer.Core.Interfaces;
-using FileExplorer.Models;
 using Avalonia.Media;
+using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
+using FileExplorer.Models;
 using Microsoft.Extensions.Caching.Memory;
+using System.IO;
 using System.IO.Enumeration;
 using System.Text.RegularExpressions;
 
@@ -27,10 +27,17 @@ public class FileSystemProvider : IItemProvider
 	{
 		if (folder is FileModel model)
 		{
-			//var regex = new Regex(filter);
-
 			return model.TreeItem
-				.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name), recursive ? uint.MaxValue : 0)
+				.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name) || Regex.IsMatch(name, filter), recursive ? uint.MaxValue : 0)
+				.Select(s => new FileModel(s))
+				.ToAsyncEnumerable();
+		}
+		else if (folder is null && OperatingSystem.IsWindows())
+		{
+			return DriveInfo.GetDrives()
+				.Where(w => w.IsReady)
+				.Select(s => new FileSystemTreeItem(s.Name, true))
+				.SelectMany(s => s.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name) || Regex.IsMatch(name, filter), recursive ? uint.MaxValue : 0))
 				.Select(s => new FileModel(s))
 				.ToAsyncEnumerable();
 		}
@@ -85,20 +92,20 @@ public class FileSystemProvider : IItemProvider
 			return Task.FromResult<IImage?>(null);
 		}
 
-		//if (_imageCache is not null)
-		//{
-		//	return _imageCache.GetOrCreateAsync(item.GetHashCode(), async entry =>
-		//	{
-		//		var image = await ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested && item.IsVisible);
+		if (_imageCache is not null)
+		{
+			return _imageCache.GetOrCreateAsync(item.GetHashCode(), async entry =>
+			{
+				var image = await ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested && item.IsVisible);
 
-		//		if (image is not null)
-		//		{
-		//			entry.SetSize((long)image.Size.Width * (long)image.Size.Height * 4L);
-		//		}
+				if (image is not null)
+				{
+					entry.SetSize((long)image.Size.Width * (long)image.Size.Height * 4L);
+				}
 
-		//		return image;
-		//	});
-		//}
+				return image;
+			});
+		}
 
 		return ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested && item.IsVisible);
 	}

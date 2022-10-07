@@ -83,7 +83,7 @@ public partial class TabItemViewModel
 			Items = Files,
 		};
 
-		CurrentViewMode = ViewTypes.Tree;
+		CurrentViewMode = ViewTypes.Grid;
 	}
 
 	public IFileItem? Undo()

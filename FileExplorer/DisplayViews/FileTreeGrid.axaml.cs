@@ -41,6 +41,15 @@ public class FileTreeGrid : UserControl, IFileViewer
 			{
 				Columns =
 				{
+					new TemplateColumn<IFileItem>("", new FuncDataTemplate<IFileItem>((x, _) =>
+						new CheckBox()
+						{
+							[!CheckBox.IsCheckedProperty] = new Binding("IsSelected", BindingMode.TwoWay)
+						}), GridLength.Auto, new ColumnOptions<IFileItem>
+						{
+							CompareAscending = (x, y) => String.Compare(x?.Name, y?.Name, StringComparison.CurrentCulture),
+							CompareDescending = (x, y) => String.Compare(y?.Name, x?.Name, StringComparison.CurrentCulture),
+						}),
 					new HierarchicalExpanderColumn<IFileItem>(
 						new TemplateColumn<IFileItem>("Name", new FuncDataTemplate<IFileItem>((x, _) =>
 							new StackPanel

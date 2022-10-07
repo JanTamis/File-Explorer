@@ -37,10 +37,10 @@ public partial class App : Application
 		{
 			var theme = this.LocateMaterialTheme<MaterialTheme>();
 
-			//if (OperatingSystem.IsWindows() && SystemThemeProbe.GetSystemBaseThemeMode() is BaseThemeMode mode)
-			//{
-			//	theme.BaseTheme = mode;
-			//}
+			if (OperatingSystem.IsWindows() && SystemThemeProbe.GetSystemBaseThemeMode() is { } mode)
+			{
+				theme.BaseTheme = mode;
+			}
 
 			Resources["WindowBackground"] = theme.BaseTheme switch
 			{

@@ -234,8 +234,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 			{
 				yield return enumerable.Current;
 			}
-
-			if (enumerable.Current.IsFolder && RuntimeHelpers.TryEnsureSufficientExecutionStack())
+			else if (RuntimeHelpers.TryEnsureSufficientExecutionStack())
 			{
 				foreach (var childOfChild in enumerable.Current.EnumerateChildren(include, layers - 1))
 				{

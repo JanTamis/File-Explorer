@@ -66,7 +66,7 @@ public static class ThumbnailProvider
 		{
 			return await Task.Factory.StartNew(() => model?.GetPath((path, imageSize) =>
 			{
-				Bitmap? image = null!;
+				Bitmap? image = null;
 
 				if (shouldReturnImage is null || shouldReturnImage?.Invoke() == true)
 				{
