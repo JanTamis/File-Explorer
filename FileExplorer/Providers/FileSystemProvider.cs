@@ -6,6 +6,7 @@ using Microsoft.Extensions.Caching.Memory;
 using System.IO;
 using System.IO.Enumeration;
 using System.Text.RegularExpressions;
+using Avalonia.Controls;
 
 namespace FileExplorer.Providers;
 
@@ -73,7 +74,7 @@ public class FileSystemProvider : IItemProvider
 		}
 
 		throw new ArgumentException("Provide a valid folder that is created from this provider");
-	}
+	} 
 
 	public ValueTask<IFileItem?> GetParentAsync(IFileItem folder, CancellationToken token)
 	{
@@ -108,5 +109,10 @@ public class FileSystemProvider : IItemProvider
 		}
 
 		return ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested && item.IsVisible);
+	}
+
+	public IEnumerable<IControl> GetMenuItems(IFileItem item)
+	{
+		return Enumerable.Empty<IControl>();
 	}
 }

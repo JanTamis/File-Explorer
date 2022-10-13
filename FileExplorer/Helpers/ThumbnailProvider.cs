@@ -6,6 +6,7 @@ using System.Reflection;
 using Avalonia.Threading;
 using Avalonia.Media.Imaging;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices.ComTypes;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Models;
 using SkiaSharp;
@@ -123,7 +124,7 @@ public static class ThumbnailProvider
 			{
 				name = "File";
 
-				var extension = Path.GetExtension(model.Name).ToLower();
+				var extension = model.Extension;
 
 				if (extension.Length > 1)
 				{
@@ -142,9 +143,15 @@ public static class ThumbnailProvider
 								if (extension == val)
 								{
 									name = key;
+									break;
 								}
 							}
 						}
+					}
+
+					if (name == "File")
+					{
+						name = extension;
 					}
 				}
 			}
@@ -166,7 +173,7 @@ public static class ThumbnailProvider
 			{
 				Bitmap? image = null!;
 
-				if (shouldReturnImage is null || shouldReturnImage?.Invoke() == true)
+				if (shouldReturnImage is null || shouldReturnImage())
 				{
 					image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly, () => size is < 64 and >= 32);
 				}

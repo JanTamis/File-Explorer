@@ -30,38 +30,32 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 
 	public void SelectAll()
 	{
-		BeginBatchUpdate();
+		using var _ = new DelegateExecutor(BeginBatchUpdate, EndBatchUpdate);
 
 		foreach (var item in Items)
 		{
 			item.IsSelected = true;
 		}
-
-		EndBatchUpdate();
 	}
 
 	public void SelectNone()
 	{
-		BeginBatchUpdate();
+		using var _ = new DelegateExecutor(BeginBatchUpdate, EndBatchUpdate);
 
 		foreach (var item in Items)
 		{
 			item.IsSelected = false;
 		}
-
-		EndBatchUpdate();
 	}
 
 	public void SelectInvert()
 	{
-		BeginBatchUpdate();
+		using var _ = new DelegateExecutor(BeginBatchUpdate, EndBatchUpdate);
 
 		foreach (var item in Items)
 		{
 			item.IsSelected ^= true;
 		}
-
-		EndBatchUpdate();
 	}
 
 	public ObservableRangeCollection<IFileItem> Items
@@ -261,6 +255,6 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 	public void OnPropertyChanged<T>(ref T field, T value, [CallerMemberName] string? name = null)
 	{
 		field = value;
-		PropertyChanged.Invoke(this, new PropertyChangedEventArgs(name));
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 	}
 }

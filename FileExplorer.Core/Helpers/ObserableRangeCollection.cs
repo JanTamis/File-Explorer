@@ -524,6 +524,7 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 	public void Clear()
 	{
 		_data.Clear();
+		_data.Capacity = 0;
 
 		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 		CountChanged.Invoke(_data.Count);

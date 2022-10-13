@@ -2,12 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:models="clr-namespace:FileExplorer.Core.Interfaces;assembly=FileExplorer.Core"
              xmlns:controls="using:FileExplorer.Controls"
-			 xmlns:styles="clr-namespace:Material.Styles;assembly=Material.Styles"
-			 xmlns:ripple="clr-namespace:Material.Ripple;assembly=Material.Ripple"
-			 xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-             xmlns:converters="using:FileExplorer.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FileExplorer.DisplayViews.FileGrid">
 	<ScrollViewer>

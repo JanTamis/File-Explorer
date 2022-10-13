@@ -37,20 +37,20 @@ public class FileTreeGrid : UserControl, IFileViewer
 		{
 			var grid = this.FindControl<TreeDataGrid>(ControlName);
 
-			var source = new HierarchicalTreeDataGridSource<IFileItem>(value)
+			var source = new FlatTreeDataGridSource<IFileItem>(value)
 			{
 				Columns =
 				{
-					new TemplateColumn<IFileItem>("", new FuncDataTemplate<IFileItem>((x, _) =>
-						new CheckBox()
-						{
-							[!CheckBox.IsCheckedProperty] = new Binding("IsSelected", BindingMode.TwoWay)
-						}), GridLength.Auto, new ColumnOptions<IFileItem>
-						{
-							CompareAscending = (x, y) => String.Compare(x?.Name, y?.Name, StringComparison.CurrentCulture),
-							CompareDescending = (x, y) => String.Compare(y?.Name, x?.Name, StringComparison.CurrentCulture),
-						}),
-					new HierarchicalExpanderColumn<IFileItem>(
+					// new TemplateColumn<IFileItem>("", new FuncDataTemplate<IFileItem>((x, _) =>
+					// 	new CheckBox()
+					// 	{
+					// 		[!CheckBox.IsCheckedProperty] = new Binding("IsSelected", BindingMode.TwoWay)
+					// 	}), GridLength.Auto, new ColumnOptions<IFileItem>
+					// 	{
+					// 		CompareAscending = (x, y) => String.Compare(x?.Name, y?.Name, StringComparison.CurrentCulture),
+					// 		CompareDescending = (x, y) => String.Compare(y?.Name, x?.Name, StringComparison.CurrentCulture),
+					// 	}),
+					// new HierarchicalExpanderColumn<IFileItem>(
 						new TemplateColumn<IFileItem>("Name", new FuncDataTemplate<IFileItem>((x, _) =>
 							new StackPanel
 							{
@@ -62,6 +62,7 @@ public class FileTreeGrid : UserControl, IFileViewer
 									{
 										Width = 24,
 										Height = 24,
+										Margin = new Thickness(2.5, 0, 0, 0),
 										[!DataContextProperty] = new Binding
 										{
 											ConverterParameter = Provider,
@@ -81,8 +82,8 @@ public class FileTreeGrid : UserControl, IFileViewer
 							CompareAscending = (x, y) => String.Compare(x?.Name, y?.Name, StringComparison.CurrentCulture),
 							CompareDescending = (x, y) => String.Compare(y?.Name, x?.Name, StringComparison.CurrentCulture),
 						}),
-						x => Provider?.GetItems(x, "*", false, default).OrderByDescending(o => o.IsFolder).ThenBy(t => t.Name) ?? Enumerable.Empty<IFileItem>(),
-						x => x is { IsFolder: true } && Provider?.HasItems(x) is true),
+						// x => Provider?.GetItems(x, "*", false, default).OrderByDescending(o => o.IsFolder).ThenBy(t => t.Name) ?? Enumerable.Empty<IFileItem>(),
+						// x => x is { IsFolder: true } && Provider?.HasItems(x) is true),
 					new TextColumn<IFileItem, string>("Edit Date", item => item.EditedOn.Humanize(false, DateTime.Now, CultureInfo.CurrentCulture), GridLength.Auto, new TextColumnOptions<IFileItem>()
 					{
 						CompareAscending = (x, y) => x.EditedOn.CompareTo(y.EditedOn),

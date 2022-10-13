@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="9.02" y1="0.77697754" x2="18.655" y2="37.597015" id="gradient_1">
+      <stop offset="0%" stop-color="#FEDE00" />
+      <stop offset="100%" stop-color="#FFD000" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="ZIP-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M39 16L39 41C39 42.105 38.105 43 37 43L11 43C9.895 43 9 42.105 9 41L9 7C9 5.895 9.895 5 11 5L28 5L39 16L39 16Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M28 5L28 14C28 15.105 28.895 16 30 16L39 16L28 5L28 5Z" id="Shape" fill="#E97C01" stroke="none" />
+    <path d="M22.066 29.559L16.132 29.559L16.132 28.603L19.908 23.543L16.404 23.543L16.404 22.192L22.055 22.192L22.055 23.122L18.361 28.213L22.065 28.213L22.065 29.559L22.066 29.559Z" id="Shape" fill="#3C3C3C" stroke="none" />
+    <path d="M24.809 29.559L23.15 29.559L23.15 22.192L24.809 22.192L24.809 29.559L24.809 29.559Z" id="Shape" fill="#3C3C3C" stroke="none" />
+    <path d="M28.143 27.021L28.143 29.559L26.484 29.559L26.484 22.192L29.084 22.192C30.94 22.192 31.868 22.975 31.868 24.54C31.868 25.28 31.602 25.878 31.069 26.336C30.536 26.793 29.825 27.022 28.934 27.022L28.143 27.022L28.143 27.021ZM28.143 23.466L28.143 25.762L28.795 25.762C29.679 25.762 30.12 25.375 30.12 24.601C30.12 23.844 29.678 23.466 28.795 23.466L28.143 23.466L28.143 23.466Z" id="Shape" fill="#3C3C3C" fill-rule="evenodd" stroke="none" />
+  </g>
+</svg>
