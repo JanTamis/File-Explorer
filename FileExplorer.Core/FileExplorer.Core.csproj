@@ -15,9 +15,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Avalonia" Version="0.10.17" />
+      <PackageReference Include="Avalonia" Version="11.0.0-preview2" />
       <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
-      <PackageReference Include="Material.Avalonia" Version="3.0.0-avalonia10-preview2" />
+      <PackageReference Include="Material.Avalonia" Version="3.0.0-avalonia11-preview2" />
       <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     </ItemGroup>
 

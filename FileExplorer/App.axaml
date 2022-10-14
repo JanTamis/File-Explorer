@@ -37,7 +37,7 @@
   <Application.Styles>
 	<themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Blue" />
 
-	<link:HyperLinkStyle/>
+	<!-- <link:HyperLinkStyle/> -->
 
 	<StyleInclude Source="avares://Material.Icons.Avalonia/App.xaml" />
 	<StyleInclude Source="avares://DialogHost.Avalonia/Styles.xaml" />

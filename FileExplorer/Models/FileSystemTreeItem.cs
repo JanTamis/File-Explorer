@@ -1,4 +1,5 @@
-﻿using FileExplorer.Core.Interfaces;
+﻿using System.Collections;
+using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
 using System.IO;
@@ -170,78 +171,39 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	{
 		if (!IsFolder)
 		{
-			yield break;
+			return Enumerable.Empty<FileSystemTreeItem>();
 		}
 
-		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(Path, Options)
-		{
-			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
-		};
+		var enumerable = new FileSystemEnumerable<FileSystemTreeItem>(Path, (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this));
 
 		if (layers is 0)
 		{
-			while (enumerable.MoveNext())
-			{
-				yield return enumerable.Current;
-			}
-
-			yield break;
+			return enumerable;
 		}
 
-		while (enumerable.MoveNext())
-		{
-			yield return enumerable.Current;
-
-			if (enumerable.Current.IsFolder)
-			{
-				foreach (var childOfChild in enumerable.Current.EnumerateChildren(layers - 1))
-				{
-					yield return childOfChild;
-				}
-			}
-		}
+		return enumerable.SelectMany(s => s.EnumerateChildren(layers - 1).Prepend(s));
 	}
 
 	public IEnumerable<FileSystemTreeItem> EnumerateChildren(ReadOnlySpanFunc<char, bool> include, uint layers = UInt32.MaxValue)
 	{
 		if (!IsFolder)
 		{
-			yield break;
+			return Enumerable.Empty<FileSystemTreeItem>();
 		}
 
-		var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(Path, Options)
+		var enumerable = new FileSystemTreeItemEnumerable(new DelegateFileSystemEnumerator<FileSystemTreeItem>(Path, Options)
 		{
 			Find = (ref FileSystemEntry entry) => entry.IsDirectory || include(entry.FileName),
+
 			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
-		};
+		});
 
 		if (layers is 0)
 		{
-			while (enumerable.MoveNext())
-			{
-				if (!enumerable.Current.IsFolder || include(enumerable.Current.Value))
-				{
-					yield return enumerable.Current;
-				}
-			}
-
-			yield break;
+			return enumerable;
 		}
 
-		while (enumerable.MoveNext())
-		{
-			if (!enumerable.Current.IsFolder && include(enumerable.Current.Value))
-			{
-				yield return enumerable.Current;
-			}
-			else if (RuntimeHelpers.TryEnsureSufficientExecutionStack())
-			{
-				foreach (var childOfChild in enumerable.Current.EnumerateChildren(include, layers - 1))
-				{
-					yield return childOfChild;
-				}
-			}
-		}
+		return enumerable.SelectMany(s => s.EnumerateChildren(include, layers - 1).Prepend(s));
 	}
 
 	private string GetPath()
@@ -317,6 +279,26 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 			}
 
 			item.Value.CopyTo(buffer.Slice(Math.Max(index - item.Value.Length, 0)));
+		}
+	}
+
+	private class FileSystemTreeItemEnumerable : IEnumerable<FileSystemTreeItem>
+	{
+		private readonly FileSystemEnumerator<FileSystemTreeItem> _enumerator;
+
+		public FileSystemTreeItemEnumerable(FileSystemEnumerator<FileSystemTreeItem> enumerator)
+		{
+			_enumerator = enumerator;
+		}
+
+		public IEnumerator<FileSystemTreeItem> GetEnumerator()
+		{
+			return _enumerator;
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return _enumerator;
 		}
 	}
 }

@@ -269,7 +269,7 @@ public partial class TabItemViewModel
 
 	partial void OnIsLoadingChanged(bool value)
 	{
-		GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized, false, true);
+		GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
 	}
 
 	partial void OnCurrentFolderChanged(IFileItem? value)

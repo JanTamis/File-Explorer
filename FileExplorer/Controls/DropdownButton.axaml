@@ -16,11 +16,11 @@
 										HorizontalAlignment="Stretch"
 										Margin="0 0 30 0"
 										Cursor="Hand"/>
-						<DropDown PlaceholderText="{TemplateBinding Content}" 
-											HorizontalAlignment="Stretch"
-											VerticalAlignment="Stretch">
-							
-						</DropDown>
+						<!-- <DropDown PlaceholderText="{TemplateBinding Content}"  -->
+						<!-- 					HorizontalAlignment="Stretch" -->
+						<!-- 					VerticalAlignment="Stretch"> -->
+						<!-- 	 -->
+						<!-- </DropDown> -->
 					</Panel>
       </ControlTemplate>
     </Setter>
