@@ -169,7 +169,7 @@
 
 					<Viewbox Margin="0">
 						<Button Cursor="Hand"
-						        Classes="flat"
+						        Classes="Flat"
 						        assist:ShadowAssist.ShadowDepth="Depth0"
 						        Padding="0"
 						        Command="{Binding AddTab}"
@@ -255,7 +255,7 @@
 					      Margin="5 0 5 5">
 						<StackPanel Orientation="Horizontal"
 						            Grid.Column="0">
-							<Button Classes="flat"
+							<Button Classes="Flat"
 							        Command="{Binding Undo}"
 							        Padding="5">
 								<material:MaterialIcon Kind="ArrowBack"
@@ -263,7 +263,7 @@
 								                       Width="25"
 								                       Foreground="{DynamicResource MaterialDesignBody}" />
 							</Button>
-							<Button Classes="flat"
+							<Button Classes="Flat"
 							        Command="{Binding Redo}"
 							        Padding="5">
 								<material:MaterialIcon Kind="ArrowForward"
@@ -272,7 +272,7 @@
 								                       Foreground="{DynamicResource MaterialDesignBody}" />
 							</Button>
 
-							<Button Classes="flat"
+							<Button Classes="Flat"
 							        Command="{Binding GoUp}"
 							        Padding="5">
 								<material:MaterialIcon Kind="ArrowUp"
@@ -282,7 +282,7 @@
 							</Button>
 
 							<Panel>
-								<Button Classes="flat"
+								<Button Classes="Flat"
 								        IsVisible="{Binding !CurrentTab.IsLoading}"
 								        Command="{Binding Refresh}"
 								        Padding="5">
@@ -292,7 +292,7 @@
 									                       Foreground="{DynamicResource MaterialDesignBody}" />
 								</Button>
 
-								<Button Classes="flat"
+								<Button Classes="Flat"
 								        IsVisible="{Binding CurrentTab.IsLoading}"
 								        Command="{Binding CancelUpdateFiles}"
 								        Padding="5">

@@ -1,9 +1,7 @@
 ﻿using Avalonia.Threading;
 using System.Collections;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace FileExplorer.Core.Helpers;
@@ -47,7 +45,7 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 		{
 			_data[index] = value;
 
-			OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value));
+			OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, index));
 		}
 	}
 
@@ -275,21 +273,12 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 		ArgumentNullException.ThrowIfNull(collection);
 
 		var watch = Stopwatch.GetTimestamp();
-
-		var isDone = false;
 		var index = Math.Max(0, Count - 1);
 
-		Task.Run(async () =>
-		{
-			using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(UpdateCountTime));
+		using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(UpdateCountTime));
+		var timerTask = timer.WaitForNextTickAsync(token);
 
-			while (!isDone && await timer.WaitForNextTickAsync(token))
-			{
-				CountChanged(Count);
-			}
-		}, token);
-
-		ValueTask task = default;
+		var task = ValueTask.CompletedTask;
 
 		await foreach (var item in collection.WithCancellation(token))
 		{
@@ -299,6 +288,13 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 			}
 
 			_data.Add(item);
+
+			if (timerTask is { IsCompleted : true, Result: true })
+			{
+				CountChanged(Count);
+
+				timerTask = timer.WaitForNextTickAsync(token);
+			}
 
 			if (task is { IsCompleted: true } && Stopwatch.GetElapsedTime(watch).TotalMilliseconds >= UpdateTime)
 			{
@@ -311,8 +307,6 @@ public class ObservableRangeCollection<T> : INotifyCollectionChanged, IList<T>, 
 
 		await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new ReadonlyPartialCollection<T>(_data, index, Count - index), index));
 		CountChanged(Count);
-
-		isDone = true;
 	}
 
 	public async ValueTask OnCollectionChanged(NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)

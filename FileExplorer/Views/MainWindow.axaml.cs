@@ -75,7 +75,7 @@ public class MainWindow : FluentWindow
 		PointerPressed += MainWindow_PointerPressed;
 	}
 
-	private async void TreeItemGenerated(object? sender, ItemContainerEventArgs e)
+	private void TreeItemGenerated(object? sender, ItemContainerEventArgs e)
 	{
 		for (var i = 0; i < e.Containers.Count; i++)
 		{
