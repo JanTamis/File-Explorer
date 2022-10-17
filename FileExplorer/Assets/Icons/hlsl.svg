@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="42.449917" y1="-5.9469995" x2="-14.8290825" y2="65.278" id="gradient_1">
+      <stop offset="0%" stop-color="#002B82" />
+      <stop offset="18.6%" stop-color="#003E99" />
+      <stop offset="57.5%" stop-color="#0070D3" />
+      <stop offset="58.399998%" stop-color="#0071D4" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="8.112" y1="14.700001" x2="24.975" y2="41.606" id="gradient_2">
+      <stop offset="0%" stop-color="#007AD9" />
+      <stop offset="100%" stop-color="#2AA4F4" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="10.292917" y1="1.3200002" x2="16.214916" y2="34.905" id="gradient_3">
+      <stop offset="0%" stop-color="#A3FFFF" />
+      <stop offset="22.300001%" stop-color="#9DFBFF" />
+      <stop offset="52.999996%" stop-color="#8BF1FF" />
+      <stop offset="88.5%" stop-color="#6EE0FF" />
+      <stop offset="100%" stop-color="#63DAFF" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Impossible-Shapes-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M29.855 19.482C29.669 19.174 29.345 19.001 28.97 19C28.61 19.011 28.282 19.215 28.115 19.534L23.21 29.137L27.132 36L2.294 36L2.1 36.35C1.99 36.56 1.96 36.79 2 37C2.03 37.2 2.13 37.38 2.27 37.52L8.46 43.71C8.65 43.9 8.9 44 9.16 44L42.75 44C42.98 44 43.2 43.92 43.37 43.78C43.53 43.66 43.65 43.49 43.71 43.28L43.79 42.542L29.855 19.482L29.855 19.482Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M45.861 35.146L28.29 4.5C28.2 4.35 28.08 4.23 27.93 4.14C27.78 4.05 27.6 4 27.42 4L26.881 4L13.873 30.017L23.873 30L29 20L43.37 43.78C43.53 43.66 43.65 43.49 43.71 43.28L45.951 35.926C45.975 35.848 45.988 35.768 45.991 35.687C45.998 35.501 45.951 35.313 45.861 35.146L45.861 35.146Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M29 37L2 37C1.96 36.79 1.99 36.56 2.1 36.35L18.97 4.53C19.14 4.2 19.48 4 19.85 4L27.42 4C27.6 4 27.78 4.05 27.93 4.14L15.492 29.017L24.4 29L29 37L29 37Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+  </g>
+</svg>

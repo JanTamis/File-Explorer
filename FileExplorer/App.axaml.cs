@@ -36,7 +36,7 @@ public partial class App : Application
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
 			var theme = this.LocateMaterialTheme<MaterialTheme>();
-
+			
 			if (OperatingSystem.IsWindows() && SystemThemeProbe.GetSystemBaseThemeMode() is { } mode)
 			{
 				theme.BaseTheme = mode;

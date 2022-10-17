@@ -1,56 +1,41 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<svg width="48px" height="49px" viewBox="0 0 48 49" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
-	<defs>
-		<linearGradient x1="0.048090935" y1="0.952" x2="0.5090909" y2="0.49090907" id="gradient_1">
-			<stop offset="0" stop-color="#3079D6" />
-			<stop offset="1" stop-color="#297CD2" />
-		</linearGradient>
-		<linearGradient x1="0.3861944" y1="0.0113333315" x2="0.61691666" y2="1.0021112" id="gradient_2">
-			<stop offset="0" stop-color="#0370C8" />
-			<stop offset="0.484" stop-color="#036FC5" />
-			<stop offset="0.775" stop-color="#036ABD" />
-			<stop offset="1" stop-color="#0362B0" />
-		</linearGradient>
-		<radialGradient gradientUnits="objectBoundingBox" cx="49.999992%" cy="50.000008%" fx="49.999992%" fy="50.000008%" r="50.000004%" gradientTransform="translate(0.49999994,0.50000006),translate(-0.49999994,-0.50000006)" id="gradient_3">
-			<stop offset="0%" stop-color="#000000" />
-			<stop offset="100%" stop-color="#000000" stop-opacity="0" />
-		</radialGradient>
-		<linearGradient x1="0.1608125" y1="0.1608125" x2="0.85843754" y2="0.85843754" id="gradient_4">
-			<stop offset="0" stop-color="#75DAFF" />
-			<stop offset="1" stop-color="#1EA2E4" />
-		</linearGradient>
-		<radialGradient gradientUnits="objectBoundingBox" cx="50%" cy="115.45718%" fx="50%" fy="115.45718%" r="115.70709%" gradientTransform="translate(0.5,1.1545718),scale(0.44130632,1),translate(-0.5,-1.1545718)" id="gradient_5">
-			<stop offset="0%" stop-color="#000000" />
-			<stop offset="100%" stop-color="#000000" stop-opacity="0" />
-		</radialGradient>
-		<linearGradient x1="0.22595909" y1="0.20341682" x2="0.7895744" y2="1.5035834" id="gradient_6">
-			<stop offset="0" stop-color="#75DAFF" />
-			<stop offset="1" stop-color="#1EA2E4" />
-		</linearGradient>
-		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
-		<path d="M0 0L25 0L25 25L0 25L0 0Z" id="path_2" />
-		<clipPath id="mask_1">
-			<use xlink:href="#path_1" />
-		</clipPath>
-		<clipPath id="mask_2">
-			<use xlink:href="#path_2" />
-		</clipPath>
-	</defs>
-	<g id="icons8_file_2">
-		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
-		<g clip-path="url(#mask_1)">
-			<path d="M30 11L30 36C30 37.105 29.105 38 28 38L2 38C0.895001 38 0 37.105 0 36L0 2C0 0.895 0.895001 0 2 0L19 0L30 11L30 11Z" transform="translate(9 5)" id="Shape" fill="#50E6FF" fill-rule="evenodd" stroke="none" />
-			<path d="M0 0L0 9C0 10.105 0.895 11 2 11L11 11L0 0L0 0Z" transform="translate(28 5)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
-		</g>
-	</g>
-	<g id="icons8_name" transform="translate(11.609833 16.645493)">
-		<path d="M0 0L25 0L25 25L0 25L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
-		<g clip-path="url(#mask_2)">
-			<path d="M17.7083 18.75L1.04167 18.75C0.46875 18.75 0 18.2813 0 17.7083L0 1.04167C0 0.46875 0.46875 0 1.04167 0L17.7083 0C18.2813 0 18.75 0.46875 18.75 1.04167L18.75 17.7083C18.75 18.2813 18.2813 18.75 17.7083 18.75L17.7083 18.75Z" transform="translate(3.125 3.125)" id="Shape" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
-			<path d="M0 4.94792C0 2.21526 2.21526 0 4.94792 0C7.68058 0 9.89583 2.21526 9.89583 4.94792C9.89583 7.68058 7.68058 9.89583 4.94792 9.89583C2.21526 9.89583 0 7.68058 0 4.94792Z" transform="translate(7.5520935 5.46875)" id="Circle" fill="url(#gradient_3)" fill-rule="evenodd" stroke="none" />
-			<path d="M0 4.16667C0 1.86548 1.86548 0 4.16667 0C6.46785 0 8.33333 1.86548 8.33333 4.16667C8.33333 6.46785 6.46785 8.33333 4.16667 8.33333C1.86548 8.33333 0 6.46785 0 4.16667Z" transform="translate(8.3333435 5.7291718)" id="Circle" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
-			<path d="M0 7.29167L16.5229 7.29167C16.0094 3.18229 12.5104 0 8.26146 0C4.0125 0 0.513542 3.18229 0 7.29167L0 7.29167Z" transform="translate(4.238556 14.5833435)" id="Shape" fill="url(#gradient_5)" fill-rule="evenodd" stroke="none" />
-			<path d="M0 6.25L14.4177 6.25C13.9109 2.71771 10.8812 0 7.20885 0C3.53646 0 0.506771 2.71771 0 6.25L0 6.25Z" transform="translate(5.2911377 15.625)" id="Shape" fill="url(#gradient_6)" fill-rule="evenodd" stroke="none" />
-		</g>
-	</g>
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="11.002001" y1="2.494" x2="29.584" y2="38.647" id="gradient_1">
+      <stop offset="0%" stop-color="#5961C3" />
+      <stop offset="100%" stop-color="#3A41AC" />
+    </linearGradient>
+    <radialGradient gradientUnits="objectBoundingBox" cx="49.999992%" cy="50.000008%" fx="49.999992%" fy="50.000008%" r="50.000008%" gradientTransform="translate(0.49999994,0.50000006),translate(-0.49999994,-0.50000006)" id="gradient_2">
+      <stop offset="0%" stop-color="#000000" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient gradientUnits="objectBoundingBox" cx="49.49935%" cy="99.45333%" fx="49.49935%" fy="99.45333%" r="99.94001%" gradientTransform="translate(0.4949935,0.9945333),scale(0.54026794,1),translate(-0.4949935,-0.9945333)" id="gradient_3">
+      <stop offset="17.7%" stop-color="#000000" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="5.129999" y1="0.9239998" x2="10.832001" y2="14.98" id="gradient_4">
+      <stop offset="0%" stop-color="#A6ACFC" />
+      <stop offset="28.7%" stop-color="#A0A7FA" />
+      <stop offset="65.100006%" stop-color="#9198F4" />
+      <stop offset="100%" stop-color="#7B83EB" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="10.784" y1="0.13599777" x2="14.365" y2="13.993" id="gradient_5">
+      <stop offset="0%" stop-color="#A6ACFC" />
+      <stop offset="28.7%" stop-color="#A0A7FA" />
+      <stop offset="65.100006%" stop-color="#9198F4" />
+      <stop offset="100%" stop-color="#7B83EB" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Test-Account-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M44 24C44 35.045 35.045 44 24 44C12.955 44 4 35.045 4 24C4 12.955 12.955 4 24 4C35.045 4 44 12.955 44 24L44 24Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M14.5 20C14.5 14.7533 18.7533 10.5 24 10.5C29.2467 10.5 33.5 14.7533 33.5 20C33.5 25.2467 29.2467 29.5 24 29.5C18.7533 29.5 14.5 25.2467 14.5 20Z" id="Circle" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+    <path d="M24 44C29.396 44 34.284 41.852 37.882 38.378C35.601 32.755 30.078 29 24 29C17.922 29 12.399 32.755 10.118 38.378C13.716 41.852 18.604 44 24 44L24 44Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+    <path d="M16 19C16 14.5817 19.5817 11 24 11C28.4183 11 32 14.5817 32 19C32 23.4183 28.4183 27 24 27C19.5817 27 16 23.4183 16 19Z" id="Circle" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
+    <path d="M24 44C29.015 44 33.587 42.141 37.098 39.091C35.107 33.784 30.002 30 24 30C17.998 30 12.893 33.784 10.902 39.091C14.413 42.141 18.985 44 24 44L24 44Z" id="Shape" fill="url(#gradient_5)" stroke="none" />
+  </g>
 </svg>

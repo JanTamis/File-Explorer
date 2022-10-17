@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient gradientUnits="objectBoundingBox" cx="117.99168%" cy="84.65278%" fx="117.99168%" fy="84.65278%" r="63.727768%" gradientTransform="translate(1.1799167,0.84652776),translate(-1.1799167,-0.84652776)" id="gradient_1">
+      <stop offset="0%" stop-color="#FFCF7B" />
+      <stop offset="19.5%" stop-color="#FECD76" />
+      <stop offset="43.9%" stop-color="#FAC666" />
+      <stop offset="71%" stop-color="#F3BC4D" />
+      <stop offset="99.69999%" stop-color="#EAAD29" />
+      <stop offset="100%" stop-color="#EAAD29" />
+    </radialGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="17.91" y1="-0.05347294" x2="17.91" y2="24.228529" id="gradient_2">
+      <stop offset="0%" stop-color="#C26715" />
+      <stop offset="50.800003%" stop-color="#B85515" />
+      <stop offset="100%" stop-color="#AD3F16" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Picture-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M40 6L8 6C6.895 6 6 6.895 6 8L6 40C6 41.105 6.895 42 8 42L40 42C41.105 42 42 41.105 42 40L42 8C42 6.895 41.105 6 40 6L40 6Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M32.065 23.065C30.916 21.916 29.06 21.891 27.88 23.008L18 32.368L18 42L40 42C41.105 42 42 41.105 42 40L42 33L32.065 23.065L32.065 23.065Z" id="Shape" fill="#D6742D" stroke="none" />
+    <path d="M27 14.5C27 12.567 28.567 11 30.5 11C32.433 11 34 12.567 34 14.5C34 16.433 32.433 18 30.5 18C28.567 18 27 16.433 27 14.5Z" id="Circle" fill="#FFF8DE" fill-rule="evenodd" stroke="none" />
+    <path d="M8 42L40 42C40.811 42 41.507 41.515 41.82 40.82L20.065 19.065C18.916 17.916 17.06 17.891 15.88 19.008L6 28.368L6 40C6 41.105 6.895 42 8 42L8 42Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+  </g>
+</svg>

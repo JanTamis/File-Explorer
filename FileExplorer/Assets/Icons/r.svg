@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="7.7730002" y1="0.9520004" x2="29.818" y2="21.782999" id="gradient_1">
+      <stop offset="0%" stop-color="#BEC1C4" />
+      <stop offset="100%" stop-color="#939399" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="5.1230016" y1="-1.7490025" x2="12.303001" y2="19.284996" id="gradient_2">
+      <stop offset="0.3%" stop-color="#008DED" />
+      <stop offset="100%" stop-color="#0061A7" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="R-Project-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M24 6C10.745 6 0 13.291 0 22.286C0 31.281 10.745 38.572 24 38.572C37.255 38.572 48 31.281 48 22.286C48 13.291 37.255 6 24 6L24 6ZM26.5 35C16.283 35 8 29.627 8 23C8 16.373 16.283 11 26.5 11C36.717 11 45 16.373 45 23C45 29.627 36.717 35 26.5 35L26.5 35Z" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+    <path d="M39.051 33.469C38.473 32.524 37.614 31.8 36.609 31.364C40.01 30.523 42.535 27.46 42.535 23.8C42.535 19.493 39.042 16 34.735 16L20.001 16L20.001 42L26.934 42L26.934 31.6L28.889 31.6C29.856 31.6 30.745 32.125 31.21 32.973L36.175 42L44.268 42L39.051 33.469L39.051 33.469ZM26.935 21.2L33.002 21.2C34.437 21.2 35.602 22.365 35.602 23.8C35.602 25.235 34.437 26.4 33.002 26.4L26.935 26.4L26.935 21.2L26.935 21.2Z" id="Shape" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+  </g>
+</svg>

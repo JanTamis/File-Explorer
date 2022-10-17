@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="9.069" y1="-3.0010056" x2="27.925999" y2="24.275" id="gradient_1">
+      <stop offset="0%" stop-color="#7DD8F3" />
+      <stop offset="100%" stop-color="#45B0D0" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0.80799997" y1="-1.220007" x2="38.75" y2="6.494999" id="gradient_2">
+      <stop offset="0%" stop-color="#0077D2" />
+      <stop offset="100%" stop-color="#0B59A2" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="New-Property-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M4 38L4 13L44 13L44 38C44 39.1 43.1 40 42 40L6 40C4.9 40 4 39.1 4 38L4 38Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M38.5 22L15.5 22C15.2 22 15 21.8 15 21.5L15 20.5C15 20.2 15.2 20 15.5 20L38.5 20C38.8 20 39 20.2 39 20.5L39 21.5C39 21.8 38.8 22 38.5 22L38.5 22Z" id="Shape" fill="#0F94BF" stroke="none" />
+    <path d="M38.5 27L15.5 27C15.2 27 15 26.8 15 26.5L15 25.5C15 25.2 15.2 25 15.5 25L38.5 25C38.8 25 39 25.2 39 25.5L39 26.5C39 26.8 38.8 27 38.5 27L38.5 27Z" id="Shape" fill="#0F94BF" stroke="none" />
+    <path d="M38.5 32L15.5 32C15.2 32 15 31.8 15 31.5L15 30.5C15 30.2 15.2 30 15.5 30L38.5 30C38.8 30 39 30.2 39 30.5L39 31.5C39 31.8 38.8 32 38.5 32L38.5 32Z" id="Shape" fill="#0F94BF" stroke="none" />
+    <path d="M44 10L44 13L4 13L4 10C4 8.9 4.9 8 6 8L42 8C43.1 8 44 8.9 44 10L44 10Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M9.5 22L10.5 22C10.8 22 11 21.8 11 21.5L11 20.5C11 20.2 10.8 20 10.5 20L9.5 20C9.2 20 9 20.2 9 20.5L9 21.5C9 21.8 9.2 22 9.5 22L9.5 22Z" id="Shape" fill="#0F94BF" stroke="none" />
+    <path d="M9.5 27L10.5 27C10.8 27 11 26.8 11 26.5L11 25.5C11 25.2 10.8 25 10.5 25L9.5 25C9.2 25 9 25.2 9 25.5L9 26.5C9 26.8 9.2 27 9.5 27L9.5 27Z" id="Shape" fill="#0F94BF" stroke="none" />
+    <path d="M9.5 32L10.5 32C10.8 32 11 31.8 11 31.5L11 30.5C11 30.2 10.8 30 10.5 30L9.5 30C9.2 30 9 30.2 9 30.5L9 31.5C9 31.8 9.2 32 9.5 32L9.5 32Z" id="Shape" fill="#0F94BF" stroke="none" />
+  </g>
+</svg>

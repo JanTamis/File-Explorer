@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0" y1="7.5" x2="32" y2="7.5" id="gradient_1">
+      <stop offset="0%" stop-color="#11408A" />
+      <stop offset="100%" stop-color="#103F8F" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0" y1="7.5" x2="32" y2="7.5" id="gradient_2">
+      <stop offset="0%" stop-color="#1D59B3" />
+      <stop offset="100%" stop-color="#195BBC" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0" y1="7.000001" x2="32" y2="7.000001" id="gradient_3">
+      <stop offset="0%" stop-color="#3079D6" />
+      <stop offset="100%" stop-color="#297CD2" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0" y1="3" x2="32" y2="3" id="gradient_4">
+      <stop offset="0%" stop-color="#42A3F2" />
+      <stop offset="100%" stop-color="#42A4EB" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Database-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M40 28L8 28C8 28 8 38.271 8 39C8 41.209 15.163 43 24 43C32.837 43 40 41.209 40 39C40 38.271 40 28 40 28L40 28Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M40 18L8 18C8 18 8 28.271 8 29C8 31.209 15.163 33 24 33C32.837 33 40 31.209 40 29C40 28.271 40 18 40 18L40 18Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M40 8L8 8C8 8 8 17.756 8 18.5C8 20.433 15.163 22 24 22C32.837 22 40 20.433 40 18.5C40 17.756 40 8 40 8L40 8Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+    <path d="M8 8C8 6.34315 15.1634 5 24 5C32.8366 5 40 6.34315 40 8C40 9.65685 32.8366 11 24 11C15.1634 11 8 9.65685 8 8Z" id="Oval" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
+  </g>
+</svg>

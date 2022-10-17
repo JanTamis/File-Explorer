@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="3.5849988" y1="-0.27900696" x2="6.248001" y2="9.659004" id="gradient_1">
+      <stop offset="0%" stop-color="#2AA4F4" />
+      <stop offset="100%" stop-color="#007AD9" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="3.585999" y1="-0.27900696" x2="6.248002" y2="9.658995" id="gradient_2">
+      <stop offset="0%" stop-color="#2AA4F4" />
+      <stop offset="100%" stop-color="#007AD9" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="3.585" y1="-0.27900696" x2="6.248" y2="9.658995" id="gradient_3">
+      <stop offset="0%" stop-color="#2AA4F4" />
+      <stop offset="100%" stop-color="#007AD9" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="1.0110025" y1="1.010994" x2="5.2120028" y2="5.2120056" id="gradient_4">
+      <stop offset="0%" stop-color="#33BEF0" />
+      <stop offset="100%" stop-color="#0A85D9" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="1.0109999" y1="1.010994" x2="5.2120004" y2="5.2120056" id="gradient_5">
+      <stop offset="0%" stop-color="#33BEF0" />
+      <stop offset="100%" stop-color="#0A85D9" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Vector-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M8.024 30.5C8.019 30.329 8.016 30.157 8.016 29.984C8.016 21.156 15.172 14 24 14C32.828 14 39.984 21.156 39.984 29.984C39.984 30.157 39.981 30.328 39.976 30.5" id="Shape" fill="none" stroke="#ABB4BE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M4.5 14.5L42.5 14.5" id="Line" fill="none" fill-rule="evenodd" stroke="#ABB4BE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+    <path d="M27 19.5L21 19.5C19.9 19.5 19 18.6 19 17.5L19 11.5C19 10.4 19.9 9.5 21 9.5L27 9.5C28.1 9.5 29 10.4 29 11.5L29 17.5C29 18.6 28.1 19.5 27 19.5L27 19.5Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M43 40.5L37 40.5C35.9 40.5 35 39.6 35 38.5L35 32.5C35 31.4 35.9 30.5 37 30.5L43 30.5C44.1 30.5 45 31.4 45 32.5L45 38.5C45 39.6 44.1 40.5 43 40.5L43 40.5Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M11 40.5L5 40.5C3.9 40.5 3 39.6 3 38.5L3 32.5C3 31.4 3.9 30.5 5 30.5L11 30.5C12.1 30.5 13 31.4 13 32.5L13 38.5C13 39.6 12.1 40.5 11 40.5L11 40.5Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+    <path d="M41 14.5C41 12.8431 42.3431 11.5 44 11.5C45.6569 11.5 47 12.8431 47 14.5C47 16.1569 45.6569 17.5 44 17.5C42.3431 17.5 41 16.1569 41 14.5Z" id="Circle" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
+    <path d="M1 14.5C1 12.8431 2.34315 11.5 4 11.5C5.65685 11.5 7 12.8431 7 14.5C7 16.1569 5.65685 17.5 4 17.5C2.34315 17.5 1 16.1569 1 14.5Z" id="Circle" fill="url(#gradient_5)" fill-rule="evenodd" stroke="none" />
+  </g>
+</svg>

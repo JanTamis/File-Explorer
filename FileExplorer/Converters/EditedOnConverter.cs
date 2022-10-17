@@ -14,7 +14,7 @@ public class EditedOnConverter : IValueConverter
 			return model.EditedOn.Humanize();
 		}
 
-		return String.Empty;
+		return Task.FromResult(String.Empty);
 	}
 
 	public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

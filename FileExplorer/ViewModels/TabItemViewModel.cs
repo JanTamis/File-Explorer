@@ -1,4 +1,5 @@
-﻿using Avalonia.Threading;
+﻿using Avalonia;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FileExplorer.Core.Helpers;
 using FileExplorer.DisplayViews;
@@ -7,6 +8,9 @@ using FileExplorer.Providers;
 using FileExplorer.Models;
 using FileExplorer.Core.Interfaces;
 using Avalonia.Controls;
+using Avalonia.Svg.Skia;
+using FileExplorer.Core.Models;
+using Image = Avalonia.Controls.Image;
 
 namespace FileExplorer.ViewModels;
 
@@ -26,6 +30,7 @@ public partial class TabItemViewModel
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(FolderName))]
 	[NotifyPropertyChangedFor(nameof(Folders))]
+	[NotifyPropertyChangedFor(nameof(MenuItems))]
 	private IFileItem? _currentFolder;
 
 	[ObservableProperty]
@@ -63,7 +68,44 @@ public partial class TabItemViewModel
 
 	public Task<IEnumerable<IPathSegment>> Folders => Provider.GetPathAsync(CurrentFolder).AsTask();
 
-	public IEnumerable<IControl> MenuItems => Provider.GetMenuItems(CurrentFolder);
+	public IEnumerable<IControl> MenuItems => Provider.GetMenuItems(CurrentFolder).Select<MenuItemModel, IControl>(s =>
+	{
+		switch (s.Type)
+		{
+			case MenuItemType.Button:
+				var source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/UIIcons/{s.Icon}.svg", null);
+
+				return new Button
+				{
+					Classes = new Classes("Flat"),
+					Content = new Image
+					{
+						Source = new SvgImage
+						{
+							Source = source,
+
+						},
+						Width = 30,
+						Height = 30,
+					} ,
+					Width = 40,
+					Height = 40,
+				};
+			case MenuItemType.Separator:
+				return new Border
+				{
+					Width = 2,
+					Margin = new Thickness(4, 0),
+					Classes = new Classes("Separator"),
+				};
+			case MenuItemType.Dropdown:
+				break;
+			default:
+				throw new ArgumentOutOfRangeException();
+		}
+
+		return null;
+	});
 
 	public bool SearchFailed => !IsLoading && FileCount == 0;
 
@@ -183,7 +225,6 @@ public partial class TabItemViewModel
 		if (path is { IsFolder: true })
 		{
 			CurrentFolder = path;
-			OnPropertyChanged(nameof(MenuItems));
 
 			await UpdateFiles(false, "*");
 		}

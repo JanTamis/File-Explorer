@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="17.344" y1="-2.737" x2="24.656" y2="38.737003" id="gradient_1">
+      <stop offset="0%" stop-color="#21AD64" />
+      <stop offset="100%" stop-color="#088242" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="-9.94" y1="-9.94" x2="30.777" y2="30.777" id="gradient_2">
+      <stop offset="0%" stop-color="#FED100" />
+      <stop offset="100%" stop-color="#E36001" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Large-Icons-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M43 6L5 6C3.895 6 3 6.895 3 8L3 40C3 41.105 3.895 42 5 42L43 42C44.105 42 45 41.105 45 40L45 8C45 6.895 44.105 6 43 6L43 6Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M32.825 24.535C32.371 24.27 31.623 24.103 30.755 24C31.623 23.897 32.371 23.73 32.825 23.465C34.715 22.359 35.361 19.907 34.271 18C33.18 16.084 30.762 15.426 28.871 16.531C28.417 16.797 27.9 17.369 27.378 18.078C27.723 17.267 27.953 16.529 27.953 16C27.953 13.79 26.184 12 24 12C21.815 12 20.047 13.789 20.047 16C20.047 16.53 20.277 17.268 20.623 18.08C20.1 17.37 19.584 16.798 19.13 16.532C17.24 15.427 14.822 16.084 13.73 18.001C12.64 19.908 13.286 22.359 15.176 23.466C15.63 23.731 16.378 23.898 17.246 24.001C16.378 24.104 15.63 24.271 15.176 24.536C13.285 25.64 12.64 28.09 13.729 30C14.821 31.916 17.239 32.569 19.129 31.469C19.583 31.203 20.1 30.63 20.623 29.92C20.278 30.733 20.047 31.471 20.047 32.002C20.047 34.211 21.815 36 24 36C26.184 36 27.953 34.211 27.953 32.002C27.953 31.472 27.723 30.734 27.377 29.922C27.9 30.631 28.416 31.203 28.87 31.47C30.761 32.57 33.179 31.918 34.27 30.001C35.36 28.09 34.715 25.64 32.825 24.535L32.825 24.535Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M28 24.003C28 26.211 26.211 28 24 28C21.789 28 20 26.211 20 24.003C20 21.789 21.789 20 24 20C26.211 20 28 21.789 28 24.003" id="Shape" fill="url(#gradient_2)" stroke="none" />
+  </g>
+</svg>

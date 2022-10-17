@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="5.89545" y1="7.972073" x2="21.751448" y2="21.277075" id="gradient_1">
+      <stop offset="0%" stop-color="#26ABE7" />
+      <stop offset="100%" stop-color="#086DBF" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="19.772" y1="23.910997" x2="7.954999" y2="7.034" id="gradient_2">
+      <stop offset="0%" stop-color="#FEB705" />
+      <stop offset="100%" stop-color="#FFDA1C" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Python-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M24.047 5C22.492 5.005 21.414 5.142 20.111 5.367C16.263 6.037 15.562 7.444 15.562 10.037L15.562 14L24.562 14L24.562 16L15.22 16L10.87 16C8.234 16 5.927 17.242 5.196 20.219C4.37 23.636 4.333 25.776 5.196 29.344C5.851 32.005 7.294 34 9.931 34L13.563 34L13.563 28.896C13.563 25.93 16.249 23 19.327 23L26.563 23C29.086 23 31.563 21.138 31.563 18.623L31.563 10.037C31.563 7.598 29.804 5.774 27.345 5.365C27.406 5.359 25.589 4.994 24.047 5L24.047 5ZM19.063 9C19.884 9 20.563 9.677 20.563 10.502C20.563 11.335 19.884 12 19.063 12C18.226 12 17.563 11.336 17.563 10.502C17.563 9.68 18.226 9 19.063 9L19.063 9Z" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+    <path d="M23.078 43C24.633 42.995 25.711 42.858 27.014 42.633C30.862 41.963 31.563 40.556 31.563 37.963L31.563 34L22.563 34L22.563 32L31.906 32L36.256 32C38.892 32 41.199 30.758 41.93 27.781C42.756 24.364 42.793 22.224 41.93 18.656C41.274 15.995 39.831 14 37.194 14L33.562 14L33.562 19.104C33.562 22.07 30.876 25 27.798 25L20.562 25C18.039 25 15.562 26.862 15.562 29.377L15.562 37.963C15.562 40.402 17.321 42.226 19.78 42.635C19.719 42.641 21.536 43.006 23.078 43L23.078 43ZM28.063 39C27.242 39 26.563 38.323 26.563 37.498C26.563 36.665 27.242 36 28.063 36C28.9 36 29.563 36.664 29.563 37.498C29.563 38.32 28.899 39 28.063 39L28.063 39Z" id="Shape" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+  </g>
+</svg>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="13.000002" y1="15.647" x2="13.000002" y2="-0.296" id="gradient_1">
+      <stop offset="0%" stop-color="#92A3B0" />
+      <stop offset="1.5%" stop-color="#A3B5C4" />
+      <stop offset="3.2%" stop-color="#AEC2D1" />
+      <stop offset="4.5999994%" stop-color="#B2C6D6" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="3" y1="9.372999" x2="3" y2="1.1549997" id="gradient_2">
+      <stop offset="0%" stop-color="#4B4B4B" />
+      <stop offset="100%" stop-color="#3B3B3B" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Lock-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M44 37L4 37L4 42C4 43.105 4.895 44 6 44L42 44C43.105 44 44 43.105 44 42L44 37L44 37Z" id="Shape" fill="#C48C00" stroke="none" />
+    <path d="M11 13L11 16L15 16L15 13C15 8.029 19.029 4 24 4L24 4C28.971 4 33 8.029 33 13L33 16L37 16L37 13C37 5.82 31.18 0 24 0L24 0C16.82 0 11 5.82 11 13L11 13Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M44 23L4 23L4 18C4 16.895 4.895 16 6 16L42 16C43.105 16 44 16.895 44 18L44 23L44 23Z" id="Shape" fill="#FAD500" stroke="none" />
+    <path d="M4 23L44 23L44 30L4 30L4 23Z" id="Rectangle" fill="#EDBE00" fill-rule="evenodd" stroke="none" />
+    <path d="M4 30L44 30L44 37L4 37L4 30Z" id="Rectangle" fill="#E3A600" fill-rule="evenodd" stroke="none" />
+    <path d="M27 29C27 27.343 25.657 26 24 26C22.343 26 21 27.343 21 29C21 30.304 21.837 31.403 23 31.816L23 35C23 35.552 23.448 36 24 36C24.552 36 25 35.552 25 35L25 31.816C26.163 31.403 27 30.304 27 29L27 29Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+  </g>
+</svg>

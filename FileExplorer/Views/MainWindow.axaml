@@ -464,7 +464,13 @@
 												        Grid.Row="0"
 												        Background="{DynamicResource MaterialDesignCardBackground}">
 													<Grid ColumnDefinitions="Auto, *">
-													  <ItemsControl Items="{Binding CurrentTab.MenuItems}">
+														<Grid.Styles>
+															<Style Selector="Border.Separator">
+																<Setter Property="Background" Value="{DynamicResource WindowBackground}" />
+															</Style>
+														</Grid.Styles>
+
+														<ItemsControl Items="{Binding CurrentTab.MenuItems}">
 														<ItemsControl.ItemsPanel>
 														  <ItemsPanelTemplate>
 															<StackPanel Orientation="Horizontal"/>

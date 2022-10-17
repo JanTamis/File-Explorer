@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="5.249" y1="0.35999972" x2="5.249" y2="10.786999" id="gradient_1">
+      <stop offset="0%" stop-color="#DEDEDE" />
+      <stop offset="100%" stop-color="#D6D6D6" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Design-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M42.414 35.414L12.586 5.586C11.805 4.805 10.539 4.805 9.758 5.586L5.586 9.757C4.805 10.538 4.805 11.804 5.586 12.585L35.414 42.413C36.195 43.194 37.461 43.194 38.242 42.413L42.414 38.241C43.195 37.462 43.195 36.195 42.414 35.414L42.414 35.414Z" id="Shape" fill="#0370C8" stroke="none" />
+    <path d="M42.583 9.067L38.932 5.417C38.377 4.861 37.473 4.861 36.917 5.417L35.199 7.137L40.863 12.801L42.583 11.083C43.139 10.526 43.139 9.625 42.583 9.067" id="Shape" fill="#C94F60" stroke="none" />
+    <path d="M6.905 35.43L5 43L12.571 41.094L13.365 34.527L6.905 35.43L6.905 35.43Z" id="Shape" fill="#F0F0F0" stroke="none" />
+    <path d="M36.032 17.632L12.572 41.093L6.907 35.428L30.367 11.967L36.032 17.632L36.032 17.632Z" id="Shape" fill="#EDBE00" stroke="none" />
+    <path d="M30.363 11.968L35.195 7.134L40.863 12.798L36.031 17.632L30.363 11.968L30.363 11.968Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M5.965 39.172L5 43L8.827 42.035L5.965 39.172L5.965 39.172Z" id="Shape" fill="#787878" stroke="none" />
+    <path d="M35.293 32.2928L37.2927 30.293L38.707 31.7072L36.7073 33.707L35.293 32.2928Z" id="Rectangle" fill="#0E8DF2" fill-rule="evenodd" stroke="none" />
+    <path d="M37.2931 36.2927L40.2933 33.2924L41.7076 34.7066L38.7074 37.7069L37.2931 36.2927Z" id="Rectangle" fill="#0E8DF2" fill-rule="evenodd" stroke="none" />
+    <path d="M29.293 26.2928L31.2927 24.293L32.7069 25.7072L30.7073 27.707L29.293 26.2928Z" id="Rectangle" fill="#0E8DF2" fill-rule="evenodd" stroke="none" />
+    <path d="M31.2931 30.2927L34.2933 27.2924L35.7076 28.7066L32.7074 31.7069L31.2931 30.2927Z" id="Rectangle" fill="#0E8DF2" fill-rule="evenodd" stroke="none" />
+    <path d="M16.2931 15.2927L19.2933 12.2924L20.7076 13.7066L17.7074 16.7069L16.2931 15.2927Z" id="Rectangle" fill="#0E8DF2" fill-rule="evenodd" stroke="none" />
+    <path d="M20.293 17.2928L22.2927 15.293L23.7069 16.7072L21.7073 18.707L20.293 17.2928Z" id="Rectangle" fill="#0E8DF2" fill-rule="evenodd" stroke="none" />
+    <path d="M10.2931 9.29271L13.2933 6.2924L14.7076 7.70659L11.7074 10.7069L10.2931 9.29271Z" id="Rectangle" fill="#0E8DF2" fill-rule="evenodd" stroke="none" />
+    <path d="M14.293 11.2928L16.2927 9.29304L17.7069 10.7072L15.7073 12.707L14.293 11.2928Z" id="Rectangle" fill="#0E8DF2" fill-rule="evenodd" stroke="none" />
+  </g>
+</svg>

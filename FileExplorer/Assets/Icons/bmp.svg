@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0" y1="13.10125" x2="40.000004" y2="13.10125" id="gradient_1">
+      <stop offset="0%" stop-color="#C26715" />
+      <stop offset="50.800003%" stop-color="#B85515" />
+      <stop offset="100%" stop-color="#AD3F16" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Landscape-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M37 19C36.448 19 36 18.553 36 18L36 6C36 5.447 36.448 5 37 5C37.552 5 38 5.447 38 6L38 18C38 18.553 37.552 19 37 19L37 19Z" id="Shape" fill="#FAC500" stroke="none" />
+    <path d="M43 13L31 13C30.448 13 30 12.553 30 12C30 11.447 30.448 11 31 11L43 11C43.552 11 44 11.447 44 12C44 12.553 43.552 13 43 13L43 13Z" id="Shape" fill="#FAC500" stroke="none" />
+    <path d="M32.757 17.242C32.501 17.242 32.245 17.144 32.05 16.949C31.659 16.558 31.659 15.926 32.05 15.535L40.535 7.051C40.926 6.66 41.558 6.66 41.949 7.051C42.34 7.442 42.34 8.074 41.949 8.465L33.464 16.949C33.269 17.145 33.013 17.242 32.757 17.242L32.757 17.242Z" id="Shape" fill="#FAC500" stroke="none" />
+    <path d="M41.243 17.242C40.987 17.242 40.731 17.144 40.536 16.949L32.05 8.465C31.659 8.074 31.659 7.442 32.05 7.051C32.441 6.66 33.073 6.66 33.464 7.051L41.949 15.535C42.34 15.926 42.34 16.558 41.949 16.949C41.754 17.145 41.499 17.242 41.243 17.242L41.243 17.242Z" id="Shape" fill="#FAC500" stroke="none" />
+    <path d="M32 12C32 9.23858 34.2386 7 37 7C39.7614 7 42 9.23858 42 12C42 14.7614 39.7614 17 37 17C34.2386 17 32 14.7614 32 12Z" id="Circle" fill="#FAC500" fill-rule="evenodd" stroke="none" />
+    <path d="M18.715 16.715C17.492 15.492 15.509 15.492 14.286 16.715L2 29L2 40C2 41.105 2.895 42 4 42L42 42L18.715 16.715L18.715 16.715Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M44 42C45.105 42 46 41.105 46 40L46 35L33.715 22.715C32.492 21.492 30.509 21.492 29.286 22.715L12 42L44 42L44 42Z" id="Shape" fill="#D6742D" stroke="none" />
+  </g>
+</svg>

@@ -7,6 +7,7 @@ using System.IO;
 using System.IO.Enumeration;
 using System.Text.RegularExpressions;
 using Avalonia.Controls;
+using FileExplorer.Core.Models;
 
 namespace FileExplorer.Providers;
 
@@ -111,8 +112,15 @@ public class FileSystemProvider : IItemProvider
 		return ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested && item.IsVisible);
 	}
 
-	public IEnumerable<IControl> GetMenuItems(IFileItem item)
+	public IEnumerable<MenuItemModel> GetMenuItems(IFileItem item)
 	{
-		return Enumerable.Empty<IControl>();
+		yield return new MenuItemModel(MenuItemType.Button, "Cut");
+		yield return new MenuItemModel(MenuItemType.Button, "Copy");
+		yield return new MenuItemModel(MenuItemType.Button, "Paste");
+		yield return new MenuItemModel(MenuItemType.Button, "Remove");
+		yield return new MenuItemModel(MenuItemType.Separator);
+		yield return new MenuItemModel(MenuItemType.Button, "Properties");
+		yield return new MenuItemModel(MenuItemType.Button, "Zip");
+		yield return new MenuItemModel(MenuItemType.Separator);
 	}
 }

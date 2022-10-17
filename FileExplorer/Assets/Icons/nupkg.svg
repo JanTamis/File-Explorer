@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="10.037" y1="-4.801998" x2="25.123" y2="31.195965" id="gradient_1">
+      <stop offset="0%" stop-color="#EBA600" />
+      <stop offset="100%" stop-color="#C28200" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0" y1="3" x2="38" y2="3" id="gradient_2">
+      <stop offset="0%" stop-color="#FFD869" />
+      <stop offset="100%" stop-color="#FEC936" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Package-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M40 42L8 42C6.9 42 6 41.1 6 40L6 12L42 12L42 40C42 41.1 41.1 42 40 42L40 42Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M28 37L38 37L38 39L28 39L28 37Z" id="Rectangle" fill="#B14716" fill-rule="evenodd" stroke="none" />
+    <path d="M38 32L36 30L34 32L35 32L35 35L37 35L37 32L38 32Z" id="Polygon" fill="#B14716" fill-rule="evenodd" stroke="none" />
+    <path d="M32 32L30 30L28 32L29 32L29 35L31 35L31 32L32 32Z" id="Polygon" fill="#B14716" fill-rule="evenodd" stroke="none" />
+    <path d="M43 12L5 12L5 8C5 6.9 5.9 6 7 6L41 6C42.1 6 43 6.9 43 8L43 12L43 12Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+  </g>
+</svg>

@@ -1,20 +1,16 @@
-﻿using FileExplorer.Core.Interfaces;
+﻿using System.Collections;
+using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
-using System.Collections;
 using System.IO;
 using System.IO.Enumeration;
-using System.Text;
-using System.Text.Unicode;
+using System.Runtime.CompilerServices;
 
 namespace FileExplorer.Models;
 
 public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, IEquatable<FileSystemTreeItem>
 {
 	private string? _path;
-
-	private byte _charCount;
-	private byte[] _data;
 
 	public static readonly EnumerationOptions Options = new()
 	{
@@ -66,27 +62,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 
 	public FileSystemTreeItem? Parent { get; set; }
 
-	public string Value
-	{
-		get
-		{
-			if (_path is not null)
-			{
-				return System.IO.Path.GetFileName(_path);
-			}
-
-			return String.Create(_charCount, _data, (buffer, data) => Utf8.ToUtf16(data, buffer, out _, out _));
-		}
-		set
-		{
-			Span<byte> buffer = stackalloc byte[value.Length * 2];
-
-			Utf8.FromUtf16(value, buffer, out _, out var written);
-
-			_charCount = (byte)value.Length;
-			_data = buffer.Slice(0, written).ToArray();
-		}
-	}
+	public string Value { get; set; }
 
 	public bool HasParent => Parent is not null;
 
@@ -115,14 +91,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		IsFolder = isFolder;
 		Parent = parent;
 
-		Span<byte> buffer = stackalloc byte[name.Length * 2];
-
-		Utf8.FromUtf16(name, buffer, out _, out var written);
-
-		_charCount = (byte)name.Length;
-		_data = buffer.Slice(0, written).ToArray();
-		
-		// Value = name.ToString();
+		Value = name.ToString();
 	}
 
 	/// <summary>
@@ -234,15 +203,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 			return enumerable;
 		}
 
-		return enumerable.SelectMany(s =>
-		{
-			if (!s.IsFolder || include(s.Value))
-			{
-				return s.EnumerateChildren(include, layers - 1).Prepend(s);
-			}
-
-			return s.EnumerateChildren(include, layers - 1);
-		});
+		return enumerable.SelectMany(s => s.EnumerateChildren(include, layers - 1).Prepend(s));
 	}
 
 	private string GetPath()
@@ -285,15 +246,15 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	private int GetPathLength()
 	{
 		var item = this;
-		var count = _charCount;
+		var count = Value.Length;
 
 		while (item.Parent is not null)
 		{
 			item = item.Parent;
 
-			count += item._charCount;
+			count += item.Value.Length;
 
-			if (item._data[^1] != ((byte)PathHelper.DirectorySeparator))
+			if (!item.Value.EndsWith(PathHelper.DirectorySeparator))
 			{
 				count++;
 			}
@@ -304,8 +265,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 
 	private static void BuildPath(Span<char> buffer, FileSystemTreeItem item)
 	{
-		Utf8.ToUtf16(item._data, buffer.Slice(buffer.Length - item.Value.Length), out _, out _);
-		// item.Value.CopyTo(buffer.Slice(buffer.Length - item.Value.Length));
+		item.Value.CopyTo(buffer.Slice(buffer.Length - item.Value.Length));
 
 		while (item.Parent is not null)
 		{
@@ -318,8 +278,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 				buffer[index] = PathHelper.DirectorySeparator;
 			}
 
-			Utf8.ToUtf16(item._data, buffer.Slice(Math.Max(index - item.Value.Length, 0)), out _, out _);
-			// item.Value.CopyTo(buffer.Slice(Math.Max(index - item.Value.Length, 0)));
+			item.Value.CopyTo(buffer.Slice(Math.Max(index - item.Value.Length, 0)));
 		}
 	}
 

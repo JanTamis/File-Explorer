@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient gradientUnits="objectBoundingBox" cx="91.94524%" cy="78.84999%" fx="91.94524%" fy="78.84999%" r="74.02943%" gradientTransform="translate(0.91945237,0.7884999),scale(0.8095238,1),translate(-0.91945237,-0.7884999)" id="gradient_1">
+      <stop offset="0%" stop-color="#BD8AF5" />
+      <stop offset="13.7%" stop-color="#B88BF5" />
+      <stop offset="30.899996%" stop-color="#A88FF3" />
+      <stop offset="49.9%" stop-color="#8F96F2" />
+      <stop offset="70.200005%" stop-color="#6B9EEF" />
+      <stop offset="91.299995%" stop-color="#3EAAEC" />
+      <stop offset="100%" stop-color="#29AFEA" />
+    </radialGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="17.999998" y1="-1.9674698" x2="17.999998" y2="45.17353" id="gradient_2">
+      <stop offset="0%" stop-color="#124787" />
+      <stop offset="92.299995%" stop-color="#173B75" />
+      <stop offset="100%" stop-color="#173A73" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Wallpaper-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M43 6L5 6C3.895 6 3 6.895 3 8L3 38C3 39.105 3.895 40 5 40L43 40C44.105 40 45 39.105 45 38L45 8C45 6.895 44.105 6 43 6L43 6Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M32 15.5C32 13.567 33.567 12 35.5 12C37.433 12 39 13.567 39 15.5C39 17.433 37.433 19 35.5 19C33.567 19 32 17.433 32 15.5Z" id="Circle" fill="#FFF8DE" fill-rule="evenodd" stroke="none" />
+    <path d="M35.065 24.065C33.916 22.916 32.06 22.891 30.88 24.008L21 33.368L21 42L43 42C44.105 42 45 41.105 45 40L45 34L35.065 24.065L35.065 24.065Z" id="Shape" fill="#436DCD" stroke="none" />
+    <path d="M39 42L17.065 20.065C15.916 18.916 14.06 18.891 12.88 20.008L3 29.368L3 40C3 41.105 3.895 42 5 42L39 42L39 42Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+  </g>
+</svg>

@@ -6,11 +6,9 @@ using System.Reflection;
 using Avalonia.Threading;
 using Avalonia.Media.Imaging;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices.ComTypes;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Models;
-using SkiaSharp;
-
+using Microsoft.Graph;
 
 namespace FileExplorer.Helpers;
 #pragma warning disable CA1416
@@ -124,7 +122,7 @@ public static class ThumbnailProvider
 			{
 				name = "File";
 
-				var extension = model.Extension;
+				var extension = model.Extension.ToLower();
 
 				if (extension.Length > 1)
 				{
@@ -138,13 +136,10 @@ public static class ThumbnailProvider
 					{
 						foreach (var (key, value) in TypeMap)
 						{
-							foreach (var val in value)
+							if (value.Contains(extension))
 							{
-								if (extension == val)
-								{
-									name = key;
-									break;
-								}
+								name = key;
+								break;
 							}
 						}
 					}
@@ -156,7 +151,7 @@ public static class ThumbnailProvider
 				}
 			}
 
-			return GetImage(name!);
+			return GetImage(name);
 		}, size) ?? Task.FromResult<IImage?>(null), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
 	}
 
@@ -243,12 +238,9 @@ public static class ThumbnailProvider
 					{
 						foreach (var (key, value) in TypeMap)
 						{
-							foreach (var val in value)
+							if (value.Contains(extension))
 							{
-								if (extension == val)
-								{
-									name = key;
-								}
+								name = key;
 							}
 						}
 					}
@@ -273,7 +265,7 @@ public static class ThumbnailProvider
 			image = await Dispatcher.UIThread.InvokeAsync(() => new SvgImage
 			{
 				Source = source,
-			}, DispatcherPriority.ContextIdle);
+			});
 
 			Images.TryAdd(key, image);
 		}

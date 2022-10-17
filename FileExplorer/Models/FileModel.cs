@@ -12,7 +12,6 @@ namespace FileExplorer.Models;
 public sealed partial class FileModel : IFileItem
 {
 	public static readonly ConcurrentBag<FileModel> FileImageQueue = new();
-
 	public FileSystemTreeItem TreeItem { get; }
 
 	private string? _name;
@@ -72,7 +71,7 @@ public sealed partial class FileModel : IFileItem
 	}
 
 	public string Extension => _extension ??= !IsFolder
-		? TreeItem.GetPath(path => System.IO.Path.GetExtension(path).ToString())
+		? System.IO.Path.GetExtension(TreeItem.Value)
 		: String.Empty;
 
 	public long Size
@@ -90,11 +89,11 @@ public sealed partial class FileModel : IFileItem
 
 	public long TotalSize => IsFolder
 		? TreeItem.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions
-		{
-			RecurseSubdirectories = true,
-			IgnoreInaccessible = true,
-			AttributesToSkip = FileSystemTreeItem.Options.AttributesToSkip,
-		})).Sum()
+			{
+				RecurseSubdirectories = true,
+				IgnoreInaccessible = true,
+				AttributesToSkip = FileSystemTreeItem.Options.AttributesToSkip,
+			})).Sum()
 		: Size;
 
 	public bool IsFolder => TreeItem.IsFolder;
@@ -154,7 +153,6 @@ public sealed partial class FileModel : IFileItem
 	{
 		TreeItem = item;
 	}
-
 
 	public T GetPath<T>(ReadOnlySpanFunc<char, T> action)
 	{

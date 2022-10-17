@@ -84,18 +84,19 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 			{
 				var box = new ListBoxItem
 				{
+					[!ToolTip.TipProperty] = new Binding("Name"),
 					[!RippleEffect.RippleFillProperty] = new Binding("PrimaryHueMidForegroundBrush"),
 					[!ListBoxItem.IsSelectedProperty] = new Binding("IsSelected"),
 					Content = new StackPanel
 					{
-						Orientation = Orientation.Vertical,
 						Margin = new Thickness(5),
+						Height = 100,
 						Children =
 						{
 							new Image
 							{
-								Width = 100,
-								Height = 100,
+								Width = 64,
+								Height = 64,
 								[!DataContextProperty] = new Binding
 								{
 									ConverterParameter = Provider,

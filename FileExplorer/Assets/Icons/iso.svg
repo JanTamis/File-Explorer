@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="23.768002" y1="1.6131593" x2="23.972" y2="21.322634" id="gradient_1">
+      <stop offset="0%" stop-color="#32BDEF" />
+      <stop offset="100%" stop-color="#1EA2E4" />
+    </linearGradient>
+    <radialGradient gradientUnits="objectBoundingBox" cx="94.10228%" cy="7.185447%" fx="94.10228%" fy="7.185447%" r="6814%" gradientTransform="translate(0.9410228,0.07185447),scale(0.9999409,1),rotate(55.728012),scale(1,1.0090362),translate(-0.9410228,-0.07185447)" id="gradient_2">
+      <stop offset="34.7%" stop-color="#7DD8F3" />
+      <stop offset="56.5%" stop-color="#7AD9F4" stop-opacity="0.6666667" />
+      <stop offset="74%" stop-color="#70DCF7" stop-opacity="0.4" />
+      <stop offset="89.9%" stop-color="#5FE1FB" stop-opacity="0.15686275" />
+      <stop offset="100%" stop-color="#50E6FF" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient gradientUnits="objectBoundingBox" cx="5.894804%" cy="92.80819%" fx="5.894804%" fy="92.80819%" r="9358.925%" gradientTransform="translate(0.05894804,0.92808187),scale(0.9999408,1),rotate(-179.24887),scale(1,1.0224174),translate(-0.05894804,-0.92808187)" id="gradient_3">
+      <stop offset="34.7%" stop-color="#7DD8F3" />
+      <stop offset="56.5%" stop-color="#7AD9F4" stop-opacity="0.6666667" />
+      <stop offset="74%" stop-color="#70DCF7" stop-opacity="0.4" />
+      <stop offset="89.9%" stop-color="#5FE1FB" stop-opacity="0.15686275" />
+      <stop offset="100%" stop-color="#50E6FF" stop-opacity="0" />
+    </radialGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="-0.04000092" y1="9.333334" x2="18.70667" y2="9.333334" id="gradient_4">
+      <stop offset="0%" stop-color="#0077D2" />
+      <stop offset="100%" stop-color="#0B59A2" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Burn-CD-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <g clip-path="url(#mask_1)">
+      <path d="M0 24C0 10.7452 10.7452 0 24 0C37.2548 0 48 10.7452 48 24C48 37.2548 37.2548 48 24 48C10.7452 48 0 37.2548 0 24Z" id="Circle" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+      <path d="M24 24L15.792 46.552C12.4987 45.3533 9.50804 43.448 7.02937 40.9693C4.5507 38.4907 2.64537 35.5 1.4467 32.2067L24 24L24 24Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+      <path d="M24 24L32.208 1.448C35.5013 2.64667 38.492 4.552 40.9707 7.03067C43.4493 9.50933 45.3547 12.5 46.5533 15.7933L24 24L24 24Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+      <path d="M14.6667 24C14.6667 18.8453 18.8453 14.6667 24 14.6667C29.1547 14.6667 33.3333 18.8453 33.3333 24C33.3333 29.1547 29.1547 33.3333 24 33.3333C18.8453 33.3333 14.6667 29.1547 14.6667 24Z" id="Circle" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
+      <path d="M20 24C20 21.7909 21.7909 20 24 20C26.2092 20 28 21.7909 28 24C28 26.2091 26.2092 28 24 28C21.7909 28 20 26.2091 20 24Z" id="Circle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+    </g>
+  </g>
+</svg>

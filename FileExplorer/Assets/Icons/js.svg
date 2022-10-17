@@ -1,31 +1,14 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient x1="0.048090935" y1="0.952" x2="0.5090909" y2="0.49090907" id="gradient_1">
-      <stop offset="0" stop-color="#3079D6" />
-      <stop offset="1" stop-color="#297CD2" />
-    </linearGradient>
     <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
-    <path d="M0 0L25 0L25 25L0 25L0 0Z" id="path_2" />
     <clipPath id="mask_1">
       <use xlink:href="#path_1" />
     </clipPath>
-    <clipPath id="mask_2">
-      <use xlink:href="#path_2" />
-    </clipPath>
   </defs>
-  <g id="icons8_file_2">
-    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
-    <g clip-path="url(#mask_1)">
-      <path d="M30 11L30 36C30 37.105 29.105 38 28 38L2 38C0.895001 38 0 37.105 0 36L0 2C0 0.895 0.895001 0 2 0L19 0L30 11L30 11Z" transform="translate(9 5)" id="Shape" fill="#50E6FF" fill-rule="evenodd" stroke="none" />
-      <path d="M0 0L0 9C0 10.105 0.895 11 2 11L11 11L0 0L0 0Z" transform="translate(28 5)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
-    </g>
-  </g>
-  <g id="icons8_javascript_1" transform="translate(11.0000305 16.645508)">
-    <path d="M0 0L25 0L25 25L0 25L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
-    <g clip-path="url(#mask_2)">
-      <path d="M0 18.75L0 0L18.75 0L18.75 18.75L0 18.75L0 18.75Z" transform="translate(3.125 3.125)" id="Shape" fill="#FFD600" fill-rule="evenodd" stroke="none" />
-      <path d="M7.39844 5.70156C7.75886 6.28698 8.15053 6.84791 8.98021 6.84791C9.67709 6.84791 10.0427 6.50156 10.0427 6.02239C10.0427 5.44895 9.66459 5.24531 8.89792 4.91146L8.47761 4.73229C7.26459 4.2177 6.45782 3.57291 6.45782 2.21094C6.45782 0.955727 7.41875 0.000518799 8.92032 0.000518799C9.98959 0.000518799 10.7578 0.370832 11.312 1.34062L10.0026 2.1776C9.71459 1.66302 9.40313 1.46041 8.92032 1.46041C8.42761 1.46041 8.11563 1.77135 8.11563 2.1776C8.11563 2.67969 8.42813 2.88281 9.14948 3.19375L9.5698 3.37291C10.9995 3.98177 11.8057 4.60364 11.8057 6.00156C11.8057 7.50781 10.6161 8.33333 9.01928 8.33333C7.4573 8.33333 6.57032 7.54948 6.07657 6.57916L7.39844 5.70156L7.39844 5.70156ZM1.36406 5.74427C1.6276 6.21614 2.02812 6.57917 2.60417 6.57917C3.15521 6.57917 3.4724 6.36146 3.4724 5.5151L3.4724 0L5.20833 0L5.20833 5.78177C5.20833 7.53542 4.19115 8.33333 2.70573 8.33333C1.36354 8.33333 0.394791 7.42396 0 6.57917L1.36406 5.74427L1.36406 5.74427Z" transform="translate(7.9859314 11.4583435)" id="Shape" fill="#000001" fill-rule="evenodd" stroke="none" />
-    </g>
+  <g id="Javascript-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M6 42L6 6L42 6L42 42L6 42L6 42Z" id="Shape" fill="#F7DF1E" stroke="none" />
+    <path d="M29.538 32.947C30.23 34.071 30.982 35.148 32.575 35.148C33.913 35.148 34.615 34.483 34.615 33.563C34.615 32.462 33.889 32.071 32.417 31.43L31.61 31.086C29.281 30.098 27.732 28.86 27.732 26.245C27.732 23.835 29.577 22.001 32.46 22.001C34.513 22.001 35.988 22.712 37.052 24.574L34.538 26.181C33.985 25.193 33.387 24.804 32.46 24.804C31.514 24.804 30.915 25.401 30.915 26.181C30.915 27.145 31.515 27.535 32.9 28.132L33.707 28.476C36.452 29.645 38 30.839 38 33.523C38 36.415 35.716 38 32.65 38C29.651 38 27.948 36.495 27 34.632L29.538 32.947L29.538 32.947ZM17.952 33.029C18.458 33.935 19.227 34.632 20.333 34.632C21.391 34.632 22 34.214 22 32.589L22 22L25.333 22L25.333 33.101C25.333 36.468 23.38 38 20.528 38C17.951 38 16.091 36.254 15.333 34.632L17.952 33.029L17.952 33.029Z" id="Shape" fill="#000001" fill-rule="evenodd" stroke="none" />
   </g>
 </svg>

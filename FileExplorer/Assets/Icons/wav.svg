@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Audio-Wave-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M24 28L23 28C22.448 28 22 27.552 22 27L22 21C22 20.448 22.448 20 23 20L24 20C24.552 20 25 20.448 25 21L25 27C25 27.552 24.552 28 24 28L24 28Z" id="Shape" fill="#0078D4" stroke="none" />
+    <path d="M19 35L18 35C17.448 35 17 34.552 17 34L17 14C17 13.448 17.448 13 18 13L19 13C19.552 13 20 13.448 20 14L20 34C20 34.552 19.552 35 19 35L19 35Z" id="Shape" fill="#0078D4" stroke="none" />
+    <path d="M14 45L13 45C12.448 45 12 44.552 12 44L12 4C12 3.448 12.448 3 13 3L14 3C14.552 3 15 3.448 15 4L15 44C15 44.552 14.552 45 14 45L14 45Z" id="Shape" fill="#0078D4" stroke="none" />
+    <path d="M9 38L8 38C7.448 38 7 37.552 7 37L7 11C7 10.448 7.448 10 8 10L9 10C9.552 10 10 10.448 10 11L10 37C10 37.552 9.552 38 9 38L9 38Z" id="Shape" fill="#0078D4" stroke="none" />
+    <path d="M4 31L3 31C2.448 31 2 30.552 2 30L2 18C2 17.448 2.448 17 3 17L4 17C4.552 17 5 17.448 5 18L5 30C5 30.552 4.552 31 4 31L4 31Z" id="Shape" fill="#0078D4" stroke="none" />
+    <path d="M44 29.25L43 29.25C42.448 29.25 42 28.802 42 28.25L42 19.75C42 19.198 42.448 18.75 43 18.75L44 18.75C44.552 18.75 45 19.198 45 19.75L45 28.25C45 28.802 44.552 29.25 44 29.25L44 29.25Z" id="Shape" fill="#0078D4" stroke="none" />
+    <path d="M39 35.25L38 35.25C37.448 35.25 37 34.802 37 34.25L37 13.75C37 13.198 37.448 12.75 38 12.75L39 12.75C39.552 12.75 40 13.198 40 13.75L40 34.25C40 34.802 39.552 35.25 39 35.25L39 35.25Z" id="Shape" fill="#0078D4" stroke="none" />
+    <path d="M34 45L33 45C32.448 45 32 44.552 32 44L32 4C32 3.448 32.448 3 33 3L34 3C34.552 3 35 3.448 35 4L35 44C35 44.552 34.552 45 34 45L34 45Z" id="Shape" fill="#0078D4" stroke="none" />
+    <path d="M29 38L28 38C27.448 38 27 37.552 27 37L27 11C27 10.448 27.448 10 28 10L29 10C29.552 10 30 10.448 30 11L30 37C30 37.552 29.552 38 29 38L29 38Z" id="Shape" fill="#0078D4" stroke="none" />
+  </g>
+</svg>

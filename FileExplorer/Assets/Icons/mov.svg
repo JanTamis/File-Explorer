@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient gradientUnits="objectBoundingBox" cx="114.01098%" cy="80.26447%" fx="114.01098%" fy="80.26447%" r="73.96479%" gradientTransform="translate(1.1401098,0.8026447),scale(0.78571427,1),scale(1,1.0391446),translate(-1.1401098,-0.8026447)" id="gradient_1">
+      <stop offset="0%" stop-color="#BD8AF5" />
+      <stop offset="13.7%" stop-color="#B88BF5" />
+      <stop offset="30.899996%" stop-color="#A88FF3" />
+      <stop offset="49.9%" stop-color="#8F96F2" />
+      <stop offset="70.200005%" stop-color="#6B9EEF" />
+      <stop offset="91.299995%" stop-color="#3EAAEC" />
+      <stop offset="100%" stop-color="#29AFEA" />
+    </radialGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Movie-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M43 41L5 41C3.895 41 3 40.105 3 39L3 10C3 8.895 3.895 8 5 8L43 8C44.105 8 45 8.895 45 10L45 39C45 40.105 44.105 41 43 41L43 41Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M41 16L39 16C38.448 16 38 15.552 38 15L38 13C38 12.448 38.448 12 39 12L41 12C41.552 12 42 12.448 42 13L42 15C42 15.552 41.552 16 41 16L41 16Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M41 23L39 23C38.448 23 38 22.552 38 22L38 20C38 19.448 38.448 19 39 19L41 19C41.552 19 42 19.448 42 20L42 22C42 22.552 41.552 23 41 23L41 23Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M41 30L39 30C38.448 30 38 29.552 38 29L38 27C38 26.448 38.448 26 39 26L41 26C41.552 26 42 26.448 42 27L42 29C42 29.552 41.552 30 41 30L41 30Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M41 37L39 37C38.448 37 38 36.552 38 36L38 34C38 33.448 38.448 33 39 33L41 33C41.552 33 42 33.448 42 34L42 36C42 36.552 41.552 37 41 37L41 37Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M9 16L7 16C6.448 16 6 15.552 6 15L6 13C6 12.448 6.448 12 7 12L9 12C9.552 12 10 12.448 10 13L10 15C10 15.552 9.552 16 9 16L9 16Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M9 23L7 23C6.448 23 6 22.552 6 22L6 20C6 19.448 6.448 19 7 19L9 19C9.552 19 10 19.448 10 20L10 22C10 22.552 9.552 23 9 23L9 23Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M9 30L7 30C6.448 30 6 29.552 6 29L6 27C6 26.448 6.448 26 7 26L9 26C9.552 26 10 26.448 10 27L10 29C10 29.552 9.552 30 9 30L9 30Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M9 37L7 37C6.448 37 6 36.552 6 36L6 34C6 33.448 6.448 33 7 33L9 33C9.552 33 10 33.448 10 34L10 36C10 36.552 9.552 37 9 37L9 37Z" id="Shape" fill="#FFFFFF" stroke="none" />
+  </g>
+</svg>

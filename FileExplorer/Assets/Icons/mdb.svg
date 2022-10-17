@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0.5860001" y1="0.5860007" x2="19.043001" y2="19.043001" id="gradient_1">
+      <stop offset="0%" stop-color="#BB273D" />
+      <stop offset="100%" stop-color="#9F1728" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Microsoft-Access-2019-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M42 29L12 29C12 29 12 37.657 12 38C12 40.761 18.716 43 27 43C35.284 43 42 40.761 42 38C42 37.657 42 29 42 29L42 29Z" id="Shape" fill="#881421" stroke="none" />
+    <path d="M42 19L12 19C12 19 12 28.657 12 29C12 31.761 18.716 34 27 34C35.284 34 42 31.761 42 29C42 28.657 42 19 42 19L42 19Z" id="Shape" fill="#AF2031" stroke="none" />
+    <path d="M42 9.5L12 9.5C12 9.5 12 18.657 12 19C12 21.761 18.716 24 27 24C35.284 24 42 21.761 42 19C42 18.657 42 9.5 42 9.5L42 9.5Z" id="Shape" fill="#C94F60" stroke="none" />
+    <path d="M12 9.5C12 7.01472 18.7157 5 27 5C35.2843 5 42 7.01472 42 9.5C42 11.9853 35.2843 14 27 14C18.7157 14 12 11.9853 12 9.5Z" id="Oval" fill="#E08095" fill-rule="evenodd" stroke="none" />
+    <path d="M22.319 13L12 13L12 37L22.319 37C24.352 37 26 35.352 26 33.319L26 16.681C26 14.648 24.352 13 22.319 13L22.319 13Z" id="Shape" fill="#000000" fill-opacity="0.05" stroke="none" />
+    <path d="M22.213 36L12 36L12 13.333L22.213 13.333C23.937 13.333 25.334 14.73 25.334 16.454L25.334 32.879C25.333 34.603 23.936 36 22.213 36L22.213 36Z" id="Shape" fill="#000000" fill-opacity="0.07" stroke="none" />
+    <path d="M22.084 35.008L11.978 34.987L12.022 13.654L22.128 13.675C23.542 13.678 24.686 14.827 24.683 16.241L24.65 32.453C24.647 33.867 23.498 35.011 22.084 35.008L22.084 35.008Z" id="Shape" fill="#000000" fill-opacity="0.09" stroke="none" />
+    <path d="M22 34L6 34C4.895 34 4 33.105 4 32L4 16C4 14.895 4.895 14 6 14L22 14C23.105 14 24 14.895 24 16L24 32C24 33.105 23.105 34 22 34L22 34Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M12.895 19.005L15.161 19.005L18.801 29.005L16.66 29.005L15.858 26.62L12.113 26.62L11.325 29.005L9.199 29.005L12.895 19.005L12.895 19.005ZM15.378 25.078L14.213 21.459C14.117 21.194 14.045 20.921 13.997 20.643L13.955 20.643C13.911 20.928 13.841 21.208 13.746 21.48L12.567 25.078L15.378 25.078L15.378 25.078Z" id="Shape" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+  </g>
+</svg>

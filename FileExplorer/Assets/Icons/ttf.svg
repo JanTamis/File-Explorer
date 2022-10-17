@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="15.738" y1="-1.1580001" x2="22.192" y2="35.443" id="gradient_1">
+      <stop offset="0%" stop-color="#A235D4" />
+      <stop offset="44.100002%" stop-color="#A033D1" />
+      <stop offset="70.200005%" stop-color="#982CC9" />
+      <stop offset="91.5%" stop-color="#8B21BB" />
+      <stop offset="100%" stop-color="#831BB3" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="3.930999" y1="-17.738" x2="11.080999" y2="22.807997" id="gradient_2">
+      <stop offset="0%" stop-color="#A235D4" />
+      <stop offset="44.100002%" stop-color="#A033D1" />
+      <stop offset="70.200005%" stop-color="#982CC9" />
+      <stop offset="91.5%" stop-color="#8B21BB" />
+      <stop offset="100%" stop-color="#831BB3" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="7.436" y1="-1.4380007" x2="13.915999" y2="35.312" id="gradient_3">
+      <stop offset="0%" stop-color="#A235D4" />
+      <stop offset="44.100002%" stop-color="#A033D1" />
+      <stop offset="70.200005%" stop-color="#982CC9" />
+      <stop offset="91.5%" stop-color="#8B21BB" />
+      <stop offset="100%" stop-color="#831BB3" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Choose-Font-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M11 17L8 17C7.448 17 7 16.552 7 16L7 15.5C7 7.796 13.279 5 17.5 5L40 5C40.552 5 41 5.448 41 6L41 9C41 9.552 40.552 10 40 10L17.5 10C16.596 10.014 12 10.342 12 15.5L12 16C12 16.552 11.552 17 11 17L11 17Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M28 26L15 26C14.448 26 14 25.552 14 25L14 22C14 21.448 14.448 21 15 21L28 21C28.552 21 29 21.448 29 22L29 25C29 25.552 28.552 26 28 26L28 26Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M10.118 43L8 43C7.448 43 7 42.552 7 42L7 38C7 37.448 7.448 37 8 37L10.118 37C12.305 37 14.238 35.579 14.89 33.492L23.137 7.106L28.864 8.895L20.617 35.282C19.182 39.874 14.929 43 10.118 43L10.118 43Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+  </g>
+</svg>

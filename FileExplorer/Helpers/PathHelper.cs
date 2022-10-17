@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Text;
 using FileExplorer.Models;
 
 namespace FileExplorer.Helpers;
@@ -7,12 +8,15 @@ namespace FileExplorer.Helpers;
 public static class PathHelper
 {
 	public static char DirectorySeparator { get; }
+	public static byte[] DirectorySeparatorUTF8 { get; }
 
 	static PathHelper()
 	{
 		DirectorySeparator = OperatingSystem.IsWindows()
 			? '\\'
 			: '/';
+
+		DirectorySeparatorUTF8 = Encoding.UTF8.GetBytes(DirectorySeparator.ToString());
 	}
 
 	public static FileSystemTreeItem? FromPath([NotNullIfNotNull("path")]string? path)

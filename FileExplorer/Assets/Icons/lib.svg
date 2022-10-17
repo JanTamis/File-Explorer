@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="1.5" y1="8.084" x2="1.5" y2="0.083999634" id="gradient_1">
+      <stop offset="0%" stop-color="#EBA600" />
+      <stop offset="100%" stop-color="#C28200" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0" y1="2.5" x2="38" y2="2.5" id="gradient_2">
+      <stop offset="0%" stop-color="#FFCF54" />
+      <stop offset="26.1%" stop-color="#FDCB4D" />
+      <stop offset="63.9%" stop-color="#F7C13A" />
+      <stop offset="100%" stop-color="#F0B421" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0" y1="11.5" x2="6" y2="11.5" id="gradient_3">
+      <stop offset="0%" stop-color="#7819A2" />
+      <stop offset="100%" stop-color="#771AA9" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0" y1="1" x2="6" y2="1" id="gradient_4">
+      <stop offset="0%" stop-color="#912FBD" />
+      <stop offset="100%" stop-color="#9332BF" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Book-Shelf-Icon">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+    <path d="M36 34L36 41C36 41.552 36.448 42 37 42L38 42C38.552 42 39 41.552 39 41L39 34L36 34L36 34Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M9 34L9 41C9 41.552 9.448 42 10 42L11 42C11.552 42 12 41.552 12 41L12 34L9 34L9 34Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M42 34L6 34C5.448 34 5 33.552 5 33L5 30C5 29.448 5.448 29 6 29L42 29C42.552 29 43 29.448 43 30L43 33C43 33.552 42.552 34 42 34L42 34Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M10 6L14 6C14.552 6 15 6.448 15 7L15 28C15 28.552 14.552 29 14 29L10 29C9.448 29 9 28.552 9 28L9 7C9 6.448 9.448 6 10 6L10 6Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+    <path d="M18 6L22 6C22.552 6 23 6.448 23 7L23 28C23 28.552 22.552 29 22 29L18 29C17.448 29 17 28.552 17 28L17 7C17 6.448 17.448 6 18 6L18 6Z" id="Shape" fill="#107C42" stroke="none" />
+    <path d="M24 12L28 12C28.552 12 29 12.448 29 13L29 28C29 28.552 28.552 29 28 29L24 29C23.448 29 23 28.552 23 28L23 13C23 12.448 23.448 12 24 12L24 12Z" id="Shape" fill="#AF2031" stroke="none" />
+    <path d="M9 9L15 9L15 11L9 11L9 9Z" id="Rectangle" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
+    <path d="M9 24L15 24L15 26L9 26L9 24Z" id="Rectangle" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
+    <path d="M17 9L23 9L23 11L17 11L17 9Z" id="Rectangle" fill="#21A366" fill-rule="evenodd" stroke="none" />
+    <path d="M17 24L23 24L23 26L17 26L17 24Z" id="Rectangle" fill="#21A366" fill-rule="evenodd" stroke="none" />
+    <path d="M23 15L29 15L29 17L23 17L23 15Z" id="Rectangle" fill="#C94F60" fill-rule="evenodd" stroke="none" />
+    <path d="M23 24L29 24L29 26L23 26L23 24Z" id="Rectangle" fill="#C94F60" fill-rule="evenodd" stroke="none" />
+    <path d="M38.822 27.581L34.72 28.948C34.189 29.125 33.616 28.832 33.449 28.298L29.046 14.207C28.883 13.687 29.167 13.132 29.684 12.96L33.786 11.593C34.317 11.416 34.89 11.709 35.057 12.243L39.46 26.334C39.623 26.854 39.339 27.409 38.822 27.581L38.822 27.581Z" id="Shape" fill="#027AD4" stroke="none" />
+    <path d="M32.872 26.452L32.273 24.535L38.26 22.494L38.859 24.411L32.872 26.452Z" id="Polygon" fill="#25A2E5" fill-rule="evenodd" stroke="none" />
+    <path d="M29.576 15.904L30.175 17.821L36.15 15.74L35.551 13.823L29.576 15.904Z" id="Polygon" fill="#25A2E5" fill-rule="evenodd" stroke="none" />
+  </g>
+</svg>

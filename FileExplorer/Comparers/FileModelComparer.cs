@@ -16,7 +16,7 @@ public readonly struct FileModelComparer : IComparer<IFileItem>
 		var result = sortMember switch
 		{
 			SortEnum.Name => String.Compare(x.Name, y.Name, StringComparison.CurrentCulture),
-			SortEnum.Edited => y.EditedOn.CompareTo(x.EditedOn),
+			// SortEnum.Edited => y.EditedOn.CompareTo(x.EditedOn),
 			SortEnum.Size => x.Size.CompareTo(y.Size),
 			SortEnum.Extension => String.Compare(x.Extension, y.Extension, StringComparison.CurrentCulture),
 			_ => 0,
