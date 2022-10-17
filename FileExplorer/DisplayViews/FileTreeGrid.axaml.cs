@@ -5,9 +5,11 @@ using Avalonia.Controls.Models.TreeDataGrid;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
+using Avalonia.Data.Converters;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.Svg.Skia;
 using FileExplorer.Converters;
 using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
@@ -37,6 +39,15 @@ public class FileTreeGrid : UserControl, IFileViewer
 		{
 			var grid = this.FindControl<TreeDataGrid>(ControlName);
 
+			var folder = new SvgImage
+			{
+				Source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/Folder.svg", null),
+			};
+			var file = new SvgImage
+			{
+				Source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/File.svg", null),
+			};
+
 			var source = new FlatTreeDataGridSource<IFileItem>(value)
 			{
 				Columns =
@@ -58,18 +69,58 @@ public class FileTreeGrid : UserControl, IFileViewer
 								Margin = new Thickness(0, 5),
 								Children =
 								{
-									new Image
+									new Panel
 									{
-										Width = 24,
-										Height = 24,
 										Margin = new Thickness(2.5, 0, 0, 0),
 										[!DataContextProperty] = new Binding
 										{
 											ConverterParameter = Provider,
 											Converter = PathToImageConverter.Instance,
 										},
-										[!Image.SourceProperty] = new Binding("Result"),
+
+										Children =
+										{
+											new Image
+											{
+												Width = 24,
+												Height = 24,
+												[!Image.IsVisibleProperty] = new Binding("IsSuccessfullyCompleted"),
+												[!Image.SourceProperty] = new Binding("Result"),
+											},
+
+											new Image
+											{
+												Width = 24,
+												Height = 24,
+												[!Image.IsVisibleProperty] = new MultiBinding
+												{
+													Bindings =
+													{
+														new Binding("!IsSuccessfullyCompleted"),
+														new Binding("$parent[1].DataContext.IsFolder")
+													},
+													Converter = BoolConverters.And,
+												},
+												Source = folder,
+											},
+											new Image
+											{
+												Width = 24,
+												Height = 24,
+												[!Image.IsVisibleProperty] = new MultiBinding
+												{
+													Bindings =
+													{
+														new Binding("!IsSuccessfullyCompleted"),
+														new Binding("!$parent[1].DataContext.IsFolder")
+													},
+													Converter = BoolConverters.And,
+												},
+												Source = file,
+											},
+										},
 									},
+
 									new TextBlock
 									{
 										Margin = new Thickness(2.5, 0, 0, 0),

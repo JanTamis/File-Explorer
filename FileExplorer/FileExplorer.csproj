@@ -100,8 +100,8 @@
     <PackageReference Include="Material.Avalonia" Version="3.0.0-avalonia11-preview2" />
     <PackageReference Include="Material.Icons.Avalonia" Version="1.2.0" />
     <PackageReference Include="MetadataExtractor" Version="2.7.2" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0-preview.6.22324.4" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0-preview.6.22324.4" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0-rc.2.22472.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0-rc.2.22472.3" />
     <PackageReference Include="StrongInject" Version="1.4.5-CI-20220524-023137" />
     <PackageReference Include="Svg.Skia" Version="0.6.0-preview2" />
     <PackageReference Include="System.Linq.Async" Version="6.0.1" />

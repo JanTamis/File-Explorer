@@ -4,11 +4,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
+using Avalonia.Data.Converters;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using Avalonia.Svg.Skia;
 using FileExplorer.Converters;
 using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
@@ -26,7 +28,6 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 	public event Action SelectionChanged = delegate { };
 
 	private ObservableRangeCollection<IFileItem> _items;
-	private IItemProvider _provider;
 
 	public void SelectAll()
 	{
@@ -71,53 +72,7 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 		}
 	}
 
-	public IItemProvider Provider
-	{
-		get => _provider;
-		set
-		{
-			_provider = value;
-
-			var grid = this.FindControl<ItemsRepeater>("fileList");
-
-			grid.ItemTemplate = new FuncDataTemplate<IFileItem>((x, _) =>
-			{
-				var box = new ListBoxItem
-				{
-					[!ToolTip.TipProperty] = new Binding("Name"),
-					[!RippleEffect.RippleFillProperty] = new Binding("PrimaryHueMidForegroundBrush"),
-					[!ListBoxItem.IsSelectedProperty] = new Binding("IsSelected"),
-					Content = new StackPanel
-					{
-						Margin = new Thickness(5),
-						Height = 100,
-						Children =
-						{
-							new Image
-							{
-								Width = 64,
-								Height = 64,
-								[!DataContextProperty] = new Binding
-								{
-									ConverterParameter = Provider,
-									Converter = PathToImageConverter.Instance,
-								},
-								[!Image.SourceProperty] = new Binding("Result"),
-							},
-							new TextBlock
-							{
-								Margin = new Thickness(4, 2),
-								TextTrimming = TextTrimming.CharacterEllipsis,
-								TextAlignment = TextAlignment.Center,
-								[!TextBlock.TextProperty] = new Binding("Name"),
-							},
-						},
-					},
-				};
-				return box;
-			});
-		}
-	}
+	public IItemProvider Provider { get; set; }
 
 	public FileGrid()
 	{
@@ -126,6 +81,15 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 		DataContext = this;
 
 		var grid = this.FindControl<ItemsRepeater>("fileList");
+
+		var folder = new SvgImage
+		{
+			Source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/Folder.svg", null),
+		};
+		var file = new SvgImage
+		{
+			Source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/File.svg", null),
+		};
 
 		grid.ItemTemplate = new FuncDataTemplate<IFileItem>((x, _) =>
 		{
@@ -139,16 +103,56 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 					Margin = new Thickness(5),
 					Children =
 					{
-						new Image
+						new Panel
 						{
-							Width = 100,
-							Height = 100,
+							Margin = new Thickness(2.5, 0, 0, 0),
 							[!DataContextProperty] = new Binding
 							{
 								ConverterParameter = Provider,
 								Converter = PathToImageConverter.Instance,
 							},
-							[!Image.SourceProperty] = new Binding("Result"),
+
+							Children =
+							{
+								new Image
+								{
+									Width = 64,
+									Height = 64,
+									[!Image.IsVisibleProperty] = new Binding("IsSuccessfullyCompleted"),
+									[!Image.SourceProperty] = new Binding("Result"),
+								},
+
+								new Image
+								{
+									Width = 64,
+									Height = 64,
+									[!Image.IsVisibleProperty] = new MultiBinding
+									{
+										Bindings =
+										{
+											new Binding("!IsSuccessfullyCompleted"),
+											new Binding("$parent[1].DataContext.IsFolder")
+										},
+										Converter = BoolConverters.And,
+									},
+									Source = folder,
+								},
+								new Image
+								{
+									Width = 64,
+									Height = 64,
+									[!Image.IsVisibleProperty] = new MultiBinding
+									{
+										Bindings =
+										{
+											new Binding("!IsSuccessfullyCompleted"),
+											new Binding("!$parent[1].DataContext.IsFolder")
+										},
+										Converter = BoolConverters.And,
+									},
+									Source = file,
+								},
+							},
 						},
 						new TextBlock
 						{
@@ -161,24 +165,6 @@ public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 				},
 			};
 			return box;
-		});
-
-		DataContextProperty.Changed.Subscribe(args =>
-		{
-			if (args.NewValue.GetValueOrDefault() is IFileItem newItem)
-			{
-				newItem.IsVisible = true;
-
-				if (args.Sender is ListBoxItem item)
-				{
-					item.IsSelected = newItem.IsSelected;
-				}
-			}
-
-			if (args.OldValue.GetValueOrDefault() is IFileItem oldItem)
-			{
-				oldItem.IsVisible = false;
-			}
 		});
 
 		grid.ElementPrepared += Grid_ElementPrepared;

@@ -8,7 +8,6 @@ using Avalonia.Media.Imaging;
 using System.Diagnostics.CodeAnalysis;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Models;
-using Microsoft.Graph;
 
 namespace FileExplorer.Helpers;
 #pragma warning disable CA1416
@@ -18,40 +17,40 @@ public static class ThumbnailProvider
 {
 	// private static readonly Dictionary<string, string>? fileTypes = OperatingSystem.IsWindows() ? RegisteredFileType.GetFileTypeAndIcon() : new();
 
-	private static readonly ConcurrentDictionary<string, IImage> Images = new();
+	private static readonly Dictionary<string, IImage> Images = new();
 	private static readonly ConcurrentDictionary<string, string[]> TypeMap = new();
 
 	public static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default, Environment.ProcessorCount / 2); // BitOperations.Log2((uint)Environment.ProcessorCount));
 
 	static ThumbnailProvider()
 	{
-		if (!OperatingSystem.IsWindows())
-		{
-			var assembly = Assembly.GetExecutingAssembly();
-			var files = assembly.GetManifestResourceNames();
+		//if (!OperatingSystem.IsWindows())
+		//{
+			//var assembly = Assembly.GetExecutingAssembly();
+			//var files = assembly.GetManifestResourceNames();
 
-			const string basePathMapping = "FileExplorer.Assets.Lookup.";
+			//const string basePathMapping = "FileExplorer.Assets.Lookup.";
 
-			foreach (var file in files)
-			{
-				if (file.StartsWith(basePathMapping))
-				{
-					var name = file.Split('.')[^2];
-					var stream = assembly.GetManifestResourceStream(file);
+			//foreach (var file in files)
+			//{
+			//	if (file.StartsWith(basePathMapping))
+			//	{
+			//		var name = file.Split('.')[^2];
+			//		var stream = assembly.GetManifestResourceStream(file);
 
-					if (stream is not null)
-					{
-						var reader = new StreamReader(stream);
+			//		if (stream is not null)
+			//		{
+			//			var reader = new StreamReader(stream);
 
-						reader.ReadToEndAsync().ContinueWith(c =>
-						{
-							TypeMap.TryAdd(name, reader.ReadToEnd()
-								.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
-						});
-					}
-				}
-			}
-		}
+			//			reader.ReadToEndAsync().ContinueWith(c =>
+			//			{
+			//				TypeMap.TryAdd(name, reader.ReadToEnd()
+			//					.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+			//			});
+			//		}
+			//	}
+			//}
+		//}
 	}
 
 	public static async Task<IImage?> GetFileImage(IFileItem? model, IItemProvider provider, int size, Func<bool>? shouldReturnImage = null)
@@ -83,8 +82,6 @@ public static class ThumbnailProvider
 
 		return await await Task.Factory.StartNew(() => model?.GetPath((path, imageSize) =>
 		{
-			var name = String.Empty;
-
 			if (model.IsFolder)
 			{
 				if (OperatingSystem.IsWindows())
@@ -95,63 +92,37 @@ public static class ThumbnailProvider
 
 						if (folderText is not null && path.SequenceEqual(KnownFolders.GetPath(folder)))
 						{
-							name = folderText;
-							break;
+							return GetImage(folderText);
 						}
 					}
 				}
 
-				if (!model.IsRoot && name == String.Empty && model is FileModel)
+				if (model is FileModel { IsRoot: false })
 				{
 					var driveInfo = new DriveInfo(new string(model.Name[0], 1));
 
 					if (driveInfo.IsReady)
 					{
-						name = Enum.GetName(driveInfo.DriveType);
+						return GetImage(Enum.GetName(driveInfo.DriveType));
 					}
 				}
 
-				if (name == String.Empty)
+				if (provider.HasItems(model))
 				{
-					name = provider.HasItems(model)
-						? "FolderFiles"
-						: "Folder";
+					return GetImage("FolderFiles");
 				}
 			}
 			else
 			{
-				name = "File";
+				var extension = model.Extension?.ToLower();
 
-				var extension = model.Extension.ToLower();
-
-				if (extension.Length > 1)
+				if (extension is { Length: > 1 })
 				{
-					extension = extension[1..];
-
-					if (Images.ContainsKey(extension))
-					{
-						name = extension;
-					}
-					else
-					{
-						foreach (var (key, value) in TypeMap)
-						{
-							if (value.Contains(extension))
-							{
-								name = key;
-								break;
-							}
-						}
-					}
-
-					if (name == "File")
-					{
-						name = extension;
-					}
+					return GetImage(extension[1..]);
 				}
 			}
 
-			return GetImage(name);
+			return Task.FromException<IImage?>(new ArgumentException("No image was found for the item"));
 		}, size) ?? Task.FromResult<IImage?>(null), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
 	}
 
@@ -222,32 +193,32 @@ public static class ThumbnailProvider
 			}
 			else
 			{
-				name = "File";
+				// name = "File";
 
-				var extension = Path.GetExtension(model.Value).ToLower();
+				name = Path.GetExtension(model.Value).ToLower();
 
-				if (extension.Length > 1)
-				{
-					extension = extension[1..];
+				//if (extension.Length > 1)
+				//{
+				//	extension = extension[1..];
 
-					if (Images.ContainsKey(extension))
-					{
-						name = extension;
-					}
-					else
-					{
-						foreach (var (key, value) in TypeMap)
-						{
-							if (value.Contains(extension))
-							{
-								name = key;
-							}
-						}
-					}
-				}
+				//	if (Images.ContainsKey(extension))
+				//	{
+				//		name = extension;
+				//	}
+				//	else
+				//	{
+				//		foreach (var (key, value) in TypeMap)
+				//		{
+				//			if (value.Contains(extension))
+				//			{
+				//				name = key;
+				//			}
+				//		}
+				//	}
+				//}
 			}
 
-			return GetImage(name!);
+			return GetImage(name);
 		}, size) ?? Task.FromResult<IImage?>(null), CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ExclusiveScheduler).ConfigureAwait(false);
 	}
 
@@ -265,7 +236,7 @@ public static class ThumbnailProvider
 			image = await Dispatcher.UIThread.InvokeAsync(() => new SvgImage
 			{
 				Source = source,
-			});
+			}, DispatcherPriority.Background);
 
 			Images.TryAdd(key, image);
 		}
