@@ -1,1 +1,1 @@
-A File explorer which focuses om performance and style 
+A File explorer which focuses on performance and style 
