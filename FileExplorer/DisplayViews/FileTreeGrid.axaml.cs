@@ -18,7 +18,7 @@ using Humanizer;
 
 namespace FileExplorer.DisplayViews;
 
-public class FileTreeGrid : UserControl, IFileViewer
+public sealed class FileTreeGrid : UserControl, IFileViewer
 {
 	private const string ControlName = "TreeDataGrid";
 
@@ -82,16 +82,16 @@ public class FileTreeGrid : UserControl, IFileViewer
 										{
 											new Image
 											{
-												Width = 24,
-												Height = 24,
+												Width = 28,
+												Height = 28,
 												[!Image.IsVisibleProperty] = new Binding("IsSuccessfullyCompleted"),
 												[!Image.SourceProperty] = new Binding("Result"),
 											},
 
 											new Image
 											{
-												Width = 24,
-												Height = 24,
+												Width = 28,
+												Height = 28,
 												[!Image.IsVisibleProperty] = new MultiBinding
 												{
 													Bindings =
@@ -105,8 +105,8 @@ public class FileTreeGrid : UserControl, IFileViewer
 											},
 											new Image
 											{
-												Width = 24,
-												Height = 24,
+												Width = 28,
+												Height = 28,
 												[!Image.IsVisibleProperty] = new MultiBinding
 												{
 													Bindings =

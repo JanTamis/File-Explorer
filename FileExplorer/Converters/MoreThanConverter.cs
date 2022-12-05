@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace FileExplorer.Converters;
 
-public class MoreThanConverter : IValueConverter
+public sealed class MoreThanConverter : IValueConverter
 {
 	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{

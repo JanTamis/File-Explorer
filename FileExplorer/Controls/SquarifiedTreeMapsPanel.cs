@@ -2,7 +2,7 @@ using Avalonia;
 
 namespace FileExplorer.Controls;
 
-public class SquarifiedTreeMapsPanel : TreeMapsPanel
+public sealed class SquarifiedTreeMapsPanel : TreeMapsPanel
 {
 	#region protected methods
 

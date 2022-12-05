@@ -2,7 +2,7 @@ using FileExplorer.Core.Interfaces;
 
 namespace FileExplorer.Graph.Models;
 
-public class GraphPathSegment : IPathSegment
+public sealed class GraphPathSegment : IPathSegment
 {
 	private readonly GraphFileModel _file;
 

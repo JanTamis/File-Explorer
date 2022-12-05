@@ -1,6 +1,5 @@
 ﻿using Avalonia.Logging;
 using Material.Styles.Themes.Base;
-using Microsoft.Graph;
 using System.Runtime.InteropServices;
 
 namespace FileExplorer;

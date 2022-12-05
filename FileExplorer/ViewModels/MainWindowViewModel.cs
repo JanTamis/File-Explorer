@@ -18,7 +18,7 @@ using Humanizer;
 namespace FileExplorer.ViewModels
 {
 	[INotifyPropertyChanged]
-	public partial class MainWindowViewModel
+	public sealed partial class MainWindowViewModel
 	{
 		public readonly WindowNotificationManager notificationManager;
 
@@ -286,90 +286,7 @@ namespace FileExplorer.ViewModels
 
 		public void AnalyzeFolder()
 		{
-			// var view = new AnalyzerView();
-			// CurrentTab.DisplayControl = view;
-			//
-			// var drive = new DriveInfo(Path.Substring(0, 1));
-			// var parent = new FileIndexModel(PathHelper.FromPath(Path));
-			//
-			// if (drive.Name == Path)
-			// {
-			// 	parent = new FileIndexModel(PathHelper.FromPath(Path));
-			// }
-			//
-			// var options = new EnumerationOptions()
-			// {
-			// 	IgnoreInaccessible = true,
-			// 	AttributesToSkip = FileAttributes.Temporary,
-			// };
-			//
-			// var folderQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(new FileSystemTreeItem(x.FileName, x.IsDirectory)), options)
-			// {
-			// 	ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
-			// };
-			//
-			// var fileQuery = new FileSystemEnumerable<FileIndexModel>(Path, (ref FileSystemEntry x) => new FileIndexModel(new FileSystemTreeItem(x.FileName, x.IsDirectory)), options)
-			// {
-			// 	ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
-			// };
-			//
-			// ThreadPool.QueueUserWorkItem(async x =>
-			// {
-			// 	var query = folderQuery.Concat(fileQuery);
-			//
-			// 	var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
-			// 	{
-			// 		var resultX = await x.TaskSize;
-			// 		var resultY = await y.TaskSize;
-			//
-			// 		return resultY.CompareTo(resultX);
-			// 	});
-			//
-			// 	await view.Root.AddRangeAsync(query, comparer, token: CurrentTab.TokenSource.Token);
-			// });
-			//
-			// ThreadPool.QueueUserWorkItem(async x =>
-			// {
-			// 	var options = new EnumerationOptions()
-			// 	{
-			// 		IgnoreInaccessible = true,
-			// 		AttributesToSkip = FileAttributes.System,
-			// 		RecurseSubdirectories = true,
-			// 	};
-			//
-			// 	await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = true);
-			//
-			// 	var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(Path, (ref FileSystemEntry y) => (System.IO.Path.GetExtension(y.FileName).ToString(), y.Length), options)
-			// 		{
-			// 			ShouldIncludePredicate = (ref FileSystemEntry z) => !z.IsDirectory,
-			// 		}
-			// 		.Where(w => !String.IsNullOrEmpty(w.Extension))
-			// 		.GroupBy(g => g.Extension)
-			// 		.Where(w => CurrentTab.TokenSource?.IsCancellationRequested != true);
-			//
-			// 	var comparer = new ExtensionModelComparer();
-			//
-			// 	foreach (var extension in extensionQuery)
-			// 	{
-			// 		var model = new ExtensionModel(extension.Key, extension.Sum(s => s.Size))
-			// 		{
-			// 			TotalFiles = extension.Count(),
-			// 		};
-			//
-			// 		var index = view.Extensions.BinarySearch(model, comparer);
-			//
-			// 		if (index >= 0)
-			// 		{
-			// 			await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(index, model));
-			// 		}
-			// 		else
-			// 		{
-			// 			await Dispatcher.UIThread.InvokeAsync(() => view.Extensions.Insert(~index, model));
-			// 		}
-			// 	}
-			//
-			// 	await Dispatcher.UIThread.InvokeAsync(() => CurrentTab.IsLoading = false);
-			// });
+
 		}
 
 		public void ShowProperties()

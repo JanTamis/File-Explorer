@@ -1,9 +1,10 @@
 ﻿using System.IO;
+using System.IO.Enumeration;
 using FileExplorer.Core.Helpers;
 
 namespace FileExplorer.Models;
 
-public class FileIndexModel
+public sealed class FileIndexModel
 {
 	private readonly FileSystemTreeItem _treeItem;
 
@@ -18,12 +19,21 @@ public class FileIndexModel
 	private ObservableRangeCollection<FileIndexModel>? _items;
 
 	private IEnumerable<FileIndexModel>? query => _treeItem
-		.EnumerateChildren()
+		.EnumerateChildrenRecursive()
 		.Select(s => new FileIndexModel(s));
 
-	private IEnumerable<long> sizeQuery => _treeItem
-		.EnumerateChildren()
-		.Select(s => s.GetPath((path, isFolder) => !isFolder ? new FileInfo(path.ToString()).Length : 0, IsFolder));
+	private IEnumerable<long> sizeQuery
+	{
+		get
+		{
+			var path = _treeItem.GetPath(x => x.ToString());
+
+			var options = FileSystemTreeItem.Options;
+			options.RecurseSubdirectories = true;
+
+			return new FileSystemEnumerable<long>(path, (ref FileSystemEntry x) => x.Length, options);
+		}
+	}
 
 	public bool IsFolder => _treeItem.IsFolder;
 
@@ -55,22 +65,22 @@ public class FileIndexModel
 
 	public FileIndexModel? Parent { get; init; }
 
-	public ValueTask<long> ParentSize => Parent?.TaskSize ?? ValueTask.FromResult(0L);
+	public Task<long> ParentSize => Parent?.TaskSize ?? Task.FromResult(0L);
 
 	public string Name { get; init; }
 
 	public long Size { get; set; }
 
-	public ValueTask<long> TaskSize
+	public Task<long> TaskSize
 	{
 		get
 		{
 			if (_taskSize is null or { IsCompleted: false } && Size is 0)
 			{
-				return new ValueTask<long>(_taskSize ??= Task.Run(() => Size = sizeQuery.Sum()));
+				return _taskSize ??= Task.Run(() => Size = sizeQuery.Sum());
 			}
 
-			return ValueTask.FromResult(Size);
+			return Task.FromResult(Size);
 		}
 	}
 
@@ -82,6 +92,8 @@ public class FileIndexModel
 		{
 			Parent = new FileIndexModel(item.Parent);
 		}
+
+		Name = _treeItem.Value;
 	}
 
 	public override string ToString()

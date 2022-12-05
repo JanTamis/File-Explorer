@@ -3,7 +3,7 @@
 namespace FileExplorer.Models;
 
 [INotifyPropertyChanged]
-public partial class ExtensionModel : IComparable<ExtensionModel>
+public sealed partial class ExtensionModel : IComparable<ExtensionModel>
 {
 	[ObservableProperty]
 	private long _totalSize;
@@ -32,7 +32,7 @@ public partial class ExtensionModel : IComparable<ExtensionModel>
 	}
 }
 
-public class ExtensionModelComparer : IComparer<ExtensionModel>
+public sealed class ExtensionModelComparer : IComparer<ExtensionModel>
 {
 	public int Compare(ExtensionModel? x, ExtensionModel? y)
 	{

@@ -6,6 +6,8 @@
 						 xmlns:controls="using:FileExplorer.Controls"
 						 xmlns:models="clr-namespace:FileExplorer.Models"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             Width="800"
+             Height="600"
              x:Class="FileExplorer.DisplayViews.AnalyzerView">
 	<UserControl.Resources>
 		<converters:PathToImageConverter x:Key="imageConverter" />
@@ -23,33 +25,34 @@
 
 	<Grid ColumnDefinitions="2*, *"
 				RowDefinitions="*, 0.5*">
-		<TreeView Items="{Binding Root}">
-			<TreeView.DataTemplates>
-				<TreeDataTemplate DataType="{x:Type models:FileIndexModel}" ItemsSource="{Binding Items}">
-					<Grid ColumnDefinitions="250, Auto, *">
-						<TextBlock Text="{Binding Name}"
-											 TextTrimming="CharacterEllipsis"
-											 VerticalAlignment="Center" />
-
-						<ProgressBar Value="{Binding TaskSize^}"
-												 MinWidth="75"
-												 Maximum="{Binding ParentSize^}"
-												 Grid.Column="1" />
-
-						<TextBlock Text="{Binding TaskSize^, Converter={StaticResource sizeConverter}, FallbackValue=Loading...}"
-											 VerticalAlignment="Center"
-											 Grid.Column="2"
-											 Margin="5 0 0 0" />
-					</Grid>
-				</TreeDataTemplate>
-			</TreeView.DataTemplates>
-
-			<TreeView.ItemsPanel>
-				<ItemsPanelTemplate>
-					<StackPanel Orientation="Vertical" />
-				</ItemsPanelTemplate>
-			</TreeView.ItemsPanel>
-		</TreeView>
+		<TreeDataGrid x:Name="RootDataGrid" />
+		<!-- <TreeView Items="{Binding Root}"> -->
+		<!-- 	<TreeView.DataTemplates> -->
+		<!-- 		<TreeDataTemplate DataType="{x:Type models:FileIndexModel}" ItemsSource="{Binding Items}"> -->
+		<!-- 			<Grid ColumnDefinitions="250, Auto, *"> -->
+		<!-- 				<TextBlock Text="{Binding Name}" -->
+		<!-- 									 TextTrimming="CharacterEllipsis" -->
+		<!-- 									 VerticalAlignment="Center" /> -->
+		<!-- -->
+		<!-- 				<ProgressBar Value="{Binding TaskSize^}" -->
+		<!-- 										 MinWidth="75" -->
+		<!-- 										 Maximum="{Binding ParentSize^}" -->
+		<!-- 										 Grid.Column="1" /> -->
+		<!-- -->
+		<!-- 				<TextBlock Text="{Binding TaskSize^, Converter={StaticResource sizeConverter}, FallbackValue=Loading...}" -->
+		<!-- 									 VerticalAlignment="Center" -->
+		<!-- 									 Grid.Column="2" -->
+		<!-- 									 Margin="5 0 0 0" /> -->
+		<!-- 			</Grid> -->
+		<!-- 		</TreeDataTemplate> -->
+		<!-- 	</TreeView.DataTemplates> -->
+		<!-- -->
+		<!-- 	<TreeView.ItemsPanel> -->
+		<!-- 		<ItemsPanelTemplate> -->
+		<!-- 			<StackPanel Orientation="Vertical" /> -->
+		<!-- 		</ItemsPanelTemplate> -->
+		<!-- 	</TreeView.ItemsPanel> -->
+		<!-- </TreeView> -->
 
 		<GridSplitter ResizeDirection="Columns"
 									HorizontalAlignment="Left"

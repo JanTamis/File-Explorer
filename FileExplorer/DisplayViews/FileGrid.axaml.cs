@@ -19,7 +19,7 @@ using Material.Ripple;
 
 namespace FileExplorer.DisplayViews;
 
-public partial class FileGrid : UserControl, ISelectableControl, IFileViewer
+public sealed partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 {
 	private int anchorIndex = 0;
 	new event PropertyChangedEventHandler? PropertyChanged = delegate { };

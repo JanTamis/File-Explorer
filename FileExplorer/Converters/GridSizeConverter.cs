@@ -1,11 +1,10 @@
-﻿using Avalonia.Controls;
-using Avalonia.Data.Converters;
+﻿using Avalonia.Data.Converters;
 using FileExplorer.Interfaces;
 using System.Globalization;
 
 namespace FileExplorer.Converters
 {
-	public class GridSizeConverter : IValueConverter, ISingleton<GridSizeConverter>
+	public sealed class GridSizeConverter : IValueConverter, ISingleton<GridSizeConverter>
 	{
 		public static readonly GridSizeConverter Instance = new();
 

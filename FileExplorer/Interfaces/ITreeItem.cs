@@ -19,5 +19,5 @@ public interface ITreeItem<TValue, TChildren> where TChildren : class, ITreeItem
 
 	public int GetChildrenCount();
 
-	IEnumerable<TChildren> EnumerateChildren(uint layers = UInt32.MaxValue);
+	IEnumerable<TChildren> EnumerateChildrenRecursive();
 }

@@ -8,7 +8,7 @@ using FileExplorer.Core.Interfaces;
 
 namespace FileExplorer.Converters;
 
-public class PathToImageConverter : IValueConverter, ISingleton<PathToImageConverter>
+public sealed class PathToImageConverter : IValueConverter, ISingleton<PathToImageConverter>
 {
 	public static readonly PathToImageConverter Instance = new();
 

@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+<svg width="60px" height="60px" viewBox="0 0 60 60" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <radialGradient gradientUnits="objectBoundingBox" cx="91.94524%" cy="78.84999%" fx="91.94524%" fy="78.84999%" r="74.02943%" gradientTransform="translate(0.91945237,0.7884999),scale(0.8095238,1),translate(-0.91945237,-0.7884999)" id="gradient_1">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0.5290003" y1="10.472" x2="5.6" y2="5.3999996" id="gradient_1">
+      <stop offset="0%" stop-color="#3079D6" />
+      <stop offset="100%" stop-color="#297CD2" />
+    </linearGradient>
+    <radialGradient gradientUnits="objectBoundingBox" cx="91.94524%" cy="78.84999%" fx="91.94524%" fy="78.84999%" r="91.44811%" gradientTransform="translate(0.91945237,0.7884999),scale(0.8095238,1),scale(1,0.8095238),translate(-0.91945237,-0.7884999)" id="gradient_2">
       <stop offset="0%" stop-color="#BD8AF5" />
       <stop offset="13.7%" stop-color="#B88BF5" />
       <stop offset="30.899996%" stop-color="#A88FF3" />
@@ -10,7 +14,7 @@
       <stop offset="91.299995%" stop-color="#3EAAEC" />
       <stop offset="100%" stop-color="#29AFEA" />
     </radialGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="17.999998" y1="-1.9674698" x2="17.999998" y2="45.17353" id="gradient_2">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="8.749998" y1="-12.339799" x2="8.749998" y2="15.159119" id="gradient_3">
       <stop offset="0%" stop-color="#124787" />
       <stop offset="92.299995%" stop-color="#173B75" />
       <stop offset="100%" stop-color="#173A73" />
@@ -20,11 +24,18 @@
       <use xlink:href="#path_1" />
     </clipPath>
   </defs>
-  <g id="Wallpaper-Icon">
+  <g id="File-Icon-2" transform="translate(6 4)">
     <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
-    <path d="M43 6L5 6C3.895 6 3 6.895 3 8L3 38C3 39.105 3.895 40 5 40L43 40C44.105 40 45 39.105 45 38L45 8C45 6.895 44.105 6 43 6L43 6Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
-    <path d="M32 15.5C32 13.567 33.567 12 35.5 12C37.433 12 39 13.567 39 15.5C39 17.433 37.433 19 35.5 19C33.567 19 32 17.433 32 15.5Z" id="Circle" fill="#FFF8DE" fill-rule="evenodd" stroke="none" />
-    <path d="M35.065 24.065C33.916 22.916 32.06 22.891 30.88 24.008L21 33.368L21 42L43 42C44.105 42 45 41.105 45 40L45 34L35.065 24.065L35.065 24.065Z" id="Shape" fill="#436DCD" stroke="none" />
-    <path d="M39 42L17.065 20.065C15.916 18.916 14.06 18.891 12.88 20.008L3 29.368L3 40C3 41.105 3.895 42 5 42L39 42L39 42Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M39 16L39 41C39 42.105 38.105 43 37 43L11 43C9.895 43 9 42.105 9 41L9 7C9 5.895 9.895 5 11 5L28 5L39 16L39 16Z" id="Shape" fill="#50E6FF" stroke="none" />
+    <path d="M28 5L28 14C28 15.105 28.895 16 30 16L39 16L28 5L28 5Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+  </g>
+  <g id="svg-2" transform="translate(16 19)">
+    <g id="Wallpaper-Icon">
+      <path d="M0 0L28 0L28 28L0 28L0 0L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+      <path d="M25.0833 3.5L2.91667 3.5C2.27208 3.5 1.75 4.02208 1.75 4.66667L1.75 22.1667C1.75 22.8113 2.27208 23.3333 2.91667 23.3333L25.0833 23.3333C25.7279 23.3333 26.25 22.8113 26.25 22.1667L26.25 4.66667C26.25 4.02208 25.7279 3.5 25.0833 3.5L25.0833 3.5L25.0833 3.5Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+      <path d="M18.6667 9.04167C18.6667 7.91408 19.5807 7 20.7083 7C21.8359 7 22.75 7.91408 22.75 9.04167C22.75 10.1693 21.8359 11.0833 20.7083 11.0833C19.5807 11.0833 18.6667 10.1693 18.6667 9.04167L18.6667 9.04167Z" id="Circle" fill="#FFF8DE" fill-rule="evenodd" stroke="none" />
+      <path d="M20.4546 14.0379C19.7843 13.3677 18.7017 13.3531 18.0133 14.0047L12.25 19.4647L12.25 24.5L25.0833 24.5C25.7279 24.5 26.25 23.9779 26.25 23.3333L26.25 19.8333L20.4546 14.0379L20.4546 14.0379L20.4546 14.0379Z" id="Shape#1" fill="#436DCD" stroke="none" />
+      <path d="M22.75 24.5L9.95458 11.7046C9.28433 11.0343 8.20167 11.0198 7.51333 11.6713L1.75 17.1313L1.75 23.3333C1.75 23.9779 2.27208 24.5 2.91667 24.5L22.75 24.5L22.75 24.5L22.75 24.5Z" id="Shape#2" fill="url(#gradient_3)" stroke="none" />
+    </g>
   </g>
 </svg>

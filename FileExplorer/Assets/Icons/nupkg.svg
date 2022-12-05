@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="10.037" y1="-4.801998" x2="25.123" y2="31.195965" id="gradient_1">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0.5290003" y1="10.472" x2="5.6" y2="5.3999996" id="gradient_1">
+      <stop offset="0%" stop-color="#3079D6" />
+      <stop offset="100%" stop-color="#297CD2" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="2.607229" y1="-10.851291" x2="12.350269" y2="12.397393" id="gradient_2">
       <stop offset="0%" stop-color="#EBA600" />
       <stop offset="100%" stop-color="#C28200" />
     </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="0" y1="3" x2="38" y2="3" id="gradient_2">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="-3.2291667" y1="-1.9375" x2="21.3125" y2="-1.9375" id="gradient_3">
       <stop offset="0%" stop-color="#FFD869" />
       <stop offset="100%" stop-color="#FEC936" />
     </linearGradient>
@@ -14,12 +18,21 @@
       <use xlink:href="#path_1" />
     </clipPath>
   </defs>
-  <g id="Package-Icon">
+  <g id="File-Icon-2">
     <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
-    <path d="M40 42L8 42C6.9 42 6 41.1 6 40L6 12L42 12L42 40C42 41.1 41.1 42 40 42L40 42Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
-    <path d="M28 37L38 37L38 39L28 39L28 37Z" id="Rectangle" fill="#B14716" fill-rule="evenodd" stroke="none" />
-    <path d="M38 32L36 30L34 32L35 32L35 35L37 35L37 32L38 32Z" id="Polygon" fill="#B14716" fill-rule="evenodd" stroke="none" />
-    <path d="M32 32L30 30L28 32L29 32L29 35L31 35L31 32L32 32Z" id="Polygon" fill="#B14716" fill-rule="evenodd" stroke="none" />
-    <path d="M43 12L5 12L5 8C5 6.9 5.9 6 7 6L41 6C42.1 6 43 6.9 43 8L43 12L43 12Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <g clip-path="url(#mask_1)">
+      <path d="M39 16L39 41C39 42.105 38.105 43 37 43L11 43C9.895 43 9 42.105 9 41L9 7C9 5.895 9.895 5 11 5L28 5L39 16L39 16Z" id="Shape" fill="#50E6FF" fill-rule="evenodd" stroke="none" />
+      <path d="M28 5L28 14C28 15.105 28.895 16 30 16L39 16L28 5L28 5Z" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+    </g>
+  </g>
+  <g id="svg" transform="translate(8 14)">
+    <g id="Package-Icon">
+      <path d="M0 0L31 0L31 31L0 31L0 0L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+      <path d="M25.8333 27.125L5.16667 27.125C4.45625 27.125 3.875 26.5438 3.875 25.8333L3.875 7.75L27.125 7.75L27.125 25.8333C27.125 26.5438 26.5437 27.125 25.8333 27.125L25.8333 27.125L25.8333 27.125Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+      <path d="M18.0833 23.8958L24.5417 23.8958L24.5417 25.1875L18.0833 25.1875L18.0833 23.8958L18.0833 23.8958Z" id="Rectangle" fill="#B14716" fill-rule="evenodd" stroke="none" />
+      <path d="M24.5417 20.6667L23.25 19.375L21.9583 20.6667L22.6042 20.6667L22.6042 22.6042L23.8958 22.6042L23.8958 20.6667L24.5417 20.6667L24.5417 20.6667Z" id="Polygon" fill="#B14716" fill-rule="evenodd" stroke="none" />
+      <path d="M20.6667 20.6667L19.375 19.375L18.0833 20.6667L18.7292 20.6667L18.7292 22.6042L20.0208 22.6042L20.0208 20.6667L20.6667 20.6667L20.6667 20.6667Z" id="Polygon#1" fill="#B14716" fill-rule="evenodd" stroke="none" />
+      <path d="M27.7708 7.75L3.22917 7.75L3.22917 5.16667C3.22917 4.45625 3.81042 3.875 4.52083 3.875L26.4792 3.875C27.1896 3.875 27.7708 4.45625 27.7708 5.16667L27.7708 7.75L27.7708 7.75L27.7708 7.75Z" id="Shape#1" fill="url(#gradient_3)" stroke="none" />
+    </g>
   </g>
 </svg>

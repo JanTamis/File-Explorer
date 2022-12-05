@@ -4,7 +4,6 @@ using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
 using System.IO;
 using System.IO.Enumeration;
-using System.Runtime.CompilerServices;
 
 namespace FileExplorer.Models;
 
@@ -23,12 +22,9 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	{
 		get
 		{
-			if (IsFolder)
+			if (IsFolder && Directory.Exists(GetPath()))
 			{
-				if (Directory.Exists(Path))
-				{
-					return new FileSystemEnumerable<FileSystemTreeItem>(Path, (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName, x.IsDirectory, this), Options);
-				}
+				return new FileSystemEnumerable<FileSystemTreeItem>(Path, (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName, x.IsDirectory, this), Options);
 			}
 
 			return Enumerable.Empty<FileSystemTreeItem>();
@@ -39,19 +35,14 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	{
 		get
 		{
-			if (IsFolder)
+			if (IsFolder && Directory.Exists(GetPath()))
 			{
-				if (Directory.Exists(Path))
+				var enumerable = new FileSystemEnumerable<byte>(Path, (ref FileSystemEntry _) => 0, Options)
 				{
-					var enumerable = new FileSystemEnumerable<byte>(Path, (ref FileSystemEntry _) => 0, Options)
-					{
-						ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
-					};
+					ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
+				};
 
-					return enumerable
-						.GetEnumerator()
-						.MoveNext();
-				}
+				return enumerable.Any();
 			}
 
 			return false;
@@ -72,14 +63,11 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	{
 		get
 		{
-			if (IsFolder)
+			if (IsFolder && Directory.Exists(Path))
 			{
-				if (Directory.Exists(Path))
-				{
-					var enumerable = new DelegateFileSystemEnumerator<byte>(Path, Options);
+				using var enumerable = new DelegateFileSystemEnumerator<byte>(Path, Options);
 
-					return enumerable.MoveNext();
-				}
+				return enumerable.MoveNext();
 			}
 
 			return false;
@@ -102,12 +90,12 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	{
 		var parent = this;
 
-		while (parent is { HasParent: true })
+		while (parent is { Parent: not null })
 		{
 			parent = parent.Parent;
 		}
 
-		return parent!;
+		return parent;
 	}
 
 	/// <summary>
@@ -160,50 +148,134 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 			RecurseSubdirectories = true,
 		};
 
-		var query = Directory.Exists(Path)
-			? new FileSystemEnumerable<bool>(Path, (ref FileSystemEntry _) => false, options)
-			: Enumerable.Empty<bool>();
+		if (Directory.Exists(Path))
+		{
+			return new FileSystemEnumerable<bool>(Path, (ref FileSystemEntry _) => false, options)
+				.Count();
+		}
 
-		return query.Count();
+		return 0;
 	}
 
-	public IEnumerable<FileSystemTreeItem> EnumerateChildren(uint layers = UInt32.MaxValue)
+	public IEnumerable<FileSystemTreeItem> EnumerateChildrenRecursive()
 	{
 		if (!IsFolder)
 		{
 			return Enumerable.Empty<FileSystemTreeItem>();
 		}
 
-		var enumerable = new FileSystemEnumerable<FileSystemTreeItem>(Path, (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this));
+		var path = _path ?? GetPath();
 
-		if (layers is 0)
+		if (!Directory.Exists(path))
 		{
-			return enumerable;
+			return Enumerable.Empty<FileSystemTreeItem>();
 		}
 
-		return enumerable.SelectMany(s => s.EnumerateChildren(layers - 1).Prepend(s));
+		var enumerable = new FileSystemEnumerable<FileSystemTreeItem>(path, (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this));
+
+		return enumerable.SelectMany(s => s.EnumerateChildrenRecursive().Prepend(s));
 	}
 
-	public IEnumerable<FileSystemTreeItem> EnumerateChildren(ReadOnlySpanFunc<char, bool> include, uint layers = UInt32.MaxValue)
+	public async IAsyncEnumerable<FileSystemTreeItem[]> EnumerateChildrenRecursiveAsync()
+	{
+		if (!IsFolder)
+		{
+			yield break;
+		}
+
+		var path = _path ?? GetPath();
+
+		if (!Directory.Exists(path))
+		{
+			yield break;
+		}
+
+		var task = Task.Factory.StartNew(x =>
+		{
+			if (x is FileSystemTreeItem item)
+			{
+				var enumerable = new FileSystemEnumerable<FileSystemTreeItem>(path, (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this));
+
+				return enumerable.ToArray();
+			}
+
+			return Array.Empty<FileSystemTreeItem>();
+		}, this);
+
+		yield return await task;
+
+		foreach (var item in task.Result)
+		{
+			await foreach (var child in item.EnumerateChildrenRecursiveAsync())
+			{
+				yield return child;
+			}
+		}
+	}
+
+	public IEnumerable<FileSystemTreeItem> EnumerateChildrenRecursive(ReadOnlySpanFunc<char, bool> include)
 	{
 		if (!IsFolder)
 		{
 			return Enumerable.Empty<FileSystemTreeItem>();
 		}
 
-		var enumerable = new FileSystemTreeItemEnumerable(new DelegateFileSystemEnumerator<FileSystemTreeItem>(Path, Options)
+		var path = _path ?? GetPath();
+
+		if (!Directory.Exists(path))
+		{
+			return Enumerable.Empty<FileSystemTreeItem>();
+		}
+
+		var enumerable = new FileSystemTreeItemEnumerable(new DelegateFileSystemEnumerator<FileSystemTreeItem>(path, Options)
+		{
+			Find = (ref FileSystemEntry entry) => entry.IsDirectory || include(entry.FileName),
+			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
+		});
+
+		return enumerable.SelectMany(s => s.EnumerateChildrenRecursive(include).Prepend(s));
+	}
+
+	public IEnumerable<FileSystemTreeItem> EnumerateChildren(ReadOnlySpanFunc<char, bool> include)
+	{
+		if (!IsFolder)
+		{
+			return Enumerable.Empty<FileSystemTreeItem>();
+		}
+
+		var path = _path ?? GetPath();
+
+		if (!Directory.Exists(path))
+		{
+			return Enumerable.Empty<FileSystemTreeItem>();
+		}
+
+		return new FileSystemTreeItemEnumerable(new DelegateFileSystemEnumerator<FileSystemTreeItem>(path, Options)
 		{
 			Find = (ref FileSystemEntry entry) => entry.IsDirectory || include(entry.FileName),
 
 			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
 		});
+	}
 
-		if (layers is 0)
+	public IEnumerable<FileSystemTreeItem> EnumerateChildren()
+	{
+		if (!IsFolder)
 		{
-			return enumerable;
+			return Enumerable.Empty<FileSystemTreeItem>();
 		}
 
-		return enumerable.SelectMany(s => s.EnumerateChildren(include, layers - 1).Prepend(s));
+		var path = _path ?? GetPath();
+
+		if (!Directory.Exists(path))
+		{
+			return Enumerable.Empty<FileSystemTreeItem>();
+		}
+
+		return new FileSystemTreeItemEnumerable(new DelegateFileSystemEnumerator<FileSystemTreeItem>(path, Options)
+		{
+			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
+		});
 	}
 
 	private string GetPath()
@@ -215,12 +287,28 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 
 	public T GetPath<T>(ReadOnlySpanFunc<char, T> action)
 	{
-		return action(Path);
+		if (_path is not null)
+		{
+			return action(Path);
+		}
+
+		Span<char> buffer = stackalloc char[GetPathLength()];
+		BuildPath(buffer, this);
+
+		return action(buffer);
 	}
 
 	public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
 	{
-		return action(Path, parameter);
+		if (_path is not null)
+		{
+			return action(Path, parameter);
+		}
+
+		Span<char> buffer = stackalloc char[GetPathLength()];
+		BuildPath(buffer, this);
+
+		return action(buffer, parameter);
 	}
 
 	public override string ToString()
@@ -284,9 +372,9 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 
 	private class FileSystemTreeItemEnumerable : IEnumerable<FileSystemTreeItem>
 	{
-		private readonly FileSystemEnumerator<FileSystemTreeItem> _enumerator;
+		private readonly DelegateFileSystemEnumerator<FileSystemTreeItem> _enumerator;
 
-		public FileSystemTreeItemEnumerable(FileSystemEnumerator<FileSystemTreeItem> enumerator)
+		public FileSystemTreeItemEnumerable(DelegateFileSystemEnumerator<FileSystemTreeItem> enumerator)
 		{
 			_enumerator = enumerator;
 		}
@@ -298,7 +386,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 
 		IEnumerator IEnumerable.GetEnumerator()
 		{
-			return _enumerator;
+			return GetEnumerator();
 		}
 	}
 }

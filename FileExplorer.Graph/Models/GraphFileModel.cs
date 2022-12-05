@@ -3,7 +3,7 @@ using Microsoft.Graph;
 
 namespace FileExplorer.Graph.Models
 {
-	public class GraphFileModel : IFileItem
+	public sealed class GraphFileModel : IFileItem
 	{
 		internal readonly DriveItem item;
 

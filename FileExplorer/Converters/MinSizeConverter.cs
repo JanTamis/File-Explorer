@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace FileExplorer.Converters;
 
-public class MinSizeConverter : IValueConverter
+public sealed class MinSizeConverter : IValueConverter
 {
 	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{

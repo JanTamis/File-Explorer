@@ -1,32 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="18" y1="0" x2="18" y2="12" id="gradient_1">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0.5290003" y1="10.472" x2="5.6" y2="5.3999996" id="gradient_1">
+      <stop offset="0%" stop-color="#3079D6" />
+      <stop offset="100%" stop-color="#297CD2" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="7.4999995" y1="-11.25" x2="7.4999995" y2="-3.75" id="gradient_2">
       <stop offset="23.299997%" stop-color="#41A5EE" />
       <stop offset="31.7%" stop-color="#3994DE" />
       <stop offset="56.199997%" stop-color="#2366B4" />
       <stop offset="75.1%" stop-color="#154A9B" />
       <stop offset="85.99999%" stop-color="#103F91" />
     </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="18" y1="0" x2="18" y2="12" id="gradient_2">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="7.4999995" y1="-3.75" x2="7.4999995" y2="3.75" id="gradient_3">
       <stop offset="23.299997%" stop-color="#E8457C" />
       <stop offset="27.2%" stop-color="#E14177" />
       <stop offset="53.7%" stop-color="#B32C59" />
       <stop offset="74.19999%" stop-color="#971E46" />
       <stop offset="85.99999%" stop-color="#8C193F" />
     </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="18" y1="0" x2="18" y2="12" id="gradient_3">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="7.4999995" y1="-18.75" x2="7.4999995" y2="-11.25" id="gradient_4">
       <stop offset="23.299997%" stop-color="#33C481" />
       <stop offset="32.5%" stop-color="#2EB173" />
       <stop offset="56.6%" stop-color="#228353" />
       <stop offset="75.2%" stop-color="#1B673F" />
       <stop offset="85.99999%" stop-color="#185C37" />
     </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="6" y1="0" x2="6" y2="35.999996" id="gradient_4">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="-7.5" y1="-3.75" x2="-7.5" y2="18.749996" id="gradient_5">
       <stop offset="3.9%" stop-color="#F8C819" />
       <stop offset="28.2%" stop-color="#AF4316" />
     </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="6" y1="0" x2="6" y2="30" id="gradient_5">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="-7.5" y1="-7.5000005" x2="-7.5" y2="11.249999" id="gradient_6">
       <stop offset="0%" stop-color="#EAAD29" />
       <stop offset="24.499998%" stop-color="#D98E24" />
       <stop offset="63.200005%" stop-color="#C0631C" />
@@ -35,7 +39,7 @@
       <stop offset="94.9%" stop-color="#943B13" />
       <stop offset="100%" stop-color="#8C3612" />
     </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="8" y1="0" x2="8" y2="11" id="gradient_6">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="-5" y1="-13.125001" x2="-5" y2="-6.2500005" id="gradient_7">
       <stop offset="61.3%" stop-color="#E6E6E6" />
       <stop offset="78.5%" stop-color="#E4E4E4" />
       <stop offset="85.7%" stop-color="#DDDDDD" />
@@ -48,17 +52,26 @@
       <use xlink:href="#path_1" />
     </clipPath>
   </defs>
-  <g id="Winrar-Icon">
+  <g id="File-Icon-2">
     <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
-    <path d="M6 18L42 18L42 30L6 30L6 18Z" id="Rectangle" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
-    <path d="M42 18L6 18L6 8C6 6.895 6.895 6 8 6L40 6C41.105 6 42 6.895 42 8L42 18L42 18Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
-    <path d="M40 42L8 42C6.895 42 6 41.105 6 40L6 30L42 30L42 40C42 41.105 41.105 42 40 42L40 42Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
-    <path d="M17 6L31 6L31 42L17 42L17 6Z" id="Rectangle" fill="#000000" fill-opacity="0.05" fill-rule="evenodd" stroke="none" />
-    <path d="M17.5 6L30.5 6L30.5 42L17.5 42L17.5 6Z" id="Rectangle" fill="#000000" fill-opacity="0.07" fill-rule="evenodd" stroke="none" />
-    <path d="M18 6L30 6L30 42L18 42L18 6Z" id="Rectangle" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
-    <path d="M24 12C20.686 12 18 14.686 18 18L18 42L30 42L30 18C30 14.686 27.314 12 24 12L24 12Z" id="Shape" fill="url(#gradient_5)" stroke="none" />
-    <path d="M20 32C19.27 32 18.59 31.8 18 31.45L18 32.59C18.61 32.85 19.29 33 20 33L28 33C28.71 33 29.39 32.85 30 32.59L30 31.45C29.41 31.8 28.73 32 28 32L20 32L20 32ZM29 22L29 28C29 28.55 28.55 29 28 29L26 29L26 27C26 25.9 25.1 25 24 25C22.9 25 22 25.9 22 27L22 29L20 29C19.45 29 19 28.55 19 28L19 22C19 21.45 18.55 21 18 21L18 28C18 29.1 18.9 30 20 30L23 30L23 27C23 26.45 23.45 26 24 26C24.55 26 25 26.45 25 27L25 30L28 30C29.1 30 30 29.1 30 28L30 21C29.45 21 29 21.45 29 22L29 22Z" id="Shape" fill="#000000" fill-opacity="0.05" fill-rule="evenodd" stroke="none" />
-    <path d="M29.5 22L29.5 28C29.5 28.83 28.83 29.5 28 29.5L25.5 29.5L25.5 27C25.5 26.17 24.83 25.5 24 25.5C23.17 25.5 22.5 26.17 22.5 27L22.5 29.5L20 29.5C19.17 29.5 18.5 28.83 18.5 28L18.5 22C18.5 21.72 18.28 21.5 18 21.5L18 28C18 29.1 18.9 30 20 30L23 30L23 27C23 26.45 23.45 26 24 26C24.55 26 25 26.45 25 27L25 30L28 30C29.1 30 30 29.1 30 28L30 21.5C29.72 21.5 29.5 21.72 29.5 22L29.5 22ZM20 32C19.27 32 18.59 31.8 18 31.45L18 32.03C18.6 32.33 19.28 32.5 20 32.5L28 32.5C28.72 32.5 29.4 32.33 30 32.03L30 31.45C29.41 31.8 28.73 32 28 32L20 32L20 32Z" id="Shape" fill="#000000" fill-opacity="0.07" fill-rule="evenodd" stroke="none" />
-    <path d="M32 23L32 28C32 30.2 30.2 32 28 32L20 32C17.8 32 16 30.2 16 28L16 23C16 21.895 16.895 21 18 21L18 21L18 28C18 29.105 18.895 30 20 30L23 30L23 27C23 26.448 23.448 26 24 26L24 26C24.552 26 25 26.448 25 27L25 30L28 30C29.105 30 30 29.105 30 28L30 21C31.1 21 32 21.9 32 23L32 23Z" id="Shape" fill="url(#gradient_6)" stroke="none" />
+    <g clip-path="url(#mask_1)">
+      <path d="M39 16L39 41C39 42.105 38.105 43 37 43L11 43C9.895 43 9 42.105 9 41L9 7C9 5.895 9.895 5 11 5L28 5L39 16L39 16Z" id="Shape" fill="#50E6FF" fill-rule="evenodd" stroke="none" />
+      <path d="M28 5L28 14C28 15.105 28.895 16 30 16L39 16L28 5L28 5Z" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+    </g>
+  </g>
+  <g id="svg" transform="translate(9 14)">
+    <g id="Winrar-Icon">
+      <path d="M0 0L30 0L30 30L0 30L0 0L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+      <path d="M3.75 11.25L26.25 11.25L26.25 18.75L3.75 18.75L3.75 11.25L3.75 11.25Z" id="Rectangle" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+      <path d="M26.25 11.25L3.75 11.25L3.75 5C3.75 4.30937 4.30937 3.75 5 3.75L25 3.75C25.6906 3.75 26.25 4.30937 26.25 5L26.25 11.25L26.25 11.25L26.25 11.25Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+      <path d="M25 26.25L5 26.25C4.30937 26.25 3.75 25.6906 3.75 25L3.75 18.75L26.25 18.75L26.25 25C26.25 25.6906 25.6906 26.25 25 26.25L25 26.25L25 26.25Z" id="Shape#1" fill="url(#gradient_4)" stroke="none" />
+      <path d="M10.625 3.75L19.375 3.75L19.375 26.25L10.625 26.25L10.625 3.75L10.625 3.75Z" id="Rectangle#1" fill="#000000" fill-opacity="0.050980393" fill-rule="evenodd" stroke="none" />
+      <path d="M10.9375 3.75L19.0625 3.75L19.0625 26.25L10.9375 26.25L10.9375 3.75L10.9375 3.75Z" id="Rectangle#2" fill="#000000" fill-opacity="0.07058824" fill-rule="evenodd" stroke="none" />
+      <path d="M11.25 3.75L18.75 3.75L18.75 26.25L11.25 26.25L11.25 3.75L11.25 3.75Z" id="Rectangle#3" fill="url(#gradient_5)" fill-rule="evenodd" stroke="none" />
+      <path d="M15 7.5C12.9288 7.5 11.25 9.17875 11.25 11.25L11.25 26.25L18.75 26.25L18.75 11.25C18.75 9.17875 17.0712 7.5 15 7.5L15 7.5L15 7.5Z" id="Shape#2" fill="url(#gradient_6)" stroke="none" />
+      <path d="M12.5 20C12.0438 20 11.6187 19.875 11.25 19.6562L11.25 20.3687C11.6313 20.5312 12.0563 20.625 12.5 20.625L17.5 20.625C17.9437 20.625 18.3687 20.5312 18.75 20.3687L18.75 19.6562C18.3813 19.875 17.9562 20 17.5 20L12.5 20L12.5 20L12.5 20ZM18.125 13.75L18.125 17.5C18.125 17.8438 17.8438 18.125 17.5 18.125L16.25 18.125L16.25 16.875C16.25 16.1875 15.6875 15.625 15 15.625C14.3125 15.625 13.75 16.1875 13.75 16.875L13.75 18.125L12.5 18.125C12.1562 18.125 11.875 17.8438 11.875 17.5L11.875 13.75C11.875 13.4062 11.5938 13.125 11.25 13.125L11.25 17.5C11.25 18.1875 11.8125 18.75 12.5 18.75L14.375 18.75L14.375 16.875C14.375 16.5312 14.6562 16.25 15 16.25C15.3438 16.25 15.625 16.5312 15.625 16.875L15.625 18.75L17.5 18.75C18.1875 18.75 18.75 18.1875 18.75 17.5L18.75 13.125C18.4062 13.125 18.125 13.4062 18.125 13.75L18.125 13.75L18.125 13.75Z" id="Shape#3" fill="#000000" fill-opacity="0.050980393" fill-rule="evenodd" stroke="none" />
+      <path d="M18.4375 13.75L18.4375 17.5C18.4375 18.0187 18.0187 18.4375 17.5 18.4375L15.9375 18.4375L15.9375 16.875C15.9375 16.3563 15.5188 15.9375 15 15.9375C14.4812 15.9375 14.0625 16.3563 14.0625 16.875L14.0625 18.4375L12.5 18.4375C11.9812 18.4375 11.5625 18.0187 11.5625 17.5L11.5625 13.75C11.5625 13.575 11.425 13.4375 11.25 13.4375L11.25 17.5C11.25 18.1875 11.8125 18.75 12.5 18.75L14.375 18.75L14.375 16.875C14.375 16.5312 14.6562 16.25 15 16.25C15.3438 16.25 15.625 16.5312 15.625 16.875L15.625 18.75L17.5 18.75C18.1875 18.75 18.75 18.1875 18.75 17.5L18.75 13.4375C18.575 13.4375 18.4375 13.575 18.4375 13.75L18.4375 13.75L18.4375 13.75ZM12.5 20C12.0438 20 11.6187 19.875 11.25 19.6562L11.25 20.0187C11.625 20.2063 12.05 20.3125 12.5 20.3125L17.5 20.3125C17.95 20.3125 18.375 20.2063 18.75 20.0187L18.75 19.6562C18.3813 19.875 17.9562 20 17.5 20L12.5 20L12.5 20L12.5 20Z" id="Shape#4" fill="#000000" fill-opacity="0.07058824" fill-rule="evenodd" stroke="none" />
+      <path d="M20 14.375L20 17.5C20 18.875 18.875 20 17.5 20L12.5 20C11.125 20 10 18.875 10 17.5L10 14.375C10 13.6844 10.5594 13.125 11.25 13.125L11.25 13.125L11.25 17.5C11.25 18.1906 11.8094 18.75 12.5 18.75L14.375 18.75L14.375 16.875C14.375 16.53 14.655 16.25 15 16.25L15 16.25C15.345 16.25 15.625 16.53 15.625 16.875L15.625 18.75L17.5 18.75C18.1906 18.75 18.75 18.1906 18.75 17.5L18.75 13.125C19.4375 13.125 20 13.6875 20 14.375L20 14.375L20 14.375Z" id="Shape#5" fill="url(#gradient_7)" stroke="none" />
+    </g>
   </g>
 </svg>

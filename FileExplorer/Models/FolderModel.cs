@@ -18,7 +18,7 @@ public sealed class FolderModel : IPathSegment
 	public Task<IImage?> Image => ThumbnailProvider.GetFileImage(TreeItem, 24);
 
 	public IEnumerable<IPathSegment> SubSegments => _folders ?? TreeItem?
-		.EnumerateChildren(0)
+		.EnumerateChildren()
 		.Where(w => w.IsFolder)
 		.Select(s => new FolderModel(s)) ?? Enumerable.Empty<IPathSegment>();
 

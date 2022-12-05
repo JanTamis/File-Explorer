@@ -6,7 +6,7 @@ using Humanizer;
 
 namespace FileExplorer.Converters;
 
-public class SizeConverter : IValueConverter
+public sealed class SizeConverter : IValueConverter
 {
 	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{

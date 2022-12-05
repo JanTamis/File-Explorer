@@ -4,7 +4,7 @@ using FileExplorer.ViewModels;
 
 namespace FileExplorer;
 
-public class ViewLocator : IDataTemplate
+public sealed class ViewLocator : IDataTemplate
 {
 	public bool SupportsRecycling => false;
 

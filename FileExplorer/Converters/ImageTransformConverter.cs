@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace FileExplorer.Converters;
 
-public class ImageTransformConverter : IValueConverter
+public sealed class ImageTransformConverter : IValueConverter
 {
 	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{

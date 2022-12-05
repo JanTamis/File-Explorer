@@ -3,11 +3,11 @@ using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using FileExplorer.Interfaces;
+using FileExplorer.Core.Interfaces;
 
 namespace FileExplorer.Popup;
 
-public partial class OneDriveLogin : UserControl, IPopup, INotifyPropertyChanged
+public sealed partial class OneDriveLogin : UserControl, IPopup, INotifyPropertyChanged
 {
 	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
 

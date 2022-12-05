@@ -4,11 +4,10 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
-using FileExplorer.Interfaces;
 
 namespace FileExplorer.Popup;
 
-public partial class Rename : UserControl, IPopup, INotifyPropertyChanged
+public sealed partial class Rename : UserControl, IPopup, INotifyPropertyChanged
 {
 	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
 

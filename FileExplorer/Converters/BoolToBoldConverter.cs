@@ -5,7 +5,7 @@ using FileExplorer.Interfaces;
 
 namespace FileExplorer.Converters;
 
-public class BoolToBoldConverter : IValueConverter, ISingleton<BoolToBoldConverter>
+public sealed class BoolToBoldConverter : IValueConverter, ISingleton<BoolToBoldConverter>
 {
 	public static readonly BoolToBoldConverter Instance = new();
 

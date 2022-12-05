@@ -6,7 +6,7 @@ using FileExplorer.Models;
 namespace FileExplorer.Controls;
 
 // https://wpf.2000things.com/2014/10/09/1176-custom-panel-part-viii/
-public class WeightedPanel : Panel
+public sealed class WeightedPanel : Panel
 {
 	public static AttachedProperty<double> WeightProperty = AvaloniaProperty.RegisterAttached<WeightedPanel, Control, double>("Weight", 0.0);
 
@@ -137,7 +137,7 @@ public class WeightedPanel : Panel
 	}
 }
 
-public class ChildAndRect
+public sealed class ChildAndRect
 {
 	public Control Element { get; set; }
 	public Rect Rectangle { get; set; }

@@ -11,7 +11,7 @@ using FileExplorer.ViewModels;
 
 namespace FileExplorer.Views;
 
-public class MainWindow : FluentWindow
+public sealed class MainWindow : FluentWindow
 {
 	public MainWindow()
 	{

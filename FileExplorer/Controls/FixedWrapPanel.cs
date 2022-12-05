@@ -3,11 +3,11 @@ using Avalonia.Layout;
 
 namespace FileExplorer.Controls
 {
-	public class FixedWrapPanel : UniformGridLayout
+	public sealed class FixedWrapPanel : UniformGridLayout
 	{
 		protected override Size ArrangeOverride(VirtualizingLayoutContext context, Size finalSize)
 		{
-			MinItemWidth = (int)(finalSize.Width / Math.Max(1, (int)(finalSize.Width / 175)));
+			MinItemWidth = Math.Floor(finalSize.Width / Math.Max(1, Math.Floor(finalSize.Width / 175)));
 
 			return base.ArrangeOverride(context, finalSize);
 		}

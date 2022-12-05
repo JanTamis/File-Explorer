@@ -8,14 +8,16 @@ using FileExplorer.Providers;
 using FileExplorer.Models;
 using FileExplorer.Core.Interfaces;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Svg.Skia;
+using CommunityToolkit.HighPerformance.Buffers;
 using FileExplorer.Core.Models;
 using Image = Avalonia.Controls.Image;
 
 namespace FileExplorer.ViewModels;
 
 [INotifyPropertyChanged]
-public partial class TabItemViewModel
+public sealed partial class TabItemViewModel
 {
 	private readonly Stack<IFileItem?> _undoStack = new();
 	private readonly Stack<IFileItem?> _redoStack = new();
@@ -75,7 +77,7 @@ public partial class TabItemViewModel
 			case MenuItemType.Button:
 				var source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/UIIcons/{s.Icon}.svg", null);
 
-				return new Button
+				var button = new Button
 				{
 					Classes = new Classes("Flat"),
 					Content = new Image
@@ -83,14 +85,34 @@ public partial class TabItemViewModel
 						Source = new SvgImage
 						{
 							Source = source,
-
 						},
 						Width = 30,
 						Height = 30,
-					} ,
+					},
 					Width = 40,
 					Height = 40,
 				};
+
+				if (s.Action is not null)
+				{
+					button.Click += delegate
+					{
+						var model = new MenuItemActionModel
+						{
+							Files = Files,
+							CurrentFolder = CurrentFolder,
+						};
+
+						s.Action(model);
+
+						if (model.Popup is not null)
+						{
+							PopupContent = model.Popup;
+						}
+					};
+				}
+
+				return button;
 			case MenuItemType.Separator:
 				return new Border
 				{
@@ -104,7 +126,7 @@ public partial class TabItemViewModel
 				throw new ArgumentOutOfRangeException();
 		}
 
-		return null;
+		throw new ArgumentOutOfRangeException();
 	});
 
 	public bool SearchFailed => !IsLoading && FileCount == 0;
@@ -163,6 +185,8 @@ public partial class TabItemViewModel
 
 	public async Task UpdateFiles(bool recursive, string search)
 	{
+		StringPool.Shared.Reset();
+
 		TokenSource?.Cancel();
 		TokenSource = new CancellationTokenSource();
 
@@ -178,42 +202,48 @@ public partial class TabItemViewModel
 
 			if (recursive)
 			{
-				try
+				if (Provider is FileSystemProvider)
+				{
+					var tempItems = Provider.GetItems(CurrentFolder, "*", false, TokenSource.Token)
+						.Select(s =>
+						{
+							var result = Enumerable.Empty<IFileItem>();
+
+							if (s.IsFolder)
+							{
+								result = Provider.GetItems(s, search, recursive, TokenSource.Token);
+							}
+
+							return result.Prepend(s);
+						});
+
+					await Files.AddRangeAsync(tempItems, TokenSource.Token);
+				}
+				else
 				{
 					await Files.AddRangeAsync(items, TokenSource.Token);
-				}
-				catch (Exception e)
-				{
-					Console.WriteLine(e);
 				}
 			}
 			else
 			{
-				try
+				await Files.AddRangeAsync(items, Comparer<IFileItem>.Create((x, y) =>
 				{
-					await Files.AddRangeAsync(items, Comparer<IFileItem>.Create((x, y) =>
+					switch (x, y)
 					{
-						switch (x, y)
-						{
-							case (null, null): return 0;
-							case (null, _): return -1;
-							case (_, null): return 1;
-						}
+						case (null, null): return 0;
+						case (null, _): return -1;
+						case (_, null): return 1;
+					}
 
-						var result = y.IsFolder.CompareTo(x.IsFolder);
+					var result = y.IsFolder.CompareTo(x.IsFolder);
 
-						if (result is 0)
-						{
-							result = String.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
-						}
+					if (result is 0)
+					{
+						result = String.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
+					}
 
-						return result;
-					}), TokenSource.Token);
-				}
-				catch (Exception e)
-				{
-					Console.WriteLine(e);
-				}
+					return result;
+				}), TokenSource.Token);
 			}
 		});
 
@@ -306,7 +336,7 @@ public partial class TabItemViewModel
 
 	partial void OnIsLoadingChanged(bool value)
 	{
-		GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
+		GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized, false, true);
 	}
 
 	partial void OnCurrentFolderChanged(IFileItem? value)

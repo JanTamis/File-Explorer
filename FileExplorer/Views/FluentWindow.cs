@@ -1,4 +1,6 @@
-﻿using Avalonia;
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Platform;
@@ -6,9 +8,11 @@ using Avalonia.Styling;
 
 namespace FileExplorer.Views;
 
-public partial class FluentWindow : Window, IStyleable
+public partial class FluentWindow : Window, IStyleable, INotifyPropertyChanged
 {
 	Type IStyleable.StyleKey => typeof(Window);
+
+	public Thickness TitleBarMargin { get; set; }
 
 	public FluentWindow()
 	{
@@ -25,24 +29,43 @@ public partial class FluentWindow : Window, IStyleable
 		PseudoClasses.Set(":windows", OperatingSystem.IsWindows());
 		PseudoClasses.Set(":macos", OperatingSystem.IsMacOS());
 		PseudoClasses.Set(":linux", OperatingSystem.IsLinux());
+
+		if (OperatingSystem.IsMacOS())
+		{
+			TitleBarMargin = new Thickness(70, 0, 0, 0);
+		}
 	}
 
-	public void Minimize()
+	protected override void HandleWindowStateChanged(WindowState state)
 	{
-		WindowState = WindowState.Minimized;
-	}
+		if (OperatingSystem.IsMacOS())
+		{
+			if (state is WindowState.FullScreen)
+			{
+				TitleBarMargin = default;
+			}
+			else
+			{
+				TitleBarMargin = new Thickness(70, 0, 0, 0);
+			}
 
-	public void ChangeState()
-	{
-		WindowState = WindowState is WindowState.Normal
-			? WindowState.Maximized
-			: WindowState.Normal;
+			OnPropertyChanged(nameof(TitleBarMargin));
+		}
+		
+		base.HandleWindowStateChanged(state);
 	}
 
 	protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
 	{
 		base.OnApplyTemplate(e);
 
-		ExtendClientAreaChromeHints =	ExtendClientAreaChromeHints.NoChrome;
+		ExtendClientAreaChromeHints =	ExtendClientAreaChromeHints.OSXThickTitleBar | ExtendClientAreaChromeHints.SystemChrome;
+	}
+
+	public new event PropertyChangedEventHandler? PropertyChanged;
+
+	private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+	{
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 }

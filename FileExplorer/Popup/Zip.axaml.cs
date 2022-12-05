@@ -6,12 +6,11 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using DialogHostAvalonia;
 using FileExplorer.Core.Interfaces;
-using FileExplorer.Interfaces;
 using FileExplorer.Models;
 
 namespace FileExplorer.Popup;
 
-public partial class Zip : UserControl, IPopup, INotifyPropertyChanged
+public sealed partial class Zip : UserControl, IPopup, INotifyPropertyChanged
 {
   private IEnumerable<IFileItem> _selectedFiles;
   public new event PropertyChangedEventHandler? PropertyChanged = delegate { };

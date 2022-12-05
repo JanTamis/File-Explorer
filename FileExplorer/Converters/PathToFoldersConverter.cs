@@ -5,7 +5,7 @@ using FileExplorer.Models;
 
 namespace FileExplorer.Converters;
 
-public class PathToFoldersConverter : IValueConverter
+public sealed class PathToFoldersConverter : IValueConverter
 {
 	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{

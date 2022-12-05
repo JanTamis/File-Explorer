@@ -9,16 +9,13 @@ using Microsoft.Graph;
 
 namespace FileExplorer.Graph;
 
-public class GraphItemProvider : IItemProvider
+public sealed class GraphItemProvider : IItemProvider
 {
 	private readonly GraphServiceClient _client;
-	private readonly HttpClient _httpClient;
 	private readonly MemoryCache _imageCache;
 
 	public GraphItemProvider(Func<string, Uri, CancellationToken, Task> getCode)
 	{
-		_httpClient = new HttpClient();
-
 		_imageCache = new MemoryCache(new MemoryCacheOptions
 		{
 			ExpirationScanFrequency = TimeSpan.FromMinutes(1),

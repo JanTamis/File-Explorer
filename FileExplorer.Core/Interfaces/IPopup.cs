@@ -1,4 +1,4 @@
-﻿namespace FileExplorer.Interfaces;
+﻿namespace FileExplorer.Core.Interfaces;
 
 public interface IPopup
 {

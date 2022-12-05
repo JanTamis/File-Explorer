@@ -1,8 +1,9 @@
-﻿using FileExplorer.Interfaces;
+﻿using FileExplorer.Core.Interfaces;
+using FileExplorer.Interfaces;
 
 namespace FileExplorer.Helpers;
 
-public readonly struct AsyncComparer<T> : IAsyncComparer<T>
+public class AsyncComparer<T> : IAsyncComparer<T>
 {
 	readonly AsyncComparison<T> comparison;
 

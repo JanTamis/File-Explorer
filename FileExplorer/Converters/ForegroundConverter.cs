@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace FileExplorer.Converters;
 
-public class ForegroundConverter : IValueConverter
+public sealed class ForegroundConverter : IValueConverter
 {
 	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{

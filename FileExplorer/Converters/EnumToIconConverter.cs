@@ -6,7 +6,7 @@ using FileExplorer.Interfaces;
 
 namespace FileExplorer.Converters;
 
-public class EnumToIconConverter : IValueConverter, ISingleton<EnumToIconConverter>
+public sealed class EnumToIconConverter : IValueConverter, ISingleton<EnumToIconConverter>
 {
 	public static readonly EnumToIconConverter Instance = new();
 	

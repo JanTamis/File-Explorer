@@ -7,7 +7,7 @@ using FileExplorer.Models;
 
 namespace FileExplorer.DisplayViews;
 
-public partial class Quickstart : UserControl, IFileViewer
+public sealed partial class Quickstart : UserControl, IFileViewer
 {
 	private IEnumerable<FileModel> RecentFiles
 	{

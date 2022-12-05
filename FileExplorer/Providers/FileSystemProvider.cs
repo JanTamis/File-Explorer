@@ -6,12 +6,14 @@ using Microsoft.Extensions.Caching.Memory;
 using System.IO;
 using System.IO.Enumeration;
 using System.Text.RegularExpressions;
-using Avalonia.Controls;
+using Avalonia.Threading;
 using FileExplorer.Core.Models;
+using FileExplorer.DisplayViews;
+using FileExplorer.Popup;
 
 namespace FileExplorer.Providers;
 
-public class FileSystemProvider : IItemProvider
+public sealed class FileSystemProvider : IItemProvider
 {
 	private readonly MemoryCache? _imageCache;
 
@@ -29,17 +31,22 @@ public class FileSystemProvider : IItemProvider
 	{
 		if (folder is FileModel model)
 		{
-			return model.TreeItem
-				.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name) || Regex.IsMatch(name, filter), recursive ? uint.MaxValue : 0)
-				.Select(s => new FileModel(s))
-				.ToAsyncEnumerable();
-		}
-		else if (folder is null && OperatingSystem.IsWindows())
-		{
-			return DriveInfo.GetDrives()
-				.Where(w => w.IsReady)
-				.Select(s => new FileSystemTreeItem(s.Name, true))
-				.SelectMany(s => s.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name) || Regex.IsMatch(name, filter), recursive ? uint.MaxValue : 0))
+			IEnumerable<FileSystemTreeItem> enumerable;
+
+			if (filter is "*" or "*.*")
+			{
+				enumerable = recursive
+					? model.TreeItem.EnumerateChildrenRecursive()
+					: model.TreeItem.EnumerateChildren();
+			}
+			else
+			{
+				enumerable = recursive
+					? model.TreeItem.EnumerateChildrenRecursive(name => FileSystemName.MatchesSimpleExpression(filter, name) || Regex.IsMatch(name, filter))
+					: model.TreeItem.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name) || Regex.IsMatch(name, filter));
+			}
+
+			return enumerable
 				.Select(s => new FileModel(s))
 				.ToAsyncEnumerable();
 		}
@@ -51,9 +58,22 @@ public class FileSystemProvider : IItemProvider
 	{
 		if (folder is FileModel model)
 		{
-			return model.TreeItem
-				.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name), recursive ? uint.MaxValue : 0)
-				.Select(s => new FileModel(s));
+			IEnumerable<FileSystemTreeItem> enumerable;
+			
+			if (filter is "*" or "*.*")
+			{
+				enumerable = recursive
+					? model.TreeItem.EnumerateChildrenRecursive()
+					: model.TreeItem.EnumerateChildren();
+			}
+			else
+			{
+				enumerable = recursive
+					? model.TreeItem.EnumerateChildrenRecursive(name => FileSystemName.MatchesSimpleExpression(filter, name)) // || Regex.IsMatch(name, filter))
+					: model.TreeItem.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name)); // || Regex.IsMatch(name, filter));
+			}
+			
+			return enumerable.Select(s => new FileModel(s));
 		}
 
 		return Enumerable.Empty<IFileItem>();
@@ -114,13 +134,84 @@ public class FileSystemProvider : IItemProvider
 
 	public IEnumerable<MenuItemModel> GetMenuItems(IFileItem item)
 	{
+		if (item is null)
+		{
+			yield break;
+		}
+
 		yield return new MenuItemModel(MenuItemType.Button, "Cut");
 		yield return new MenuItemModel(MenuItemType.Button, "Copy");
 		yield return new MenuItemModel(MenuItemType.Button, "Paste");
 		yield return new MenuItemModel(MenuItemType.Button, "Remove");
 		yield return new MenuItemModel(MenuItemType.Separator);
-		yield return new MenuItemModel(MenuItemType.Button, "Properties");
+		yield return new MenuItemModel(MenuItemType.Button, "Properties", x =>
+		{
+			x.Popup = new Properties
+			{
+				Provider = this,
+				Model = x.CurrentFolder,
+			};
+		});
 		yield return new MenuItemModel(MenuItemType.Button, "Zip");
 		yield return new MenuItemModel(MenuItemType.Separator);
+		yield return new MenuItemModel(MenuItemType.Button, "Analyze", x =>
+		{
+			var analyzer = new AnalyzerView();
+			var path = x.CurrentFolder.GetPath(x => x.ToString());
+			var tokenSource = new CancellationTokenSource();
+
+			var options = FileSystemTreeItem.Options;
+
+			var folderQuery = new FileSystemEnumerable<FileIndexModel>(path, (ref FileSystemEntry x) => new FileIndexModel(PathHelper.FromPath(x.ToFullPath())), options)
+			{
+				ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
+			};
+
+			ThreadPool.QueueUserWorkItem(async x =>
+			{
+				var query = folderQuery; //.Concat(fileQuery);
+
+				var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
+				{
+					var resultX = x.TaskSize;
+					var resultY = y.TaskSize;
+
+					Task.WhenAll(resultX, resultY);
+
+					return resultY.Result.CompareTo(resultX.Result);
+				});
+
+				await analyzer.Root.AddRangeAsyncComparer<AsyncComparer<FileIndexModel>>(query, token: tokenSource.Token);
+			});
+
+			// ThreadPool.QueueUserWorkItem(async x =>
+			// {
+			// 	var options = new EnumerationOptions()
+			// 	{
+			// 		IgnoreInaccessible = true,
+			// 		AttributesToSkip = FileAttributes.System,
+			// 		RecurseSubdirectories = true,
+			// 	};
+			//
+			// 	var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(path, (ref FileSystemEntry y) => (Path.GetExtension(y.FileName).ToString(), y.Length), options)
+			// 		{
+			// 			ShouldIncludePredicate = (ref FileSystemEntry z) => !z.IsDirectory,
+			// 		}
+			// 		.Where(w => !String.IsNullOrEmpty(w.Extension))
+			// 		.GroupBy(g => g.Extension)
+			// 		.Where(w => tokenSource?.IsCancellationRequested != true);
+			//
+			// 	var comparer = new ExtensionModelComparer();
+			//
+			// 	analyzer.Extensions.AddRange(extensionQuery.Select(s => new ExtensionModel(s.Key, s.Sum(s => s.Size))
+			// 	{
+			// 		TotalFiles = s.Count(),
+			// 	}), comparer);
+			// });
+
+			// analyzer.OnClose += tokenSource.Cancel;
+
+			x.Popup = analyzer;
+		});
 	}
 }

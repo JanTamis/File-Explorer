@@ -1,17 +1,18 @@
 ﻿using Humanizer;
 using System.Collections.Concurrent;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Enumeration;
-using CommunityToolkit.Mvvm.ComponentModel;
+using System.Runtime.CompilerServices;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
+using CommunityToolkit.HighPerformance.Helpers;
 
 namespace FileExplorer.Models;
 
-[INotifyPropertyChanged]
-public sealed partial class FileModel : IFileItem
+public sealed class FileModel : IFileItem, INotifyPropertyChanged
 {
-	public static readonly ConcurrentBag<FileModel> FileImageQueue = new();
 	public FileSystemTreeItem TreeItem { get; }
 
 	private string? _name;
@@ -20,27 +21,36 @@ public sealed partial class FileModel : IFileItem
 
 	private DateTime _editedOn;
 
-	[ObservableProperty]
 	private bool _isVisible = true;
-
-	[ObservableProperty]
 	private bool _isSelected;
+
+	public bool IsVisible
+	{
+		get => _isVisible;
+		set => SetProperty(ref _isVisible, value);
+	}
+
+	public bool IsSelected
+	{
+		get => _isSelected;
+		set => SetProperty(ref _isSelected, value);
+	}
 
 	public string? ExtensionName { get; set; }
 
-	public bool IsRoot => TreeItem.HasParent;
+	public bool IsRoot => !TreeItem.HasParent;
 
-	public string Path => TreeItem.GetPath(path => path.ToString());
+	public string Path => TreeItem.Path;
 
 	public string Name
 	{
 		get => TreeItem.IsFolder
 			? TreeItem.Value
-			: TreeItem.GetPath(path => System.IO.Path.GetFileNameWithoutExtension(path).ToString());
+			: _name ??= System.IO.Path.GetFileNameWithoutExtension(TreeItem.Value);
 		set
 		{
 			TreeItem.Value = value;
-
+			
 			try
 			{
 				var path = Path;
@@ -70,7 +80,7 @@ public sealed partial class FileModel : IFileItem
 		}
 	}
 
-	public string Extension => _extension ??= !IsFolder
+	public string Extension =>_extension ??= !IsFolder
 		? System.IO.Path.GetExtension(TreeItem.Value)
 		: String.Empty;
 
@@ -88,46 +98,43 @@ public sealed partial class FileModel : IFileItem
 	}
 
 	public long TotalSize => IsFolder
-		? TreeItem.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions
+		? new FileSystemEnumerable<long>(Path, (ref FileSystemEntry x) => x.Length, new EnumerationOptions
 			{
 				RecurseSubdirectories = true,
 				IgnoreInaccessible = true,
 				AttributesToSkip = FileSystemTreeItem.Options.AttributesToSkip,
-			})).Sum()
+			}).Sum()
 		: Size;
 
 	public bool IsFolder => TreeItem.IsFolder;
 
-	public Task<string> SizeFromTask => Task.Run(() =>
+	public Task<string> SizeFromTask => Task.Factory.StartNew(x =>
 	{
-		var size = TreeItem.GetPath((path, state) =>
-		{
-			var result = 0L;
+		var file = x as FileModel;
+		var path = file!.TreeItem.Path;
+		var result = 0L;
 
-			if (!state.IsFolder)
-			{
-				result = state.Size;
-			}
-			else if (path[^1] == PathHelper.DirectorySeparator && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
-			{
-				result = info.TotalSize - info.TotalFreeSpace;
-			}
-			else if (state.IsFolder)
-			{
-				var query = new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length,
-					new EnumerationOptions { RecurseSubdirectories = true })
+		if (!file.IsFolder)
+		{
+			result = file.Size;
+		}
+		else if (path[^1] == PathHelper.DirectorySeparator && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
+		{
+			result = info.TotalSize - info.TotalFreeSpace;
+		}
+		else if (file.IsFolder)
+		{
+			var query = new FileSystemEnumerable<long>(path, (ref FileSystemEntry x) => x.Length,
+				new EnumerationOptions { RecurseSubdirectories = true })
 				{
-					ShouldIncludePredicate = (ref FileSystemEntry x) => !x.IsDirectory,
+					ShouldIncludePredicate = (ref FileSystemEntry y) => !y.IsDirectory,
 				};
 
-				result = query.Sum();
-			}
+			result = query.Sum();
+		}
 
-			return result;
-		}, this);
-
-		return size.Bytes().ToString();
-	});
+		return result.Bytes().ToString();
+	}, this);
 
 	public DateTime EditedOn
 	{
@@ -135,14 +142,9 @@ public sealed partial class FileModel : IFileItem
 		{
 			if (_editedOn == default)
 			{
-				if (!IsFolder)
-				{
-					_editedOn = File.GetLastWriteTime(Path);
-				}
-				else
-				{
-					_editedOn = Directory.GetLastWriteTime(Path);
-				}
+				_editedOn = IsFolder
+					? Directory.GetLastWriteTime(Path)
+					: File.GetLastWriteTime(Path);
 			}
 
 			return _editedOn;
@@ -166,6 +168,25 @@ public sealed partial class FileModel : IFileItem
 
 	public override int GetHashCode()
 	{
-		return GetPath(String.GetHashCode);
+		return GetPath(HashCode<char>.Combine);
+	}
+
+	private bool SetProperty<T>([NotNullIfNotNull("newValue")] ref T field, T newValue, [CallerMemberName] string? propertyName = null)
+	{
+		if (EqualityComparer<T>.Default.Equals(field, newValue))
+		{
+			return false;
+		}
+
+		field = newValue;
+		OnPropertyChanged(propertyName);
+		return true;
+	}
+
+	public event PropertyChangedEventHandler? PropertyChanged;
+
+	private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+	{
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 }

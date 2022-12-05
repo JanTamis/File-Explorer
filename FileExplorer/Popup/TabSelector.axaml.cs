@@ -3,12 +3,12 @@ using Avalonia.Markup.Xaml;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using FileExplorer.Core.Helpers;
-using FileExplorer.Interfaces;
+using FileExplorer.Core.Interfaces;
 using FileExplorer.ViewModels;
 
 namespace FileExplorer.Popup;
 
-public partial class TabSelector : UserControl, IPopup, INotifyPropertyChanged
+public sealed partial class TabSelector : UserControl, IPopup, INotifyPropertyChanged
 {
 	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
 

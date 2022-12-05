@@ -5,7 +5,7 @@ using System.Globalization;
 
 namespace FileExplorer.Converters
 {
-	public class WindowStateToIconConverter : IValueConverter
+	public sealed class WindowStateToIconConverter : IValueConverter
 	{
 		public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 		{

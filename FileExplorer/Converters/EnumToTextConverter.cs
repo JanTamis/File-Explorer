@@ -5,7 +5,7 @@ using Humanizer;
 
 namespace FileExplorer.Converters;
 
-public class EnumToTextConverter : IValueConverter, ISingleton<EnumToTextConverter>
+public sealed class EnumToTextConverter : IValueConverter, ISingleton<EnumToTextConverter>
 {
 	public static readonly EnumToTextConverter Instance = new();
 

@@ -3,11 +3,11 @@ using Avalonia.Markup.Xaml;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using DialogHostAvalonia;
-using FileExplorer.Interfaces;
+using FileExplorer.Core.Interfaces;
 
 namespace FileExplorer.Popup;
 
-public partial class Choice : UserControl, IPopup, INotifyPropertyChanged
+public sealed partial class Choice : UserControl, IPopup, INotifyPropertyChanged
 {
 	private string _submitText;
 	private string _closeText;

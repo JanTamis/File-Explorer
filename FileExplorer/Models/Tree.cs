@@ -2,7 +2,7 @@
 
 namespace FileExplorer.Helpers;
 
-public class Tree<TTreeItem, TValue> where TTreeItem : class, ITreeItem<TValue, TTreeItem>
+public sealed class Tree<TTreeItem, TValue> where TTreeItem : class, ITreeItem<TValue, TTreeItem>
 {
 	public List<TTreeItem> Children { get; }
 
@@ -48,7 +48,7 @@ public class Tree<TTreeItem, TValue> where TTreeItem : class, ITreeItem<TValue, 
 
 			if (layers > 0)
 			{
-				foreach (var childOfChild in Children[i].EnumerateChildren(layers - 1))
+				foreach (var childOfChild in Children[i].EnumerateChildrenRecursive())
 				{
 					yield return childOfChild;
 				}
@@ -71,7 +71,7 @@ public class Tree<TTreeItem, TValue> where TTreeItem : class, ITreeItem<TValue, 
 		{
 			yield return Children[i];
 
-			foreach (var childOfChild in Children[i].EnumerateChildren())
+			foreach (var childOfChild in Children[i].EnumerateChildrenRecursive())
 			{
 				yield return childOfChild;
 			}

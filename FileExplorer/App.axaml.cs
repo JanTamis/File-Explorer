@@ -11,7 +11,7 @@ using Material.Styles.Themes.Base;
 
 namespace FileExplorer;
 
-public partial class App : Application
+public sealed partial class App : Application
 {
 	public static MainWindowViewModel? MainViewModel { get; set; }
 	public static Container Container { get; } = new Container();

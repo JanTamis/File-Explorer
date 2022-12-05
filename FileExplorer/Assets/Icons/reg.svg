@@ -1,21 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+<svg width="60px" height="60px" viewBox="0 0 60 60" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
   <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0.5290003" y1="10.472" x2="5.6" y2="5.3999996" id="gradient_1">
+      <stop offset="0%" stop-color="#3079D6" />
+      <stop offset="100%" stop-color="#297CD2" />
+    </linearGradient>
     <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
     <clipPath id="mask_1">
       <use xlink:href="#path_1" />
     </clipPath>
   </defs>
-  <g id="Registry-Editor-Icon">
+  <g id="File-Icon-2" transform="translate(6 4)">
     <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
-    <path d="M15 23L6 23L6 15C6 14.4 6.4 14 7 14L14 14C14.6 14 15 14.4 15 15L15 23L15 23Z" id="Shape" fill="#37C6D0" stroke="none" />
-    <path d="M15 41L7 41C6.4 41 6 40.6 6 40L6 32L15 32L15 41L15 41Z" id="Shape" fill="#37C6D0" stroke="none" />
-    <path d="M32 41L24 41L24 32L32 32C32.6 32 33 32.4 33 33L33 40C33 40.6 32.6 41 32 41L32 41Z" id="Shape" fill="#37C6D0" stroke="none" />
-    <path d="M6 23L15 23L15 32L6 32L6 23Z" id="Rectangle" fill="#1A9BA1" fill-rule="evenodd" stroke="none" />
-    <path d="M15 32L24 32L24 41L15 41L15 32Z" id="Rectangle" fill="#1A9BA1" fill-rule="evenodd" stroke="none" />
-    <path d="M24 32L15 32L15 23L23 23C23.6 23 24 23.4 24 24L24 32L24 32Z" id="Shape" fill="#37C6D0" stroke="none" />
-    <path d="M41 15L34 15C33.4 15 33 14.6 33 14L33 7C33 6.4 33.4 6 34 6L41 6C41.6 6 42 6.4 42 7L42 14C42 14.6 41.6 15 41 15L41 15Z" id="Shape" fill="#37C6D0" stroke="none" />
-    <path d="M22.8 19.2L17.9 14.3C17.5 13.9 17.5 13.3 17.9 12.9L22.8 8C23.2 7.6 23.8 7.6 24.2 8L29.1 12.9C29.5 13.3 29.5 13.9 29.1 14.3L24.2 19.2C23.8 19.5 23.2 19.5 22.8 19.2L22.8 19.2Z" id="Shape" fill="#37C6D0" stroke="none" />
-    <path d="M41.1 26.8L34.4 28.8C33.9 29 33.3 28.7 33.2 28.1L31.2 21.4C31 20.9 31.3 20.3 31.9 20.2L38.6 18.2C39.1 18 39.7 18.3 39.8 18.9L41.8 25.6C42 26.1 41.7 26.7 41.1 26.8L41.1 26.8Z" id="Shape" fill="#37C6D0" stroke="none" />
+    <path d="M39 16L39 41C39 42.105 38.105 43 37 43L11 43C9.895 43 9 42.105 9 41L9 7C9 5.895 9.895 5 11 5L28 5L39 16L39 16Z" id="Shape" fill="#50E6FF" stroke="none" />
+    <path d="M28 5L28 14C28 15.105 28.895 16 30 16L39 16L28 5L28 5Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+  </g>
+  <g id="svg-2" transform="translate(15 18)" style="mix-blend-mode: multiply;">
+    <g id="Registry-Editor-Icon">
+      <path d="M0 0L30 0L30 30L0 30L0 0L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
+      <path d="M9.375 14.375L3.75 14.375L3.75 9.37499C3.75 8.99999 4 8.74999 4.375 8.74999L8.75 8.74999C9.125 8.74999 9.375 8.99999 9.375 9.37499L9.375 14.375L9.375 14.375L9.375 14.375Z" id="Shape" fill="#37C6D0" stroke="none" />
+      <path d="M9.375 25.625L4.375 25.625C4 25.625 3.75 25.375 3.75 25L3.75 20L9.375 20L9.375 25.625L9.375 25.625L9.375 25.625Z" id="Shape#1" fill="#37C6D0" stroke="none" />
+      <path d="M20 25.625L15 25.625L15 20L20 20C20.375 20 20.625 20.25 20.625 20.625L20.625 25C20.625 25.375 20.375 25.625 20 25.625L20 25.625L20 25.625Z" id="Shape#2" fill="#37C6D0" stroke="none" />
+      <path d="M3.75 14.375L9.375 14.375L9.375 20L3.75 20L3.75 14.375L3.75 14.375Z" id="Rectangle" fill="#1A9BA1" fill-rule="evenodd" stroke="none" />
+      <path d="M9.375 20L15 20L15 25.625L9.375 25.625L9.375 20L9.375 20Z" id="Rectangle#1" fill="#1A9BA1" fill-rule="evenodd" stroke="none" />
+      <path d="M15 20L9.375 20L9.375 14.375L14.375 14.375C14.75 14.375 15 14.625 15 15L15 20L15 20L15 20Z" id="Shape#3" fill="#37C6D0" stroke="none" />
+      <path d="M25.625 9.375L21.25 9.375C20.875 9.375 20.625 9.125 20.625 8.75L20.625 4.375C20.625 4 20.875 3.75 21.25 3.75L25.625 3.75C26 3.75 26.25 4 26.25 4.375L26.25 8.75C26.25 9.125 26 9.375 25.625 9.375L25.625 9.375L25.625 9.375Z" id="Shape#4" fill="#37C6D0" stroke="none" />
+      <path d="M14.25 12L11.1875 8.9375C10.9375 8.6875 10.9375 8.3125 11.1875 8.0625L14.25 5C14.5 4.75 14.875 4.75 15.125 5L18.1875 8.0625C18.4375 8.3125 18.4375 8.6875 18.1875 8.9375L15.125 12C14.875 12.1875 14.5 12.1875 14.25 12L14.25 12L14.25 12Z" id="Shape#5" fill="#37C6D0" stroke="none" />
+      <path d="M25.6875 16.75L21.5 18C21.1875 18.125 20.8125 17.9375 20.75 17.5625L19.5 13.375C19.375 13.0625 19.5625 12.6875 19.9375 12.625L24.125 11.375C24.4375 11.25 24.8125 11.4375 24.875 11.8125L26.125 16C26.25 16.3125 26.0625 16.6875 25.6875 16.75L25.6875 16.75L25.6875 16.75Z" id="Shape#6" fill="#37C6D0" stroke="none" />
+    </g>
   </g>
 </svg>

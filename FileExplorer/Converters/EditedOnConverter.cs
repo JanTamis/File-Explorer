@@ -5,7 +5,7 @@ using Humanizer;
 
 namespace FileExplorer.Converters;
 
-public class EditedOnConverter : IValueConverter
+public sealed class EditedOnConverter : IValueConverter
 {
 	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{

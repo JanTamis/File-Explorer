@@ -3,7 +3,7 @@ using Avalonia.Data.Converters;
 
 namespace FileExplorer.Converters;
 
-public class EnumToValuesConverter : IValueConverter
+public sealed class EnumToValuesConverter : IValueConverter
 {
 	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{

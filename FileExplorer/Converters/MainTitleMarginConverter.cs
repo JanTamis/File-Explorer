@@ -4,7 +4,7 @@ using Avalonia.Data.Converters;
 
 namespace FileExplorer.Converters;
 
-public class MainTitleMarginConverter : IValueConverter
+public sealed class MainTitleMarginConverter : IValueConverter
 {
 	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{

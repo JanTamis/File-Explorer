@@ -6,7 +6,7 @@ using System.Runtime.Intrinsics.X86;
 
 namespace FileExplorer.Helpers;
 
-public class SolidColorBrushTransition : Transition<IBrush>
+public sealed class SolidColorBrushTransition : Transition<IBrush>
 {
 	public override IObservable<IBrush> DoTransition(IObservable<double> progress, IBrush oldValue, IBrush newValue)
 	{

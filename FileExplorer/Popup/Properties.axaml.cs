@@ -10,12 +10,11 @@ using DialogHostAvalonia;
 using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
-using FileExplorer.Interfaces;
 using FileExplorer.Models;
 
 namespace FileExplorer.Popup;
 
-public partial class Properties : UserControl, IPopup, INotifyPropertyChanged
+public sealed partial class Properties : UserControl, IPopup, INotifyPropertyChanged
 {
 	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
 
@@ -58,7 +57,7 @@ public partial class Properties : UserControl, IPopup, INotifyPropertyChanged
 	public IFileItem Model
 	{
 		get => _model;
-		set
+		init
 		{
 			OnPropertyChanged(ref _model, value);
 			Path = Model.GetPath(path => path.ToString());
@@ -72,20 +71,16 @@ public partial class Properties : UserControl, IPopup, INotifyPropertyChanged
 				_size = 0;
 				OnPropertyChanged(nameof(Size));
 
-				Task.Run(() =>
+				Task.Run(async () =>
 				{
-					var enumerable = _model.GetPath(path => new FileSystemEnumerable<long>(path.ToString(), (ref FileSystemEntry x) => x.Length, new EnumerationOptions
-					{
-						RecurseSubdirectories = true,
-						IgnoreInaccessible = true,
-						AttributesToSkip = FileSystemTreeItem.Options.AttributesToSkip,
-					}));
 
-					var watch = Stopwatch.StartNew();
+					var enumerable = Provider.GetItemsAsync(value, "*", true, default);
+
+					var timestamp = Stopwatch.GetTimestamp();
 
 					_source = new CancellationTokenSource();
 						
-					foreach (var child in enumerable)
+					await foreach (var child in enumerable)
 					{
 						if (_source.IsCancellationRequested)
 						{
@@ -93,13 +88,13 @@ public partial class Properties : UserControl, IPopup, INotifyPropertyChanged
 							break;
 						}
 
-						_size += child;
+						_size += child.Size;
 
-						if (watch.ElapsedMilliseconds > 50)
+						if (Stopwatch.GetElapsedTime(timestamp).TotalMilliseconds > 50)
 						{
 							OnPropertyChanged(nameof(Size));
 
-							watch.Restart();
+							timestamp = Stopwatch.GetTimestamp();
 						}
 					}
 				});	

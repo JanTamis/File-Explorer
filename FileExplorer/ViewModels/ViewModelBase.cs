@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace FileExplorer.ViewModels;
 
-public class ViewModelBase : INotifyPropertyChanged
+public sealed class ViewModelBase : INotifyPropertyChanged
 {
 	public event PropertyChangedEventHandler PropertyChanged = delegate { };
 

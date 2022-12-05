@@ -1,8 +1,6 @@
-﻿using System.Collections.Concurrent;
-using Avalonia.Media;
+﻿using Avalonia.Media;
 using Avalonia.Svg.Skia;
 using System.IO;
-using System.Reflection;
 using Avalonia.Threading;
 using Avalonia.Media.Imaging;
 using System.Diagnostics.CodeAnalysis;
@@ -18,7 +16,7 @@ public static class ThumbnailProvider
 	// private static readonly Dictionary<string, string>? fileTypes = OperatingSystem.IsWindows() ? RegisteredFileType.GetFileTypeAndIcon() : new();
 
 	private static readonly Dictionary<string, IImage> Images = new();
-	private static readonly ConcurrentDictionary<string, string[]> TypeMap = new();
+	// private static readonly ConcurrentDictionary<string, string[]> TypeMap = new();
 
 	public static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default, Environment.ProcessorCount / 2); // BitOperations.Log2((uint)Environment.ProcessorCount));
 

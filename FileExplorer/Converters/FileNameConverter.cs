@@ -5,7 +5,7 @@ using FileExplorer.Models;
 
 namespace FileExplorer.Converters;
 
-public class FileNameConverter : IValueConverter
+public sealed class FileNameConverter : IValueConverter
 {
 	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{

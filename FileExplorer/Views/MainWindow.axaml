@@ -63,6 +63,7 @@
 			      Margin="{Binding #MainWindow.TitleBarMargin}">
 				<StackPanel Orientation="Horizontal">
 					<TabStrip Items="{Binding Tabs}"
+					          Margin="{Binding}"
 					          SelectedItem="{Binding CurrentTab}">
 						<TabStrip.ItemsPanel>
 							<ItemsPanelTemplate>
@@ -188,6 +189,27 @@
 				            Orientation="Horizontal">
 					<Button Classes="Flat"
 					        Width="40"
+					        assist:ShadowAssist.ShadowDepth="Depth0"
+					        Padding="0"
+					        Background="Transparent"
+					        Margin="0">
+						<ToolTip.Tip>
+							<ListBox SelectedItem="{Binding CurrentTab}"
+							         Items="{Binding Tabs}">
+								<ListBox.ItemTemplate>
+									<DataTemplate>
+											<TextBlock Text="{Binding FolderName}" />
+									</DataTemplate>
+								</ListBox.ItemTemplate>
+							</ListBox>
+						</ToolTip.Tip>
+						<material:MaterialIcon Kind="Tab"
+						                       Height="20"
+						                       Width="20"
+						                       Foreground="{DynamicResource MaterialDesignBody}" />
+					</Button>
+					<Button Classes="Flat"
+					        Width="40"
 					        Command="{Binding ShowSettings}"
 					        assist:ShadowAssist.ShadowDepth="Depth0"
 					        Padding="0"
@@ -196,50 +218,6 @@
 						<material:MaterialIcon Kind="SettingsOutline"
 						                       Height="20"
 						                       Width="20"
-						                       Foreground="{DynamicResource MaterialDesignBody}" />
-					</Button>
-					<Button Classes="Flat"
-					        Width="40"
-					        Command="{Binding ElementName=MainWindow, Path=Minimize}"
-					        assist:ShadowAssist.ShadowDepth="Depth0"
-					        Padding="0"
-					        Background="Transparent"
-					        Margin="0">
-						<material:MaterialIcon Kind="Minimize"
-						                       Height="25"
-						                       Width="25"
-						                       Margin="0"
-						                       Foreground="{DynamicResource MaterialDesignBody}" />
-					</Button>
-
-					<Button Width="40"
-					        Classes="Flat"
-					        Command="{Binding ElementName=MainWindow, Path=ChangeState}"
-					        assist:ShadowAssist.ShadowDepth="Depth0"
-					        Padding="0"
-					        Background="Transparent"
-					        Margin="0">
-						<Panel>
-							<material:MaterialIcon
-								Kind="{Binding ElementName=MainWindow, Path=WindowState, Converter={StaticResource windowStateToIconConverter}}"
-								Height="25"
-								Width="25"
-								Margin="0"
-								Foreground="{DynamicResource MaterialDesignBody}" />
-						</Panel>
-					</Button>
-
-					<Button Width="40"
-					        Classes="Flat"
-					        Command="{Binding ElementName=MainWindow, Path=Close}"
-					        assists:ButtonAssist.ClickFeedbackColor="Red"
-					        assist:ShadowAssist.ShadowDepth="Depth0"
-					        Padding="0"
-					        Background="Transparent"
-					        Margin="0">
-						<material:MaterialIcon Kind="Close"
-						                       Height="25"
-						                       Width="25"
 						                       Foreground="{DynamicResource MaterialDesignBody}" />
 					</Button>
 				</StackPanel>

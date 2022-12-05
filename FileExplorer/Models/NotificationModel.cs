@@ -2,7 +2,7 @@
 
 namespace FileExplorer.Models;
 
-public class NotificationModel : INotification
+public sealed class NotificationModel : INotification
 {
 	public string Title { get; set; }
 

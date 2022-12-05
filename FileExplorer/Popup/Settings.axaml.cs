@@ -2,13 +2,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
-using FileExplorer.Interfaces;
+using FileExplorer.Core.Interfaces;
 using Material.Styles.Themes;
 using Material.Styles.Themes.Base;
 
 namespace FileExplorer.Popup;
 
-public partial class Settings : UserControl, IPopup
+public sealed partial class Settings : UserControl, IPopup
 {
 	public bool HasShadow => true;
 	public bool HasToBeCanceled => false;
