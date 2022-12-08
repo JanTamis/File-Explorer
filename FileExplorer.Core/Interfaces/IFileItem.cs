@@ -15,6 +15,7 @@ public interface IFileItem
 
 	public bool IsVisible { get; set; }
 
+	string GetPath();
 	T GetPath<T>(ReadOnlySpanFunc<char, T> action);
 	T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter);
 }

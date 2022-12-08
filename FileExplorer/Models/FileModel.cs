@@ -156,6 +156,11 @@ public sealed class FileModel : IFileItem, INotifyPropertyChanged
 		TreeItem = item;
 	}
 
+	public string GetPath()
+	{
+		return TreeItem.GetPath();
+	}
+
 	public T GetPath<T>(ReadOnlySpanFunc<char, T> action)
 	{
 		return TreeItem.GetPath(action);

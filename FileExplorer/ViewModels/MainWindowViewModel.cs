@@ -46,7 +46,6 @@ namespace FileExplorer.ViewModels
 
 		public ObservableRangeCollection<TabItemViewModel> Tabs { get; } = new();
 
-
 		public MainWindowViewModel(WindowNotificationManager manager)
 		{
 			notificationManager = manager;

@@ -6,16 +6,21 @@ using Microsoft.Extensions.Caching.Memory;
 using System.IO;
 using System.IO.Enumeration;
 using System.Text.RegularExpressions;
-using Avalonia.Threading;
+using Avalonia.Svg;
+using DialogHostAvalonia;
 using FileExplorer.Core.Models;
 using FileExplorer.DisplayViews;
 using FileExplorer.Popup;
+using Directory = System.IO.Directory;
+using File = System.IO.File;
 
 namespace FileExplorer.Providers;
 
 public sealed class FileSystemProvider : IItemProvider
 {
 	private readonly MemoryCache? _imageCache;
+
+	private IFileItem[]? clipboard;
 
 	public FileSystemProvider()
 	{
@@ -132,17 +137,81 @@ public sealed class FileSystemProvider : IItemProvider
 		return ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested && item.IsVisible);
 	}
 
-	public IEnumerable<MenuItemModel> GetMenuItems(IFileItem item)
+	public IEnumerable<MenuItemModel> GetMenuItems(IFileItem? item)
 	{
 		if (item is null)
 		{
 			yield break;
 		}
 
-		yield return new MenuItemModel(MenuItemType.Button, "Cut");
-		yield return new MenuItemModel(MenuItemType.Button, "Copy");
-		yield return new MenuItemModel(MenuItemType.Button, "Paste");
-		yield return new MenuItemModel(MenuItemType.Button, "Remove");
+		yield return new MenuItemModel(MenuItemType.Button, "Cut", async x =>
+		{
+			clipboard = x.Files
+				.Where(w => w.IsSelected)
+				.ToArray();
+		});
+
+		yield return new MenuItemModel(MenuItemType.Button, "Copy", x =>
+		{
+			clipboard = x.Files
+				.Where(w => w.IsSelected)
+				.ToArray();
+		});
+
+		yield return new MenuItemModel(MenuItemType.Button, "Paste", async x =>
+		{
+			foreach (var file in clipboard ?? Enumerable.Empty<IFileItem>())
+			{
+				var path = file.GetPath();
+				File.Copy(file.GetPath(), Path.Combine(x.CurrentFolder.GetPath(), Path.GetFileName(path)));
+			}
+		});
+
+		yield return new MenuItemModel(MenuItemType.Button, "Remove", x =>
+		{
+			var selectedCount = x.Files.Count(c => c.IsSelected);
+
+			if (selectedCount > 0)
+			{
+				var source = SvgSource.Load("avares://FileExplorer/Assets/UIIcons/Question.svg", null);
+
+				var image = new SvgImage
+				{
+					Source = source,
+				};
+
+				var choice = new Choice
+				{
+					Message = $"Are you sure you want to delete {selectedCount:N0} item(s)?",
+					CloseText = "No",
+					SubmitText = "Yes",
+					Image = image,
+				};
+				x.Popup = choice;
+
+				choice.OnSubmit += delegate
+				{
+					foreach (var item in x.Files.Where(w => w.IsSelected))
+					{
+						if (item.IsFolder)
+						{
+							Directory.Delete(item.GetPath(), true);
+						}
+						else
+						{
+							File.Delete(item.GetPath());
+						}
+
+						x.Files.Remove(item);
+					}
+
+					if (!DialogHost.IsDialogOpen(null))
+					{
+						DialogHost.Close(null);
+					}
+				};
+			}
+		});
 		yield return new MenuItemModel(MenuItemType.Separator);
 		yield return new MenuItemModel(MenuItemType.Button, "Properties", x =>
 		{

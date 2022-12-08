@@ -278,7 +278,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		});
 	}
 
-	private string GetPath()
+	public string GetPath()
 	{
 		var count = GetPathLength();
 

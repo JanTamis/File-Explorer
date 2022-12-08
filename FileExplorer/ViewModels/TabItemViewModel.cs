@@ -8,7 +8,6 @@ using FileExplorer.Providers;
 using FileExplorer.Models;
 using FileExplorer.Core.Interfaces;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Avalonia.Svg.Skia;
 using CommunityToolkit.HighPerformance.Buffers;
 using FileExplorer.Core.Models;

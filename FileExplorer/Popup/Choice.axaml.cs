@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Avalonia.Media;
 using DialogHostAvalonia;
 using FileExplorer.Core.Interfaces;
 
@@ -12,6 +13,7 @@ public sealed partial class Choice : UserControl, IPopup, INotifyPropertyChanged
 	private string _submitText;
 	private string _closeText;
 	private string _message;
+	private IImage _image;
 
 	public bool HasShadow => true;
 	public bool HasToBeCanceled => false;
@@ -32,11 +34,13 @@ public sealed partial class Choice : UserControl, IPopup, INotifyPropertyChanged
 	public string Message
 	{
 		get => _message;
-		set
-		{
-			_message = value;
-			OnPropertyChanged(nameof(Message));
-		}
+		set => OnPropertyChanged(ref _message, value);
+	}
+
+	public IImage Image
+	{
+		get => _image;
+		set => OnPropertyChanged(ref _image, value);
 	}
 
 	public string Title => Message;
@@ -52,12 +56,29 @@ public sealed partial class Choice : UserControl, IPopup, INotifyPropertyChanged
 	public void Confirm()
 	{
 		OnSubmit();
+
+		try
+		{
+			DialogHost.Close(null);
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+		}
 	}
 
 	public void Close()
 	{
 		OnClose();
-		DialogHost.Close(null);
+
+		try
+		{
+			DialogHost.Close(null);
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+		}
 	}
 
 	private void InitializeComponent()
@@ -74,7 +95,7 @@ public sealed partial class Choice : UserControl, IPopup, INotifyPropertyChanged
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 	}
 
-	public void OnPropertyChanged(string name)
+	public void OnPropertyChanged([CallerMemberName] string name = null)
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 	}

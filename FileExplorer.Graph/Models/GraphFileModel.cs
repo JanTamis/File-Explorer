@@ -1,4 +1,5 @@
-﻿using FileExplorer.Core.Interfaces;
+﻿using System.Reflection.Metadata.Ecma335;
+using FileExplorer.Core.Interfaces;
 using Microsoft.Graph;
 
 namespace FileExplorer.Graph.Models
@@ -30,6 +31,11 @@ namespace FileExplorer.Graph.Models
 		public GraphFileModel(DriveItem item)
 		{
 			this.item = item;
+		}
+
+		public string GetPath()
+		{
+			return Name;
 		}
 
 		public T GetPath<T>(ReadOnlySpanFunc<char, T> action)

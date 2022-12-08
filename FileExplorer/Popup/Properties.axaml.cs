@@ -6,6 +6,7 @@ using System.IO;
 using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
 using Avalonia.Media;
+using Avalonia.Threading;
 using DialogHostAvalonia;
 using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
@@ -20,7 +21,7 @@ public sealed partial class Properties : UserControl, IPopup, INotifyPropertyCha
 
 	private string _path;
 
-	private long _size = -1;
+	private long _size = 0;
 
 	private IFileItem _model;
 
@@ -73,31 +74,55 @@ public sealed partial class Properties : UserControl, IPopup, INotifyPropertyCha
 
 				Task.Run(async () =>
 				{
-
-					var enumerable = Provider.GetItemsAsync(value, "*", true, default);
-
-					var timestamp = Stopwatch.GetTimestamp();
-
 					_source = new CancellationTokenSource();
-						
-					await foreach (var child in enumerable)
+
+					var tempItems = Provider.GetItems(Model, "*", false, _source.Token)
+						.Select(s =>
+						{
+							var result = Enumerable.Empty<IFileItem>();
+
+							if (s.IsFolder)
+							{
+								result = Provider.GetItems(s, "*", true, _source.Token)
+									.Where(w => !w.IsFolder);
+							}
+
+							return result.Prepend(s);
+						});
+
+					Task.WhenAll(tempItems.Select(s => Task.Factory.StartNew(_ =>
 					{
-						if (_source.IsCancellationRequested)
+						var timestamp = Stopwatch.GetTimestamp();
+						var size = 0l;
+
+						foreach (var item in s)
 						{
-							OnPropertyChanged(nameof(Size));
-							break;
+							if (_source.IsCancellationRequested)
+							{
+								OnPropertyChanged(nameof(Size));
+								break;
+							}
+
+							size += item.Size;
+
+							if (Stopwatch.GetElapsedTime(timestamp).TotalMilliseconds > 25 && size > 0)
+							{
+								Interlocked.Add(ref _size, size);
+								size = 0;
+								timestamp = Stopwatch.GetTimestamp();
+
+
+							}
 						}
+					}, null, _source.Token, TaskCreationOptions.None, ObservableRangeCollection<IFileItem>.concurrentExclusiveScheduler.ConcurrentScheduler)));
 
-						_size += child.Size;
+					var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(50));
 
-						if (Stopwatch.GetElapsedTime(timestamp).TotalMilliseconds > 50)
-						{
-							OnPropertyChanged(nameof(Size));
-
-							timestamp = Stopwatch.GetTimestamp();
-						}
+					while (await timer.WaitForNextTickAsync(_source.Token))
+					{
+						Dispatcher.UIThread.InvokeAsync(() => OnPropertyChanged(nameof(Size)));
 					}
-				});	
+				});
 			}
 		}
 	}

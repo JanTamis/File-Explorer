@@ -13,6 +13,7 @@
                 Grid.ColumnSpan="2">
       <Viewbox Width="48"
                Height="48"
+               Margin="0 0 5 0"
                HorizontalAlignment="Left">
         <Image Source="{Binding Icon^}" />
       </Viewbox>

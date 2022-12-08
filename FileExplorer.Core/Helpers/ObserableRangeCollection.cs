@@ -56,7 +56,7 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 
 	public ObservableRangeCollection()
 	{
-		CollectionChanged += delegate { CountChanged(Count); };
+
 	}
 
 	public ObservableRangeCollection(IEnumerable<T> items, bool needsReset = false) : this()
@@ -463,6 +463,8 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 				{
 					await Dispatcher.UIThread.InvokeAsync(() => CollectionChanged(this, notifyCollectionChangedEventArgs));
 				}
+
+				CountChanged(Count);
 			}
 		}
 		catch (TaskCanceledException e)
@@ -660,25 +662,19 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 	public void Insert(int index, T item)
 	{
 		_data.Insert(index, item);
-
 		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
-		CountChanged.Invoke(_data.Count);
 	}
 
 	public void RemoveAt(int index)
 	{
 		_data.RemoveAt(index);
-
 		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-		CountChanged.Invoke(_data.Count);
 	}
 
 	public void Add(T item)
 	{
 		_data.Add(item);
-
 		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
-		CountChanged.Invoke(_data.Count);
 	}
 
 	public void Clear()
@@ -687,7 +683,6 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 		//_data.Capacity = 0;
 
 		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-		CountChanged.Invoke(_data.Count);
 	}
 
 	public bool Contains(T item)
@@ -706,14 +701,7 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 
 		if (value)
 		{
-			if (Dispatcher.UIThread.CheckAccess())
-			{
-				OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
-			}
-			else
-			{
-				Dispatcher.UIThread.InvokeAsync(() => OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item)));
-			}
+			OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
 		}
 
 		return value;
