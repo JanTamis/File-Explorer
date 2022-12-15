@@ -33,6 +33,11 @@ namespace FileExplorer.Graph.Models
 			this.item = item;
 		}
 
+		public void UpdateData()
+		{
+
+		}
+
 		public string GetPath()
 		{
 			return Name;

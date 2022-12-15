@@ -1,7 +1,5 @@
-﻿using System.Buffers;
-using Avalonia.Threading;
+﻿using Avalonia.Threading;
 using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using FileExplorer.Core.Interfaces;
@@ -662,19 +660,20 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 	public void Insert(int index, T item)
 	{
 		_data.Insert(index, item);
-		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 	}
 
 	public void RemoveAt(int index)
 	{
 		_data.RemoveAt(index);
 		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+
 	}
 
 	public void Add(T item)
 	{
 		_data.Add(item);
-		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 	}
 
 	public void Clear()

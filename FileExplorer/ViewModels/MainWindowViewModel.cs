@@ -52,12 +52,12 @@ namespace FileExplorer.ViewModels
 
 			var drives = from drive in DriveInfo.GetDrives()
 									 where drive.IsReady
-									 select new FolderModel(PathHelper.FromPath(drive.RootDirectory.FullName), null, null);
+									 select new FolderModel(FileSystemTreeItem.FromPath(drive.RootDirectory.FullName), null, null);
 
 			var quickAccess = from specialFolder in KnownFolders()
 												let path = Environment.GetFolderPath(specialFolder)
 												where !String.IsNullOrEmpty(path)
-												select new FolderModel(PathHelper.FromPath(path), Enum.GetName(specialFolder).Humanize(), null);
+												select new FolderModel(FileSystemTreeItem.FromPath(path), Enum.GetName(specialFolder).Humanize(), null);
 
 			Folders = quickAccess.Concat(drives);
 

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Avalonia.Media;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
@@ -11,6 +12,7 @@ using DialogHostAvalonia;
 using FileExplorer.Core.Models;
 using FileExplorer.DisplayViews;
 using FileExplorer.Popup;
+using Humanizer.Bytes;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
 
@@ -64,7 +66,7 @@ public sealed class FileSystemProvider : IItemProvider
 		if (folder is FileModel model)
 		{
 			IEnumerable<FileSystemTreeItem> enumerable;
-			
+
 			if (filter is "*" or "*.*")
 			{
 				enumerable = recursive
@@ -77,7 +79,7 @@ public sealed class FileSystemProvider : IItemProvider
 					? model.TreeItem.EnumerateChildrenRecursive(name => FileSystemName.MatchesSimpleExpression(filter, name)) // || Regex.IsMatch(name, filter))
 					: model.TreeItem.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name)); // || Regex.IsMatch(name, filter));
 			}
-			
+
 			return enumerable.Select(s => new FileModel(s));
 		}
 
@@ -100,7 +102,7 @@ public sealed class FileSystemProvider : IItemProvider
 		}
 
 		throw new ArgumentException("Provide a valid folder that is created from this provider");
-	} 
+	}
 
 	public ValueTask<IFileItem?> GetParentAsync(IFileItem folder, CancellationToken token)
 	{
@@ -144,143 +146,239 @@ public sealed class FileSystemProvider : IItemProvider
 			yield break;
 		}
 
-		yield return new MenuItemModel(MenuItemType.Button, "Cut", async x =>
-		{
-			clipboard = x.Files
-				.Where(w => w.IsSelected)
-				.ToArray();
-		});
-
-		yield return new MenuItemModel(MenuItemType.Button, "Copy", x =>
-		{
-			clipboard = x.Files
-				.Where(w => w.IsSelected)
-				.ToArray();
-		});
-
-		yield return new MenuItemModel(MenuItemType.Button, "Paste", async x =>
-		{
-			foreach (var file in clipboard ?? Enumerable.Empty<IFileItem>())
-			{
-				var path = file.GetPath();
-				File.Copy(file.GetPath(), Path.Combine(x.CurrentFolder.GetPath(), Path.GetFileName(path)));
-			}
-		});
-
-		yield return new MenuItemModel(MenuItemType.Button, "Remove", x =>
-		{
-			var selectedCount = x.Files.Count(c => c.IsSelected);
-
-			if (selectedCount > 0)
-			{
-				var source = SvgSource.Load("avares://FileExplorer/Assets/UIIcons/Question.svg", null);
-
-				var image = new SvgImage
-				{
-					Source = source,
-				};
-
-				var choice = new Choice
-				{
-					Message = $"Are you sure you want to delete {selectedCount:N0} item(s)?",
-					CloseText = "No",
-					SubmitText = "Yes",
-					Image = image,
-				};
-				x.Popup = choice;
-
-				choice.OnSubmit += delegate
-				{
-					foreach (var item in x.Files.Where(w => w.IsSelected))
-					{
-						if (item.IsFolder)
-						{
-							Directory.Delete(item.GetPath(), true);
-						}
-						else
-						{
-							File.Delete(item.GetPath());
-						}
-
-						x.Files.Remove(item);
-					}
-
-					if (!DialogHost.IsDialogOpen(null))
-					{
-						DialogHost.Close(null);
-					}
-				};
-			}
-		});
+		yield return new MenuItemModel(MenuItemType.Button, "Cut", Cut);
+		yield return new MenuItemModel(MenuItemType.Button, "Copy", Copy);
+		yield return new MenuItemModel(MenuItemType.Button, "Paste", Paste);
+		yield return new MenuItemModel(MenuItemType.Button, "Remove", Remove);
 		yield return new MenuItemModel(MenuItemType.Separator);
-		yield return new MenuItemModel(MenuItemType.Button, "Properties", x =>
-		{
-			x.Popup = new Properties
-			{
-				Provider = this,
-				Model = x.CurrentFolder,
-			};
-		});
+		yield return new MenuItemModel(MenuItemType.Button, "Properties", Properties);
 		yield return new MenuItemModel(MenuItemType.Button, "Zip");
 		yield return new MenuItemModel(MenuItemType.Separator);
-		yield return new MenuItemModel(MenuItemType.Button, "Analyze", x =>
+		yield return new MenuItemModel(MenuItemType.Button, "Analyze", Analyze);
+	}
+
+	public IFolderUpdateNotificator? GetNotificator(IFileItem? folder, string filter, bool recursive)
+	{
+		if (folder is null)
 		{
-			var analyzer = new AnalyzerView();
-			var path = x.CurrentFolder.GetPath(x => x.ToString());
-			var tokenSource = new CancellationTokenSource();
+			return null;
+		}
 
-			var options = FileSystemTreeItem.Options;
+		return new FileSystemUpdater(folder.GetPath(), filter, recursive);
+	}
 
-			var folderQuery = new FileSystemEnumerable<FileIndexModel>(path, (ref FileSystemEntry x) => new FileIndexModel(PathHelper.FromPath(x.ToFullPath())), options)
+	public static TimeSpan EstimateTime(TimeSpan elapsedTime, double progress)
+	{
+		return Math.ReciprocalEstimate(progress) * elapsedTime - elapsedTime;
+	}
+
+	private void Cut(MenuItemActionModel model)
+	{
+		clipboard = model.Files
+			.Where(w => w.IsSelected)
+			.ToArray();
+	}
+
+	private void Copy(MenuItemActionModel model)
+	{
+		clipboard = model.Files
+			.Where(w => w.IsSelected)
+			.ToArray();
+	}
+
+	private void Paste(MenuItemActionModel model)
+	{
+		if (clipboard is null or { Length: 0 })
+		{
+			return;
+		}
+
+		var progress = new Progress();
+
+		progress.Loaded += async delegate
+		{
+			var maxLength = (double)clipboard
+				.Select(s => new FileInfo(s.GetPath()).Length)
+				.Sum();
+
+			var length = 0L;
+			var previousLength = 0L;
+			var isDone = false;
+			var startTime = Stopwatch.GetTimestamp();
+
+			Task.Run(async () =>
 			{
-				ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
-			};
+				const int interval = 1000;
+				using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(interval));
 
-			ThreadPool.QueueUserWorkItem(async x =>
-			{
-				var query = folderQuery; //.Concat(fileQuery);
-
-				var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
+				while (await timer.WaitForNextTickAsync() && !isDone)
 				{
-					var resultX = x.TaskSize;
-					var resultY = y.TaskSize;
+					progress.Speed = (length - previousLength) * (long)(1000d / interval);
+					progress.EstimateTime = $"Estimated time: {EstimateTime(Stopwatch.GetElapsedTime(startTime), progress.Process):hh\\:mm\\:ss}";
 
-					Task.WhenAll(resultX, resultY);
-
-					return resultY.Result.CompareTo(resultX.Result);
-				});
-
-				await analyzer.Root.AddRangeAsyncComparer<AsyncComparer<FileIndexModel>>(query, token: tokenSource.Token);
+					previousLength = length;
+				}
 			});
 
-			// ThreadPool.QueueUserWorkItem(async x =>
-			// {
-			// 	var options = new EnumerationOptions()
-			// 	{
-			// 		IgnoreInaccessible = true,
-			// 		AttributesToSkip = FileAttributes.System,
-			// 		RecurseSubdirectories = true,
-			// 	};
-			//
-			// 	var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(path, (ref FileSystemEntry y) => (Path.GetExtension(y.FileName).ToString(), y.Length), options)
-			// 		{
-			// 			ShouldIncludePredicate = (ref FileSystemEntry z) => !z.IsDirectory,
-			// 		}
-			// 		.Where(w => !String.IsNullOrEmpty(w.Extension))
-			// 		.GroupBy(g => g.Extension)
-			// 		.Where(w => tokenSource?.IsCancellationRequested != true);
-			//
-			// 	var comparer = new ExtensionModelComparer();
-			//
-			// 	analyzer.Extensions.AddRange(extensionQuery.Select(s => new ExtensionModel(s.Key, s.Sum(s => s.Size))
-			// 	{
-			// 		TotalFiles = s.Count(),
-			// 	}), comparer);
-			// });
+			foreach (var file in clipboard)
+			{
+				var sourcePath = file.GetPath();
+				var destinationPath = Path.Combine(model.CurrentFolder.GetPath(), Path.GetFileName(sourcePath));
 
-			// analyzer.OnClose += tokenSource.Cancel;
+				if (File.Exists(destinationPath) || Directory.Exists(destinationPath))
+				{
+					continue;
+				}
 
-			x.Popup = analyzer;
+				await using var sourceStream = File.OpenRead(sourcePath);
+				await using var destinationStream = File.Create(destinationPath);
+
+				var currentFileDone = false;
+
+				Task.Run(async () =>
+				{
+					using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(25));
+					var currentFileLengthCount = 0L;
+
+					while (await timer.WaitForNextTickAsync() && !currentFileDone)
+					{
+						var streamPosition = sourceStream.Position;
+
+						length += streamPosition - currentFileLengthCount;
+						currentFileLengthCount = streamPosition;
+
+						progress.Process = length / maxLength;
+					}
+				});
+
+				await sourceStream.CopyToAsync(destinationStream);
+				currentFileDone = true;
+			}
+
+			progress.Process = 1;
+			progress.Close();
+			isDone = true;
+		};
+
+		model.Popup = progress;
+	}
+
+	private void Remove(MenuItemActionModel model)
+	{
+		var selectedCount = model.Files.Count(c => c.IsSelected);
+
+		if (selectedCount > 0)
+		{
+			var itemText = selectedCount > 1
+				? "items"
+				: "item";
+
+			var choice = new Choice
+			{
+				Message = $"Are you sure you want to delete {selectedCount:N0} {itemText}?",
+				CloseText = "No",
+				SubmitText = "Yes",
+				Image = new SvgImage
+				{
+					Source = SvgSource.Load("avares://FileExplorer/Assets/UIIcons/Question.svg", null),
+				},
+			};
+
+			choice.OnSubmit += delegate
+			{
+				foreach (var item in model.Files.Where(w => w.IsSelected))
+				{
+					Task.Factory.StartNew(parameter =>
+					{
+						var path = parameter as string;
+
+						if (Directory.Exists(path))
+						{
+							Directory.Delete(path, true);
+						}
+						else if (File.Exists(path))
+						{
+							File.Delete(path);
+						}
+					}, item.GetPath());
+				}
+
+				if (!DialogHost.IsDialogOpen(null))
+				{
+					DialogHost.Close(null);
+				}
+			};
+
+			model.Popup = choice;
+		}
+	}
+
+	private void Analyze(MenuItemActionModel model)
+	{
+		var analyzer = new AnalyzerView();
+		var path = model.CurrentFolder.GetPath(x => x.ToString());
+		var tokenSource = new CancellationTokenSource();
+
+		var options = FileSystemTreeItem.Options;
+
+		var folderQuery = new FileSystemEnumerable<FileIndexModel>(path, (ref FileSystemEntry x) => new FileIndexModel(FileSystemTreeItem.FromPath(x.ToFullPath())), options)
+		{
+			ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
+		};
+
+		ThreadPool.QueueUserWorkItem(async x =>
+		{
+			var query = folderQuery; //.Concat(fileQuery);
+
+			var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
+			{
+				var resultX = x.TaskSize;
+				var resultY = y.TaskSize;
+
+				Task.WhenAll(resultX, resultY);
+
+				return resultY.Result.CompareTo(resultX.Result);
+			});
+
+			await analyzer.Root.AddRangeAsyncComparer<AsyncComparer<FileIndexModel>>(query, token: tokenSource.Token);
 		});
+
+		// ThreadPool.QueueUserWorkItem(async x =>
+		// {
+		// 	var options = new EnumerationOptions()
+		// 	{
+		// 		IgnoreInaccessible = true,
+		// 		AttributesToSkip = FileAttributes.System,
+		// 		RecurseSubdirectories = true,
+		// 	};
+		//
+		// 	var extensionQuery = new FileSystemEnumerable<(string Extension, long Size)>(path, (ref FileSystemEntry y) => (Path.GetExtension(y.FileName).ToString(), y.Length), options)
+		// 		{
+		// 			ShouldIncludePredicate = (ref FileSystemEntry z) => !z.IsDirectory,
+		// 		}
+		// 		.Where(w => !String.IsNullOrEmpty(w.Extension))
+		// 		.GroupBy(g => g.Extension)
+		// 		.Where(w => tokenSource?.IsCancellationRequested != true);
+		//
+		// 	var comparer = new ExtensionModelComparer();
+		//
+		// 	analyzer.Extensions.AddRange(extensionQuery.Select(s => new ExtensionModel(s.Key, s.Sum(s => s.Size))
+		// 	{
+		// 		TotalFiles = s.Count(),
+		// 	}), comparer);
+		// });
+
+		// analyzer.OnClose += tokenSource.Cancel;
+
+		model.Popup = analyzer;
+	}
+
+	public void Properties(MenuItemActionModel model)
+	{
+		model.Popup = new Properties
+		{
+			Provider = this,
+			Model = model.CurrentFolder,
+		};
 	}
 }

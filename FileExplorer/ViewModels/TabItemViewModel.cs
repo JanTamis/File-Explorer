@@ -25,6 +25,8 @@ public sealed partial class TabItemViewModel
 
 	private bool _isUserEntered = true;
 
+	private IFolderUpdateNotificator? _updateNotificator;
+
 	[ObservableProperty]
 	private string _search = String.Empty;
 
@@ -140,7 +142,7 @@ public sealed partial class TabItemViewModel
 	{
 		Files.CountChanged += count => FileCount = count;
 
-		DisplayControl = new FileGrid
+		DisplayControl = new FileTreeGrid
 		{
 			Provider = Provider,
 			Items = Files,
@@ -190,6 +192,19 @@ public sealed partial class TabItemViewModel
 		TokenSource = new CancellationTokenSource();
 
 		IsLoading = true;
+
+		if (_updateNotificator is not null)
+		{
+			_updateNotificator.Changed -= UpdateFolder;
+			_updateNotificator.Dispose();
+		}
+		
+		_updateNotificator = Provider.GetNotificator(CurrentFolder, search, recursive);
+
+		if (_updateNotificator is not null)
+		{
+			_updateNotificator.Changed += UpdateFolder;
+		}
 
 		await await Task.Run<Task>(async () =>
 		{
@@ -352,5 +367,56 @@ public sealed partial class TabItemViewModel
 		}
 
 		IsSearching = false;
+	}
+
+	private void UpdateFolder(ChangeType type, string path, string? newPath)
+	{
+		switch (type)
+		{
+			case ChangeType.Changed:
+				for (var i = Files.Count - 1; i >= 0; i--)
+				{
+					if (Files[i].GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path))
+					{
+						Files[i].UpdateData();
+					}
+				}
+				break;
+			case ChangeType.Created:
+				if (_provider is FileSystemProvider)
+				{
+					for (var i = Files.Count - 1; i >= 0; i--)
+					{
+						if (Files[i].GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path))
+						{
+							return;
+						}
+					}
+
+					_files.Add(new FileModel(FileSystemTreeItem.FromPath(path)));
+				}
+				break;
+			case ChangeType.Deleted:
+				for (var i = Files.Count - 1; i >= 0; i--)
+				{
+					if (Files[i].GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path))
+					{
+						Files.RemoveAt(i);
+						break;
+					}
+				}
+				break;
+			case ChangeType.Renamed:
+				for (var i = _files.Count - 1; i >= 0; i--)
+				{
+					if (Files[i].GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path))
+					{
+						Files[i].Name = System.IO.Path.GetFileName(newPath);
+					}
+				}
+				break;
+			default:
+				throw new ArgumentOutOfRangeException(nameof(type), type, null);
+		}
 	}
 }

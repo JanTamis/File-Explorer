@@ -11,9 +11,11 @@ public interface IFileItem
 
 	long Size { get; }
 
-	public DateTime EditedOn { get; }
+	DateTime EditedOn { get; }
 
-	public bool IsVisible { get; set; }
+	bool IsVisible { get; set; }
+
+	void UpdateData();
 
 	string GetPath();
 	T GetPath<T>(ReadOnlySpanFunc<char, T> action);

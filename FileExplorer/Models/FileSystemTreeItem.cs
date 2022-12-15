@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
@@ -215,25 +216,14 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 
 	public IEnumerable<FileSystemTreeItem> EnumerateChildrenRecursive(ReadOnlySpanFunc<char, bool> include)
 	{
-		if (!IsFolder)
-		{
-			return Enumerable.Empty<FileSystemTreeItem>();
-		}
-
-		var path = _path ?? GetPath();
-
-		if (!Directory.Exists(path))
-		{
-			return Enumerable.Empty<FileSystemTreeItem>();
-		}
-
-		var enumerable = new FileSystemTreeItemEnumerable(new DelegateFileSystemEnumerator<FileSystemTreeItem>(path, Options)
-		{
-			Find = (ref FileSystemEntry entry) => entry.IsDirectory || include(entry.FileName),
-			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
-		});
-
-		return enumerable.SelectMany(s => s.EnumerateChildrenRecursive(include).Prepend(s));
+		return EnumerateChildren(include)
+			.SelectMany(s =>
+			{
+				return !s.IsFolder || include(s.Value)
+					? s.EnumerateChildrenRecursive(include).Prepend(s)
+					: s.EnumerateChildrenRecursive(include);
+			})
+			.Where(w => !w.IsFolder || include(w.Value));
 	}
 
 	public IEnumerable<FileSystemTreeItem> EnumerateChildren(ReadOnlySpanFunc<char, bool> include)
@@ -253,7 +243,6 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		return new FileSystemTreeItemEnumerable(new DelegateFileSystemEnumerator<FileSystemTreeItem>(path, Options)
 		{
 			Find = (ref FileSystemEntry entry) => entry.IsDirectory || include(entry.FileName),
-
 			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
 		});
 	}
@@ -329,6 +318,28 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	public override int GetHashCode()
 	{
 		return Path.GetHashCode();
+	}
+
+	public static FileSystemTreeItem? FromPath([NotNullIfNotNull("path")] string? path)
+	{
+		if (path is null)
+		{
+			return null;
+		}
+
+		var directory = new DirectoryInfo(path);
+
+		var result = new FileSystemTreeItem(directory.Name, Directory.Exists(path));
+		var temp = result;
+
+		while (directory.Parent is not null)
+		{
+			directory = directory.Parent;
+			temp.Parent = new FileSystemTreeItem(directory.Name, true);
+			temp = temp.Parent;
+		}
+
+		return result;
 	}
 
 	private int GetPathLength()

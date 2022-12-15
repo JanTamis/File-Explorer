@@ -232,4 +232,9 @@ public sealed class GraphItemProvider : IItemProvider
 
 		return Task.FromResult<IImage?>(null);
 	}
+
+	public IFolderUpdateNotificator? GetNotificator(IFileItem folder, string filter, bool recursive)
+	{
+		return null;
+	}
 }

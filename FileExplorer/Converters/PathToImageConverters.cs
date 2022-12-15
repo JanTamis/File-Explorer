@@ -28,7 +28,7 @@ public sealed class PathToImageConverter : IValueConverter, ISingleton<PathToIma
 			{
 				// IFileItem model => ThumbnailProvider.GetFileImage(model, size, () => true),
 				FileSystemTreeItem treeItem => ThumbnailProvider.GetFileImage(treeItem, size),
-				string path => ThumbnailProvider.GetFileImage(PathHelper.FromPath(path), size),
+				string path => ThumbnailProvider.GetFileImage(FileSystemTreeItem.FromPath(path), size),
 				_ => null,
 			};
 

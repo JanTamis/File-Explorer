@@ -18,4 +18,6 @@ public interface IItemProvider
 	Task<IImage?> GetThumbnailAsync(IFileItem? item, int size, CancellationToken token);
 
 	IEnumerable<MenuItemModel> GetMenuItems(IFileItem item) => Enumerable.Empty<MenuItemModel>();
+
+	IFolderUpdateNotificator? GetNotificator(IFileItem folder, string filter, bool recursive);
 }

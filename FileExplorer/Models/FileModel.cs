@@ -50,31 +50,6 @@ public sealed class FileModel : IFileItem, INotifyPropertyChanged
 		set
 		{
 			TreeItem.Value = value;
-			
-			try
-			{
-				var path = Path;
-
-				if (!IsFolder)
-				{
-					var name = System.IO.Path.GetFileNameWithoutExtension(path);
-					var extension = Extension;
-					var newPath = path.Replace(name + extension, value + extension);
-
-					File.Move(path, newPath);
-				}
-				else if (Directory.Exists(path))
-				{
-					var name = System.IO.Path.GetFileNameWithoutExtension(path);
-					var newPath = path.Replace(name, value);
-
-					Directory.Move(path, newPath);
-				}
-			}
-			catch (Exception)
-			{
-				// ignored
-			}
 
 			SetProperty(ref _name, value);
 		}
@@ -154,6 +129,16 @@ public sealed class FileModel : IFileItem, INotifyPropertyChanged
 	public FileModel(FileSystemTreeItem item)
 	{
 		TreeItem = item;
+	}
+
+	public void UpdateData()
+	{
+		_size = -1;
+		_editedOn = default;
+
+		OnPropertyChanged(nameof(Size));
+		OnPropertyChanged(nameof(EditedOn));
+
 	}
 
 	public string GetPath()
