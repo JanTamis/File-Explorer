@@ -20,4 +20,6 @@ public interface IItemProvider
 	IEnumerable<MenuItemModel> GetMenuItems(IFileItem item) => Enumerable.Empty<MenuItemModel>();
 
 	IFolderUpdateNotificator? GetNotificator(IFileItem folder, string filter, bool recursive);
+
+	Task EnumerateItemsAsync(IFileItem folder, string filter, Action<IFileItem> action);
 }

@@ -12,7 +12,6 @@ using DialogHostAvalonia;
 using FileExplorer.Core.Models;
 using FileExplorer.DisplayViews;
 using FileExplorer.Popup;
-using Humanizer.Bytes;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
 
@@ -22,7 +21,7 @@ public sealed class FileSystemProvider : IItemProvider
 {
 	private readonly MemoryCache? _imageCache;
 
-	private IFileItem[]? clipboard;
+	private IFileItem[]? _clipboard;
 
 	public FileSystemProvider()
 	{
@@ -174,21 +173,21 @@ public sealed class FileSystemProvider : IItemProvider
 
 	private void Cut(MenuItemActionModel model)
 	{
-		clipboard = model.Files
+		_clipboard = model.Files
 			.Where(w => w.IsSelected)
 			.ToArray();
 	}
 
 	private void Copy(MenuItemActionModel model)
 	{
-		clipboard = model.Files
+		_clipboard = model.Files
 			.Where(w => w.IsSelected)
 			.ToArray();
 	}
 
 	private void Paste(MenuItemActionModel model)
 	{
-		if (clipboard is null or { Length: 0 })
+		if (_clipboard is null or { Length: 0 })
 		{
 			return;
 		}
@@ -197,7 +196,7 @@ public sealed class FileSystemProvider : IItemProvider
 
 		progress.Loaded += async delegate
 		{
-			var maxLength = (double)clipboard
+			var maxLength = (double)_clipboard
 				.Select(s => new FileInfo(s.GetPath()).Length)
 				.Sum();
 
@@ -220,7 +219,7 @@ public sealed class FileSystemProvider : IItemProvider
 				}
 			});
 
-			foreach (var file in clipboard)
+			foreach (var file in _clipboard)
 			{
 				var sourcePath = file.GetPath();
 				var destinationPath = Path.Combine(model.CurrentFolder.GetPath(), Path.GetFileName(sourcePath));

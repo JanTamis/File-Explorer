@@ -38,7 +38,7 @@ public sealed partial class TabItemViewModel
 
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(SearchFailed))]
-	private ObservableRangeCollection<IFileItem> _files = new();
+	private readonly ObservableRangeCollection<IFileItem> _files = new();
 
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(SearchFailed))]
@@ -71,64 +71,63 @@ public sealed partial class TabItemViewModel
 
 	public Task<IEnumerable<IPathSegment>> Folders => Provider.GetPathAsync(CurrentFolder).AsTask();
 
-	public IEnumerable<IControl> MenuItems => Provider.GetMenuItems(CurrentFolder).Select<MenuItemModel, IControl>(s =>
-	{
-		switch (s.Type)
+	public IEnumerable<IControl> MenuItems => Provider.GetMenuItems(CurrentFolder)
+		.Select<MenuItemModel, IControl>(s =>
 		{
-			case MenuItemType.Button:
-				var source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/UIIcons/{s.Icon}.svg", null);
+			switch (s.Type)
+			{
+				case MenuItemType.Button:
+					var source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/UIIcons/{s.Icon}.svg", null);
 
-				var button = new Button
-				{
-					Classes = new Classes("Flat"),
-					Content = new Image
+					var button = new Button
 					{
-						Source = new SvgImage
+						Classes = new Classes("Flat"),
+						Content = new Image
 						{
-							Source = source,
+							Source = new SvgImage
+							{
+								Source = source,
+							},
+							Width = 30,
+							Height = 30,
 						},
-						Width = 30,
-						Height = 30,
-					},
-					Width = 40,
-					Height = 40,
-				};
-
-				if (s.Action is not null)
-				{
-					button.Click += delegate
-					{
-						var model = new MenuItemActionModel
-						{
-							Files = Files,
-							CurrentFolder = CurrentFolder,
-						};
-
-						s.Action(model);
-
-						if (model.Popup is not null)
-						{
-							PopupContent = model.Popup;
-						}
+						Width = 40,
+						Height = 40,
 					};
-				}
 
-				return button;
-			case MenuItemType.Separator:
-				return new Border
-				{
-					Width = 2,
-					Margin = new Thickness(4, 0),
-					Classes = new Classes("Separator"),
-				};
-			case MenuItemType.Dropdown:
-				break;
-			default:
-				throw new ArgumentOutOfRangeException();
-		}
+					if (s.Action is not null)
+					{
+						button.Click += delegate
+						{
+							var model = new MenuItemActionModel
+							{
+								Files = Files,
+								CurrentFolder = CurrentFolder,
+							};
 
-		throw new ArgumentOutOfRangeException();
-	});
+							s.Action(model);
+
+							if (model.Popup is not null)
+							{
+								PopupContent = model.Popup;
+							}
+						};
+					}
+
+					return button;
+				case MenuItemType.Separator:
+					return new Border
+					{
+						Width = 2,
+						Margin = new Thickness(4, 0),
+						Classes = new Classes("Separator"),
+					};
+				case MenuItemType.Dropdown:
+					break;
+			}
+
+			throw new ArgumentOutOfRangeException();
+		});
 
 	public bool SearchFailed => !IsLoading && FileCount == 0;
 
@@ -147,8 +146,6 @@ public sealed partial class TabItemViewModel
 			Provider = Provider,
 			Items = Files,
 		};
-
-		// CurrentViewMode = ViewTypes.Grid;
 	}
 
 	public IFileItem? Undo()
@@ -186,8 +183,6 @@ public sealed partial class TabItemViewModel
 
 	public async Task UpdateFiles(bool recursive, string search)
 	{
-		StringPool.Shared.Reset();
-
 		TokenSource?.Cancel();
 		TokenSource = new CancellationTokenSource();
 

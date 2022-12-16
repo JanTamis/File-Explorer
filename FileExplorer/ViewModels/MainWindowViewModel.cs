@@ -221,53 +221,6 @@ namespace FileExplorer.ViewModels
 			notificationManager.Show(new Notification("Copy Path", "The path has been copied"));
 		}
 
-		public void DeleteFiles()
-		{
-			var selectedFiles = CurrentTab.Files.Where(x => x.IsSelected);
-			var SelectedFileCount = selectedFiles.Count();
-
-			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && SelectedFileCount > 0)
-			{
-				var choice = new Choice
-				{
-					CloseText = "Cancel",
-					SubmitText = "Delete",
-					Message = CultureInfo.CurrentCulture.TextInfo.ToTitleCase($"Are you sure you want to delete {SelectedFileCount} item{(SelectedFileCount > 1 ? "s" : String.Empty)}?"),
-				};
-
-				choice.OnSubmit += () =>
-				{
-					var deletedFiles = new List<IFileItem>(SelectedFileCount);
-
-					foreach (var file in selectedFiles)
-					{
-						var path = file.GetPath(path => path.ToString());
-
-						try
-						{
-							if (File.Exists(path))
-							{
-								FileSystem.DeleteFile(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-							}
-							else if (Directory.Exists(path))
-							{
-								FileSystem.DeleteDirectory(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-							}
-
-							deletedFiles.Add(file);
-						}
-						catch (Exception)
-						{
-						}
-					}
-
-					CurrentTab.PopupContent = null;
-				};
-
-				CurrentTab.PopupContent = choice;
-			}
-		}
-
 		public void CopyTo()
 		{
 			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && Tabs.Count(x => !String.IsNullOrEmpty(x.CurrentFolder.Name)) > 1)
