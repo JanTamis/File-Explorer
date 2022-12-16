@@ -12,6 +12,9 @@ using Avalonia.Svg.Skia;
 using CommunityToolkit.HighPerformance.Buffers;
 using FileExplorer.Core.Models;
 using Image = Avalonia.Controls.Image;
+using System.Collections.Concurrent;
+using Microsoft.Graph;
+using ChangeType = FileExplorer.Core.Models.ChangeType;
 
 namespace FileExplorer.ViewModels;
 
@@ -38,7 +41,7 @@ public sealed partial class TabItemViewModel
 
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(SearchFailed))]
-	private readonly ObservableRangeCollection<IFileItem> _files = new();
+	private ObservableRangeCollection<IFileItem> _files = new();
 
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(SearchFailed))]
@@ -200,6 +203,10 @@ public sealed partial class TabItemViewModel
 		{
 			_updateNotificator.Changed += UpdateFolder;
 		}
+
+		var bag = new ConcurrentBag<IFileItem>();
+
+		await Provider.EnumerateItemsAsync(CurrentFolder, bag.Add, CancellationToken.None).ConfigureAwait(false);
 
 		await await Task.Run<Task>(async () =>
 		{

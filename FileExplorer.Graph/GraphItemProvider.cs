@@ -237,4 +237,9 @@ public sealed class GraphItemProvider : IItemProvider
 	{
 		return null;
 	}
+
+	public Task EnumerateItemsAsync(IFileItem folder, Action<IFileItem> action, CancellationToken token)
+	{
+		return Task.CompletedTask;
+	}
 }

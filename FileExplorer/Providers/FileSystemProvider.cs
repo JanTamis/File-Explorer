@@ -14,6 +14,7 @@ using FileExplorer.DisplayViews;
 using FileExplorer.Popup;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
+using System.Threading.Tasks;
 
 namespace FileExplorer.Providers;
 
@@ -22,6 +23,8 @@ public sealed class FileSystemProvider : IItemProvider
 	private readonly MemoryCache? _imageCache;
 
 	private IFileItem[]? _clipboard;
+
+	private static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default, Environment.ProcessorCount / 2);
 
 	public FileSystemProvider()
 	{
@@ -136,6 +139,25 @@ public sealed class FileSystemProvider : IItemProvider
 		}
 
 		return ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested && item.IsVisible);
+	}
+
+	public async Task EnumerateItemsAsync(IFileItem folder, Action<IFileItem> action, CancellationToken token)
+	{
+		await Task.WhenAll(await Task.Factory.StartNew(() =>
+		{
+			return GetItems(folder, "*", false, token)
+				.Select(item =>
+				{
+					action(item);
+
+					if (item.IsFolder)
+					{
+						return EnumerateItemsAsync(item, action, token);
+					}
+
+					return Task.CompletedTask;
+				});
+		}, CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ConcurrentScheduler).ConfigureAwait(false));
 	}
 
 	public IEnumerable<MenuItemModel> GetMenuItems(IFileItem? item)
@@ -372,7 +394,7 @@ public sealed class FileSystemProvider : IItemProvider
 		model.Popup = analyzer;
 	}
 
-	public void Properties(MenuItemActionModel model)
+	private void Properties(MenuItemActionModel model)
 	{
 		model.Popup = new Properties
 		{
