@@ -22,4 +22,5 @@ public interface IItemProvider
 	IFolderUpdateNotificator? GetNotificator(IFileItem folder, string filter, bool recursive);
 
 	Task EnumerateItemsAsync(IFileItem folder, string pattern, Action<IFileItem> action, CancellationToken token);
+	Task EnumerateItemsAsync<T>(IFileItem folder, string pattern, Action<IEnumerable<T>> action, Func<IFileItem, T> transformation, CancellationToken token);
 }

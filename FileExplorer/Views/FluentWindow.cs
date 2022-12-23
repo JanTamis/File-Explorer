@@ -18,6 +18,7 @@ public partial class FluentWindow : Window, IStyleable, INotifyPropertyChanged
 	{
 		ExtendClientAreaToDecorationsHint = true;
 		ExtendClientAreaTitleBarHeightHint = -1;
+		base.ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.NoChrome;
 
 		this.GetObservable(WindowStateProperty)
 			.Subscribe(x =>
@@ -59,7 +60,7 @@ public partial class FluentWindow : Window, IStyleable, INotifyPropertyChanged
 	{
 		base.OnApplyTemplate(e);
 
-		ExtendClientAreaChromeHints =	ExtendClientAreaChromeHints.OSXThickTitleBar | ExtendClientAreaChromeHints.SystemChrome;
+		ExtendClientAreaChromeHints =	ExtendClientAreaChromeHints.NoChrome;
 	}
 
 	public new event PropertyChangedEventHandler? PropertyChanged;

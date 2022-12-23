@@ -5,6 +5,9 @@ public static class Runner
 	private static readonly ConcurrentExclusiveSchedulerPair ConcurrentExclusiveSchedulerPrimary = new(TaskScheduler.Default, Environment.ProcessorCount / 2);
 	private static readonly ConcurrentExclusiveSchedulerPair ConcurrentExclusiveSchedulerSecundairy = new(TaskScheduler.Default, Environment.ProcessorCount / 4);
 
+	public static TaskScheduler PrimaryScheduler => ConcurrentExclusiveSchedulerPrimary.ConcurrentScheduler;
+	public static TaskScheduler SecundairyScheduler => ConcurrentExclusiveSchedulerSecundairy.ConcurrentScheduler;
+
 	public static Task Run(Action action, CancellationToken token = default)
 	{
 		return Task.Run(action, token);

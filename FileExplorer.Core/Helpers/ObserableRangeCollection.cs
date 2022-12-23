@@ -386,7 +386,7 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 
 		var isLocked = false;
 
-		var task = provider.EnumerateItemsAsync(folder, pattern, x => bag.Add((T)x), token).ConfigureAwait(false);
+		var task = provider.EnumerateItemsAsync(folder, pattern, (IFileItem x) => bag.Add((T)x), token).ConfigureAwait(false);
 		var isDone = false;
 
 		Runner.Run<Task>(async () =>

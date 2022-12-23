@@ -6,7 +6,7 @@ namespace FileExplorer.Providers;
 
 public class FileSystemUpdater : IFolderUpdateNotificator
 {
-	public event Action<ChangeType, string, string?>? Changed;
+	public event Action<IFolderUpdateNotificator, ChangeType, string, string?>? Changed;
 
 	private readonly FileSystemWatcher _watcher;
 
@@ -34,28 +34,37 @@ public class FileSystemUpdater : IFolderUpdateNotificator
 		_watcher.EnableRaisingEvents = true;
 	}
 
+	public bool Equals(IFolderUpdateNotificator? other)
+	{
+		return other is FileSystemUpdater updater && 
+					 _watcher.Path == updater._watcher.Path &&
+					 _watcher.Filter == updater._watcher.Filter &&
+					 _watcher.IncludeSubdirectories == updater._watcher.IncludeSubdirectories;
+	}
+
 	public void Dispose()
 	{
+		_watcher.EnableRaisingEvents = false;
 		_watcher.Dispose();
 	}
 
 	private void OnChanged(object sender, FileSystemEventArgs e)
 	{
-		Changed?.Invoke(ChangeType.Changed, e.FullPath, null);
+		Changed?.Invoke(this, ChangeType.Changed, e.FullPath, null);
 	}
 
 	private void OnCreated(object sender, FileSystemEventArgs e)
 	{
-		Changed?.Invoke(ChangeType.Created, e.FullPath, null);
+		Changed?.Invoke(this, ChangeType.Created, e.FullPath, null);
 	}
 
 	private void OnDeleted(object sender, FileSystemEventArgs e)
 	{
-		Changed?.Invoke(ChangeType.Deleted, e.FullPath, null);
+		Changed?.Invoke(this, ChangeType.Deleted, e.FullPath, null);
 	}
 
 	private void OnRenamed(object sender, RenamedEventArgs e)
 	{
-		Changed?.Invoke(ChangeType.Renamed, e.OldFullPath, e.FullPath);
+		Changed?.Invoke(this, ChangeType.Renamed, e.OldFullPath, e.FullPath);
 	}
 }

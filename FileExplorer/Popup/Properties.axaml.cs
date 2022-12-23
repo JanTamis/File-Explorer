@@ -28,7 +28,7 @@ public sealed partial class Properties : UserControl, IPopup, INotifyPropertyCha
 	private IFileItem _model;
 
 	public bool HasShadow => false;
-	public bool HasToBeCanceled => false;
+	public bool HasToBeCanceled => true;
 
 	public string Title => "Properties";
 
@@ -78,43 +78,31 @@ public sealed partial class Properties : UserControl, IPopup, INotifyPropertyCha
 				{
 					_source = new CancellationTokenSource();
 
-					var tempItems = Provider.GetItems(Model, "*", false, _source.Token)
-						.Select(s =>
-						{
-							var result = Enumerable.Empty<IFileItem>();
+					Provider.EnumerateItemsAsync(_model, "*", x => Interlocked.Add(ref _size, x.Sum()), x => x.Size, _source.Token);
 
-							if (s.IsFolder)
-							{
-								result = Provider.GetItems(s, "*", true, _source.Token)
-									.Where(w => !w.IsFolder);
-							}
+					//Task.WhenAll(tempItems.Select(s => Runner.RunPrimary(() =>
+					//{
+					//	var timestamp = Stopwatch.GetTimestamp();
+					//	var size = 0L;
 
-							return result.Prepend(s);
-						});
+					//	foreach (var item in s)
+					//	{
+					//		if (_source.IsCancellationRequested)
+					//		{
+					//			OnPropertyChanged(nameof(Size));
+					//			break;
+					//		}
 
-					Task.WhenAll(tempItems.Select(s => Runner.RunPrimary(() =>
-					{
-						var timestamp = Stopwatch.GetTimestamp();
-						var size = 0L;
+					//		size += item.Size;
 
-						foreach (var item in s)
-						{
-							if (_source.IsCancellationRequested)
-							{
-								OnPropertyChanged(nameof(Size));
-								break;
-							}
-
-							size += item.Size;
-
-							if (Stopwatch.GetElapsedTime(timestamp).TotalMilliseconds > 25 && size > 0)
-							{
-								Interlocked.Add(ref _size, size);
-								size = 0;
-								timestamp = Stopwatch.GetTimestamp();
-							}
-						}
-					}, _source.Token)));
+					//		if (Stopwatch.GetElapsedTime(timestamp).TotalMilliseconds > 25 && size > 0)
+					//		{
+					//			Interlocked.Add(ref _size, size);
+					//			size = 0;
+					//			timestamp = Stopwatch.GetTimestamp();
+					//		}
+					//	}
+					//}, _source.Token)));
 
 					var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(50));
 
@@ -157,7 +145,6 @@ public sealed partial class Properties : UserControl, IPopup, INotifyPropertyCha
 	public void Close()
 	{
 		_source?.Cancel();
-		DialogHost.Close(null);
 		OnClose();
 	}
 

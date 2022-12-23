@@ -150,9 +150,16 @@ public sealed class FileSystemProvider : IItemProvider
 			var bag = new ConcurrentQueue<Task>();
 			bag.Enqueue(Run(bag, model.TreeItem, pattern, action, token));
 
-			while (bag.TryDequeue(out var task))
+			try
 			{
-				await task;
+				while (bag.TryDequeue(out var task))
+				{
+					await task;
+				}
+			}
+			catch (Exception)
+			{
+
 			}
 		}
 
@@ -185,6 +192,64 @@ public sealed class FileSystemProvider : IItemProvider
 					}
 				}
 			}, token);
+		}
+	}
+
+	public async Task EnumerateItemsAsync<T>(IFileItem folder, string pattern, Action<IEnumerable<T>> action, Func<IFileItem, T> transformation, CancellationToken token)
+	{
+		if (folder is FileModel model)
+		{
+			var bag = new ConcurrentQueue<Task>();
+			bag.Enqueue(Run(bag, model.TreeItem, pattern, action, transformation, token));
+
+			try
+			{
+				while (!token.IsCancellationRequested && bag.TryDequeue(out var task))
+				{
+					await task;
+				}
+			}
+			catch (Exception)
+			{
+
+			}
+		}
+
+		async Task Run(ConcurrentQueue<Task> bag, FileSystemTreeItem folder, string pattern, Action<IEnumerable<T>> action, Func<IFileItem, T> transformation, CancellationToken token)
+		{
+			var result = await Runner.RunPrimary(() =>
+			{
+				var list = new List<T>();
+
+				using var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(folder.GetPath(), FileSystemTreeItem.Options)
+				{
+					Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, folder),
+					Find = (ref FileSystemEntry entry) => entry.IsDirectory || FileSystemName.MatchesSimpleExpression(pattern, entry.FileName),
+				};
+
+				while (enumerable.MoveNext() && !token.IsCancellationRequested)
+				{
+					var item = enumerable.Current;
+
+					if (item.IsFolder)
+					{
+						bag.Enqueue(Run(bag, item, pattern, action, transformation, token));
+
+						if (FileSystemName.MatchesSimpleExpression(pattern, item.Value))
+						{
+							list.Add(transformation(new FileModel(item)));
+						}
+					}
+					else
+					{
+						list.Add(transformation(new FileModel(item)));
+					}
+				}
+
+				return list;
+			}, token);
+
+			action(result);
 		}
 	}
 

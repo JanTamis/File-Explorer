@@ -23,6 +23,7 @@
                     Width="1000"
                     Background="{DynamicResource WindowBackground}"
                     Height="800"
+										CornerRadius="20"
                     BorderThickness="0"
                     WindowStartupLocation="CenterScreen"
                     xmlns:dialogHost="clr-namespace:DialogHostAvalonia;assembly=DialogHost.Avalonia"
@@ -32,8 +33,9 @@
 		<system:Int32 x:Key="ImageSize">24</system:Int32>
 	</Window.Resources>
 
-	<dialogHost:DialogHost CloseOnClickAway="True"
+	<dialogHost:DialogHost CloseOnClickAway="{Binding !CurrentTab.PopupContent}"
 	                       OverlayBackground="Black"
+												 CornerRadius="20"
 	                       DialogContent="{Binding CurrentTab.PopupContent}"
 	                       IsOpen="{Binding CurrentTab.PopupVisible}"
 	                       Margin="{Binding #MainWindow.OffScreenMargin}">
@@ -60,8 +62,9 @@
 		<Grid RowDefinitions="Auto, *, Auto">
 			<Grid ColumnDefinitions="*, Auto"
 			      Grid.Row="0"
+						MinHeight="40"
 			      Margin="{Binding #MainWindow.TitleBarMargin}">
-				<StackPanel Orientation="Horizontal">
+				<!--<StackPanel Orientation="Horizontal">
 					<TabStrip Items="{Binding Tabs}"
 					          Margin="{Binding}"
 					          SelectedItem="{Binding CurrentTab}">
@@ -183,11 +186,11 @@
 							                       Foreground="{DynamicResource MaterialDesignBodyLight}" />
 						</Button>
 					</Viewbox>
-				</StackPanel>
+				</StackPanel>-->
 
 				<StackPanel Grid.Column="1"
 				            Orientation="Horizontal">
-					<Button Classes="Flat"
+					<!--<Button Classes="Flat"
 					        Width="40"
 					        assist:ShadowAssist.ShadowDepth="Depth0"
 					        Padding="0"
@@ -207,7 +210,7 @@
 						                       Height="20"
 						                       Width="20"
 						                       Foreground="{DynamicResource MaterialDesignBody}" />
-					</Button>
+					</Button>-->
 					<Button Classes="Flat"
 					        Width="40"
 					        Command="{Binding ShowSettings}"
@@ -220,6 +223,47 @@
 						                       Width="20"
 						                       Foreground="{DynamicResource MaterialDesignBody}" />
 					</Button>
+					
+					<StackPanel Orientation="Horizontal"
+											IsVisible="{Binding IsWindows}">
+						<Button Classes="Flat"
+					        Width="40"
+					        Command="{Binding Minimize}"
+					        assist:ShadowAssist.ShadowDepth="Depth0"
+					        Padding="0"
+					        Background="Transparent"
+					        Margin="0">
+							<material:MaterialIcon Kind="WindowMinimize"
+																		 Height="20"
+																		 Width="20"
+																		 Foreground="{DynamicResource MaterialDesignBody}" />
+						</Button>
+						<Button Classes="Flat"
+										Width="40"
+										Command="{Binding Toggle}"
+										assist:ShadowAssist.ShadowDepth="Depth0"
+										Padding="0"
+										Background="Transparent"
+										Margin="0">
+							<material:MaterialIcon Kind="{Binding ToggleIcon}"
+																		 Height="20"
+																		 Width="20"
+																		 Foreground="{DynamicResource MaterialDesignBody}" />
+						</Button>
+						<Button Classes="Flat"
+											Width="40"
+											Command="{Binding Close}"
+											assist:ShadowAssist.ShadowDepth="Depth0"
+											Padding="0"
+											Background="Transparent"
+											Margin="0">
+							<material:MaterialIcon Kind="WindowClose"
+																		 Height="23"
+																		 Width="23"
+																		 Foreground="{DynamicResource MaterialDesignBody}" />
+						</Button>
+					</StackPanel>
+					
 				</StackPanel>
 			</Grid>
 

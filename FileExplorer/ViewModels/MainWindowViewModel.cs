@@ -1,4 +1,4 @@
-using Avalonia.Controls.Notifications;
+			using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
 using FileExplorer.Helpers;
 using FileExplorer.Popup;
@@ -14,6 +14,9 @@ using FileExplorer.Models;
 using FileExplorer.Graph;
 using FileExplorer.Providers;
 using Humanizer;
+using Avalonia.Controls.ApplicationLifetimes;
+using Material.Icons;
+using Avalonia.Controls;
 
 namespace FileExplorer.ViewModels
 {
@@ -46,6 +49,27 @@ namespace FileExplorer.ViewModels
 
 		public ObservableRangeCollection<TabItemViewModel> Tabs { get; } = new();
 
+		public MaterialIconKind ToggleIcon
+		{
+			get
+			{
+				if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
+				{
+					return window.WindowState switch
+					{
+						WindowState.Maximized => MaterialIconKind.WindowRestore,
+						WindowState.Normal => MaterialIconKind.Maximize,
+						_ => MaterialIconKind.Maximize,
+					};
+				}
+
+				return MaterialIconKind.Maximize;
+			}
+		}
+
+		public bool IsWindows => OperatingSystem.IsWindows();
+		public bool IsMacOS => OperatingSystem.IsMacOS();
+
 		public MainWindowViewModel(WindowNotificationManager manager)
 		{
 			notificationManager = manager;
@@ -62,6 +86,14 @@ namespace FileExplorer.ViewModels
 			Folders = quickAccess.Concat(drives);
 
 			AddTab();
+
+			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
+			{
+				Window.WindowStateProperty.Changed.Subscribe(delegate
+				{
+					OnPropertyChanged(nameof(ToggleIcon));
+				});
+			}
 
 			IEnumerable<Environment.SpecialFolder> KnownFolders()
 			{
@@ -283,6 +315,35 @@ namespace FileExplorer.ViewModels
 			await _currentTab.SetPath(await provider.GetRootAsync());
 
 			CurrentTab.PopupContent = null;
+		}
+
+		public void Close()
+		{
+			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+			{
+				desktop.Shutdown();
+			}
+		}
+
+		public void Minimize()
+		{
+			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
+			{
+				window.WindowState = WindowState.Minimized;
+			}
+		}
+
+		public void Toggle()
+		{
+			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
+			{
+				window.WindowState = window.WindowState switch
+				{
+					WindowState.Normal => WindowState.Maximized,
+					WindowState.Maximized => WindowState.Normal,
+					_ => window.WindowState
+				};
+			}
 		}
 	}
 }
