@@ -36,7 +36,7 @@ public sealed class DynamicList<T> : IList<T>, IList
 		if (capacity == 0)
 			_items = s_emptyArray;
 		else
-			_items = new T[capacity];
+			_items = GC.AllocateUninitializedArray<T>(capacity);
 	}
 
 	// Constructs a List, copying the contents of the given collection. The
@@ -54,7 +54,7 @@ public sealed class DynamicList<T> : IList<T>, IList
 			}
 			else
 			{
-				_items = new T[count];
+				_items = GC.AllocateUninitializedArray<T>(count);
 				c.CopyTo(_items, 0);
 				_size = count;
 			}
@@ -85,7 +85,7 @@ public sealed class DynamicList<T> : IList<T>, IList
 			{
 				if (value > 0)
 				{
-					var newItems = new T[value];
+					var newItems = GC.AllocateUninitializedArray<T>(value);
 					if (_size > 0)
 					{
 						Array.Copy(_items, newItems, _size);
@@ -826,7 +826,7 @@ public sealed class DynamicList<T> : IList<T>, IList
 			return s_emptyArray;
 		}
 
-		var array = new T[_size];
+		var array = GC.AllocateUninitializedArray<T>(_size);
 		Array.Copy(_items, array, _size);
 		return array;
 	}

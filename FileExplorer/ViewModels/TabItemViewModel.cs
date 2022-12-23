@@ -9,11 +9,9 @@ using FileExplorer.Models;
 using FileExplorer.Core.Interfaces;
 using Avalonia.Controls;
 using Avalonia.Svg.Skia;
-using CommunityToolkit.HighPerformance.Buffers;
 using FileExplorer.Core.Models;
 using Image = Avalonia.Controls.Image;
-using System.Collections.Concurrent;
-using Microsoft.Graph;
+using FileExplorer.Core.Extensions;
 using ChangeType = FileExplorer.Core.Models.ChangeType;
 
 namespace FileExplorer.ViewModels;
@@ -127,6 +125,8 @@ public sealed partial class TabItemViewModel
 					};
 				case MenuItemType.Dropdown:
 					break;
+				default:
+					throw new ArgumentOutOfRangeException();
 			}
 
 			throw new ArgumentOutOfRangeException();
@@ -189,6 +189,9 @@ public sealed partial class TabItemViewModel
 		TokenSource?.Cancel();
 		TokenSource = new CancellationTokenSource();
 
+		Files.ClearTrim();
+		OnPropertyChanged(nameof(FileCount));
+
 		IsLoading = true;
 
 		if (_updateNotificator is not null)
@@ -204,36 +207,15 @@ public sealed partial class TabItemViewModel
 			_updateNotificator.Changed += UpdateFolder;
 		}
 
-		var bag = new ConcurrentBag<IFileItem>();
-
-		await Provider.EnumerateItemsAsync(CurrentFolder, bag.Add, CancellationToken.None).ConfigureAwait(false);
-
-		await await Task.Run<Task>(async () =>
+		await await Runner.Run<Task>(async () =>
 		{
-			Files.Clear();
-
-			OnPropertyChanged(nameof(FileCount));
-
 			var items = Provider.GetItemsAsync(CurrentFolder!, search, recursive, TokenSource.Token);
 
 			if (recursive)
 			{
 				if (Provider is FileSystemProvider)
 				{
-					var tempItems = Provider.GetItems(CurrentFolder, "*", false, TokenSource.Token)
-						.Select(s =>
-						{
-							var result = Enumerable.Empty<IFileItem>();
-
-							if (s.IsFolder)
-							{
-								result = Provider.GetItems(s, search, recursive, TokenSource.Token);
-							}
-
-							return result.Prepend(s);
-						});
-
-					await Files.AddRangeAsync(tempItems, TokenSource.Token);
+					await Files.AddRangeAsync(Provider, CurrentFolder, search, TokenSource.Token);
 				}
 				else
 				{
@@ -352,7 +334,12 @@ public sealed partial class TabItemViewModel
 
 	partial void OnIsLoadingChanged(bool value)
 	{
-		GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized, false, true);
+		// if (!value)
+		// {
+		// 	GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+		// }
+
+		GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized, false);
 	}
 
 	partial void OnCurrentFolderChanged(IFileItem? value)
@@ -373,27 +360,40 @@ public sealed partial class TabItemViewModel
 
 	private void UpdateFolder(ChangeType type, string path, string? newPath)
 	{
+		if (IsLoading)
+		{
+			return;
+		}
+
 		switch (type)
 		{
 			case ChangeType.Changed:
 				for (var i = Files.Count - 1; i >= 0; i--)
 				{
-					if (Files[i].GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path))
+					var file = Files[i];
+
+					if (file?.GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path) == true)
 					{
-						Files[i].UpdateData();
+						file.UpdateData();
 					}
 				}
 				break;
 			case ChangeType.Created:
 				if (_provider is FileSystemProvider)
 				{
-					for (var i = Files.Count - 1; i >= 0; i--)
-					{
-						if (Files[i].GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path))
-						{
-							return;
-						}
-					}
+					// for (var i = Files.Count - 1; i >= 0; i--)
+					// {
+					// 	if (i < Files.Count)
+					// 	{
+					// 		return;
+					// 	}
+					// 	var file = Files[i];
+					//
+					// 	if (file?.GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path) == true)
+					// 	{
+					// 		return;
+					// 	}
+					// }
 
 					_files.Add(new FileModel(FileSystemTreeItem.FromPath(path)));
 				}
@@ -401,7 +401,9 @@ public sealed partial class TabItemViewModel
 			case ChangeType.Deleted:
 				for (var i = Files.Count - 1; i >= 0; i--)
 				{
-					if (Files[i].GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path))
+					var file = Files[i];
+
+					if (file?.GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path) == true)
 					{
 						Files.RemoveAt(i);
 						break;
@@ -411,9 +413,11 @@ public sealed partial class TabItemViewModel
 			case ChangeType.Renamed:
 				for (var i = _files.Count - 1; i >= 0; i--)
 				{
-					if (Files[i].GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path))
+					var file = Files[i];
+
+					if (file?.GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path) == true)
 					{
-						Files[i].Name = System.IO.Path.GetFileName(newPath);
+						file.Name = System.IO.Path.GetFileName(newPath);
 					}
 				}
 				break;

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using FileExplorer.Core.Extensions;
 using FileExplorer.Core.Interfaces;
 using PerformanceTests;
 
@@ -17,8 +18,6 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 	public event Action<string> OnPropertyChanged = delegate { };
 
 	public event NotifyCollectionChangedEventHandler? CollectionChanged = delegate { };
-
-	public static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default, Environment.ProcessorCount / 4); // BitOperations.Log2((uint)Environment.ProcessorCount));
 
 	private readonly DynamicList<T> _data = new();
 
@@ -378,65 +377,59 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 	/// <summary>
 	/// Clears the current collection and replaces it with the specified collection.
 	/// </summary>
-	public async Task AddRangeAsync(IEnumerable<IEnumerable<T>> collection, CancellationToken token = default)
+	public async Task AddRangeAsync(IItemProvider provider, IFileItem folder, string pattern, CancellationToken token = default)
 	{
-		ArgumentNullException.ThrowIfNull(collection);
+		ArgumentNullException.ThrowIfNull(provider);
 
 		var index = Math.Max(0, Count - 1);
 		var bag = new DynamicBag<T>();
 
 		var isLocked = false;
 
-		var task = Task.WhenAll(collection.Select(s => Task.Factory.StartNew(x =>
+		var task = provider.EnumerateItemsAsync(folder, pattern, x => bag.Add((T)x), token).ConfigureAwait(false);
+		var isDone = false;
+
+		Runner.Run<Task>(async () =>
 		{
-			foreach (var item in s)
+			using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(UpdateCountTime));
+
+			try
 			{
-				if (token.IsCancellationRequested)
+				while (await timer.WaitForNextTickAsync(token) && !isDone)
 				{
-					return;
-				}
+					var lockTaken = false;
 
-				bag.Add(item);
-			}
-		}, SyncRoot, token, TaskCreationOptions.None, concurrentExclusiveScheduler.ConcurrentScheduler)));
-
-		using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(UpdateCountTime));
-
-		try
-		{
-			while (await timer.WaitForNextTickAsync(token))
-			{
-				var lockTaken = false;
-
-				try
-				{
-					bag.FreezeBag(ref lockTaken);
-
-					var count = bag.DangerousCount;
-
-					if (count > 0)
+					try
 					{
-						_data.EnsureCapacity(_data.Count + count);
-						_data._size += bag.CopyFromEachQueueToArray(_data._items, _data._size);
+						bag.FreezeBag(ref lockTaken);
 
-						OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new ReadonlyPartialCollection<T>(_data, index, Count - index), index));
+						var count = bag.DangerousCount;
 
-						index = Count;
+						if (count > 0)
+						{
+							_data.EnsureCapacity(_data.Count + count);
+							_data._size += bag.CopyFromEachQueueToArray(_data._items, _data._size);
+
+							OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new ReadonlyPartialCollection<T>(_data, index, Count - index), index));
+
+							index = Count;
+						}
+					}
+					finally
+					{
+						bag.UnfreezeBag(lockTaken);
+						bag.Clear();
 					}
 				}
-				finally
-				{
-					bag.UnfreezeBag(lockTaken);
-					bag.Clear();
-				}
 			}
-		}
-		catch (Exception e)
-		{
-			Console.WriteLine(e);
-		}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+			}
+		}, token);
 
 		await task;
+		isDone = true;
 
 		while (bag.TryTake(out var result))
 		{
@@ -474,10 +467,9 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 	public async ValueTask ClearTrim()
 	{
 		_data.Clear();
-
-		await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, _data));
-
 		_data.Capacity = 0;
+
+		await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 	}
 
 	public void Trim()

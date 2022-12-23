@@ -97,7 +97,7 @@ public sealed class FileTreeGrid : UserControl, IFileViewer
 													Bindings =
 													{
 														new Binding("!IsSuccessfullyCompleted"),
-														new Binding("$parent[1].DataContext.IsFolder")
+														new Binding("$parent[1].DataContext.IsFolder"),
 													},
 													Converter = BoolConverters.And,
 												},
@@ -112,7 +112,7 @@ public sealed class FileTreeGrid : UserControl, IFileViewer
 													Bindings =
 													{
 														new Binding("!IsSuccessfullyCompleted"),
-														new Binding("!$parent[1].DataContext.IsFolder")
+														new Binding("!$parent[1].DataContext.IsFolder"),
 													},
 													Converter = BoolConverters.And,
 												},

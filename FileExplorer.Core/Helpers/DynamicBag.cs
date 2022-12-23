@@ -414,13 +414,61 @@ public class DynamicBag<T> : IProducerConsumerCollection<T>, IReadOnlyCollection
 			for (var queue = _workStealingQueues; queue != null; queue = queue._nextQueue)
 			{
 				T? ignored;
-				while (queue.TrySteal(out ignored, take: true)) ;
+				while (queue.TrySteal(out ignored, take: true));
 			}
 		}
 		finally
 		{
 			UnfreezeBag(lockTaken);
 		}
+	}
+
+	public T[] ToArrayAndClear()
+	{
+		var arr = Array.Empty<T>();
+		if (_workStealingQueues != null)
+		{
+			var lockTaken = false;
+			try
+			{
+				FreezeBag(ref lockTaken);
+
+				var count = DangerousCount;
+
+				if (count > 0)
+				{
+					arr = GC.AllocateUninitializedArray<T>(count);
+					var copied = CopyFromEachQueueToArray(arr, 0);
+
+					var local = GetCurrentThreadWorkStealingQueue(forceCreate: false);
+					var shouldClearMore = true;
+
+					if (local != null)
+					{
+						local.LocalClear();
+
+							// If it's the only queue, nothing more to do.
+							shouldClearMore = !(local._nextQueue == null && local == _workStealingQueues);
+					}
+
+					if (shouldClearMore)
+					{
+						for (var queue = _workStealingQueues; queue != null; queue = queue._nextQueue)
+						{
+							T? ignored;
+							while (queue.TrySteal(out ignored, take: true)) ;
+						}
+					}
+				}
+			}
+			finally
+			{
+				UnfreezeBag(lockTaken);
+			}
+		}
+
+		// Bag was empty
+		return arr;
 	}
 
 	/// <summary>
@@ -435,7 +483,7 @@ public class DynamicBag<T> : IProducerConsumerCollection<T>, IReadOnlyCollection
 	/// <see cref="GetEnumerator"/> was called.  The enumerator is safe to use
 	/// concurrently with reads from and writes to the bag.
 	/// </remarks>
-	public IEnumerator<T> GetEnumerator() => new Enumerator(ToArray());
+	public IEnumerator<T> GetEnumerator() => new Enumerator(this);
 
 	/// <summary>
 	/// Returns an enumerator that iterates through the <see
@@ -1057,46 +1105,26 @@ public class DynamicBag<T> : IProducerConsumerCollection<T>, IReadOnlyCollection
 	/// </remarks>
 	private sealed class Enumerator : IEnumerator<T>
 	{
-		private readonly T[] _array;
-		private T? _current;
-		private int _index;
+		private readonly DynamicBag<T> _bag;
+		private T _current;
 
-		public Enumerator(T[] array)
+		public Enumerator(DynamicBag<T> bag)
 		{
-			_array = array;
+			_bag = bag;
 		}
 
 		public bool MoveNext()
 		{
-			if (_index < _array.Length)
-			{
-				_current = _array[_index++];
-				return true;
-			}
-
-			_index = _array.Length + 1;
-			return false;
+			return _bag.TryTake(out _current);
 		}
 
 		public T Current => _current!;
 
-		object? IEnumerator.Current
-		{
-			get
-			{
-				if (_index == 0 || _index == _array.Length + 1)
-				{
-					throw new InvalidOperationException("Enumeration is not started or is already finished");
-				}
-
-				return Current;
-			}
-		}
+		object? IEnumerator.Current => _current;
 
 		public void Reset()
 		{
-			_index = 0;
-			_current = default;
+
 		}
 
 		public void Dispose()

@@ -381,7 +381,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		}
 	}
 
-	private class FileSystemTreeItemEnumerable : IEnumerable<FileSystemTreeItem>
+	public class FileSystemTreeItemEnumerable : IEnumerable<FileSystemTreeItem>
 	{
 		private readonly DelegateFileSystemEnumerator<FileSystemTreeItem> _enumerator;
 

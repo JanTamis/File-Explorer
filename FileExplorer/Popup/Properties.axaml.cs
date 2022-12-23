@@ -8,10 +8,12 @@ using System.Runtime.CompilerServices;
 using Avalonia.Media;
 using Avalonia.Threading;
 using DialogHostAvalonia;
+using FileExplorer.Core.Extensions;
 using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 using FileExplorer.Models;
+using Microsoft.Identity.Client;
 
 namespace FileExplorer.Popup;
 
@@ -90,10 +92,10 @@ public sealed partial class Properties : UserControl, IPopup, INotifyPropertyCha
 							return result.Prepend(s);
 						});
 
-					Task.WhenAll(tempItems.Select(s => Task.Factory.StartNew(_ =>
+					Task.WhenAll(tempItems.Select(s => Runner.RunPrimary(() =>
 					{
 						var timestamp = Stopwatch.GetTimestamp();
-						var size = 0l;
+						var size = 0L;
 
 						foreach (var item in s)
 						{
@@ -110,11 +112,9 @@ public sealed partial class Properties : UserControl, IPopup, INotifyPropertyCha
 								Interlocked.Add(ref _size, size);
 								size = 0;
 								timestamp = Stopwatch.GetTimestamp();
-
-
 							}
 						}
-					}, null, _source.Token, TaskCreationOptions.None, ObservableRangeCollection<IFileItem>.concurrentExclusiveScheduler.ConcurrentScheduler)));
+					}, _source.Token)));
 
 					var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(50));
 

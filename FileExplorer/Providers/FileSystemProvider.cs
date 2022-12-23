@@ -1,4 +1,6 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Avalonia.Media;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
@@ -9,12 +11,14 @@ using System.IO.Enumeration;
 using System.Text.RegularExpressions;
 using Avalonia.Svg;
 using DialogHostAvalonia;
+using FileExplorer.Core.Extensions;
+using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Models;
 using FileExplorer.DisplayViews;
 using FileExplorer.Popup;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
-using System.Threading.Tasks;
+using FileSystemTreeItem = FileExplorer.Models.FileSystemTreeItem;
 
 namespace FileExplorer.Providers;
 
@@ -23,8 +27,6 @@ public sealed class FileSystemProvider : IItemProvider
 	private readonly MemoryCache? _imageCache;
 
 	private IFileItem[]? _clipboard;
-
-	private static readonly ConcurrentExclusiveSchedulerPair concurrentExclusiveScheduler = new(TaskScheduler.Default, Environment.ProcessorCount / 2);
 
 	public FileSystemProvider()
 	{
@@ -141,23 +143,49 @@ public sealed class FileSystemProvider : IItemProvider
 		return ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested && item.IsVisible);
 	}
 
-	public async Task EnumerateItemsAsync(IFileItem folder, Action<IFileItem> action, CancellationToken token)
+	public async Task EnumerateItemsAsync(IFileItem folder, string pattern, Action<IFileItem> action, CancellationToken token)
 	{
-		await Task.WhenAll(await Task.Factory.StartNew(() =>
+		if (folder is FileModel model)
 		{
-			return GetItems(folder, "*", false, token)
-				.Select(item =>
+			var bag = new ConcurrentQueue<Task>();
+			bag.Enqueue(Run(bag, model.TreeItem, pattern, action, token));
+
+			while (bag.TryDequeue(out var task))
+			{
+				await task;
+			}
+		}
+
+		Task Run(ConcurrentQueue<Task> bag, FileSystemTreeItem folder, string pattern, Action<FileModel> action, CancellationToken token)
+		{
+			return Runner.RunPrimary(() =>
+			{
+				using var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(folder.GetPath(), FileSystemTreeItem.Options)
 				{
-					action(item);
+					Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, folder),
+					Find = (ref FileSystemEntry entry) => entry.IsDirectory || FileSystemName.MatchesSimpleExpression(pattern, entry.FileName),
+				};
+
+				while (enumerable.MoveNext() && !token.IsCancellationRequested)
+				{
+					var item = enumerable.Current;
 
 					if (item.IsFolder)
 					{
-						return EnumerateItemsAsync(item, action, token);
-					}
+						bag.Enqueue(Run(bag, item, pattern, action, token));
 
-					return Task.CompletedTask;
-				});
-		}, CancellationToken.None, TaskCreationOptions.None, concurrentExclusiveScheduler.ConcurrentScheduler).ConfigureAwait(false));
+						if (FileSystemName.MatchesSimpleExpression(pattern, item.Value))
+						{
+							action(new FileModel(item));
+						}
+					}
+					else
+					{
+						action(new FileModel(item));
+					}
+				}
+			}, token);
+		}
 	}
 
 	public IEnumerable<MenuItemModel> GetMenuItems(IFileItem? item)
@@ -178,7 +206,7 @@ public sealed class FileSystemProvider : IItemProvider
 		yield return new MenuItemModel(MenuItemType.Button, "Analyze", Analyze);
 	}
 
-	public IFolderUpdateNotificator? GetNotificator(IFileItem? folder, string filter, bool recursive)
+	public IFolderUpdateNotificator? GetNotificator([NotNullIfNotNull(nameof(folder))] IFileItem? folder, string filter, bool recursive)
 	{
 		if (folder is null)
 		{
