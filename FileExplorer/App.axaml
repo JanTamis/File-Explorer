@@ -4,263 +4,405 @@
              xmlns:converters="using:FileExplorer.Converters"
              xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-             xmlns:link="clr-namespace:HyperText.Avalonia;assembly=HyperText.Avalonia"
              xmlns:ripple="clr-namespace:Material.Ripple;assembly=Material.Ripple"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:naming="clr-namespace:Material.Styles.Resources.Naming;assembly=Material.Styles"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="FileExplorer.App">
-  <Application.DataTemplates>
-	<local:ViewLocator />
-  </Application.DataTemplates>
+	<Application.DataTemplates>
+		<local:ViewLocator />
+	</Application.DataTemplates>
 
-  <Application.Resources>
-	<!-- fields are filled in code behind -->
-	<SolidColorBrush Color="Transparent" x:Key="WindowBackground" />
-	<SolidColorBrush Color="Transparent" x:Key="WindowBorder" />
+	<Application.Resources>
+		<!-- fields are filled in code behind -->
+		<SolidColorBrush Color="Transparent" x:Key="WindowBackground" />
+		<SolidColorBrush Color="Transparent" x:Key="WindowBorder" />
 
-	<converters:PathToImageConverter x:Key="imageConverter" />
-	<converters:EditedOnConverter x:Key="editedOnConverter" />
-	<converters:ExtensionConverter x:Key="extensionConverter" />
-	<converters:SizeConverter x:Key="sizeConverter" />
-	<converters:FileNameConverter x:Key="fileNameConverter" />
-	<converters:ImageTransformConverter x:Key="imageTransformConverter" />
-	<converters:DateTimeConverter x:Key="dateTimeConverter" />
-	<converters:IsHiddenConverter x:Key="isHiddenConverter" />
-	<converters:PathToFoldersConverter x:Key="pathToFoldersConverter" />
-	<converters:MainTitleMarginConverter x:Key="mainTitleMarginConverter" />
-	<converters:MinSizeConverter x:Key="minSizeConverter" />
-	<converters:MoreThanConverter x:Key="moreThanConverter" />
-	<converters:EnumToValuesConverter x:Key="enumToValuesConverter" />
-	<converters:WindowStateToIconConverter x:Key="windowStateToIconConverter" />
-  </Application.Resources>
+		<converters:PathToImageConverter x:Key="imageConverter" />
+		<converters:EditedOnConverter x:Key="editedOnConverter" />
+		<converters:ExtensionConverter x:Key="extensionConverter" />
+		<converters:SizeConverter x:Key="sizeConverter" />
+		<converters:FileNameConverter x:Key="fileNameConverter" />
+		<converters:ImageTransformConverter x:Key="imageTransformConverter" />
+		<converters:DateTimeConverter x:Key="dateTimeConverter" />
+		<converters:IsHiddenConverter x:Key="isHiddenConverter" />
+		<converters:PathToFoldersConverter x:Key="pathToFoldersConverter" />
+		<converters:MainTitleMarginConverter x:Key="mainTitleMarginConverter" />
+		<converters:MinSizeConverter x:Key="minSizeConverter" />
+		<converters:MoreThanConverter x:Key="moreThanConverter" />
+		<converters:EnumToValuesConverter x:Key="enumToValuesConverter" />
+		<converters:WindowStateToIconConverter x:Key="windowStateToIconConverter" />
+	</Application.Resources>
 
-  <Application.Styles>
-	<themes:MaterialTheme BaseTheme="Dark" PrimaryColor="Blue" SecondaryColor="Blue" />
+	<Application.Styles>
+		<themes:MaterialTheme BaseTheme="Dark" PrimaryColor="DeepPurple" SecondaryColor="DeepPurple" />
+		<avalonia:MaterialIconStyles />
+		
+		<StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml" />
+		<StyleInclude Source="avares://DialogHost.Avalonia/Styles.xaml" />
+		<StyleInclude Source="avares://FileExplorer/Styles/TreeDataGrid.axaml" />
 
-	<!-- <link:HyperLinkStyle/> -->
+		<Style Selector="MenuItem">
+			<Setter Property="Height" Value="30" />
+		</Style>
 
-	<StyleInclude Source="avares://Material.Icons.Avalonia/App.xaml" />
-	<StyleInclude Source="avares://DialogHost.Avalonia/Styles.xaml" />
-	<StyleInclude Source="avares://FileExplorer/Styles/TreeDataGrid.axaml" />
-	<!-- <FluentTheme Mode="Dark" /> -->
-	<!-- <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml" /> -->
+		<Style Selector="TreeViewItem">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="BorderThickness" Value="0" />
+			<Setter Property="Padding" Value="8" />
+			<Setter Property="Foreground" Value="{Binding $parent[TreeView].Foreground}" />
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate>
+						<Grid ColumnDefinitions="40,40,*" RowDefinitions="Auto,Auto,*"
+						      Name="{x:Static naming:PartNames.PartContentPanel}">
+							<ToggleButton Grid.Row="0"
+							              Grid.Column="0"
+							              Name="{x:Static naming:PartNames.PartExpanderButton}"
+							              ClickMode="Press"
+							              IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"
+							              Classes="material-tree-view-item-expander"
+							              Foreground="{TemplateBinding Foreground}"
+							              Margin="8 0 8 0"
+							              VerticalAlignment="Center" />
 
-	<Style Selector="MenuItem">
-	  <Setter Property="Height" Value="30" />
-	</Style>
+							<Border Name="PART_BehaviourEffect"
+							        Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2"
+							        IsHitTestVisible="False"
+							        Background="{TemplateBinding Foreground}" />
 
-	<Style Selector="TreeViewItem">
-	  <Setter Property="Background" Value="Transparent" />
-	  <Setter Property="BorderThickness" Value="0" />
-	  <Setter Property="Padding" Value="8" />
-	  <Setter Property="Foreground" Value="{Binding $parent[TreeView].Foreground}" />
-	  <Setter Property="Template">
-			<Setter.Value>
-			  <ControlTemplate>
-					<Grid ColumnDefinitions="40,40,*" RowDefinitions="Auto,Auto,*" Name="{x:Static naming:PartNames.PartContentPanel}">
-					  <ToggleButton Grid.Row="0"
-					                Grid.Column="0"
-					                Name="{x:Static naming:PartNames.PartExpanderButton}"
-					                ClickMode="Press"
-									        IsChecked="{TemplateBinding IsExpanded, Mode=TwoWay}"
-									        Classes="material-tree-view-item-expander"
-									        Foreground="{TemplateBinding Foreground}"
-									        Margin="8 0 8 0"
-									        VerticalAlignment="Center" />
+							<Grid Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Name="ContentGrid">
+								<ripple:RippleEffect RippleFill="{DynamicResource MaterialDesignBodyLight}"
+								                     Focusable="False">
+									<ContentPresenter Name="PART_Header"
+									                  Margin="{Binding $parent[TreeViewItem].Padding}"
+									                  Content="{TemplateBinding Header}" />
+								</ripple:RippleEffect>
+							</Grid>
 
-					  <Border Name="PART_BehaviourEffect"
-					          Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2"
-					          IsHitTestVisible="False"
-					          Background="{TemplateBinding Foreground}" />
+							<ItemsControl Name="ItemsHost"
+							              Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2"
+							              Margin="-16 0 0 0"
+							              VerticalAlignment="Top"
+							              IsVisible="{TemplateBinding IsExpanded}"
+							              ItemsSource="{TemplateBinding ItemsSource}"
+							              ItemsPanel="{TemplateBinding ItemsPanel}" />
+						</Grid>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
 
-					  <Grid Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Name="ContentGrid">
-							<ripple:RippleEffect RippleFill="{DynamicResource MaterialDesignBodyLight}"
-							                     Focusable="False">
-							  <ContentPresenter Name="PART_Header"
-							                    Margin="{Binding $parent[TreeViewItem].Padding}"
-												          Content="{TemplateBinding Header}" />
-							</ripple:RippleEffect>
-					  </Grid>
-
-					  <ItemsPresenter Name="ItemsHost"
-						                Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="2"
-						                Margin="-16 0 0 0"
-						                VerticalAlignment="Top"
-						                IsVisible="{TemplateBinding IsExpanded}"
-						                Items="{TemplateBinding Items}"
-						                ItemsPanel="{TemplateBinding ItemsPanel}" />
-					</Grid>
-			  </ControlTemplate>
-			</Setter.Value>
-	  </Setter>
-	</Style>
-
-	<Style Selector="TextBox">
-	  <Setter Property="Background" Value="Transparent" />
-	  <Setter Property="BorderThickness" Value="0" />
-	  <Setter Property="Template">
-		<ControlTemplate>
-		  <Border Name="PART_RootBorder" Cursor="Ibeam"
+		<Style Selector="TextBox">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="VerticalContentAlignment" Value="Center" />
+			<Setter Property="BorderThickness" Value="0" />
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Border Name="PART_RootBorder" Cursor="Ibeam"
 					        Background="{TemplateBinding Background}"
 					        BorderBrush="{TemplateBinding BorderBrush}"
 					        BorderThickness="{TemplateBinding BorderThickness}">
-			<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="{TemplateBinding Padding}">
-			  <DataValidationErrors Name="DataValidation">
-				<Grid ColumnDefinitions="Auto,*,Auto">
-				  <ContentPresenter Grid.Column="0" Content="{TemplateBinding InnerLeftContent}" />
-				  <Grid Name="PART_InnerRoot" Grid.Column="1">
-					<Panel Name="PART_TextRoot" VerticalAlignment="Center">
-					  <TextBlock Name="watermark" Classes="Subtitle1" Opacity="0.5"
-                                 Text="{TemplateBinding Watermark}"
-                                 FontFamily="{TemplateBinding FontFamily}"
-                                 TextAlignment="{TemplateBinding TextAlignment}"
-                                 TextWrapping="{TemplateBinding TextWrapping}" />
-					  <TextPresenter Name="PART_TextPresenter"
-                                     Text="{TemplateBinding Text, Mode=TwoWay}"
-                                     CaretIndex="{TemplateBinding CaretIndex}"
-                                     SelectionStart="{TemplateBinding SelectionStart}"
-                                     SelectionEnd="{TemplateBinding SelectionEnd}"
-                                     TextAlignment="{TemplateBinding TextAlignment}"
-                                     TextWrapping="{TemplateBinding TextWrapping}"
-                                     PasswordChar="{TemplateBinding PasswordChar}"
-                                     RevealPassword="{TemplateBinding RevealPassword}"
-                                     SelectionBrush="{TemplateBinding SelectionBrush}"
-                                     SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
-                                     CaretBrush="{TemplateBinding CaretBrush}" />
-					</Panel>
-				  </Grid>
-				  <ContentPresenter Grid.Column="2" Content="{TemplateBinding InnerRightContent}" />
-				</Grid>
-			  </DataValidationErrors>
-			</Grid>
-		  </Border>
-		</ControlTemplate>
-	  </Setter>
-	</Style>
+						<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="{TemplateBinding Padding}">
+							<DataValidationErrors Name="DataValidation">
+								<Grid ColumnDefinitions="Auto,*,Auto">
+									<ContentPresenter Grid.Column="0" Content="{TemplateBinding InnerLeftContent}" />
+									<Grid Name="PART_InnerRoot" Grid.Column="1">
+										<Panel>
+                      <TextBlock Name="PART_Watermark"
+                              Opacity="0.5"
+                              Text="{TemplateBinding Watermark}"
+                              TextAlignment="{TemplateBinding TextAlignment}"
+                              TextWrapping="{TemplateBinding TextWrapping}"
+                              IsVisible="{TemplateBinding Text, Converter={x:Static StringConverters.IsNullOrEmpty}}"
+                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                      <TextPresenter Name="PART_TextPresenter"
+                                    Text="{TemplateBinding Text, Mode=TwoWay}"
+                                    CaretIndex="{TemplateBinding CaretIndex}"
+                                    SelectionStart="{TemplateBinding SelectionStart}"
+                                    SelectionEnd="{TemplateBinding SelectionEnd}"
+                                    TextAlignment="{TemplateBinding TextAlignment}"
+                                    TextWrapping="{TemplateBinding TextWrapping}"
+                                    LineHeight="{TemplateBinding LineHeight}"
+                                    LetterSpacing="{TemplateBinding LetterSpacing}"
+                                    PasswordChar="{TemplateBinding PasswordChar}"
+                                    RevealPassword="{TemplateBinding RevealPassword}"
+                                    SelectionBrush="{TemplateBinding SelectionBrush}"
+                                    SelectionForegroundBrush="{TemplateBinding SelectionForegroundBrush}"
+                                    CaretBrush="{TemplateBinding CaretBrush}"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </Panel>
+									</Grid>
+									<ContentPresenter Grid.Column="2" Content="{TemplateBinding InnerRightContent}" />
+								</Grid>
+							</DataValidationErrors>
+						</Grid>
+					</Border>
+				</ControlTemplate>
+			</Setter>
+		</Style>
 
-	<Style Selector="ComboBox">
-	  <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-	  <Setter Property="HorizontalAlignment" Value="Stretch"/>
-	  <Setter Property="VerticalAlignment" Value="Center"/>
-	  <Setter Property="BorderBrush" Value="Transparent" />
-	  <Setter Property="BorderThickness" Value="0" />
-	  <!-- FixBorderThickness -->
-	  <Setter Property="Padding" Value="8,4" />
-	  <Setter Property="ClipToBounds" Value="False"/>
-	  <Setter Property="Template">
-		<ControlTemplate>
-		  <Grid Name="templateRoot"
-                Background="{TemplateBinding Background}"
-                ClipToBounds="False" >
-			<Grid ColumnDefinitions="*,Auto" ClipToBounds="False">
-			  <Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                    Margin="{TemplateBinding Padding}"
-                    UseLayoutRounding="{TemplateBinding UseLayoutRounding}">
+		<Style Selector="ComboBox">
+			<Setter Property="HorizontalContentAlignment" Value="Stretch" />
+			<Setter Property="HorizontalAlignment" Value="Stretch" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+			<Setter Property="BorderBrush" Value="Transparent" />
+			<Setter Property="BorderThickness" Value="0" />
+			<!-- FixBorderThickness -->
+			<Setter Property="Padding" Value="8,4" />
+			<Setter Property="ClipToBounds" Value="False" />
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Grid Name="templateRoot"
+					      Background="{TemplateBinding Background}"
+					      ClipToBounds="False">
+						<Grid ColumnDefinitions="*,Auto" ClipToBounds="False">
+							<Grid HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+							      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+							      Margin="{TemplateBinding Padding}"
+							      UseLayoutRounding="{TemplateBinding UseLayoutRounding}">
 
-				<Grid Name="InputRoot"
-                      HorizontalAlignment="Stretch"
-                      ColumnDefinitions="*,Auto">
-				  <TextBlock Name="placeholderText" Text="{TemplateBinding PlaceholderText}"
-                             Grid.Column="1"
-                             TextAlignment="Left" FontFamily="{TemplateBinding FontFamily}" Margin="0,4"/>
+								<Grid Name="InputRoot"
+								      HorizontalAlignment="Stretch"
+								      ColumnDefinitions="*,Auto">
+									<TextBlock Name="placeholderText" Text="{TemplateBinding PlaceholderText}"
+									           Grid.Column="1"
+									           TextAlignment="Left" FontFamily="{TemplateBinding FontFamily}" Margin="0,4" />
 
-				  <ContentPresenter Name="contentPresenter"
-                                    Grid.Column="0"
-                                    Content="{TemplateBinding SelectionBoxItem}"
-                                    ContentTemplate="{TemplateBinding ItemTemplate}"
-                                    HorizontalContentAlignment="Left"
-                                    Margin="0, 4"/>
-				</Grid>
-			  </Grid>
+									<ContentPresenter Name="contentPresenter"
+									                  Grid.Column="0"
+									                  Content="{TemplateBinding SelectionBoxItem}"
+									                  ContentTemplate="{TemplateBinding ItemTemplate}"
+									                  HorizontalContentAlignment="Left"
+									                  Margin="0, 4" />
+								</Grid>
+							</Grid>
 
-			  <Popup Name="PART_Popup"
-                     IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
-                     MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
-                     VerticalOffset="0"
-                     Margin="-8"
-                     WindowManagerAddShadowHint="False"
-                     PlacementTarget="{Binding ElementName=templateRoot}"
-                     IsLightDismissEnabled="True"
-                     UseLayoutRounding="True"
-                     ClipToBounds="False" >
-				<controls:Card assists:ShadowAssist.ShadowDepth="Depth1"
-                     Margin="4,0,4,4"
-                     Foreground="red"
-                     CornerRadius="0,0,4,4"
-                     Padding="0">
-				  <ScrollViewer Background="{Binding Background, ElementName=PART_Popup}"
-                                MaxHeight="{TemplateBinding MaxDropDownHeight}"
-                                MinHeight="1" >
-					<ItemsPresenter Name="PART_ItemsPresenter"
-                                    Items="{TemplateBinding Items}"
-                            ItemsPanel="{TemplateBinding ItemsPanel}"
-                            ItemTemplate="{TemplateBinding ItemTemplate}"
-                            VirtualizationMode="{TemplateBinding VirtualizationMode}" />
-				  </ScrollViewer>
-				</controls:Card>
-			  </Popup>
-			</Grid>
-		  </Grid>
-		</ControlTemplate>
-	  </Setter>
-	</Style>
+							<Popup Name="PART_Popup"
+							       IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+							       MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
+							       VerticalOffset="0"
+							       Margin="-8"
+							       WindowManagerAddShadowHint="False"
+							       PlacementTarget="{Binding ElementName=templateRoot}"
+							       IsLightDismissEnabled="True"
+							       UseLayoutRounding="True"
+							       ClipToBounds="False">
+								<controls:Card assists:ShadowAssist.ShadowDepth="Depth1"
+								               Margin="4,0,4,4"
+								               CornerRadius="0,0,4,4"
+								               Padding="0">
+									<ScrollViewer Background="{Binding Background, ElementName=PART_Popup}"
+									              MaxHeight="{TemplateBinding MaxDropDownHeight}"
+									              MinHeight="1">
+										<ItemsControl Name="PART_ItemsPresenter"
+										              ItemsSource="{TemplateBinding ItemsSource}"
+										              ItemsPanel="{TemplateBinding ItemsPanel}"
+										              ItemTemplate="{TemplateBinding ItemTemplate}" />
+									</ScrollViewer>
+								</controls:Card>
+							</Popup>
+						</Grid>
+					</Grid>
+				</ControlTemplate>
+			</Setter>
+		</Style>
 
-	<Style Selector="ComboBoxItem">
-	  <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBodyLight}" />
-	</Style>
+		<Style Selector="ComboBoxItem">
+			<Setter Property="Foreground" Value="{DynamicResource MaterialDesignBodyLight}" />
+		</Style>
 
-	<Style Selector="TitleBar">
-	  <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
-	</Style>
+		<Style Selector="TitleBar">
+			<Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+		</Style>
 
-	<Style Selector="ComboBoxItem:pointerover">
-	  <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
-	</Style>
+		<Style Selector="ComboBoxItem:pointerover">
+			<Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+		</Style>
 
-	<Style Selector="Button">
-	  <Setter Property="Cursor" Value="Arrow" />
-	</Style>
+		<Style Selector="Button">
+			<Setter Property="Cursor" Value="Arrow" />
+		</Style>
 
-	<Style Selector="TextBlock">
-	  <Setter Property="VerticalAlignment" Value="Center" />
-	</Style>
+		<Style Selector="TextBlock">
+			<Setter Property="VerticalAlignment" Value="Center" />
+		</Style>
 
-	<Style Selector="ToolTip">
-	  <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
-	  <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
-	  <Setter Property="MaxWidth" Value="100000" />
-	  <Setter Property="Padding" Value="5" />
-	  <Setter Property="Template">
-		<ControlTemplate>
-		  <controls:Card Name="PART_LayoutRoot"
-                       Margin="10"
-                       assists:ShadowAssist.ShadowDepth="CenterDepth2"
-                       BorderThickness="{TemplateBinding BorderThickness}"
-                       Background="{TemplateBinding Background}"
-                       BorderBrush="{TemplateBinding BorderBrush}"
-                       Padding="{TemplateBinding Padding}"
-                       CornerRadius="{TemplateBinding CornerRadius}">
-			<ContentPresenter Name="PART_ContentPresenter"
-                              MaxWidth="{TemplateBinding MaxWidth}"
-                              Content="{TemplateBinding Content}"
-                              ContentTemplate="{TemplateBinding ContentTemplate}" />
-		  </controls:Card>
-		</ControlTemplate>
-	  </Setter>
-	</Style>
+		<Style Selector="ToolTip">
+			<Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+			<Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
+			<Setter Property="MaxWidth" Value="100000" />
+			<Setter Property="Padding" Value="5" />
+			<Setter Property="Template">
+				<ControlTemplate>
+					<controls:Card Name="PART_LayoutRoot"
+					               Margin="10"
+					               assists:ShadowAssist.ShadowDepth="CenterDepth2"
+					               BorderThickness="{TemplateBinding BorderThickness}"
+					               Background="{TemplateBinding Background}"
+					               BorderBrush="{TemplateBinding BorderBrush}"
+					               Padding="{TemplateBinding Padding}"
+					               CornerRadius="{TemplateBinding CornerRadius}">
+						<ContentPresenter Name="PART_ContentPresenter"
+						                  MaxWidth="{TemplateBinding MaxWidth}"
+						                  Content="{TemplateBinding Content}"
+						                  ContentTemplate="{TemplateBinding ContentTemplate}" />
+					</controls:Card>
+				</ControlTemplate>
+			</Setter>
+		</Style>
 
-	  <Style Selector="Button.Flat" >
-		  <Setter Property="HorizontalContentAlignment" Value="Center" />
-		  <Setter Property="VerticalContentAlignment" Value="Center" />
-		  <Setter Property="Background" Value="Transparent" />
-		  <Setter Property="BorderBrush" Value="Transparent" />
-		  <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}" />
-		  <Setter Property="Padding" Value="16 6" />
-		  <Setter Property="assists:ShadowAssist.ShadowDepth" Value="Depth0" />
-		  <Setter Property="assists:ButtonAssist.HoverColor" Value="{DynamicResource MaterialDesignBody}" />
-		  <Setter Property="assists:ButtonAssist.ClickFeedbackColor" Value="{Binding $self.Foreground}" />
-	  </Style>
+		<Style Selector="Button.Flat">
+			<Setter Property="HorizontalContentAlignment" Value="Center" />
+			<Setter Property="VerticalContentAlignment" Value="Center" />
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="BorderBrush" Value="Transparent" />
+			<Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}" />
+			<Setter Property="Padding" Value="16 6" />
+			<Setter Property="assists:ShadowAssist.ShadowDepth" Value="Depth0" />
+			<Setter Property="assists:ButtonAssist.HoverColor" Value="{DynamicResource MaterialDesignBody}" />
+			<Setter Property="assists:ButtonAssist.ClickFeedbackColor" Value="{Binding $self.Foreground}" />
+		</Style>
 
-  </Application.Styles>
+		<Style Selector="Arc">
+			<Setter Property="StrokeLineCap" Value="Round" />
+		</Style>
+
+		<!-- <Style Selector="ListBoxItem:selected"> -->
+		<!-- 	<Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}"></Setter> -->
+		<!-- </Style> -->
+		
+		<Style Selector="TreeDataGridRow">
+			<Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDivider}"/>
+			<Setter Property="BorderThickness" Value="0 0 0 1" />
+		</Style>
+
+		<Style Selector="TreeDataGridRow:selected">
+			<Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueDarkBrush}" />
+			<Setter Property="BorderThickness" Value="0 0 0 1" />
+		</Style>
+		
+		<Style Selector="TreeDataGrid">
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Border x:Name="RootBorder"
+					        Background="{TemplateBinding Background}"
+					        BorderBrush="{TemplateBinding BorderBrush}"
+					        BorderThickness="{TemplateBinding BorderThickness}"
+					        CornerRadius="{TemplateBinding CornerRadius}">
+						<DockPanel>
+							<ScrollViewer Name="PART_HeaderScrollViewer"
+							              DockPanel.Dock="Top"
+							              IsVisible="{TemplateBinding ShowColumnHeaders}"
+							              HorizontalScrollBarVisibility="Hidden"
+							              VerticalScrollBarVisibility="Disabled">
+								<Border x:Name="ColumnHeadersPresenterBorder" 
+								        BorderBrush="{DynamicResource MaterialDesignDivider}" >
+									<TreeDataGridColumnHeadersPresenter Name="PART_ColumnHeadersPresenter"
+									                                    ElementFactory="{TemplateBinding ElementFactory}"
+									                                    Items="{TemplateBinding Columns}" />
+								</Border>
+							</ScrollViewer>
+							<ScrollViewer Name="PART_ScrollViewer"
+							              HorizontalScrollBarVisibility="Auto">
+								<TreeDataGridRowsPresenter Name="PART_RowsPresenter"
+								                           Columns="{TemplateBinding Columns}"
+								                           ElementFactory="{TemplateBinding ElementFactory}"
+								                           Items="{TemplateBinding Rows}" />
+							</ScrollViewer>
+						</DockPanel>
+					</Border>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+		
+		<Style Selector="TreeDataGridColumnHeader">
+			<Setter Property="Background" Value="Transparent" />
+			<Setter Property="MinHeight" Value="40" />
+			<Setter Property="Padding" Value="10 2" />
+			<Setter Property="VerticalContentAlignment" Value="Center" />
+			<Setter Property="Template">
+				<ControlTemplate>
+					<Border Name="DataGridBorder"
+					        Background="{TemplateBinding Background}"
+					        BorderBrush="{TemplateBinding BorderBrush}"
+					        BorderThickness="{TemplateBinding BorderThickness}"
+					        CornerRadius="{TemplateBinding CornerRadius}">
+						<DockPanel VerticalAlignment="Stretch"
+						           Height="20">
+							<Panel DockPanel.Dock="Right"
+							       TabIndex="2">
+								<Rectangle Fill="{DynamicResource MaterialDesignDivider}"
+								           HorizontalAlignment="Right"
+								           Width="1" />
+
+								<Thumb Name="PART_Resizer"
+								       DockPanel.Dock="Right"
+								       Background="Transparent"
+								       Cursor="SizeWestEast"
+								       IsVisible="{TemplateBinding CanUserResize}"
+								       Width="5">
+									<Thumb.Template>
+										<ControlTemplate>
+											<Border Background="{TemplateBinding Background}"
+											        VerticalAlignment="Stretch" />
+										</ControlTemplate>
+									</Thumb.Template>
+								</Thumb>
+							</Panel>
+							<Path Name="SortIcon"
+							      DockPanel.Dock="Right"
+							      Fill="{TemplateBinding Foreground}"
+							      HorizontalAlignment="Center"
+							      VerticalAlignment="Center"
+							      Stretch="Uniform"
+							      Height="12"
+							      TabIndex="1" />
+							<ContentPresenter Name="PART_ContentPresenter"
+							                  Content="{TemplateBinding Header}"
+							                  ContentTemplate="{TemplateBinding ContentTemplate}"
+							                  Padding="{TemplateBinding Padding}"
+							                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+							                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+							                  TabIndex="0">
+								<ContentPresenter.DataTemplates>
+									<DataTemplate DataType="x:String">
+										<TextBlock Text="{Binding}" TextTrimming="CharacterEllipsis" />
+									</DataTemplate>
+								</ContentPresenter.DataTemplates>
+							</ContentPresenter>
+						</DockPanel>
+					</Border>
+				</ControlTemplate>
+			</Setter>
+		</Style>
+
+		<!-- <ControlTheme x:Key="{x:Type TreeDataGridColumnHeader}" TargetType="TreeDataGridColumnHeader"> -->
+		<!-- 	<Style Selector="^:pointerover /template/ Border#DataGridBorder"> -->
+		<!-- 		<Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" /> -->
+		<!-- 		<Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPointerOver}" /> -->
+		<!-- 		<Setter Property="TextBlock.Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" /> -->
+		<!-- 	</Style> -->
+		<!-- -->
+		<!-- 	<Style Selector="^:pressed /template/ Border#DataGridBorder"> -->
+		<!-- 		<Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" /> -->
+		<!-- 		<Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPressed}" /> -->
+		<!-- 		<Setter Property="TextBlock.Foreground" Value="{DynamicResource ButtonForegroundPressed}" /> -->
+		<!-- 	</Style> -->
+		<!-- -->
+		<!-- 	<Style Selector="^[SortDirection=Ascending] /template/ Path#SortIcon"> -->
+		<!-- 		<Setter Property="IsVisible" Value="True" /> -->
+		<!-- 		<Setter Property="Data" Value="{StaticResource TreeDataGridGridSortIconAscendingPath}" /> -->
+		<!-- 	</Style> -->
+		<!-- -->
+		<!-- 	<Style Selector="^[SortDirection=Descending] /template/ Path#SortIcon"> -->
+		<!-- 		<Setter Property="IsVisible" Value="True" /> -->
+		<!-- 		<Setter Property="Data" Value="{StaticResource TreeDataGridGridSortIconDescendingPath}" /> -->
+		<!-- 	</Style> -->
+		<!-- -->
+		<!-- </ControlTheme> -->
+
+	</Application.Styles>
 </Application>

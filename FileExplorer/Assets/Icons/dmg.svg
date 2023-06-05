@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="18.00759" y1="0" x2="18.00759" y2="25.799007" id="gradient_1">
+      <stop offset="0%" stop-color="#737B80" />
+      <stop offset="100%" stop-color="#575C61" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="18" y1="0.08299255" x2="18" y2="12.500015" id="gradient_2">
+      <stop offset="0%" stop-color="#C3CDD9" />
+      <stop offset="100%" stop-color="#9FA7B0" />
+    </linearGradient>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="2" y1="-0.3330078" x2="2" y2="4.007019" id="gradient_3">
+      <stop offset="0%" stop-color="#75FF8A" />
+      <stop offset="100%" stop-color="#1EE446" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Software Installer" clip-path="url(#clip_1)">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Software-Installer" fill="none" fill-rule="evenodd" stroke="none" />
+    <path d="M10.8 6L37.3 6C38.3 6 39.2 6.8 39.3 7.8L42.1 29.8C42.2 31 41.3 32 40.1 32L8 32C6.8 32 5.9 31 6 29.8L8.8 7.8C8.9 6.8 9.8 6 10.8 6L10.8 6Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M42 30L6 30L6 40C6 41.1 6.9 42 8 42L40 42C41.1 42 42 41.1 42 40L42 30L42 30Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M33 37C33 35.8954 33.8954 35 35 35C36.1046 35 37 35.8954 37 37C37 38.1046 36.1046 39 35 39C33.8954 39 33 38.1046 33 37Z" id="Circle" fill="url(#gradient_3)" fill-rule="evenodd" stroke="none" />
+    <path d="M22.2 22.6C22.7 23.1 23.3 23.3 24 23.3C24.7 23.3 25.3 23 25.8 22.6L32.5 15.9C33 15.4 33.1 14.7 32.9 14C32.6 13.4 32 13 31.3 13L28 13L28 6L20 6L20 13L16.7 13C16 13 15.4 13.4 15.1 14.1C14.8 14.7 15 15.5 15.5 16L22.2 22.6L22.2 22.6Z" id="Shape" fill="#000000" fill-opacity="0.05" stroke="none" />
+    <path d="M22.6 22.3C23 22.7 23.5 22.9 24 22.9C24.5 22.9 25 22.7 25.4 22.3L32.1 15.6C32.4 15.3 32.6 14.7 32.4 14.3C32.2 13.8 31.8 13.6 31.3 13.6L27.5 13.6L27.5 6L20.5 6L20.5 13.5L16.7 13.5C16.2 13.5 15.8 13.8 15.6 14.2C15.4 14.7 15.5 15.2 15.9 15.5L22.6 22.3L22.6 22.3Z" id="Shape" fill="#000000" fill-opacity="0.07" stroke="none" />
+    <path d="M31.8 15.2L25.1 21.9C24.5 22.5 23.6 22.5 23 21.9L16.3 15.2C15.9 14.8 16.2 14 16.8 14L21 14L21 1C21 0.4 21.4 0 22 0L26 0C26.6 0 27 0.4 27 1L27 14L31.3 14C31.9 14 32.2 14.8 31.8 15.2L31.8 15.2Z" id="Shape" fill="#50E6FF" stroke="none" />
+  </g>
+</svg>

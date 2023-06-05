@@ -81,7 +81,7 @@ public sealed class WeightedPanel : Panel
 	/// <param name="elems">Child elements to measure/arrange</param>
 	/// <param name="containerSize">Available container size</param>
 	/// <returns></returns>
-	private IEnumerable<ChildAndRect> ChildrenTreemapOrder(IEnumerable<IControl> elems, Size containerSize)
+	private IEnumerable<ChildAndRect> ChildrenTreemapOrder(IEnumerable<Control> elems, Size containerSize)
 	{
 		var remainingWeight = TotalChildWeight();
 		var totalWeight = remainingWeight;
@@ -125,7 +125,7 @@ public sealed class WeightedPanel : Panel
 		}
 	}
 
-	public IEnumerable<IControl> GetChildren()
+	public IEnumerable<Control> GetChildren()
 	{
 		var count = Children.Count;
 

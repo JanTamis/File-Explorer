@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="userSpaceOnUse" x1="24.205" y1="-2.1160007" x2="62.434998" y2="74.984" id="gradient_1">
+      <stop offset="0%" stop-color="#F44F5A" />
+      <stop offset="44.3%" stop-color="#EE3D4A" />
+      <stop offset="100%" stop-color="#E52030" />
+    </linearGradient>
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Tag" clip-path="url(#clip_1)">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Tag" fill="none" fill-rule="evenodd" stroke="none" />
+    <path d="M23.828 6.172L6.2 23.8C4.626 25.374 4.626 27.926 6.2 29.5L18.5 41.8C20.074 43.374 22.626 43.374 24.2 41.8L41.828 24.172C42.578 23.422 43 22.404 43 21.344L43 9C43 6.8 41.2 5 39 5L26.657 5C25.596 5 24.579 5.421 23.828 6.172L23.828 6.172ZM37 13C35.9 13 35 12.1 35 11C35 9.9 35.9 9 37 9C38.1 9 39 9.9 39 11C39 12.1 38.1 13 37 13" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+  </g>
+</svg>

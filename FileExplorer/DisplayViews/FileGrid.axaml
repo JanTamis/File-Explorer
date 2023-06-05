@@ -3,22 +3,83 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="using:FileExplorer.Controls"
+             xmlns:viewmodels="using:FileExplorer.ViewModels"
+             xmlns:interfaces="using:FileExplorer.Core.Interfaces"
+             xmlns:converters="using:FileExplorer.Converters"
+             xmlns:displayViews="clr-namespace:FileExplorer.DisplayViews"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="viewmodels:TabItemViewModel"
              x:Class="FileExplorer.DisplayViews.FileGrid">
-	<ScrollViewer>
-		<ItemsRepeater Items="{Binding Items}"
+	<ScrollViewer Classes="MiniBar">
+		<ItemsRepeater ItemsSource="{Binding Files}"
 		               VerticalCacheLength="0"
-		               Margin="0 0 0 5"
+		               Margin="10 0 10 5"
 		               x:Name="fileList">
 			<ItemsRepeater.Layout>
 				<controls:FixedWrapPanel />
 			</ItemsRepeater.Layout>
 
-			<ItemsRepeater.Styles>
-				<Style Selector="ListBoxItem:selected">
-					<Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
-				</Style>
-			</ItemsRepeater.Styles>
+			<ItemsRepeater.ItemTemplate>
+				<DataTemplate DataType="interfaces:IFileItem">
+					<Border CornerRadius="5"
+					        Margin="10"
+					        Padding="0"
+					        ClipToBounds="True"
+					        Background="{DynamicResource MaterialDesignCardBackground}">
+						<ListBoxItem Padding="0"
+						             Margin="0">
+							<StackPanel>
+								<Panel Margin="0"
+								       Height="100">
+									<Panel.DataContext>
+										<MultiBinding Converter="{x:Static converters:PathToImageConverter.Instance}">
+											<Binding Path="$parent[ListBoxItem].DataContext" />
+											<Binding Path="$parent[displayViews:FileGrid].DataContext.Provider" />
+										</MultiBinding>
+									</Panel.DataContext>
+
+									<Image Source="{SvgImage /Assets/Icons/Folder.svg}"
+									       Width="75"
+									       Height="75">
+										<Image.IsVisible>
+											<MultiBinding Converter="{x:Static BoolConverters.And}">
+												<Binding Path="!IsSuccessfullyCompleted" />
+												<Binding Path="$parent[ListBoxItem].DataContext.IsFolder" />
+											</MultiBinding>
+										</Image.IsVisible>
+									</Image>
+									<Image Source="{SvgImage /Assets/Icons/File.svg}"
+									       Width="75"
+									       Height="75">
+										<Image.IsVisible>
+											<MultiBinding Converter="{x:Static BoolConverters.And}">
+												<Binding Path="!IsSuccessfullyCompleted" />
+												<Binding Path="!$parent[ListBoxItem].DataContext.IsFolder" />
+											</MultiBinding>
+										</Image.IsVisible>
+									</Image>
+
+									<Image Source="{Binding Result}"
+									       Width="75"
+									       Height="75"
+									       IsVisible="{Binding IsSuccessfullyCompleted}" />
+								</Panel>
+
+								<Border Background="{DynamicResource MaterialDesignTextFieldBoxBackground}"
+								        CornerRadius="0, 0, 5, 5"
+								        Padding="5, 2.5"
+								        Height="40">
+									<TextBlock Text="{Binding Name}"
+									           Foreground="{DynamicResource MaterialDesignBody}"
+									           TextWrapping="WrapWithOverflow"
+									           HorizontalAlignment="Center"
+									           VerticalAlignment="Center" />
+								</Border>
+							</StackPanel>
+						</ListBoxItem>
+					</Border>
+				</DataTemplate>
+			</ItemsRepeater.ItemTemplate>
 
 		</ItemsRepeater>
 	</ScrollViewer>

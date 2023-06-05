@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="0.5290003" y1="10.472" x2="5.6" y2="5.3999996" id="gradient_1">
-      <stop offset="0%" stop-color="#3079D6" />
-      <stop offset="100%" stop-color="#297CD2" />
-    </linearGradient>
-    <radialGradient gradientUnits="objectBoundingBox" cx="114.00988%" cy="80.26482%" fx="114.00988%" fy="80.26482%" r="94.13699%" gradientTransform="translate(1.1400988,0.8026481),scale(0.7857143,1),scale(1,0.78571427),translate(-1.1400988,-0.8026481)" id="gradient_2">
+    <radialGradient gradientUnits="objectBoundingBox" cx="114.01098%" cy="80.26447%" fx="114.01098%" fy="80.26447%" r="73.96479%" gradientTransform="translate(1.1401098,0.8026447),scale(0.78571427,1),scale(1,1.0391446),translate(-1.1401098,-0.8026447)" id="gradient_1">
       <stop offset="0%" stop-color="#BD8AF5" />
       <stop offset="13.7%" stop-color="#B88BF5" />
       <stop offset="30.899996%" stop-color="#A88FF3" />
@@ -14,37 +10,21 @@
       <stop offset="91.299995%" stop-color="#3EAAEC" />
       <stop offset="100%" stop-color="#29AFEA" />
     </radialGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="9.374998" y1="-13.026565" x2="9.374998" y2="-0.15218925" id="gradient_3">
-      <stop offset="0%" stop-color="#124787" />
-      <stop offset="92.299995%" stop-color="#173B75" />
-      <stop offset="100%" stop-color="#173A73" />
-    </linearGradient>
     <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
-    <clipPath id="mask_1">
+    <clipPath id="clip_1">
       <use xlink:href="#path_1" />
     </clipPath>
   </defs>
-  <g id="File-Icon-2">
-    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
-    <g clip-path="url(#mask_1)">
-      <path d="M39 16L39 41C39 42.105 38.105 43 37 43L11 43C9.895 43 9 42.105 9 41L9 7C9 5.895 9.895 5 11 5L28 5L39 16L39 16Z" id="Shape" fill="#50E6FF" fill-rule="evenodd" stroke="none" />
-      <path d="M28 5L28 14C28 15.105 28.895 16 30 16L39 16L28 5L28 5Z" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
-    </g>
-  </g>
-  <g id="svg" transform="translate(9 14)">
-    <g id="Video-Icon">
-      <path d="M0 0L30 0L30 30L0 30L0 0L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
-      <path d="M26.875 25.625L3.125 25.625C2.43437 25.625 1.875 25.0656 1.875 24.375L1.875 6.24999C1.875 5.55937 2.43437 4.99999 3.125 4.99999L26.875 4.99999C27.5656 4.99999 28.125 5.55937 28.125 6.24999L28.125 24.375C28.125 25.0656 27.5656 25.625 26.875 25.625L26.875 25.625L26.875 25.625Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
-      <path d="M12.3219 13.5719C11.5575 12.8075 10.3181 12.8075 9.55375 13.5719L1.875 21.25L1.875 24.375C1.875 25.0656 2.43437 25.625 3.125 25.625L24.375 25.625L12.3219 13.5719L12.3219 13.5719L12.3219 13.5719Z" id="Shape#1" fill="url(#gradient_3)" stroke="none" />
-      <path d="M26.875 25.625C27.5656 25.625 28.125 25.0656 28.125 24.375L28.125 23.75L20.4469 16.0719C19.6825 15.3075 18.4431 15.3075 17.6788 16.0719L8.125 25.625L26.875 25.625L26.875 25.625L26.875 25.625Z" id="Shape#2" fill="#436DCD" stroke="none" />
-      <path d="M25.625 10L24.375 10C24.03 10 23.75 9.72 23.75 9.375L23.75 8.125C23.75 7.78 24.03 7.5 24.375 7.5L25.625 7.5C25.97 7.5 26.25 7.78 26.25 8.125L26.25 9.375C26.25 9.72 25.97 10 25.625 10L25.625 10L25.625 10Z" id="Shape#3" fill="#FFFFFF" stroke="none" />
-      <path d="M25.625 14.375L24.375 14.375C24.03 14.375 23.75 14.095 23.75 13.75L23.75 12.5C23.75 12.155 24.03 11.875 24.375 11.875L25.625 11.875C25.97 11.875 26.25 12.155 26.25 12.5L26.25 13.75C26.25 14.095 25.97 14.375 25.625 14.375L25.625 14.375L25.625 14.375Z" id="Shape#4" fill="#FFFFFF" stroke="none" />
-      <path d="M25.625 18.75L24.375 18.75C24.03 18.75 23.75 18.47 23.75 18.125L23.75 16.875C23.75 16.53 24.03 16.25 24.375 16.25L25.625 16.25C25.97 16.25 26.25 16.53 26.25 16.875L26.25 18.125C26.25 18.47 25.97 18.75 25.625 18.75L25.625 18.75L25.625 18.75Z" id="Shape#5" fill="#FFFFFF" stroke="none" />
-      <path d="M25.625 23.125L24.375 23.125C24.03 23.125 23.75 22.845 23.75 22.5L23.75 21.25C23.75 20.905 24.03 20.625 24.375 20.625L25.625 20.625C25.97 20.625 26.25 20.905 26.25 21.25L26.25 22.5C26.25 22.845 25.97 23.125 25.625 23.125L25.625 23.125L25.625 23.125Z" id="Shape#6" fill="#FFFFFF" stroke="none" />
-      <path d="M5.625 10L4.375 10C4.03 10 3.75 9.72 3.75 9.375L3.75 8.125C3.75 7.78 4.03 7.5 4.375 7.5L5.625 7.5C5.97 7.5 6.25 7.78 6.25 8.125L6.25 9.375C6.25 9.72 5.97 10 5.625 10L5.625 10L5.625 10Z" id="Shape#7" fill="#FFFFFF" stroke="none" />
-      <path d="M5.625 14.375L4.375 14.375C4.03 14.375 3.75 14.095 3.75 13.75L3.75 12.5C3.75 12.155 4.03 11.875 4.375 11.875L5.625 11.875C5.97 11.875 6.25 12.155 6.25 12.5L6.25 13.75C6.25 14.095 5.97 14.375 5.625 14.375L5.625 14.375L5.625 14.375Z" id="Shape#8" fill="#FFFFFF" stroke="none" />
-      <path d="M5.625 18.75L4.375 18.75C4.03 18.75 3.75 18.47 3.75 18.125L3.75 16.875C3.75 16.53 4.03 16.25 4.375 16.25L5.625 16.25C5.97 16.25 6.25 16.53 6.25 16.875L6.25 18.125C6.25 18.47 5.97 18.75 5.625 18.75L5.625 18.75L5.625 18.75Z" id="Shape#9" fill="#FFFFFF" stroke="none" />
-      <path d="M5.625 23.125L4.375 23.125C4.03 23.125 3.75 22.845 3.75 22.5L3.75 21.25C3.75 20.905 4.03 20.625 4.375 20.625L5.625 20.625C5.97 20.625 6.25 20.905 6.25 21.25L6.25 22.5C6.25 22.845 5.97 23.125 5.625 23.125L5.625 23.125L5.625 23.125Z" id="Shape#10" fill="#FFFFFF" stroke="none" />
-    </g>
+  <g id="Movie" clip-path="url(#clip_1)">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Movie" fill="none" fill-rule="evenodd" stroke="none" />
+    <path d="M43 41L5 41C3.895 41 3 40.105 3 39L3 10C3 8.895 3.895 8 5 8L43 8C44.105 8 45 8.895 45 10L45 39C45 40.105 44.105 41 43 41L43 41Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M41 16L39 16C38.448 16 38 15.552 38 15L38 13C38 12.448 38.448 12 39 12L41 12C41.552 12 42 12.448 42 13L42 15C42 15.552 41.552 16 41 16L41 16Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M41 23L39 23C38.448 23 38 22.552 38 22L38 20C38 19.448 38.448 19 39 19L41 19C41.552 19 42 19.448 42 20L42 22C42 22.552 41.552 23 41 23L41 23Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M41 30L39 30C38.448 30 38 29.552 38 29L38 27C38 26.448 38.448 26 39 26L41 26C41.552 26 42 26.448 42 27L42 29C42 29.552 41.552 30 41 30L41 30Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M41 37L39 37C38.448 37 38 36.552 38 36L38 34C38 33.448 38.448 33 39 33L41 33C41.552 33 42 33.448 42 34L42 36C42 36.552 41.552 37 41 37L41 37Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M9 16L7 16C6.448 16 6 15.552 6 15L6 13C6 12.448 6.448 12 7 12L9 12C9.552 12 10 12.448 10 13L10 15C10 15.552 9.552 16 9 16L9 16Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M9 23L7 23C6.448 23 6 22.552 6 22L6 20C6 19.448 6.448 19 7 19L9 19C9.552 19 10 19.448 10 20L10 22C10 22.552 9.552 23 9 23L9 23Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M9 30L7 30C6.448 30 6 29.552 6 29L6 27C6 26.448 6.448 26 7 26L9 26C9.552 26 10 26.448 10 27L10 29C10 29.552 9.552 30 9 30L9 30Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M9 37L7 37C6.448 37 6 36.552 6 36L6 34C6 33.448 6.448 33 7 33L9 33C9.552 33 10 33.448 10 34L10 36C10 36.552 9.552 37 9 37L9 37Z" id="Shape" fill="#FFFFFF" stroke="none" />
   </g>
 </svg>

@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Tracing;
 using Avalonia.Media;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
@@ -10,12 +11,13 @@ using System.IO;
 using System.IO.Enumeration;
 using System.Text.RegularExpressions;
 using Avalonia.Svg;
+using Avalonia.Svg.Skia;
 using DialogHostAvalonia;
 using FileExplorer.Core.Extensions;
-using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Models;
 using FileExplorer.DisplayViews;
 using FileExplorer.Popup;
+using Material.Icons;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
 using FileSystemTreeItem = FileExplorer.Models.FileSystemTreeItem;
@@ -33,8 +35,6 @@ public sealed class FileSystemProvider : IItemProvider
 		_imageCache = new MemoryCache(new MemoryCacheOptions
 		{
 			ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-			TrackStatistics = true,
-			SizeLimit = 536_870_912,
 		});
 	}
 
@@ -95,17 +95,18 @@ public sealed class FileSystemProvider : IItemProvider
 		return folder is FileModel { TreeItem.HasChildren: true };
 	}
 
-	public async ValueTask<IEnumerable<IPathSegment>> GetPathAsync(IFileItem folder)
+	public ValueTask<IEnumerable<IPathSegment>> GetPathAsync(IFileItem folder)
 	{
 		if (folder is FileModel { TreeItem: not null } file)
 		{
-			return await ValueTask.FromResult(file.TreeItem
+			return ValueTask.FromResult(file.TreeItem
 				.EnumerateToRoot()
 				.Reverse()
-				.Select(s => new FolderModel(s)));
+				.Select(s => new FolderModel(s))
+				.OfType<IPathSegment>());
 		}
 
-		throw new ArgumentException("Provide a valid folder that is created from this provider");
+		return ValueTask.FromException<IEnumerable<IPathSegment>>(new ArgumentException("Provide a valid folder that is created from this provider"));
 	}
 
 	public ValueTask<IFileItem?> GetParentAsync(IFileItem folder, CancellationToken token)
@@ -118,29 +119,29 @@ public sealed class FileSystemProvider : IItemProvider
 		return new ValueTask<IFileItem?>(null as IFileItem);
 	}
 
-	public Task<IImage?> GetThumbnailAsync(IFileItem? item, int size, CancellationToken token)
+	public async Task<IImage?> GetThumbnailAsync(IFileItem? item, int size, CancellationToken token)
 	{
 		if (item is null or not FileModel)
 		{
-			return Task.FromResult<IImage?>(null);
+			return null;
 		}
 
-		if (_imageCache is not null)
-		{
-			return _imageCache.GetOrCreateAsync(item.GetHashCode(), async entry =>
-			{
-				var image = await ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested && item.IsVisible);
+		// if (_imageCache is not null)
+		// {
+		// 	return await _imageCache.GetOrCreateAsync(item.GetHashCode(), async entry =>
+		// 	{
+		// 		var image = await ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested && item.IsVisible);
+		//
+		// 		if (image is not null)
+		// 		{
+		// 			entry.SetSize((long)image.Size.Width * (long)image.Size.Height * 4L);
+		// 		}
+		//
+		// 		return image;
+		// 	});
+		// }
 
-				if (image is not null)
-				{
-					entry.SetSize((long)image.Size.Width * (long)image.Size.Height * 4L);
-				}
-
-				return image;
-			});
-		}
-
-		return ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested && item.IsVisible);
+		return await ThumbnailProvider.GetFileImage(item, this, size, () => !token.IsCancellationRequested && item.IsVisible);
 	}
 
 	public async Task EnumerateItemsAsync(IFileItem folder, string pattern, Action<IFileItem> action, CancellationToken token)
@@ -162,6 +163,8 @@ public sealed class FileSystemProvider : IItemProvider
 
 			}
 		}
+
+		return;
 
 		Task Run(ConcurrentQueue<Task> bag, FileSystemTreeItem folder, string pattern, Action<FileModel> action, CancellationToken token)
 		{
@@ -215,6 +218,8 @@ public sealed class FileSystemProvider : IItemProvider
 			}
 		}
 
+		return;
+
 		async Task Run(ConcurrentQueue<Task> bag, FileSystemTreeItem folder, string pattern, Action<IEnumerable<T>> action, Func<IFileItem, T> transformation, CancellationToken token)
 		{
 			var result = await Runner.RunPrimary(() =>
@@ -260,15 +265,15 @@ public sealed class FileSystemProvider : IItemProvider
 			yield break;
 		}
 
-		yield return new MenuItemModel(MenuItemType.Button, "Cut", Cut);
-		yield return new MenuItemModel(MenuItemType.Button, "Copy", Copy);
-		yield return new MenuItemModel(MenuItemType.Button, "Paste", Paste);
-		yield return new MenuItemModel(MenuItemType.Button, "Remove", Remove);
+		yield return new MenuItemModel(MenuItemType.Button, nameof(MaterialIconKind.Scissors), Cut);
+		yield return new MenuItemModel(MenuItemType.Button, nameof(MaterialIconKind.ContentCopy), Copy);
+		yield return new MenuItemModel(MenuItemType.Button, nameof(MaterialIconKind.ContentPaste), Paste);
+		yield return new MenuItemModel(MenuItemType.Button, nameof(MaterialIconKind.TrashCanOutline), Remove);
 		yield return new MenuItemModel(MenuItemType.Separator);
-		yield return new MenuItemModel(MenuItemType.Button, "Properties", Properties);
-		yield return new MenuItemModel(MenuItemType.Button, "Zip");
+		yield return new MenuItemModel(MenuItemType.Button, nameof(MaterialIconKind.InformationOutline), Properties);
+		yield return new MenuItemModel(MenuItemType.Button, nameof(MaterialIconKind.FolderZipOutline), Zip);
 		yield return new MenuItemModel(MenuItemType.Separator);
-		yield return new MenuItemModel(MenuItemType.Button, "Analyze", Analyze);
+		// yield return new MenuItemModel(MenuItemType.Button, nameof(MaterialIconKind.Analytics), Analyze);
 	}
 
 	public IFolderUpdateNotificator? GetNotificator([NotNullIfNotNull(nameof(folder))] IFileItem? folder, string filter, bool recursive)
@@ -394,7 +399,7 @@ public sealed class FileSystemProvider : IItemProvider
 				SubmitText = "Yes",
 				Image = new SvgImage
 				{
-					Source = SvgSource.Load("avares://FileExplorer/Assets/UIIcons/Question.svg", null),
+					Source = SvgSource.Load<SvgSource>("avares://FileExplorer/Assets/UIIcons/Question.svg", null),
 				},
 			};
 
@@ -440,22 +445,25 @@ public sealed class FileSystemProvider : IItemProvider
 			ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
 		};
 
-		ThreadPool.QueueUserWorkItem(async x =>
+		analyzer.Initialized += delegate
 		{
-			var query = folderQuery; //.Concat(fileQuery);
-
-			var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
+			ThreadPool.QueueUserWorkItem(async x =>
 			{
-				var resultX = x.TaskSize;
-				var resultY = y.TaskSize;
+				var query = folderQuery; //.Concat(fileQuery);
 
-				Task.WhenAll(resultX, resultY);
+				var comparer = new AsyncComparer<FileIndexModel>(async (x, y) =>
+				{
+					var resultX = x.TaskSize;
+					var resultY = y.TaskSize;
 
-				return resultY.Result.CompareTo(resultX.Result);
+					Task.WhenAll(resultX, resultY);
+
+					return resultY.Result.CompareTo(resultX.Result);
+				});
+
+				await analyzer.Root.AddRange(folderQuery, token: tokenSource.Token);
 			});
-
-			await analyzer.Root.AddRangeAsyncComparer<AsyncComparer<FileIndexModel>>(query, token: tokenSource.Token);
-		});
+		};
 
 		// ThreadPool.QueueUserWorkItem(async x =>
 		// {
@@ -493,6 +501,14 @@ public sealed class FileSystemProvider : IItemProvider
 		{
 			Provider = this,
 			Model = model.CurrentFolder,
+		};
+	}
+
+	private void Zip(MenuItemActionModel model)
+	{
+		model.Popup = new Zip()
+		{
+			
 		};
 	}
 }

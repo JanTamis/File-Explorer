@@ -16,6 +16,7 @@
         <entry key="FileExplorer/Popup/Properties.axaml" value="FileExplorer/FileExplorer.csproj" />
         <entry key="FileExplorer/Popup/Rename.axaml" value="FileExplorer/FileExplorer.csproj" />
         <entry key="FileExplorer/Popup/Settings.axaml" value="FileExplorer/FileExplorer.csproj" />
+        <entry key="FileExplorer/Popup/Zip.axaml" value="FileExplorer/FileExplorer.csproj" />
         <entry key="FileExplorer/Styles/TreeDataGrid.axaml" value="FileExplorer/FileExplorer.csproj" />
         <entry key="FileExplorer/Views/MainWindow.axaml" value="FileExplorer/FileExplorer.csproj" />
         <entry key="FileExplorerCore/App.axaml" value="FileExplorerCore/FileExplorerCore.csproj" />

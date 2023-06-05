@@ -35,6 +35,8 @@ public partial class FluentWindow : Window, IStyleable, INotifyPropertyChanged
 		{
 			TitleBarMargin = new Thickness(70, 0, 0, 0);
 		}
+		
+		// WindowStateProperty.Changed.AddClassHandler<FluentWindow>((x, e) => x.HandleWindowStateChanged((WindowState)e.NewValue!));
 	}
 
 	protected override void HandleWindowStateChanged(WindowState state)
@@ -60,7 +62,16 @@ public partial class FluentWindow : Window, IStyleable, INotifyPropertyChanged
 	{
 		base.OnApplyTemplate(e);
 
-		ExtendClientAreaChromeHints =	ExtendClientAreaChromeHints.NoChrome;
+		if (OperatingSystem.IsWindows())
+		{
+			ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.NoChrome;
+		}
+		else
+		{
+			ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.OSXThickTitleBar | ExtendClientAreaChromeHints.SystemChrome;
+		}
+
+
 	}
 
 	public new event PropertyChangedEventHandler? PropertyChanged;

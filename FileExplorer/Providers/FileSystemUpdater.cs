@@ -17,14 +17,7 @@ public class FileSystemUpdater : IFolderUpdateNotificator
 			IncludeSubdirectories = recursive,
 		};
 
-		_watcher.NotifyFilter = NotifyFilters.Attributes
-		                        | NotifyFilters.CreationTime
-		                        | NotifyFilters.DirectoryName
-		                        | NotifyFilters.FileName
-		                        | NotifyFilters.LastAccess
-		                        | NotifyFilters.LastWrite
-		                        | NotifyFilters.Security
-		                        | NotifyFilters.Size;
+		_watcher.NotifyFilter = NotifyFilters.Size;
 
 		_watcher.Changed += OnChanged;
 		_watcher.Created += OnCreated;

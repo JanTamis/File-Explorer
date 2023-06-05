@@ -8,7 +8,7 @@ public sealed class ImageTransformConverter : IValueConverter
 {
 	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
-		return value is bool and true 
+		return value is true 
 			? new ScaleTransform(1, -1) 
 			: null;
 	}

@@ -12,7 +12,7 @@ public sealed class BoolToBoldConverter : IValueConverter, ISingleton<BoolToBold
 	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
 		return value is true
-			? FontWeight.SemiBold
+			? FontWeight.Bold
 			: FontWeight.Normal;
 	}
 

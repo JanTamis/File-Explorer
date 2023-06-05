@@ -2,111 +2,117 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:resources="using:FileExplorer.Resources"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FileExplorer.Popup.Properties">
 	<Grid ColumnDefinitions="Auto, *"
 	      MinWidth="400"
 	      Margin="10"
-	      RowDefinitions="Auto, Auto, 30, Auto, 30, 30, Auto, 30, Auto, Auto" >
+	      RowDefinitions="Auto, Auto, 30, Auto, 30, 30, Auto, 30, Auto, Auto">
 
-    <StackPanel Orientation="Horizontal"
-                Grid.ColumnSpan="2">
-      <Viewbox Width="48"
-               Height="48"
-               Margin="0 0 5 0"
-               HorizontalAlignment="Left">
-        <Image Source="{Binding Icon^}" />
-      </Viewbox>
+		<StackPanel Orientation="Horizontal"
+		            Grid.ColumnSpan="2">
+			<Viewbox Width="48"
+			         Height="48"
+			         Margin="0 0 5 0"
+			         HorizontalAlignment="Left">
+				<Image Source="{Binding Icon^}" />
+			</Viewbox>
 
-      <TextBox Text="{Binding ItemName}"
-               HorizontalAlignment="Stretch" />
-    </StackPanel>
+			<TextBox Text="{Binding ItemName}"
+			         HorizontalAlignment="Stretch" />
+		</StackPanel>
 
-    <Border Height="1"
-            Grid.Row="1"
-            Grid.ColumnSpan="2"
-            Grid.Column="0"
-            Margin="0, 10"
-            Background="{DynamicResource SystemChromeGrayColor}"/>
+		<Border Height="1"
+		        Grid.Row="1"
+		        Grid.ColumnSpan="2"
+		        Grid.Column="0"
+		        Margin="0, 10"
+		        Background="{DynamicResource SystemChromeGrayColor}" />
 
-    <TextBlock Grid.Row="2"
-               Grid.Column="0"
-               VerticalAlignment="Center"
-               Margin="0 0 10 0"
-               Text="File Type:" />
+		<TextBlock Grid.Row="2"
+		           Grid.Column="0"
+		           VerticalAlignment="Center"
+		           Margin="0 0 10 0">
+			<Run Text="{resources:Resource Type}" />
+			<Run Text=":" />
+		</TextBlock>
 
-    <TextBlock Grid.Row="2"
-               VerticalAlignment="Center"
-               Grid.Column="1"
-               Text="{Binding Model, Converter={StaticResource extensionConverter}}" />
+		<TextBlock Grid.Row="2"
+		           VerticalAlignment="Center"
+		           Grid.Column="1"
+		           Text="{Binding Model, Converter={StaticResource extensionConverter}}" />
 
-    <Border Height="1"
-            Grid.Row="3"
-            Grid.ColumnSpan="2"
-            IsVisible="{Binding !Model.IsFolder}"
-            Grid.Column="0"
-            Margin="0, 10"
-            Background="{DynamicResource SystemChromeGrayColor}"/>
+		<Border Height="1"
+		        Grid.Row="3"
+		        Grid.ColumnSpan="2"
+		        IsVisible="{Binding !Model.IsFolder}"
+		        Grid.Column="0"
+		        Margin="0, 10"
+		        Background="{DynamicResource SystemChromeGrayColor}" />
 
-    <TextBlock Grid.Row="4"
-               Grid.Column="0"
-               VerticalAlignment="Center"
-               Margin="0 0 10 0"
-               Text="Path:" />
+		<TextBlock Grid.Row="4"
+		           Grid.Column="0"
+		           VerticalAlignment="Center"
+		           Margin="0 0 10 0">
+			<Run Text="{resources:Resource Path}" />
+			<Run Text=":" />
+		</TextBlock>
 
-    <TextBlock Grid.Row="4"
-               VerticalAlignment="Center"
-               Grid.Column="1 "
-               Text="{Binding Path}" />
+		<TextBlock Grid.Row="4"
+		           VerticalAlignment="Center"
+		           Grid.Column="1"
+		           Text="{Binding Path}" />
 
-    <TextBlock Grid.Row="5"
-               Grid.Column="0"
-               VerticalAlignment="Center"
-               Margin="0 0 10 0"
-               Text="Size:" />
+		<TextBlock Grid.Row="5"
+		           Grid.Column="0"
+		           VerticalAlignment="Center"
+		           Margin="0 0 10 0"
+		           Text="Size:" />
 
-    <TextBlock Grid.Row="5"
-               VerticalAlignment="Center"
-               Grid.Column="1 "
-               Text="{Binding Size, Converter={StaticResource sizeConverter}, FallbackValue=Loading...}" />
+		<TextBlock Grid.Row="5"
+		           VerticalAlignment="Center"
+		           Grid.Column="1"
+		           Text="{Binding Size, Converter={StaticResource sizeConverter}, FallbackValue=Loading...}" />
 
-    <Border Height="1"
-            Grid.Row="6"
-            Grid.ColumnSpan="2"
-            Grid.Column="0"
-            Margin="0, 10"
-            Background="{DynamicResource SystemChromeGrayColor}"/>
+		<Border Height="1"
+		        Grid.Row="6"
+		        Grid.ColumnSpan="2"
+		        Grid.Column="0"
+		        Margin="0, 10"
+		        Background="{DynamicResource SystemChromeGrayColor}" />
 
-    <TextBlock Grid.Row="7"
-               VerticalAlignment="Center"
-               Grid.Column="1 "
-               Text="{Binding CreatedOn}" />
+		<TextBlock Grid.Row="7"
+		           VerticalAlignment="Center"
+		           Grid.Column="1 "
+		           Text="{Binding CreatedOn}" />
 
-    <TextBlock Grid.Row="7"
-               Grid.Column="0"
-               VerticalAlignment="Center"
-               Margin="0 0 10 0"
-               Text="Created On:" />
+		<TextBlock Grid.Row="7"
+		           Grid.Column="0"
+		           VerticalAlignment="Center"
+		           Margin="0 0 10 0">
+			<Run Text="{resources:Resource CreatedOn}" />
+			<Run Text=":" />
+		</TextBlock>
 
-    <StackPanel Grid.Row="8"
-                Margin="0 20 0 0"
-                Grid.ColumnSpan="2"
-                Grid.Column="0"
-                Spacing="5"
-                HorizontalAlignment="Right"
-                Orientation="Horizontal">
-      <Button Content="Cancel"
-              Width="80"
-              HorizontalContentAlignment="Center"
-              Classes="Flat"
-              Cursor="Hand"
-              Command="{Binding Close}"
-              IsCancel="True" />
-      <Button Content="Apply"
-              Width="75"
-              Command="{Binding SaveAndQuit}"
-              HorizontalContentAlignment="Center"
-              Cursor="Hand" />
-    </StackPanel>
-  </Grid>
+		<StackPanel Grid.Row="8"
+		            Margin="0 20 0 0"
+		            Grid.ColumnSpan="2"
+		            Grid.Column="0"
+		            Spacing="5"
+		            HorizontalAlignment="Right"
+		            Orientation="Horizontal">
+			<Button Content="{resources:Resource Cancel}"
+			        Foreground="{DynamicResource MaterialDesignBody}"
+			        HorizontalContentAlignment="Center"
+			        Classes="Flat"
+			        Cursor="Hand"
+			        Command="{Binding Close}"
+			        IsCancel="True" />
+			<Button Content="{resources:Resource Apply}"
+			        Command="{Binding SaveAndQuit}"
+			        HorizontalContentAlignment="Center"
+			        Cursor="Hand" />
+		</StackPanel>
+	</Grid>
 </UserControl>

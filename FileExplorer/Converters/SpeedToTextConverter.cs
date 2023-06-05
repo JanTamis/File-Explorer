@@ -13,7 +13,7 @@ public class SpeedToTextConverter : IValueConverter, ISingleton<SpeedToTextConve
 	{
 		if (value is long speed)
 		{
-			return $"{new ByteSize(speed)}/s";
+			return $"{new ByteSize(speed).ToString()}/s";
 		}
 
 		return String.Empty;

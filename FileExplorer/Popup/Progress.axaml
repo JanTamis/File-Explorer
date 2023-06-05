@@ -16,7 +16,7 @@
 		             Maximum="1" />
 
 
-		<Grid ColumnDefinitions="* *">
+		<Grid ColumnDefinitions="*, *">
 			<TextBlock Grid.Column="0" Text="{Binding EstimateTime}" HorizontalAlignment="Left" />
 			<TextBlock Grid.Column="1" Text="{Binding Speed, Converter={x:Static converters:SpeedToTextConverter.Instance}}" HorizontalAlignment="Right" />
 		</Grid>

@@ -193,7 +193,7 @@ public class TreeMapsPanel : Panel
 
 	private bool IsValidSize(Size size)
 	{
-		return (!size.IsDefault && size.Width > 0 && !double.IsNaN(size.Width) && size.Height > 0 && !double.IsNaN(size.Height));
+		return (size != default && size.Width > 0 && !double.IsNaN(size.Width) && size.Height > 0 && !double.IsNaN(size.Height));
 	}
 
 	private bool IsValidItem(WeightUIElement item)
@@ -217,7 +217,7 @@ public class TreeMapsPanel : Panel
 			}
 			else
 			{
-				element.ComputedSize = Size.Empty;
+				element.ComputedSize = default;
 				element.ComputedLocation = new Point(0, 0);
 				element.UIElement.Measure(element.ComputedSize);
 				element.UIElement.IsVisible = false;

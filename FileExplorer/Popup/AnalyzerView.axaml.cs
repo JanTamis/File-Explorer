@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Models;
+using FileExplorer.Resources;
 
 namespace FileExplorer.DisplayViews;
 
@@ -22,12 +23,10 @@ public sealed partial class AnalyzerView : UserControl, IPopup
 			{
 				Columns =
 				{
-					new HierarchicalExpanderColumn<FileIndexModel>(new TextColumn<FileIndexModel,string>("Name", x => x.Name, GridLength.Auto), x => Enumerable.Empty<FileIndexModel>(), x => false),
+					new HierarchicalExpanderColumn<FileIndexModel>(new TextColumn<FileIndexModel,string>(ResourceDefault.Name, x => x.Name, GridLength.Auto), x => Enumerable.Empty<FileIndexModel>(), x => false),
 				},
 			};
-
-			var grid = this.FindControl<TreeDataGrid>("RootDataGrid");
-			grid.Source = source;
+			RootDataGrid.Source = source;
 		}
 	}
 
@@ -44,11 +43,6 @@ public sealed partial class AnalyzerView : UserControl, IPopup
 		InitializeComponent();
 
 		Root = new ObservableRangeCollection<FileIndexModel>();
-	}
-
-	private void InitializeComponent()
-	{
-		AvaloniaXamlLoader.Load(this);
 	}
 
 	public void Close()

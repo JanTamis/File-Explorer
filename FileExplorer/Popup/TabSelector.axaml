@@ -14,7 +14,7 @@
 		<converters:PathToFoldersConverter x:Key="pathToFoldersConverter" />
 	</UserControl.Resources>
 	
-		<ListBox Items="{Binding Tabs}"
+		<ListBox ItemsSource="{Binding Tabs}"
 						 SelectedItem="{Binding CurrentTab}"
 						 HorizontalAlignment="Stretch"
 						 Margin="4"

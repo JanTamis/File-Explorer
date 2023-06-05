@@ -1,10 +1,11 @@
+using System.Buffers;
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace PerformanceTests;
+namespace FileExplorer.Core.Helpers;
 
 public sealed class DynamicList<T> : IList<T>, IList
 {
@@ -13,9 +14,10 @@ public sealed class DynamicList<T> : IList<T>, IList
 	public T[] _items; // Do not rename (binary serialization)
 	internal int _size; // Do not rename (binary serialization)
 	private int _version; // Do not rename (binary serialization)
+	private int _length;
 
 #pragma warning disable CA1825 // avoid the extra generic instantiation for Array.Empty<T>()
-	private static readonly T[] s_emptyArray = new T[0];
+	private static readonly T[] s_emptyArray = new T[1];
 #pragma warning restore CA1825
 
 	// Constructs a List. The list is initially empty and has a capacity
@@ -33,10 +35,12 @@ public sealed class DynamicList<T> : IList<T>, IList
 	//
 	public DynamicList(int capacity)
 	{
-		if (capacity == 0)
-			_items = s_emptyArray;
-		else
-			_items = GC.AllocateUninitializedArray<T>(capacity);
+		// if (capacity == 0)
+		// 	_items = s_emptyArray;
+		// else
+		// 	_items = GC.AllocateUninitializedArray<T>(capacity);
+
+		_items = ArrayPool<T>.Shared.Rent(capacity);
 	}
 
 	// Constructs a List, copying the contents of the given collection. The
@@ -62,7 +66,8 @@ public sealed class DynamicList<T> : IList<T>, IList
 		else
 		{
 			_items = s_emptyArray;
-			using (IEnumerator<T> en = collection!.GetEnumerator())
+
+			using (var en = collection!.GetEnumerator())
 			{
 				while (en.MoveNext())
 				{
@@ -207,7 +212,36 @@ public sealed class DynamicList<T> : IList<T>, IList
 	// capacity or the new size, whichever is larger.
 	//
 	public void AddRange(IEnumerable<T> collection)
-		=> InsertRange(_size, collection);
+	{
+		ArgumentNullException.ThrowIfNull(collection);
+
+		if (collection is ICollection<T> c)
+		{
+			var count = c.Count;
+
+			if (count > 0)
+			{
+				if (_items.Length - _size < count)
+				{
+					Grow(checked(_size + count));
+				}
+
+				c.CopyTo(_items, _size);
+				_size += count;
+				_version++;
+			}
+		}
+		else
+		{
+			using (var en = collection.GetEnumerator())
+			{
+				while (en.MoveNext())
+				{
+					Add(en.Current);
+				}
+			}
+		}
+	}
 
 	public ReadOnlyCollection<T> AsReadOnly()
 		=> new ReadOnlyCollection<T>(this);
@@ -831,6 +865,11 @@ public sealed class DynamicList<T> : IList<T>, IList
 		return array;
 	}
 
+	public ref T AsRef()
+	{
+		return ref MemoryMarshal.GetArrayDataReference(_items);
+	}
+
 	// Sets the capacity of this list to the size of the list. This method can
 	// be used to minimize a list's memory overhead once it is known that no
 	// new elements will be added to the list. To completely clear a list and
@@ -842,7 +881,7 @@ public sealed class DynamicList<T> : IList<T>, IList
 	//
 	public void TrimExcess()
 	{
-		var threshold = (int)(((double)_items.Length) * 0.9);
+		var threshold = (int)(_items.Length * 0.9);
 		if (_size < threshold)
 		{
 			Capacity = _size;

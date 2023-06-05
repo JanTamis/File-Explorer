@@ -2,20 +2,31 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:resources="using:FileExplorer.Resources"
+             xmlns:assist="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FileExplorer.Popup.Settings">
-	<TabControl>
-		<TabItem Header="Search">
-			<StackPanel>
-				<CheckBox Content="Search In Files" 
-									Cursor="Hand"/>
-			</StackPanel>
+	<TabControl TabStripPlacement="Left" 
+	            >
+		<TabControl.Styles>
+			<Style Selector="TabItem:selected">
+				<Setter Property="TextBlock.Foreground" Value="{DynamicResource MaterialDesignBody}" />
+			</Style>
+			<Style Selector="TabItem">
+				<Setter Property="Theme" Value="{StaticResource MaterialBottomNavigationTabItem}" />
+			</Style>
+		</TabControl.Styles>
+		<TabItem Header="{resources:Resource General}">
+			
 		</TabItem>
-		<TabItem Header="View">
-			<StackPanel Margin="5">
-				<ToggleSwitch IsChecked="{Binding IsDarkMode}"
-											Cursor="Hand" />
+		<TabItem Header="{resources:Resource Search}" >
+			<StackPanel Margin="10">
+				<ToggleSwitch Content="{resources:Resource FindInFiles}" />
 			</StackPanel>
+			
+		</TabItem>
+		<TabItem Header="{resources:Resource Theme}" >
+
 		</TabItem>
 	</TabControl>
 </UserControl>

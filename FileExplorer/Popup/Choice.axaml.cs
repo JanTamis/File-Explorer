@@ -51,6 +51,7 @@ public sealed partial class Choice : UserControl, IPopup, INotifyPropertyChanged
 	public Choice()
 	{
 		InitializeComponent();
+		DataContext = this;
 	}
 
 	public void Confirm()
@@ -79,12 +80,6 @@ public sealed partial class Choice : UserControl, IPopup, INotifyPropertyChanged
 		{
 			Console.WriteLine(e);
 		}
-	}
-
-	private void InitializeComponent()
-	{
-		AvaloniaXamlLoader.Load(this);
-		DataContext = this;
 	}
 
 	public new event PropertyChangedEventHandler PropertyChanged = delegate { };

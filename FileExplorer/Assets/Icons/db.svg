@@ -1,43 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="0.5290003" y1="10.472" x2="5.6" y2="5.3999996" id="gradient_1">
-      <stop offset="0%" stop-color="#3079D6" />
-      <stop offset="100%" stop-color="#297CD2" />
-    </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="-4.999999" y1="-12.812504" x2="14.999997" y2="-12.812504" id="gradient_2">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0" y1="7.5" x2="32" y2="7.5" id="gradient_1">
       <stop offset="0%" stop-color="#11408A" />
       <stop offset="100%" stop-color="#103F8F" />
     </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="-4.999999" y1="-6.5625005" x2="14.999997" y2="-6.5625005" id="gradient_3">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0" y1="7.5" x2="32" y2="7.5" id="gradient_2">
       <stop offset="0%" stop-color="#1D59B3" />
       <stop offset="100%" stop-color="#195BBC" />
     </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="-4.999999" y1="-0.6249992" x2="14.999997" y2="-0.6249992" id="gradient_4">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0" y1="7.000001" x2="32" y2="7.000001" id="gradient_3">
       <stop offset="0%" stop-color="#3079D6" />
       <stop offset="100%" stop-color="#297CD2" />
     </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="-4.999999" y1="-1.2500001" x2="14.999997" y2="-1.2500001" id="gradient_5">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0" y1="3" x2="32" y2="3" id="gradient_4">
       <stop offset="0%" stop-color="#42A3F2" />
       <stop offset="100%" stop-color="#42A4EB" />
     </linearGradient>
     <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
-    <clipPath id="mask_1">
+    <clipPath id="clip_1">
       <use xlink:href="#path_1" />
     </clipPath>
   </defs>
-  <g id="File-Icon-2">
-    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
-    <path d="M39 16L39 41C39 42.105 38.105 43 37 43L11 43C9.895 43 9 42.105 9 41L9 7C9 5.895 9.895 5 11 5L28 5L39 16L39 16Z" id="Shape" fill="#50E6FF" stroke="none" />
-    <path d="M28 5L28 14C28 15.105 28.895 16 30 16L39 16L28 5L28 5Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
-  </g>
-  <g id="svg" transform="translate(9 14.5)">
-    <g id="Database-Icon">
-      <path d="M0 0L30 0L30 30L0 30L0 0L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
-      <path d="M25 17.5L5 17.5C5 17.5 5 23.9194 5 24.375C5 25.7556 9.47687 26.875 15 26.875C20.5231 26.875 25 25.7556 25 24.375C25 23.9194 25 17.5 25 17.5L25 17.5L25 17.5Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
-      <path d="M25 11.25L5 11.25C5 11.25 5 17.6694 5 18.125C5 19.5056 9.47687 20.625 15 20.625C20.5231 20.625 25 19.5056 25 18.125C25 17.6694 25 11.25 25 11.25L25 11.25L25 11.25Z" id="Shape#1" fill="url(#gradient_3)" stroke="none" />
-      <path d="M25 5L5 5C5 5 5 11.0975 5 11.5625C5 12.7706 9.47687 13.75 15 13.75C20.5231 13.75 25 12.7706 25 11.5625C25 11.0975 25 5 25 5L25 5L25 5Z" id="Shape#2" fill="url(#gradient_4)" stroke="none" />
-      <path d="M5 5C5 3.96447 9.47712 3.125 15 3.125C20.5229 3.125 25 3.96447 25 5C25 6.03553 20.5229 6.875 15 6.875C9.47712 6.875 5 6.03553 5 5L5 5Z" id="Oval" fill="url(#gradient_5)" fill-rule="evenodd" stroke="none" />
-    </g>
+  <g id="Database" clip-path="url(#clip_1)">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Database" fill="none" fill-rule="evenodd" stroke="none" />
+    <path d="M40 28L8 28C8 28 8 38.271 8 39C8 41.209 15.163 43 24 43C32.837 43 40 41.209 40 39C40 38.271 40 28 40 28L40 28Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M40 18L8 18C8 18 8 28.271 8 29C8 31.209 15.163 33 24 33C32.837 33 40 31.209 40 29C40 28.271 40 18 40 18L40 18Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M40 8L8 8C8 8 8 17.756 8 18.5C8 20.433 15.163 22 24 22C32.837 22 40 20.433 40 18.5C40 17.756 40 8 40 8L40 8Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+    <path d="M8 8C8 6.34315 15.1634 5 24 5C32.8366 5 40 6.34315 40 8C40 9.65685 32.8366 11 24 11C15.1634 11 8 9.65685 8 8Z" id="Oval" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
   </g>
 </svg>

@@ -10,7 +10,7 @@ public interface IFileViewer
 	public ObservableRangeCollection<IFileItem> Items { get; set; }
 
 	event Action<IFileItem> PathChanged;
-	public event Action SelectionChanged;
+	public event Action<int> SelectionChanged;
 
 	void SelectAll();
 	void SelectNone();
@@ -34,8 +34,8 @@ public interface IFileViewer
 		}
 
 		var mode = SelectionMode.Multiple;
-		var multi = mode.HasAllFlags(SelectionMode.Multiple);
-		var toggle = toggleModifier || mode.HasAllFlags(SelectionMode.Toggle);
+		var multi = mode.HasFlag(SelectionMode.Multiple);
+		var toggle = toggleModifier || mode.HasFlag(SelectionMode.Toggle);
 		var range = multi && rangeModifier;
 
 		if (!select)

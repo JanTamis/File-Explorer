@@ -53,6 +53,11 @@ namespace FileExplorer.Graph.Models
 			return action(Name, parameter);
 		}
 
+		public bool Equals(IFileItem? other)
+		{
+			return other is GraphFileModel model && model.item == this.item;
+		}
+
 		public override int GetHashCode()
 		{
 			return item.Id.GetHashCode();

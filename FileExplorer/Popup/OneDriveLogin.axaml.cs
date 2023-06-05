@@ -45,7 +45,7 @@ public sealed partial class OneDriveLogin : UserControl, IPopup, INotifyProperty
 
 	public void CopyCode()
 	{
-		Application.Current.Clipboard.SetTextAsync(Code);
+		// Application.Current.Clipboard.SetTextAsync(Code);
 	}
 
 	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)

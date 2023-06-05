@@ -77,7 +77,6 @@ public sealed partial class Properties : UserControl, IPopup, INotifyPropertyCha
 				Task.Run(async () =>
 				{
 					_source = new CancellationTokenSource();
-
 					Provider.EnumerateItemsAsync(_model, "*", x => Interlocked.Add(ref _size, x.Sum()), x => x.Size, _source.Token);
 
 					//Task.WhenAll(tempItems.Select(s => Runner.RunPrimary(() =>
@@ -138,7 +137,7 @@ public sealed partial class Properties : UserControl, IPopup, INotifyPropertyCha
 
 	public Properties()
 	{
-		AvaloniaXamlLoader.Load(this);
+		InitializeComponent();
 		DataContext = this;
 	}
 

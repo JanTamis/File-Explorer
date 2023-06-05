@@ -11,82 +11,91 @@ using FileExplorer.ViewModels;
 
 namespace FileExplorer.Views;
 
-public sealed class MainWindow : FluentWindow
+public sealed partial class MainWindow : FluentWindow
 {
 	public MainWindow()
 	{
 		InitializeComponent();
-#if DEBUG
-		 this.AttachDevTools();
-#endif
-	}
 
-	private void InitializeComponent()
-	{
-		AvaloniaXamlLoader.Load(this);
-
-		var grid = this.FindControl<ListBox>("fileGrid");
-		var tree = this.FindControl<TreeView>("FolderTree");
-		var pathFolders = this.FindControl<Menu>("pathFolders");
-		var searchBar = this.FindControl<TextBox>("searchBar");
-
-		if (grid is not null)
-		{
-			grid.ItemContainerGenerator.Materialized += ItemContainerGenerator_Materialized;
-		}
-
-		if (tree is not null)
-		{
-			tree.SelectionChanged += Tree_SelectionChanged;
-
-			DataContextChanged += delegate
-			{
-				if (DataContext is MainWindowViewModel viewModel)
-				{
-					tree.Items = viewModel.Folders;
-
-					KeyUp += (_, args) =>
-					{
-						if (args.KeyModifiers is KeyModifiers.Control && args.Key is Key.A && !viewModel.CurrentTab.PopupVisible)
-						{
-							viewModel.CurrentTab.DisplayControl.SelectAll();
-						}
-					};
-				}
-			};
-
-			tree.ItemContainerGenerator.Materialized += TreeItemGenerated;
-
-			TreeViewItem.IsExpandedProperty.Changed.Subscribe(async x =>
-			{
-				if (x.Sender is TreeViewItem { DataContext: FolderModel folderModel, Items: FolderModel[] } treeItem)
-				{
-					treeItem.Items = await Task.Run(() => folderModel.SubSegments.ToArray());
-				}
-			});
-		}
-
-		if (pathFolders is not null)
-		{
-			pathFolders.ItemContainerGenerator.Materialized += ItemContainerGenerator_Materialized1;
-		}
-
+		// var grid = this.FindControl<ListBox>("fileGrid");
+		// var tree = FolderTree;
+		// var pathFolders = this.FindControl<Menu>("pathFolders");
+		// var searchBar = this.searchBar;
+		//
+		// if (grid is not null)
+		// {
+		// 	grid.ContainerPrepared += ItemContainerGenerator_Materialized;
+		// }
+		//
+		// if (tree is not null)
+		// {
+		// 	tree.SelectionChanged += Tree_SelectionChanged;
+		//
+		// 	DataContextChanged += delegate
+		// 	{
+		// 		if (DataContext is MainWindowViewModel viewModel)
+		// 		{
+		// 			tree.ItemsSource = viewModel.Folders;
+		//
+		// 			KeyUp += (_, args) =>
+		// 			{
+		// 				if (args.KeyModifiers is KeyModifiers.Control && args.Key is Key.A && !viewModel.CurrentTab.PopupVisible)
+		// 				{
+		// 					viewModel.CurrentTab.DisplayControl.SelectAll();
+		// 				}
+		// 			};
+		// 		}
+		// 	};
+		//
+		// 	tree.ContainerPrepared += TreeItemGenerated;
+		//
+		// 	TreeViewItem.IsExpandedProperty.Changed.Subscribe(async x =>
+		// 	{
+		// 		if (x.Sender is TreeViewItem { DataContext: FolderModel folderModel, ItemsSource: FolderModel[] } treeItem)
+		// 		{
+		// 			treeItem.ItemsSource = await Task.Run(() => folderModel.SubSegments.ToArray());
+		// 		}
+		// 	});
+		// }
+		//
+		// if (pathFolders is not null)
+		// {
+		// 	pathFolders.ContainerPrepared += ItemContainerGenerator_Materialized1;
+		// }
+		//
+		// if (this.FindControl<Border>("FileCountLabel") is { } label)
+		// {
+		// 	label.PointerEntered += delegate
+		// 	{
+		// 		if (DataContext is MainWindowViewModel { CurrentTab: { } tab })
+		// 		{
+		// 			tab.PointerOverAmount = true;
+		// 		}
+		// 	};
+		//
+		// 	label.PointerExited += delegate
+		// 	{
+		// 		if (DataContext is MainWindowViewModel { CurrentTab: { } tab })
+		// 		{
+		// 			tab.PointerOverAmount = false;
+		// 		}
+		// 	};
+		// }
+		//
+		//
 		searchBar.KeyUp += SearchBar_KeyUp;
-		PointerPressed += MainWindow_PointerPressed;
+		// PointerPressed += MainWindow_PointerPressed;
 	}
 
-	private void TreeItemGenerated(object? sender, ItemContainerEventArgs e)
+	private void TreeItemGenerated(object? sender, ContainerPreparedEventArgs e)
 	{
-		for (var i = 0; i < e.Containers.Count; i++)
+		if (e.Container is TreeViewItem { DataContext: FolderModel folderModel } treeItem)
 		{
-			if (e.Containers[i] is { ContainerControl: TreeViewItem { DataContext: FolderModel folderModel } treeItem })
-			{
-				treeItem.ItemContainerGenerator.Materialized += TreeItemGenerated;
+			treeItem.ContainerPrepared += TreeItemGenerated;
 
-				if (folderModel.HasItems || folderModel.TreeItem is null)
-				{
-					treeItem.Items = new[] { new FolderModel(new FileSystemTreeItem("Loading...", false)) };
-				}
+			if (folderModel.HasItems || folderModel.TreeItem is null)
+			{
+				treeItem.ItemsSource = new[] { new FolderModel(new FileSystemTreeItem("Loading...", false)) };
 			}
 		}
 	}
@@ -101,57 +110,39 @@ public sealed class MainWindow : FluentWindow
 
 	private void OnTabCloseClick(object sender, RoutedEventArgs e)
 	{
-		if (DataContext is MainWindowViewModel model && sender is Button { DataContext: TabItemViewModel tab })
+		if (DataContext is MainWindowViewModel { Tabs.Count: > 0 } model && sender is Button { DataContext: TabItemViewModel tab })
 		{
-			if (model.Tabs.Count > 1)
-			{
-				tab.CancelUpdateFiles();
-				model.Tabs.Remove(tab);
+			tab.CancelUpdateFiles();
+			model.Tabs.Remove(tab);
 
-				GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-				GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced, false, true);
-			}
+			GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
+			GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive, true, true);
 		}
 	}
 
-	private void ItemContainerGenerator_Materialized1(object? sender, ItemContainerEventArgs e)
+	private void ItemContainerGenerator_Materialized1(object? sender, ContainerPreparedEventArgs e)
 	{
-		foreach (var info in e.Containers)
+		if (e.Container is MenuItem { DataContext: FolderModel folder, ContextMenu: not null } item && DataContext is MainWindowViewModel model)
 		{
-			if (info.ContainerControl is MenuItem { DataContext: FolderModel folder, ContextMenu: not null } item && DataContext is MainWindowViewModel model)
-			{
-				item.Command = new RelayCommand(() =>
-				{
-					model.CurrentTab.CurrentFolder = new FileModel(folder.TreeItem);
-				});
+			item.Command = new RelayCommand(() => { model.CurrentTab.CurrentFolder = new FileModel(folder.TreeItem); });
 
-				item.ContextMenu.ItemContainerGenerator.Materialized += (_, ee) =>
+			item.ContextMenu.ContainerPrepared += (_, ee) =>
+			{
+				if (ee.Container is MenuItem menuItem)
 				{
-					foreach (var info in ee.Containers)
-					{
-						if (info is { ContainerControl: MenuItem menuItem, Item: FolderModel folderModel })
-						{
-							menuItem.Tapped += delegate
-							{
-								model.CurrentTab.CurrentFolder = new FileModel(folder.TreeItem);
-							};
-						}
-					}
-				};
-			}
+					menuItem.Tapped += delegate { model.CurrentTab.CurrentFolder = new FileModel(folder.TreeItem); };
+				}
+			};
 		}
 	}
 
-	private void ItemContainerGenerator_Materialized(object? sender, ItemContainerEventArgs e)
+	private void ItemContainerGenerator_Materialized(object? sender, ContainerPreparedEventArgs e)
 	{
 		if (DataContext is MainWindowViewModel model)
 		{
-			foreach (var container in e.Containers)
+			if (e.Container is ListBoxItem { DataContext: FileModel fileModel } item)
 			{
-				if (container.ContainerControl is ListBoxItem { DataContext: FileModel fileModel } item)
-				{
-					item.DoubleTapped += async delegate { await model.SetPath(fileModel.TreeItem); };
-				}
+				item.DoubleTapped += async delegate { await model.SetPath(fileModel.TreeItem); };
 			}
 		}
 	}

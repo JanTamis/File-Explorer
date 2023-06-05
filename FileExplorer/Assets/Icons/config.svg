@@ -1,43 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="0.5290003" y1="10.472" x2="5.6" y2="5.3999996" id="gradient_1">
-      <stop offset="0%" stop-color="#3079D6" />
-      <stop offset="100%" stop-color="#297CD2" />
-    </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="4.2364173" y1="4.2364173" x2="-5.509395" y2="-5.509395" id="gradient_2">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="19.512001" y1="19.512001" x2="3.3810003" y2="3.3810003" id="gradient_1">
       <stop offset="0%" stop-color="#FFFFFF" />
       <stop offset="24.2%" stop-color="#F2F2F2" />
       <stop offset="100%" stop-color="#CCCCCC" />
     </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="-9.998955" y1="-9.998955" x2="-3.0570815" y2="-3.0570815" id="gradient_3">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="0.45000196" y1="0.45000196" x2="11.9400015" y2="11.9400015" id="gradient_2">
       <stop offset="0%" stop-color="#0D61A9" />
       <stop offset="36.3%" stop-color="#0E5FA4" />
       <stop offset="78%" stop-color="#135796" />
       <stop offset="100%" stop-color="#16528C" />
     </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="-1.6155413" y1="-2.6547089" x2="18.17454" y2="17.134775" id="gradient_4">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="2.652001" y1="0.94999987" x2="68.164" y2="66.46" id="gradient_3">
       <stop offset="0%" stop-color="#889097" />
       <stop offset="33.1%" stop-color="#848C94" />
       <stop offset="66.9%" stop-color="#78828B" />
       <stop offset="100%" stop-color="#64717C" />
     </linearGradient>
     <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
-    <clipPath id="mask_1">
+    <clipPath id="clip_1">
       <use xlink:href="#path_1" />
     </clipPath>
   </defs>
-  <g id="File-Icon-2">
-    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
-    <path d="M39 16L39 41C39 42.105 38.105 43 37 43L11 43C9.895 43 9 42.105 9 41L9 7C9 5.895 9.895 5 11 5L28 5L39 16L39 16Z" id="Shape" fill="#50E6FF" stroke="none" />
-    <path d="M28 5L28 14C28 15.105 28.895 16 30 16L39 16L28 5L28 5Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
-  </g>
-  <g id="svg" transform="translate(9.5 14)">
-    <g id="Settings-Icon">
-      <path d="M0 0L29 0L29 29L0 29L0 0L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
-      <path d="M7.55209 14.5C7.55209 10.6628 10.6628 7.55209 14.5 7.55209C18.3372 7.55209 21.4479 10.6628 21.4479 14.5C21.4479 18.3372 18.3372 21.4479 14.5 21.4479C10.6628 21.4479 7.55209 18.3372 7.55209 14.5L7.55209 14.5Z" id="Circle" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
-      <path d="M10.2708 14.5C10.2708 12.1643 12.1643 10.2708 14.5 10.2708C16.8357 10.2708 18.7292 12.1643 18.7292 14.5C18.7292 16.8357 16.8357 18.7292 14.5 18.7292C12.1643 18.7292 10.2708 16.8357 10.2708 14.5L10.2708 14.5Z" id="Circle#1" fill="url(#gradient_3)" fill-rule="evenodd" stroke="none" />
-      <path d="M26.2251 11.626C24.7817 11.6085 23.3843 10.8563 22.6103 9.51563C21.8654 8.22513 21.8805 6.70686 22.5125 5.47194C21.2286 4.33188 19.7079 3.45463 18.0235 2.94169C17.2653 4.08176 15.9711 4.83334 14.5 4.83334C13.0288 4.83334 11.7347 4.08176 10.9771 2.94169C9.29268 3.45463 7.77199 4.33188 6.48814 5.47194C7.1201 6.70686 7.1352 8.22513 6.39026 9.51563C5.61633 10.8563 4.21889 11.6085 2.77554 11.626C2.54958 12.5486 2.41666 13.508 2.41666 14.5C2.41666 15.2758 2.49702 16.0316 2.63658 16.7668C4.12827 16.736 5.59156 17.4967 6.39026 18.8802C7.21676 20.3121 7.10741 22.0243 6.25735 23.3178C7.51522 24.4941 9.0202 25.4058 10.6919 25.9611C11.3746 24.5437 12.821 23.5625 14.5 23.5625C16.179 23.5625 17.6253 24.5437 18.3081 25.9617C19.9798 25.4064 21.4848 24.4947 22.7426 23.3184C21.8926 22.0249 21.7832 20.3127 22.6097 18.8808C23.4084 17.4973 24.8711 16.7366 26.3634 16.7674C26.503 16.0316 26.5833 15.2758 26.5833 14.5C26.5833 13.508 26.4504 12.5486 26.2251 11.626L26.2251 11.626L26.2251 11.626ZM14.5 20.8438C10.9964 20.8438 8.15625 18.0036 8.15625 14.5C8.15625 10.9964 10.9964 8.15625 14.5 8.15625C18.0036 8.15625 20.8438 10.9964 20.8438 14.5C20.8438 18.0036 18.0036 20.8438 14.5 20.8438L14.5 20.8438L14.5 20.8438Z" id="Shape" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
-    </g>
+  <g id="Settings" clip-path="url(#clip_1)">
+    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Settings" fill="none" fill-rule="evenodd" stroke="none" />
+    <path d="M12.5 24C12.5 17.6487 17.6487 12.5 24 12.5C30.3513 12.5 35.5 17.6487 35.5 24C35.5 30.3513 30.3513 35.5 24 35.5C17.6487 35.5 12.5 30.3513 12.5 24Z" id="Circle" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+    <path d="M17 24C17 20.134 20.134 17 24 17C27.866 17 31 20.134 31 24C31 27.866 27.866 31 24 31C20.134 31 17 27.866 17 24Z" id="Circle" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+    <path d="M43.407 19.243C41.018 19.214 38.705 17.969 37.424 15.75C36.191 13.614 36.216 11.101 37.262 9.057C35.137 7.17 32.62 5.718 29.832 4.869C28.577 6.756 26.435 8 24 8C21.565 8 19.423 6.756 18.169 4.869C15.381 5.718 12.864 7.17 10.739 9.057C11.785 11.101 11.81 13.614 10.577 15.75C9.296 17.969 6.983 19.214 4.594 19.243C4.22 20.77 4 22.358 4 24C4 25.284 4.133 26.535 4.364 27.752C6.833 27.701 9.255 28.96 10.577 31.25C11.945 33.62 11.764 36.454 10.357 38.595C12.439 40.542 14.93 42.051 17.697 42.97C18.827 40.624 21.221 39 24 39C26.779 39 29.173 40.624 30.303 42.971C33.07 42.052 35.561 40.543 37.643 38.596C36.236 36.455 36.055 33.621 37.423 31.251C38.745 28.961 41.166 27.702 43.636 27.753C43.867 26.535 44 25.284 44 24C44 22.358 43.78 20.77 43.407 19.243L43.407 19.243ZM24 34.5C18.201 34.5 13.5 29.799 13.5 24C13.5 18.201 18.201 13.5 24 13.5C29.799 13.5 34.5 18.201 34.5 24C34.5 29.799 29.799 34.5 24 34.5L24 34.5Z" id="Shape" fill="url(#gradient_3)" fill-rule="evenodd" stroke="none" />
   </g>
 </svg>

@@ -1,4 +1,5 @@
-﻿using Avalonia.Media;
+﻿using System.Collections.Concurrent;
+using Avalonia.Media;
 using Avalonia.Svg.Skia;
 using System.IO;
 using Avalonia.Threading;
@@ -14,7 +15,7 @@ namespace FileExplorer.Helpers;
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 public static class ThumbnailProvider
 {
-	private static readonly Dictionary<string, IImage> Images = new();
+	private static readonly ConcurrentDictionary<string, IImage> Images = new();
 
 	public static async Task<IImage?> GetFileImage(IFileItem? model, IItemProvider provider, int size, Func<bool>? shouldReturnImage = null)
 	{
@@ -25,24 +26,14 @@ public static class ThumbnailProvider
 
 		if (OperatingSystem.IsWindows() && model is FileModel)
 		{
-			return await Runner.RunSecundairy(() => model?.GetPath((path, imageSize) =>
-			{
-				Bitmap? image = null;
-
-				if (shouldReturnImage is null || shouldReturnImage?.Invoke() == true)
-				{
-					image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly, () => size is < 64 and >= 32);
-				}
-
-				if (image is null && (shouldReturnImage is null || shouldReturnImage?.Invoke() == true))
-				{
-					image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly, () => true);
-				}
-
-				return image;
-			}, size)).ConfigureAwait(false);
+			return await ImageFromFileModel(model, size, shouldReturnImage);
 		}
 
+		return await ImageFromData(model, provider, size);
+	}
+
+	private static async Task<IImage?> ImageFromData(IFileItem model, IItemProvider provider, int size)
+	{
 		return await await Runner.RunSecundairy(() => model?.GetPath((path, imageSize) =>
 		{
 			if (model.IsFolder)
@@ -55,7 +46,7 @@ public static class ThumbnailProvider
 
 						if (folderText is not null && path.SequenceEqual(KnownFolders.GetPath(folder)))
 						{
-							return GetImage(folderText);
+							return GetImageAsync(folderText);
 						}
 					}
 				}
@@ -66,13 +57,13 @@ public static class ThumbnailProvider
 
 					if (driveInfo.IsReady)
 					{
-						return GetImage(Enum.GetName(driveInfo.DriveType));
+						return GetImageAsync(Enum.GetName(driveInfo.DriveType));
 					}
 				}
 
 				if (provider.HasItems(model))
 				{
-					return GetImage("FolderFiles");
+					return GetImageAsync("FolderFiles");
 				}
 			}
 			else
@@ -81,12 +72,34 @@ public static class ThumbnailProvider
 
 				if (extension is { Length: > 1 })
 				{
-					return GetImage(extension[1..]);
+					return GetImageAsync(extension[1..]);
 				}
 			}
 
-			return Task.FromException<IImage?>(new ArgumentException("No image was found for the item"));
+			return model.IsFolder
+				? GetImageAsync("Folder")
+				: GetImageAsync("File"); // Task.FromException<IImage?>(new ArgumentException("No image was found for the item"));
 		}, size) ?? Task.FromResult<IImage?>(null)).ConfigureAwait(false);
+	}
+
+	private static async Task<IImage?> ImageFromFileModel(IFileItem model, int size, Func<bool>? shouldReturnImage)
+	{
+		return await Runner.RunSecundairy(() => model?.GetPath((path, imageSize) =>
+		{
+			Bitmap? image = null;
+
+			if (shouldReturnImage is null || shouldReturnImage?.Invoke() == true)
+			{
+				image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly, () => size is < 64 and >= 32);
+			}
+
+			if (image is null && (shouldReturnImage is null || shouldReturnImage?.Invoke() == true))
+			{
+				image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly, () => true);
+			}
+
+			return image;
+		}, size)).ConfigureAwait(false);
 	}
 
 	public static async Task<IImage?> GetFileImage(FileSystemTreeItem? model, int size, Func<bool>? shouldReturnImage = null)
@@ -118,52 +131,75 @@ public static class ThumbnailProvider
 
 		return await await Runner.RunSecundairy(() => model?.GetPath((path, imageSize) =>
 		{
-			var name = String.Empty;
-
 			if (model.IsFolder)
 			{
-				foreach (var folder in Enum.GetValues<Environment.SpecialFolder>())
+				if (OperatingSystem.IsWindows())
 				{
-					var folderText = Enum.GetName(folder);
-
-					if (folderText is not null && model.GetPath((path, knownFolder) => path.SequenceEqual(Environment.GetFolderPath(knownFolder)), folder))
+					foreach (var folder in Enum.GetValues<KnownFolder>())
 					{
-						name = folderText;
-						break;
-					}
-				}
+						var folderText = Enum.GetName(folder);
 
-				if (name == String.Empty)
-				{
-					var drives = DriveInfo.GetDrives();
-
-					foreach (var drive in drives)
-					{
-						if (drive.IsReady && drive.RootDirectory.FullName == path)
+						if (folderText is not null && path.SequenceEqual(KnownFolders.GetPath(folder)))
 						{
-							name = "Fixed";
-							break;
+							return GetImageAsync(folderText);
 						}
 					}
 				}
 
-				if (name == String.Empty)
+				if (model.Parent is null)
 				{
-					name = model.HasChildren
-						? "FolderFiles"
-						: "Folder";
+					var driveInfo = new DriveInfo(new string(model.Value[0], 1));
+
+					if (driveInfo.IsReady)
+					{
+						return GetImageAsync(Enum.GetName(driveInfo.DriveType));
+					}
+				}
+
+				if (model.HasChildren)
+				{
+					return GetImageAsync("FolderFiles");
 				}
 			}
 			else
 			{
-				name = Path.GetExtension(model.Value).ToLower();
+				var extension = Path.GetExtension(path);
+
+				if (extension is { Length: > 1 })
+				{
+					return GetImageAsync(extension[1..].ToString().ToLower());
+				}
 			}
 
-			return GetImage(name);
+			return model.IsFolder
+				? GetImageAsync("Folder")
+				: GetImageAsync("File"); // Task.FromException<IImage?>(new ArgumentException("No image was found for the item"));
 		}, size) ?? Task.FromResult<IImage?>(null));
 	}
 
-	private static async Task<IImage?> GetImage(string? key)
+	public static async Task<IImage?> GetImageAsync(string? key)
+	{
+		if (String.IsNullOrEmpty(key))
+		{
+			return null;
+		}
+		
+		if (!Images.TryGetValue(key, out var image))
+		{
+			var source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/{key}.svg", null);
+
+			image = await Dispatcher.UIThread.InvokeAsync(() => new SvgImage
+			{
+				Source = source,
+			}, DispatcherPriority.Background).GetTask();
+			
+			Images.TryAdd(key, image);
+		}
+
+		return image;
+	}
+
+	public static IImage? GetImage(string? key)
 	{
 		if (String.IsNullOrEmpty(key))
 		{
@@ -174,10 +210,10 @@ public static class ThumbnailProvider
 		{
 			var source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/{key}.svg", null);
 
-			image = await Dispatcher.UIThread.InvokeAsync(() => new SvgImage
+			image = new SvgImage
 			{
 				Source = source,
-			}, DispatcherPriority.Background);
+			};
 
 			Images.TryAdd(key, image);
 		}

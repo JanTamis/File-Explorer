@@ -58,7 +58,7 @@ public sealed partial class Quickstart : UserControl, IFileViewer
 	public ValueTask<int> ItemCount => ValueTask.FromResult(0);
 
 	public event Action<IFileItem>? PathChanged;
-	public event Action? SelectionChanged;
+	public event Action<int>? SelectionChanged;
 
 	public void SelectAll()
 	{

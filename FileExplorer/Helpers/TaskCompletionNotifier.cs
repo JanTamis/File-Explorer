@@ -1,18 +1,20 @@
 ﻿using System.ComponentModel;
+using Avalonia;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace FileExplorer.Helpers;
 
 /// <summary>
 /// Watches a task and raises property-changed notifications when the task completes.
 /// </summary>
-public sealed class TaskCompletionNotifier<TResult> : INotifyPropertyChanged
+public sealed partial class TaskCompletionNotifier<TResult> : ObservableObject
 {
 	// Gets the task being watched. This property never changes and is never <c>null</c>.
 	public Task<TResult> Task { get; }
 
 	// Gets the result of the task. Returns the default value of TResult if the task has not completed successfully.
-	public TResult? Result => Task.Status is TaskStatus.RanToCompletion 
-		? Task.Result 
+	public TResult? Result => IsCompleted
+		? Task.Result
 		: _defaultResult;
 
 	// Gets whether the task has completed.
@@ -26,8 +28,6 @@ public sealed class TaskCompletionNotifier<TResult> : INotifyPropertyChanged
 
 	// Gets whether the task has faulted.
 	public bool IsFaulted => Task.IsFaulted;
-
-	public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
 	private readonly TResult? _defaultResult;
 
@@ -44,30 +44,25 @@ public sealed class TaskCompletionNotifier<TResult> : INotifyPropertyChanged
 
 			task.ContinueWith(t =>
 			{
-				var propertyChanged = PropertyChanged;
+				OnPropertyChanged(nameof(IsCompleted));
 
-				if (propertyChanged is not null)
+				if (t.IsCanceled)
 				{
-					propertyChanged(this, new PropertyChangedEventArgs(nameof(IsCompleted)));
-
-					if (t.IsCanceled)
-					{
-						propertyChanged(this, new PropertyChangedEventArgs(nameof(IsCanceled)));
-					}
-					else if (t.IsFaulted)
-					{
-						propertyChanged(this, new PropertyChangedEventArgs(nameof(IsFaulted)));
-					}
-					else
-					{
-						propertyChanged(this, new PropertyChangedEventArgs(nameof(IsSuccessfullyCompleted)));
-						propertyChanged(this, new PropertyChangedEventArgs(nameof(Result)));
-					}
+					OnPropertyChanged(nameof(IsCanceled));
+				}
+				else if (t.IsFaulted)
+				{
+					OnPropertyChanged(nameof(IsFaulted));
+				}
+				else
+				{
+					OnPropertyChanged(nameof(IsSuccessfullyCompleted));
+					OnPropertyChanged(nameof(Result));
 				}
 			},
-			CancellationToken.None,
-			TaskContinuationOptions.ExecuteSynchronously,
-			scheduler);
+				CancellationToken.None,
+				TaskContinuationOptions.ExecuteSynchronously,
+				scheduler);
 		}
 	}
 }

@@ -320,7 +320,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		return Path.GetHashCode();
 	}
 
-	public static FileSystemTreeItem? FromPath([NotNullIfNotNull("path")] string? path)
+	public static FileSystemTreeItem? FromPath([NotNullIfNotNull(nameof(path))] string? path)
 	{
 		if (path is null)
 		{

@@ -1,10 +1,8 @@
-﻿using Avalonia.Threading;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using FileExplorer.Core.Extensions;
 using FileExplorer.Core.Interfaces;
-using PerformanceTests;
 
 namespace FileExplorer.Core.Helpers;
 
@@ -21,7 +19,7 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 
 	private readonly DynamicList<T> _data = new();
 
-	private const int UpdateTime = 500;
+	private const int UpdateTime = 100;
 	private const int UpdateCountTime = 50;
 
 	public int Count => _data.Count;
@@ -33,6 +31,12 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 	public bool IsSynchronized => false;
 
 	public object SyncRoot { get; } = new object();
+
+	public int Capacity
+	{
+		get => _data.Capacity;
+		set => _data.Capacity = value;
+	}
 
 	object? IList.this[int index]
 	{
@@ -53,10 +57,9 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 
 	public ObservableRangeCollection()
 	{
-
 	}
 
-	public ObservableRangeCollection(IEnumerable<T> items, bool needsReset = false) : this()
+	public ObservableRangeCollection(IEnumerable<T> items) : this()
 	{
 		if (items is ICollection<T>)
 		{
@@ -211,6 +214,7 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 		CountChanged(Count);
 
 		isDone = true;
+		return;
 
 		async ValueTask UpdateList(List<T> buffer, TComparer comparer)
 		{
@@ -239,14 +243,13 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 
 		var watch = Stopwatch.GetTimestamp();
 
-		var isDone = false;
 		var index = Math.Max(0, Count - 1);
 
 		Task.Run(async () =>
 		{
 			using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(UpdateCountTime));
 
-			while (!isDone && await timer.WaitForNextTickAsync(token))
+			while (await timer.WaitForNextTickAsync(token))
 			{
 				CountChanged(Count);
 			}
@@ -263,7 +266,7 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 
 			if (Stopwatch.GetElapsedTime(watch).TotalMilliseconds >= UpdateTime)
 			{
-				OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new ReadonlyPartialCollection<T>(_data, index, Count - index), index));
+				await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new ReadonlyPartialCollection<T>(_data, index, Count - index), index));
 
 				watch = Stopwatch.GetTimestamp();
 				index = Count;
@@ -382,11 +385,11 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 		ArgumentNullException.ThrowIfNull(provider);
 
 		var index = Math.Max(0, Count - 1);
-		var bag = new DynamicBag<T>();
+		var bag = new DynamicQueue<T>();
 
 		var isLocked = false;
 
-		var task = provider.EnumerateItemsAsync(folder, pattern, (IFileItem x) => bag.Add((T)x), token).ConfigureAwait(false);
+		var task = provider.EnumerateItemsAsync(folder, pattern, x => bag.Enqueue((T)x), token).ConfigureAwait(false);
 		var isDone = false;
 
 		Runner.Run<Task>(async () =>
@@ -397,29 +400,35 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 			{
 				while (await timer.WaitForNextTickAsync(token) && !isDone)
 				{
-					var lockTaken = false;
+					// var lockTaken = false;
+					//
+					// try
+					// {
+					// 	bag.FreezeBag(ref lockTaken);
+					//
+					// 	var count = bag.DangerousCount;
+					//
+					// 	if (count > 0)
+					// 	{
+					// 		_data.EnsureCapacity(_data.Count + count);
+					// 		_data._size += bag.CopyFromEachQueueToArray(_data._items, _data._size);
+					//
+					// 		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new ReadonlyPartialCollection<T>(_data, index, Count - index), index));
+					//
+					// 		index = Count;
+					// 	}
+					// }
+					// finally
+					// {
+					// 	bag.UnfreezeBag(lockTaken);
+					// 	bag.Clear();
+					// }
 
-					try
-					{
-						bag.FreezeBag(ref lockTaken);
+					bag.AppendTo(_data);
 
-						var count = bag.DangerousCount;
+					OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new ReadonlyPartialCollection<T>(_data, index, Count - index), index));
 
-						if (count > 0)
-						{
-							_data.EnsureCapacity(_data.Count + count);
-							_data._size += bag.CopyFromEachQueueToArray(_data._items, _data._size);
-
-							OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new ReadonlyPartialCollection<T>(_data, index, Count - index), index));
-
-							index = Count;
-						}
-					}
-					finally
-					{
-						bag.UnfreezeBag(lockTaken);
-						bag.Clear();
-					}
+					index = Count;
 				}
 			}
 			catch (Exception e)
@@ -431,30 +440,23 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 		await task;
 		isDone = true;
 
-		while (bag.TryTake(out var result))
-		{
-			_data.Add(result);
-		}
+		// while (bag.TryTake(out var result))
+		// {
+		// 	_data.Add(result);
+		// }
+		bag.AppendTo(_data);
 
 		await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, new ReadonlyPartialCollection<T>(_data, index, Count - index), index));
 		CountChanged(Count);
 	}
 
-	public async ValueTask OnCollectionChanged(NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
+	public ValueTask OnCollectionChanged(NotifyCollectionChangedEventArgs notifyCollectionChangedEventArgs)
 	{
 		try
 		{
 			if (CollectionChanged is not null)
 			{
-				if (Dispatcher.UIThread.CheckAccess())
-				{
-					CollectionChanged(this, notifyCollectionChangedEventArgs);
-				}
-				else
-				{
-					await Dispatcher.UIThread.InvokeAsync(() => CollectionChanged(this, notifyCollectionChangedEventArgs));
-				}
-
+				CollectionChanged(this, notifyCollectionChangedEventArgs);
 				CountChanged(Count);
 			}
 		}
@@ -462,6 +464,8 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 		{
 			Console.WriteLine(e);
 		}
+		
+		return ValueTask.CompletedTask;
 	}
 
 	public async ValueTask ClearTrim()
@@ -475,6 +479,11 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 	public void Trim()
 	{
 		_data.Capacity = 0;
+	}
+
+	public void TrimExcess()
+	{
+		_data.TrimExcess();
 	}
 
 	public int BinarySearch<TComparer>(T value, TComparer comparer) where TComparer : IComparer<T>
@@ -659,7 +668,6 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 	{
 		_data.RemoveAt(index);
 		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-
 	}
 
 	public void Add(T item)
@@ -690,10 +698,7 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 	{
 		var value = _data.Remove(item);
 
-		if (value)
-		{
-			OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
-		}
+		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 
 		return value;
 	}
@@ -736,18 +741,5 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 	public void CopyTo(Array array, int index)
 	{
 		throw new NotImplementedException();
-	}
-
-	private class TempList
-	{
-		private const int DefaultCapacity = 4;
-
-		internal T[] _items; // Do not rename (binary serialization)
-		internal int _size; // Do not rename (binary serialization)
-		private int _version; // Do not rename (binary serialization)
-
-#pragma warning disable CA1825 // avoid the extra generic instantiation for Array.Empty<T>()
-		private static readonly T[] s_emptyArray = new T[0];
-#pragma warning restore CA1825
 	}
 }
