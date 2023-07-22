@@ -1,44 +1,27 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
-	<defs>
-		<linearGradient x1="0.048090935" y1="0.952" x2="0.5090909" y2="0.49090907" id="gradient_1">
-			<stop offset="0" stop-color="#3079D6" />
-			<stop offset="1" stop-color="#297CD2" />
-		</linearGradient>
-		<linearGradient x1="0.036249995" y1="0.036250055" x2="0.95275" y2="0.95275" id="gradient_2">
-			<stop offset="0" stop-color="#18884F" />
-			<stop offset="1" stop-color="#0B6731" />
-		</linearGradient>
-		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
-		<path d="M0 0L25 0L25 25L0 25L0 0Z" id="path_2" />
-		<clipPath id="mask_1">
-			<use xlink:href="#path_1" />
-		</clipPath>
-		<clipPath id="mask_2">
-			<use xlink:href="#path_2" />
-		</clipPath>
-	</defs>
-	<g id="icons8_file_4">
-		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
-		<g clip-path="url(#mask_1)">
-			<path d="M30 11L30 36C30 37.105 29.105 38 28 38L2 38C0.895001 38 0 37.105 0 36L0 2C0 0.895 0.895001 0 2 0L19 0L30 11L30 11Z" transform="translate(9 5)" id="Shape" fill="#50E6FF" fill-rule="evenodd" stroke="none" />
-			<path d="M0 0L0 9C0 10.105 0.895 11 2 11L11 11L0 0L0 0Z" transform="translate(28 5)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
-		</g>
-	</g>
-	<g id="icons8_microsoft_excel_2019_2" transform="translate(10.2057495 16.556671)">
-		<path d="M0 0L25 0L25 25L0 25L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
-		<g clip-path="url(#mask_2)">
-			<path d="M0 0L8.33333 0L8.33333 4.6875L0 4.6875L0 0Z" transform="translate(14.5833435 7.8125)" id="Rectangle" fill="#21A366" fill-rule="evenodd" stroke="none" />
-			<path d="M16.6667 0L0 0L0 8.33333C0 8.90885 0.466146 9.375 1.04167 9.375L15.625 9.375C16.2005 9.375 16.6667 8.90885 16.6667 8.33333L16.6667 0L16.6667 0Z" transform="translate(6.25 12.5)" id="Shape" fill="#185C37" fill-rule="evenodd" stroke="none" />
-			<path d="M0 0L8.33333 0L8.33333 4.6875L0 4.6875L0 0Z" transform="translate(14.5833435 12.5)" id="Rectangle" fill="#107C42" fill-rule="evenodd" stroke="none" />
-			<path d="M0 0L8.33333 0L8.33333 4.6875L0 4.6875L0 0Z" transform="translate(6.25 7.8125)" id="Rectangle" fill="#3FA071" fill-rule="evenodd" stroke="none" />
-			<path d="M7.29167 0L0 0L0 4.6875L8.33333 4.6875L8.33333 1.04167C8.33333 0.466146 7.86719 0 7.29167 0L7.29167 0Z" transform="translate(14.5833435 3.125)" id="Shape" fill="#33C481" fill-rule="evenodd" stroke="none" />
-			<path d="M1.04167 0L8.33333 0L8.33333 4.6875L0 4.6875L0 1.04167C0 0.466146 0.466146 0 1.04167 0L1.04167 0Z" transform="translate(6.25 3.125)" id="Shape" fill="#21A366" fill-rule="evenodd" stroke="none" />
-			<path d="M5.37448 0L0 0L0 12.5L5.37448 12.5C6.43333 12.5 7.29167 11.6417 7.29167 10.5828L7.29167 1.91719C7.29167 0.858333 6.43333 0 5.37448 0L5.37448 0Z" transform="translate(6.25 6.7708435)" id="Shape" fill="#000000" fill-opacity="0.05" fill-rule="evenodd" stroke="none" />
-			<path d="M5.31927 11.8057L0 11.8057L0 0L5.31927 0C6.21719 0 6.94479 0.727604 6.94479 1.62552L6.94479 10.1802C6.94427 11.0781 6.21667 11.8057 5.31927 11.8057L5.31927 11.8057Z" transform="translate(6.25 6.944275)" id="Shape" fill="#000000" fill-opacity="0.07" fill-rule="evenodd" stroke="none" />
-			<path d="M5.26354 11.1109L0 11.1109L0 0L5.26354 0C6 0 6.59687 0.596875 6.59687 1.33333L6.59687 9.7776C6.5974 10.5141 6 11.1109 5.26354 11.1109L5.26354 11.1109Z" transform="translate(6.25 7.118225)" id="Shape" fill="#000000" fill-opacity="0.09" fill-rule="evenodd" stroke="none" />
-			<path d="M9.375 10.4167L1.04167 10.4167C0.466146 10.4167 0 9.95052 0 9.375L0 1.04167C0 0.466146 0.466146 0 1.04167 0L9.375 0C9.95052 0 10.4167 0.466146 10.4167 1.04167L10.4167 9.375C10.4167 9.95052 9.95052 10.4167 9.375 10.4167L9.375 10.4167Z" transform="translate(2.083313 7.2916565)" id="Shape" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
-			<path d="M0.146354 0L1.38906 0L2.3974 1.95521L3.46302 0L4.62396 0L3.02448 2.60417L4.66042 5.20833L3.43594 5.20833L2.33698 3.16146L1.24271 5.20833L0 5.20833L1.66302 2.59479L0.146354 0L0.146354 0Z" transform="translate(4.9614563 9.8958435)" id="Shape" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
-		</g>
-	</g>
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.036249995" y1="0.036250055" x2="0.95275" y2="0.95275" id="gradient_1">
+      <stop offset="0%" stop-color="#18884F" />
+      <stop offset="100%" stop-color="#0B6731" />
+    </linearGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Microsoft Excel 2019" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Microsoft-Excel-2019" fill="none" stroke="none" />
+    <path d="M28 15L44 15L44 24L28 24L28 15Z" id="Rectangle" fill="#21A366" fill-rule="evenodd" stroke="none" />
+    <path d="M44 24L12 24L12 40C12 41.105 12.895 42 14 42L42 42C43.105 42 44 41.105 44 40L44 24L44 24Z" id="Shape" fill="#185C37" stroke="none" />
+    <path d="M28 24L44 24L44 33L28 33L28 24Z" id="Rectangle" fill="#107C42" fill-rule="evenodd" stroke="none" />
+    <path d="M12 15L28 15L28 24L12 24L12 15Z" id="Rectangle" fill="#3FA071" fill-rule="evenodd" stroke="none" />
+    <path d="M42 6L28 6L28 15L44 15L44 8C44 6.895 43.105 6 42 6L42 6Z" id="Shape" fill="#33C481" stroke="none" />
+    <path d="M14 6L28 6L28 15L12 15L12 8C12 6.895 12.895 6 14 6L14 6Z" id="Shape" fill="#21A366" stroke="none" />
+    <path d="M22.319 13L12 13L12 37L22.319 37C24.352 37 26 35.352 26 33.319L26 16.681C26 14.648 24.352 13 22.319 13L22.319 13Z" id="Shape" fill="#000000" fill-opacity="0.05" stroke="none" />
+    <path d="M22.213 36L12 36L12 13.333L22.213 13.333C23.937 13.333 25.334 14.73 25.334 16.454L25.334 32.879C25.333 34.603 23.936 36 22.213 36L22.213 36Z" id="Shape" fill="#000000" fill-opacity="0.07" stroke="none" />
+    <path d="M22.106 35L12 35L12 13.667L22.106 13.667C23.52 13.667 24.666 14.813 24.666 16.227L24.666 32.44C24.667 33.854 23.52 35 22.106 35L22.106 35Z" id="Shape" fill="#000000" fill-opacity="0.09" stroke="none" />
+    <path d="M22 34L6 34C4.895 34 4 33.105 4 32L4 16C4 14.895 4.895 14 6 14L22 14C23.105 14 24 14.895 24 16L24 32C24 33.105 23.105 34 22 34L22 34Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M9.807 19L12.193 19L14.129 22.754L16.175 19L18.404 19L15.333 24L18.474 29L16.123 29L14.013 25.07L11.912 29L9.526 29L12.719 23.982L9.807 19L9.807 19Z" id="Shape" fill="#FFFFFF" stroke="none" />
+  </g>
 </svg>

@@ -9,24 +9,11 @@
              Width="800"
              Height="600"
              x:Class="FileExplorer.DisplayViews.AnalyzerView">
-	<UserControl.Resources>
-		<converters:PathToImageConverter x:Key="imageConverter" />
-		<converters:EditedOnConverter x:Key="editedOnConverter" />
-		<converters:ExtensionConverter x:Key="extensionConverter" />
-		<converters:SizeConverter x:Key="sizeConverter" />
-		<converters:FileNameConverter x:Key="fileNameConverter" />
-		<converters:MinSizeConverter x:Key="minSizeConverter" />
-		<converters:MoreThanConverter x:Key="moreThanConverter" />
-		<converters:BackgroundConverter x:Key="backgroundConverter" />
-		<converters:ForegroundConverter x:Key="foregroundConverter" />
-
-		<converters:PathToFoldersConverter x:Key="pathToFoldersConverter" />
-	</UserControl.Resources>
-
 	<Grid ColumnDefinitions="2*, *"
-				RowDefinitions="*, 0.5*">
-		<TreeDataGrid x:Name="RootDataGrid" />
-		<!-- <TreeView Items="{Binding Root}"> -->
+	      RowDefinitions="*, 0.5*">
+		<TreeDataGrid x:Name="RootDataGrid" 
+		              Grid.ColumnSpan="2" />
+		<!-- <TreeView ItemsSource="{Binding Root}"> -->
 		<!-- 	<TreeView.DataTemplates> -->
 		<!-- 		<TreeDataTemplate DataType="{x:Type models:FileIndexModel}" ItemsSource="{Binding Items}"> -->
 		<!-- 			<Grid ColumnDefinitions="250, Auto, *"> -->
@@ -53,95 +40,95 @@
 		<!-- 		</ItemsPanelTemplate> -->
 		<!-- 	</TreeView.ItemsPanel> -->
 		<!-- </TreeView> -->
-
-		<GridSplitter ResizeDirection="Columns"
-									HorizontalAlignment="Left"
-									Background="{DynamicResource MenuBackground}"
-									Width="5"
-									Grid.RowSpan="2"
-									Grid.Column="1" />
-
-		<DataGrid Grid.Column="1"
-							Grid.RowSpan="2"
-							IsReadOnly="True"
-							Items="{Binding Extensions}"
-							Margin="5 0 0 0">
-			<DataGrid.Columns>
-				<DataGridTemplateColumn Header="Extension"
-																Width="*"
-																SortMemberPath="Extension">
-					<DataGridTemplateColumn.CellTemplate>
-						<DataTemplate>
-							<TextBlock Text="{Binding Extension}"
-												 TextTrimming="CharacterEllipsis"
-												 VerticalAlignment="Center" />
-						</DataTemplate>
-					</DataGridTemplateColumn.CellTemplate>
-				</DataGridTemplateColumn>
-				<!--<DataGridTextColumn Header="Description" 
-														Width="*"/>-->
-				<DataGridTextColumn Header="Bytes"
-														Width="Auto"
-														Binding="{Binding TotalSize, Converter={StaticResource sizeConverter}}"/>
-
-				<DataGridTextColumn Header="Files"
-														Binding="{Binding TotalFiles, StringFormat={}{0:N0}, Mode=OneWay}"
-														Width="Auto"/>
-			</DataGrid.Columns>
-		</DataGrid>
-
-		<ItemsControl Grid.Row="2"
-									Margin="0 5 0 0"
-									Items="{Binding Root}">
-			<ItemsControl.ItemsPanel>
-				<ItemsPanelTemplate>
-					<controls:SquarifiedTreeMapsPanel />
-				</ItemsPanelTemplate>
-			</ItemsControl.ItemsPanel>
-
-			<ItemsControl.ItemTemplate>
-				<DataTemplate>
-					<Border Background="{Binding Name, Converter={StaticResource backgroundConverter}}"
-									ToolTip.Tip="{Binding Name}"
-									BorderThickness="0">
-							<!--<TextBlock Text="{Binding Name}"
-												 Foreground="{Binding $parent.Background, Converter={StaticResource foregroundConverter}}"
-												 HorizontalAlignment="Center"
-												 VerticalAlignment="Center"
-												 TextTrimming="CharacterEllipsis" />-->
-
-						<ItemsControl Margin="0 5 0 0"
-													Items="{Binding Items}">
-							<ItemsControl.ItemsPanel>
-								<ItemsPanelTemplate>
-									<controls:SquarifiedTreeMapsPanel />
-								</ItemsPanelTemplate>
-							</ItemsControl.ItemsPanel>
-
-							<ItemsControl.ItemTemplate>
-								<DataTemplate>
-									<Border Background="{Binding Name, Converter={StaticResource backgroundConverter}}"
-													ToolTip.Tip="{Binding Name}"
-													BorderThickness="1">
-										<TextBlock Text="{Binding Name}"
-															 Foreground="{Binding $parent.Background, Converter={StaticResource foregroundConverter}}"
-															 HorizontalAlignment="Center"
-															 VerticalAlignment="Center"
-															 TextWrapping="WrapWithOverflow"
-															 TextTrimming="CharacterEllipsis" />
-									</Border>
-								</DataTemplate>
-							</ItemsControl.ItemTemplate>
-						</ItemsControl>
-					</Border>
-				</DataTemplate>
-			</ItemsControl.ItemTemplate>
-		</ItemsControl>
-
-		<GridSplitter ResizeDirection="Rows"
-									VerticalAlignment="Top"
-									Background="{DynamicResource MenuBackground}"
-									Height="5"
-									Grid.Row="1" />
+		<!-- -->
+		<!-- <GridSplitter ResizeDirection="Columns" -->
+		<!-- 							HorizontalAlignment="Left" -->
+		<!-- 							Background="{DynamicResource MenuBackground}" -->
+		<!-- 							Width="5" -->
+		<!-- 							Grid.RowSpan="2" -->
+		<!-- 							Grid.Column="1" /> -->
+		<!-- -->
+		<!-- <DataGrid Grid.Column="1" -->
+		<!-- 					Grid.RowSpan="2" -->
+		<!-- 					IsReadOnly="True" -->
+		<!-- 					ItemsSource="{Binding Extensions}" -->
+		<!-- 					Margin="5 0 0 0"> -->
+		<!-- 	<DataGrid.Columns> -->
+		<!-- 		<DataGridTemplateColumn Header="Extension" -->
+		<!-- 														Width="*" -->
+		<!-- 														SortMemberPath="Extension"> -->
+		<!-- 			<DataGridTemplateColumn.CellTemplate> -->
+		<!-- 				<DataTemplate> -->
+		<!-- 					<TextBlock Text="{Binding Extension}" -->
+		<!-- 										 TextTrimming="CharacterEllipsis" -->
+		<!-- 										 VerticalAlignment="Center" /> -->
+		<!-- 				</DataTemplate> -->
+		<!-- 			</DataGridTemplateColumn.CellTemplate> -->
+		<!-- 		</DataGridTemplateColumn> -->
+		<!-- 		<DataGridTextColumn Header="Description"  -->
+		<!-- 												Width="*"/>-->
+		<!-- 		<DataGridTextColumn Header="Bytes" -->
+		<!-- 												Width="Auto" -->
+		<!-- 												Binding="{Binding TotalSize, Converter={StaticResource sizeConverter}}"/> -->
+		<!-- -->
+		<!-- 		<DataGridTextColumn Header="Files" -->
+		<!-- 												Binding="{Binding TotalFiles, StringFormat={}{0:N0}, Mode=OneWay}" -->
+		<!-- 												Width="Auto"/> -->
+		<!-- 	</DataGrid.Columns> -->
+		<!-- </DataGrid> -->
+		<!-- -->
+		<!-- <ItemsControl Grid.Row="2" -->
+		<!-- 							Margin="0 5 0 0" -->
+		<!-- 							ItemsSource="{Binding Root}"> -->
+		<!-- 	<ItemsControl.ItemsPanel> -->
+		<!-- 		<ItemsPanelTemplate> -->
+		<!-- 			<controls:SquarifiedTreeMapsPanel /> -->
+		<!-- 		</ItemsPanelTemplate> -->
+		<!-- 	</ItemsControl.ItemsPanel> -->
+		<!-- -->
+		<!-- 	<ItemsControl.ItemTemplate> -->
+		<!-- 		<DataTemplate> -->
+		<!-- 			<Border Background="{Binding Name, Converter={StaticResource backgroundConverter}}" -->
+		<!-- 							ToolTip.Tip="{Binding Name}" -->
+		<!-- 							BorderThickness="0"> -->
+		<!-- 					<TextBlock Text="{Binding Name}" -->
+		<!-- 										 Foreground="{Binding $parent.Background, Converter={StaticResource foregroundConverter}}" -->
+		<!-- 										 HorizontalAlignment="Center" -->
+		<!-- 										 VerticalAlignment="Center" -->
+		<!-- 										 TextTrimming="CharacterEllipsis" />-->
+		<!-- -->
+		<!-- 				<ItemsControl Margin="0 5 0 0" -->
+		<!-- 											ItemsSource="{Binding Items}"> -->
+		<!-- 					<ItemsControl.ItemsPanel> -->
+		<!-- 						<ItemsPanelTemplate> -->
+		<!-- 							<controls:SquarifiedTreeMapsPanel /> -->
+		<!-- 						</ItemsPanelTemplate> -->
+		<!-- 					</ItemsControl.ItemsPanel> -->
+		<!-- -->
+		<!-- 					<ItemsControl.ItemTemplate> -->
+		<!-- 						<DataTemplate> -->
+		<!-- 							<Border Background="{Binding Name, Converter={StaticResource backgroundConverter}}" -->
+		<!-- 											ToolTip.Tip="{Binding Name}" -->
+		<!-- 											BorderThickness="1"> -->
+		<!-- 								<TextBlock Text="{Binding Name}" -->
+		<!-- 													 Foreground="{Binding $parent.Background, Converter={StaticResource foregroundConverter}}" -->
+		<!-- 													 HorizontalAlignment="Center" -->
+		<!-- 													 VerticalAlignment="Center" -->
+		<!-- 													 TextWrapping="WrapWithOverflow" -->
+		<!-- 													 TextTrimming="CharacterEllipsis" /> -->
+		<!-- 							</Border> -->
+		<!-- 						</DataTemplate> -->
+		<!-- 					</ItemsControl.ItemTemplate> -->
+		<!-- 				</ItemsControl> -->
+		<!-- 			</Border> -->
+		<!-- 		</DataTemplate> -->
+		<!-- 	</ItemsControl.ItemTemplate> -->
+		<!-- </ItemsControl> -->
+		<!-- -->
+		<!-- <GridSplitter ResizeDirection="Rows" -->
+		<!-- 							VerticalAlignment="Top" -->
+		<!-- 							Background="{DynamicResource MenuBackground}" -->
+		<!-- 							Height="5" -->
+		<!-- 							Grid.Row="1" /> -->
 	</Grid>
 </UserControl>

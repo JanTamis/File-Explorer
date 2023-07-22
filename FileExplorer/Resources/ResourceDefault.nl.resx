@@ -83,4 +83,25 @@
     <data name="FileSelectionFormat" xml:space="preserve">
         <value>{1} van {0} geselecteerd</value>
     </data>
+    <data name="NoFilesAndDirectories" xml:space="preserve">
+        <value>Geen bestanden of mappen gevonden...</value>
+    </data>
+    <data name="None" xml:space="preserve">
+        <value>Geen</value>
+    </data>
+    <data name="Edited" xml:space="preserve">
+        <value>Gewijzigd</value>
+    </data>
+    <data name="Close" xml:space="preserve">
+        <value>Sluiten</value>
+    </data>
+    <data name="ZipFiles" xml:space="preserve">
+        <value>Zip bestanden</value>
+    </data>
+    <data name="Delete" xml:space="preserve">
+        <value>Verwijder</value>
+    </data>
+    <data name="DeleteTextformat" xml:space="preserve">
+        <value>Weet je zeker dat je {0:N0} {1} wil verwijderen</value>
+    </data>
 </root>

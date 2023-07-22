@@ -23,9 +23,11 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	{
 		get
 		{
-			if (IsFolder && Directory.Exists(GetPath()))
+			var path = GetPath();
+			
+			if (IsFolder && Directory.Exists(path))
 			{
-				return new FileSystemEnumerable<FileSystemTreeItem>(Path, (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName, x.IsDirectory, this), Options);
+				return new FileSystemEnumerable<FileSystemTreeItem>(path, (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName, x.IsDirectory, this), Options);
 			}
 
 			return Enumerable.Empty<FileSystemTreeItem>();
@@ -36,9 +38,11 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	{
 		get
 		{
-			if (IsFolder && Directory.Exists(GetPath()))
+			var path = GetPath();
+			
+			if (IsFolder && Directory.Exists(path))
 			{
-				var enumerable = new FileSystemEnumerable<byte>(Path, (ref FileSystemEntry _) => 0, Options)
+				var enumerable = new FileSystemEnumerable<byte>(path, (ref FileSystemEntry _) => 0, Options)
 				{
 					ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
 				};
@@ -217,12 +221,9 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	public IEnumerable<FileSystemTreeItem> EnumerateChildrenRecursive(ReadOnlySpanFunc<char, bool> include)
 	{
 		return EnumerateChildren(include)
-			.SelectMany(s =>
-			{
-				return !s.IsFolder || include(s.Value)
-					? s.EnumerateChildrenRecursive(include).Prepend(s)
-					: s.EnumerateChildrenRecursive(include);
-			})
+			.SelectMany(s => !s.IsFolder || include(s.Value)
+				? s.EnumerateChildrenRecursive(include).Prepend(s)
+				: s.EnumerateChildrenRecursive(include))
 			.Where(w => !w.IsFolder || include(w.Value));
 	}
 

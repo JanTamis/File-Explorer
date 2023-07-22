@@ -1,15 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.30929172" y1="-0.010130435" x2="0.68645835" y2="0.99880433" id="gradient_1">
+      <stop offset="0%" stop-color="#889097" />
+      <stop offset="33.1%" stop-color="#848C94" />
+      <stop offset="66.9%" stop-color="#78828B" />
+      <stop offset="100%" stop-color="#64717C" />
+    </linearGradient>
+    <radialGradient gradientUnits="objectBoundingBox" cx="-1.0954559%" cy="-2.268182%" fx="-1.0954559%" fy="-2.268182%" r="1108.6053%" gradientTransform="translate(-0.010954559,-0.02268182),scale(1,0.5),rotate(-158.84981),scale(1,1.3113964),translate(0.010954559,0.02268182)" id="gradient_2">
+      <stop offset="0%" stop-color="#BD8AF5" />
+      <stop offset="13.7%" stop-color="#B88BF5" />
+      <stop offset="30.899996%" stop-color="#A88FF3" />
+      <stop offset="49.9%" stop-color="#8F96F2" />
+      <stop offset="70.200005%" stop-color="#6B9EEF" />
+      <stop offset="91.299995%" stop-color="#3EAAEC" />
+      <stop offset="100%" stop-color="#29AFEA" />
+    </radialGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.5" y1="1.0105" x2="0.5" y2="0.038000107" id="gradient_3">
+      <stop offset="0%" stop-color="#6D7479" />
+      <stop offset="100%" stop-color="#323538" />
+    </linearGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
     <clipPath id="clip_1">
       <use xlink:href="#path_1" />
     </clipPath>
   </defs>
-  <g id="Apple Logo" clip-path="url(#clip_1)">
-    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Apple-Logo" fill="none" fill-rule="evenodd" stroke="none" />
-    <path d="M36.232 23.985C36.232 18.12 40.998 15.475 41.198 15.349C38.602 11.356 34.408 10.882 32.836 10.881C29.193 10.881 25.973 12.903 24.251 12.903C22.454 12.903 19.833 10.782 16.888 10.881C13.045 10.956 9.525 13.227 7.554 16.572C6.157 18.968 5.607 21.789 5.658 24.659C5.66 24.772 5.675 24.887 5.678 25L36.32 25C36.279 24.671 36.243 24.337 36.232 23.985L36.232 23.985Z" id="Shape" fill="#0883D9" stroke="none" />
-    <path d="M30.565 7.063C32.261 5.191 33.21 2.621 33.06 0C30.714 0 27.994 1.372 26.272 3.394C24.924 5.066 23.477 7.687 24.001 10.307C26.422 10.607 29.043 9.085 30.565 7.063L30.565 7.063Z" id="Shape" fill="#0883D9" stroke="none" />
-    <path d="M17.511 45C20.282 45 21.305 43.152 24.924 43.152C28.294 43.152 29.342 45 32.262 45C35.332 45 37.354 42.205 39.175 39.433C41.47 36.215 42.245 33.145 42.344 33.019C42.25 33.019 37.057 30.907 36.318 25L5.678 25C5.835 30.311 7.906 35.79 10.349 39.309C12.27 42.055 14.441 45 17.511 45L17.511 45Z" id="Shape" fill="#0370C8" stroke="none" />
+  <g id="Iphone 14 Pro" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Iphone-14-Pro" fill="none" stroke="none" />
+    <path d="M12 44L12 4C12 2.343 13.343 1 15 1L33 1C34.657 1 36 2.343 36 4L36 44C36 45.657 34.657 47 33 47L15 47C13.343 47 12 45.657 12 44L12 44Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M13 44L13 4C13 2.895 13.895 2 15 2L33 2C34.105 2 35 2.895 35 4L35 44C35 45.105 34.105 46 33 46L15 46C13.895 46 13 45.105 13 44L13 44Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M27 4C26.814 4 21.186 4 21 4C20.448 4 20 4.448 20 5C20 5.552 20.448 6 21 6C21.186 6 26.814 6 27 6C27.552 6 28 5.552 28 5C28 4.448 27.552 4 27 4L27 4Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
   </g>
 </svg>

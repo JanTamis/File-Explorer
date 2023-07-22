@@ -8,6 +8,8 @@ public interface IFileItem
 
 	string Extension { get; }
 	string Name { get; set; }
+	
+	string ToolTipText { get; }
 
 	long Size { get; }
 

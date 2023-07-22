@@ -1,16 +1,13 @@
 using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
 using FileExplorer.Popup;
-using System.IO;
 using System.Timers;
 using Avalonia;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FileExplorer.Core.Helpers;
-using FileExplorer.Core.Interfaces;
 using FileExplorer.Models;
 using FileExplorer.Graph;
 using FileExplorer.Providers;
-using Humanizer;
 using Avalonia.Controls.ApplicationLifetimes;
 using Material.Icons;
 using Avalonia.Controls;
@@ -83,6 +80,19 @@ public partial class MainWindowViewModel
 
 	public bool IsWindows => OperatingSystem.IsWindows();
 	public bool IsMacOS => OperatingSystem.IsMacOS();
+	
+	public Thickness WindowMargin { get; set; }
+
+	public IEnumerable<ViewTypes> AllViewTypes
+	{
+		get
+		{
+			yield return ViewTypes.Grid;
+			yield return ViewTypes.List;
+		}
+	}
+
+	public IEnumerable<SortEnum> AllSortTypes => Enum.GetValues<SortEnum>();
 
 	public MainWindowViewModel(WindowNotificationManager manager)
 	{
@@ -101,11 +111,30 @@ public partial class MainWindowViewModel
 
 		AddTab();
 
+		if (IsMacOS)
+		{
+			WindowMargin = new Thickness(75, 0, 0, 0);
+		}
+
 		if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
 		{
 			Window.WindowStateProperty.Changed.Subscribe(delegate
 			{
 				OnPropertyChanged(nameof(ToggleIcon));
+
+				if (IsMacOS)
+				{
+					if (window.WindowState is WindowState.Normal)
+					{
+						WindowMargin = new Thickness(75, 0, 0, 0);
+					}
+					else
+					{
+						WindowMargin = new Thickness(0, 0, 0, 0);
+					}
+					
+					OnPropertyChanged(nameof(WindowMargin));
+				}
 			});
 		}
 
@@ -131,7 +160,7 @@ public partial class MainWindowViewModel
 		Tabs.Add(tab);
 		CurrentTab = tab;
 
-		tab.SetPath(new FileModel(FileSystemTreeItem.FromPath("/")));
+		// tab.SetPath(new FileModel(FileSystemTreeItem.FromPath("/")));
 	}
 
 	public async Task GoUp()

@@ -8,10 +8,13 @@ using System.Runtime.CompilerServices;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 using CommunityToolkit.HighPerformance.Helpers;
+using CommunityToolkit.Mvvm.ComponentModel;
+using FileExplorer.Resources;
 
 namespace FileExplorer.Models;
 
-public sealed class FileModel : IFileItem, INotifyPropertyChanged
+[INotifyPropertyChanged]
+public sealed partial class FileModel : IFileItem
 {
 	public FileSystemTreeItem TreeItem { get; }
 
@@ -21,20 +24,12 @@ public sealed class FileModel : IFileItem, INotifyPropertyChanged
 
 	private DateTime _editedOn;
 
-	private bool _isVisible = true;
+	[ObservableProperty]
+	private bool _isVisible;
+	
+	[ObservableProperty]
 	private bool _isSelected;
 
-	public bool IsVisible
-	{
-		get => _isVisible;
-		set => SetProperty(ref _isVisible, value);
-	}
-
-	public bool IsSelected
-	{
-		get => _isSelected;
-		set => SetProperty(ref _isSelected, value);
-	}
 
 	public string? ExtensionName { get; set; }
 
@@ -55,9 +50,30 @@ public sealed class FileModel : IFileItem, INotifyPropertyChanged
 		}
 	}
 
-	public string Extension =>_extension ??= !IsFolder
+	public string Extension => _extension ??= !IsFolder
 		? System.IO.Path.GetExtension(TreeItem.Value)
 		: String.Empty;
+
+	public string ToolTipText
+	{
+		get
+		{
+			if (IsFolder)
+			{
+				return $"""
+					{ResourceDefault.Name}: {Name}
+					{ResourceDefault.EditDate}: {EditedOn}
+					""";
+			}
+			
+			return $"""
+				{ResourceDefault.Name}: {Name}
+				{ResourceDefault.Extension}: {Extension}
+				{ResourceDefault.Size}: {Size.Bytes().ToString()}
+				{ResourceDefault.EditDate}: {EditedOn}
+				""";
+		}
+	}
 
 	public long Size
 	{
@@ -99,7 +115,7 @@ public sealed class FileModel : IFileItem, INotifyPropertyChanged
 		}
 		else if (file.IsFolder)
 		{
-			var query = new FileSystemEnumerable<long>(path, (ref FileSystemEntry x) => x.Length,
+			var query = new FileSystemEnumerable<long>(path, (ref FileSystemEntry entry) => entry.Length,
 				new EnumerationOptions { RecurseSubdirectories = true })
 				{
 					ShouldIncludePredicate = (ref FileSystemEntry y) => !y.IsDirectory,
@@ -159,24 +175,5 @@ public sealed class FileModel : IFileItem, INotifyPropertyChanged
 	public override int GetHashCode()
 	{
 		return GetPath(HashCode<char>.Combine);
-	}
-
-	private bool SetProperty<T>([NotNullIfNotNull("newValue")] ref T field, T newValue, [CallerMemberName] string? propertyName = null)
-	{
-		if (EqualityComparer<T>.Default.Equals(field, newValue))
-		{
-			return false;
-		}
-
-		field = newValue;
-		OnPropertyChanged(propertyName);
-		return true;
-	}
-
-	public event PropertyChangedEventHandler? PropertyChanged;
-
-	private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-	{
-		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 	}
 }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.5" y1="0.11894442" x2="0.5" y2="1.0078335" id="gradient_1">
+      <stop offset="0%" stop-color="#FBA62D" />
+      <stop offset="17.4%" stop-color="#FC8E2C" />
+      <stop offset="54.8%" stop-color="#FE602A" />
+      <stop offset="83.5%" stop-color="#FF4329" />
+      <stop offset="100%" stop-color="#FF3829" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="-0.01062265" y1="0.0050546527" x2="0.7377206" y2="0.7536204" id="gradient_2">
+      <stop offset="0%" stop-color="#FAA53D" />
+      <stop offset="43.8%" stop-color="#E17A2F" />
+      <stop offset="79.49999%" stop-color="#D15D26" />
+      <stop offset="100%" stop-color="#CB5223" />
+    </linearGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Swift" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Swift" fill="none" stroke="none" />
+    <path d="M40 42L8 42C6.9 42 6 41.1 6 40L6 8C6 6.9 6.9 6 8 6L40 6C41.1 6 42 6.9 42 8L42 40C42 41.1 41.1 42 40 42L40 42Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M30 30C38.847 21.152 26.019 11 26.019 11L21.014 6L8 6C6.9 6 6 6.9 6 8L6 21.967L10 25.967C10 25.967 21.153 38.848 30 30L30 30Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M26.019 11C37.448 18.698 33.751 27.187 33.751 27.187C33.751 27.187 37.001 30.821 35.687 34C35.687 34 34.347 31.774 32.099 31.774C29.933 31.774 28.659 34 24.299 34C14.591 34 10 25.967 10 25.967C18.747 31.667 24.719 27.63 24.719 27.63C20.778 25.364 12 14 12 14C19.299 20.155 23 22 23 22C21.118 20.458 15 13 15 13C19.224 17.238 28.307 23.378 28.307 23.378C30.691 16.834 26.019 11 26.019 11L26.019 11Z" id="Shape" fill="#FFFFFF" stroke="none" />
+  </g>
+</svg>

@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Tracing;
+using System.Globalization;
 using Avalonia.Media;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
@@ -9,6 +10,8 @@ using FileExplorer.Models;
 using Microsoft.Extensions.Caching.Memory;
 using System.IO;
 using System.IO.Enumeration;
+using System.Runtime.Versioning;
+using System.Text;
 using System.Text.RegularExpressions;
 using Avalonia.Svg;
 using Avalonia.Svg.Skia;
@@ -17,6 +20,7 @@ using FileExplorer.Core.Extensions;
 using FileExplorer.Core.Models;
 using FileExplorer.DisplayViews;
 using FileExplorer.Popup;
+using FileExplorer.Resources;
 using Material.Icons;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
@@ -29,6 +33,8 @@ public sealed class FileSystemProvider : IItemProvider
 	private readonly MemoryCache? _imageCache;
 
 	private IFileItem[]? _clipboard;
+
+	private static readonly CompositeFormat _deleteFormat = CompositeFormat.Parse(ResourceDefault.DeleteTextformat);
 
 	public FileSystemProvider()
 	{
@@ -389,14 +395,14 @@ public sealed class FileSystemProvider : IItemProvider
 		if (selectedCount > 0)
 		{
 			var itemText = selectedCount > 1
-				? "items"
-				: "item";
+				? ResourceDefault.Items
+				: ResourceDefault.Item;
 
 			var choice = new Choice
 			{
-				Message = $"Are you sure you want to delete {selectedCount:N0} {itemText}?",
-				CloseText = "No",
-				SubmitText = "Yes",
+				Message = String.Format(CultureInfo.CurrentCulture, _deleteFormat, selectedCount, itemText),
+				CloseText = ResourceDefault.Close,
+				SubmitText = ResourceDefault.Delete,
 				Image = new SvgImage
 				{
 					Source = SvgSource.Load<SvgSource>("avares://FileExplorer/Assets/UIIcons/Question.svg", null),
@@ -506,9 +512,10 @@ public sealed class FileSystemProvider : IItemProvider
 
 	private void Zip(MenuItemActionModel model)
 	{
-		model.Popup = new Zip()
+		model.Popup = new Zip
 		{
-			
+			SelectedFiles =  model.Files.Where(w => w.IsSelected).ToList(),
+			Folder = model.CurrentFolder,
 		};
 	}
 }

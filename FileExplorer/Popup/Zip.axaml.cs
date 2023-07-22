@@ -1,101 +1,79 @@
 using System.ComponentModel;
 using System.IO;
-using System.IO.Compression;
 using System.Runtime.CompilerServices;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
-using CommunityToolkit.Mvvm.ComponentModel;
 using DialogHostAvalonia;
 using FileExplorer.Core.Interfaces;
-using FileExplorer.Models;
+using SharpCompress.Archives;
+using SharpCompress.Common;
+using SharpCompress.Writers;
 
 namespace FileExplorer.Popup;
 
 public sealed partial class Zip : UserControl, IPopup
 {
-  private IEnumerable<IFileItem> _selectedFiles;
+  private List<IFileItem> _selectedFiles;
+  private int _progress;
+  
+  public List<IFileItem> SelectedFiles
+  {
+    get => _selectedFiles;
+    set
+    {
+      OnPropertyChanged(ref _selectedFiles, value);
+      OnPropertyChanged(nameof(FileCount));
+    }
+  }
+
+  public IFileItem Folder
+  {
+    get => _folder;
+    set => OnPropertyChanged(ref _folder, value);
+  }
+
+  public int Progress
+  {
+    get => _progress;
+    set => OnPropertyChanged(ref _progress, value);
+  }
+  
+  public int FileCount => SelectedFiles?.Count ?? 0;
+
   public new event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
   public bool HasShadow => true;
-  public bool HasToBeCanceled => true;
-  public string Title => $"Zipping Items...";
+  public bool HasToBeCanceled => false;
+  public string Title => "Zipping Items...";
 
   private CancellationTokenSource? _source;
+  private IFileItem _folder;
 
   public event Action? OnClose;
-  
+
   public Zip()
   {
     InitializeComponent();
-
-    DataContext = this;
   }
 
-  // public async Task ZipFiles()
-  // {
-  //   CurrentCount = 0;
-  //   _source = new CancellationTokenSource();
-  //
-  //   var task = Task.Run(() =>
-  //   {
-  //     var path = String.Empty;
-  //     var attempt = 0;
-  //
-  //     do
-  //     {
-  //       attempt++;
-  //       path = TreeItem.GetPath(path => Path.Combine(path.ToString(), $"Archive{attempt}.zip"));
-  //     } while (File.Exists(path));
-  //
-  //     using (var zip = ZipFile.Open(path, ZipArchiveMode.Create))
-  //     {
-  //       foreach (var file in SelectedFiles)
-  //       {
-  //         if (_source.IsCancellationRequested)
-  //         {
-  //           break;
-  //         }
-  //
-  //         if (!file.IsFolder)
-  //         {
-  //           try
-  //           {
-  //             zip.CreateEntryFromFile(file.GetPath(path => path.ToString()), file.Name, CompressionLevel);
-  //           }
-  //           catch (Exception) { }
-  //         }
-  //
-  //         CurrentCount++;
-  //
-  //         OnPropertyChanged(nameof(CurrentCount));
-  //         OnPropertyChanged(nameof(Progress));
-  //       }
-  //     }
-  //
-  //     FileModel = new FileModel(new FileSystemTreeItem(Path.GetFileName(path), false, TreeItem));
-  //
-  //     CurrentCount = Count;
-  //
-  //     OnPropertyChanged(nameof(CurrentCount));
-  //     OnPropertyChanged(nameof(Progress));
-  //
-  //     Close();
-  //   }, _source.Token);
-  //
-  //   var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(100));
-  //
-  //   while (await timer.WaitForNextTickAsync(_source.Token))
-  //   {
-  //     if (task.IsCompleted)
-  //     {
-  //       break;
-  //     }
-  //
-  //     OnPropertyChanged(nameof(CurrentCount));
-  //     OnPropertyChanged(nameof(Progress));
-  //     OnPropertyChanged(nameof(CurrentFile));
-  //   }
-  // }
+  public async Task ZipFiles()
+  {
+    await Task.Run(() =>
+    {
+      using var archive = ArchiveFactory.Create(ArchiveType.Zip);
+
+      foreach (var selectedFile in SelectedFiles)
+      {
+        _source?.Token.ThrowIfCancellationRequested();
+        archive.AddEntry(selectedFile.Name, File.OpenRead(selectedFile.GetPath()), true);
+
+        Progress++;
+      }
+
+      archive.SaveTo($"{Folder.GetPath()}/archive.zip", new WriterOptions(CompressionType.Deflate));
+    });
+
+    Close();
+  }
 
   public void Close()
   {
@@ -108,7 +86,7 @@ public sealed partial class Zip : UserControl, IPopup
     }
   }
 
-  protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
+  private void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
   {
     property = value;
     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

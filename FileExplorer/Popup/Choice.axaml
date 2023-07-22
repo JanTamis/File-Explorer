@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="FileExplorer.Popup.Choice">
-	<Grid ColumnDefinitions="Auto, 200"
+	<Grid ColumnDefinitions="Auto, auto"
 	      MaxWidth="500"
 	      RowDefinitions="*, Auto"
 	      Margin="10">
@@ -16,6 +16,7 @@
 		<TextBlock Text="{Binding Message}"
 		           Grid.Column="1"
 		           Grid.Row="0"
+		           VerticalAlignment="Center"
 		           TextWrapping="Wrap"
 		           FontSize="16" />
 
@@ -26,11 +27,12 @@
 		            Grid.Row="1">
 			<Button Content="{Binding CloseText}"
 			        Command="{Binding Close}"
+			        Foreground="{DynamicResource MaterialDesignBody}"
 			        Margin="0 0 5 0"
 			        MinWidth="80"
 			        Cursor="Hand"
 			        Classes="Flat"
-			        FontSize="23"
+			        FontSize="21"
 			        HorizontalContentAlignment="Center"
 			        VerticalContentAlignment="Center"
 			        HorizontalAlignment="Stretch" />
@@ -39,7 +41,7 @@
 			        Command="{Binding Confirm}"
 			        MinWidth="80"
 			        Cursor="Hand"
-			        FontSize="23"
+			        FontSize="21"
 			        HorizontalContentAlignment="Center"
 			        VerticalContentAlignment="Center"
 			        HorizontalAlignment="Stretch" />

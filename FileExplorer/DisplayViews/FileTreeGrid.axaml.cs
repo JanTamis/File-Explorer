@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Globalization;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
@@ -25,7 +26,9 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 {
 	private int anchorIndex = 0;
 
-	private const int ImageSize = 35;
+	private const int ImageSize = 30;
+
+	private static PropertyInfo? isSelectedProperty = typeof(TreeDataGridRow).GetProperty(nameof(TreeDataGridRow.IsSelected));
 
 	public IItemProvider? Provider { get; set; }
 
@@ -55,8 +58,6 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 		}
 		set
 		{
-			var grid = fileList;
-
 			var folder = new SvgImage
 			{
 				Source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/Folder.svg", null),
@@ -139,7 +140,7 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 									},
 								},
 							},
-						}), GridLength.Auto, new TemplateColumnOptions<IFileItem>
+						}), null, GridLength.Auto, new TemplateColumnOptions<IFileItem>
 					{
 						CanUserResizeColumn = false,
 						CompareAscending = (x, y) =>
@@ -169,29 +170,32 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 					// x => x is { IsFolder: true } && Provider?.HasItems(x) is true),
 					new TextColumn<IFileItem, string>(ResourceDefault.Name, item => item.Name, GridLength.Auto, new TextColumnOptions<IFileItem>()
 					{
-						SingleTapEdit = true,
 						CompareAscending = (x, y) => String.Compare(x!.Name, y!.Name),
 						CompareDescending = (x, y) => String.Compare(y!.Name, x!.Name),
+						CanUserSortColumn = false,
 					}),
 					new TextColumn<IFileItem, string>(ResourceDefault.EditDate, item => item.EditedOn.Humanize(false, DateTime.Now, CultureInfo.CurrentCulture), GridLength.Auto, new TextColumnOptions<IFileItem>()
 					{
 						CompareAscending = (x, y) => DateTime.Compare(x!.EditedOn, y!.EditedOn),
 						CompareDescending = (x, y) => DateTime.Compare(y!.EditedOn, x!.EditedOn),
+						CanUserSortColumn = false,
 					}),
 					new TextColumn<IFileItem, string>(ResourceDefault.Extension, item => item.Extension, GridLength.Auto, new TextColumnOptions<IFileItem>
 					{
 						CompareAscending = (x, y) => String.Compare(x?.Extension, y?.Extension),
 						CompareDescending = (x, y) => String.Compare(y?.Extension, x?.Extension),
+						CanUserSortColumn = false,
 					}),
 					new TextColumn<IFileItem, string>(ResourceDefault.Size, item => item.IsFolder ? null : item.Size.Bytes().ToString(), GridLength.Auto, new TextColumnOptions<IFileItem>
 					{
 						CompareAscending = (x, y) => x!.Size.CompareTo(y!.Size),
 						CompareDescending = (x, y) => y!.Size.CompareTo(x!.Size),
+						CanUserSortColumn = false,
 					}),
 				},
 			};
 
-			grid.Source = source;
+			fileList.Source = source;
 
 			IFileItem? previousModel = null;
 
@@ -231,10 +235,10 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 				}
 			});
 
-			if (grid.RowSelection is not null)
+			if (fileList.RowSelection is not null)
 			{
-				grid.RowSelection.SingleSelect = false;
-				grid.RowSelection.SelectionChanged += (_, args) => SelectionChanged(args.SelectedIndexes.Count);
+				fileList.RowSelection.SingleSelect = false;
+				fileList.RowSelection.SelectionChanged += (_, args) => SelectionChanged(args.SelectedIndexes.Count);
 			}
 		}
 	}
@@ -273,19 +277,31 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 	{
 		InitializeComponent();
 
-		// fileList.ElementPrepared += Grid_ElementPrepared;
-		// fileList.ElementClearing += Grid_ElementClearing;
-		//
-		// fileList.KeyDown += Grid_KeyDown;1
-
-		
-		
+		fileList.KeyDown += Grid_KeyDown;
 	}
 
 	protected override void OnInitialized()
 	{
-		fileList.RowSelection.SelectionChanged += delegate { SelectionChanged.Invoke(fileList.RowSelection.Count); };
-		fileList.RowSelection.SingleSelect = false;
+		if (fileList.RowSelection is not null)
+		{
+			fileList.RowSelection.SelectionChanged += (sender, args) =>
+			{
+				SelectionChanged.Invoke(fileList.RowSelection.Count);
+			};
+			
+			fileList.RowSelection.SingleSelect = false;
+
+			fileList.RowPrepared += (sender, args) =>
+			{
+				if (args.Row is { DataContext: IFileItem item })
+				{
+					isSelectedProperty?.SetValue(args.Row, item.IsSelected);
+				}
+
+				args.Row[!TreeDataGridRow.IsSelectedProperty] = new Binding("DataContext.IsSelected", BindingMode.OneWayToSource);
+			};
+		}
+
 		base.OnInitialized();
 	}
 
@@ -299,47 +315,6 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 			}
 
 			SelectionChanged?.Invoke(Items.Count);
-		}
-	}
-
-	private void Grid_ElementClearing(object? sender, ItemsRepeaterElementClearingEventArgs e)
-	{
-		if (e.Element is ListBoxItem item)
-		{
-			item.DoubleTapped -= Item_DoubleTapped;
-			item.PointerPressed -= Item_PointerPressed;
-		}
-	}
-
-	private async void Item_PointerPressed(object? sender, PointerPressedEventArgs e)
-	{
-		if (sender is ListBoxItem { DataContext: IFileItem model } item)
-		{
-			var point = e.GetCurrentPoint(item);
-
-			if (point.Properties.IsLeftButtonPressed || point.Properties.IsRightButtonPressed)
-			{
-				var index = Items.IndexOf(model);
-
-				anchorIndex = IFileViewer.UpdateSelection(
-					this,
-					anchorIndex,
-					index,
-					true,
-					e.KeyModifiers.HasFlag(KeyModifiers.Shift),
-					e.KeyModifiers.HasFlag(KeyModifiers.Control));
-			}
-		}
-	}
-
-	private void Grid_ElementPrepared(object? sender, ItemsRepeaterElementPreparedEventArgs e)
-	{
-		if (e.Element is ListBoxItem { DataContext: IFileItem model } item)
-		{
-			item.DoubleTapped += Item_DoubleTapped;
-			item.PointerPressed += Item_PointerPressed;
-
-			model.IsVisible = true;
 		}
 	}
 

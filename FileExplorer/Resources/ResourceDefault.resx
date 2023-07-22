@@ -90,4 +90,25 @@
     <data name="FileSelectionFormat" xml:space="preserve">
         <value>{1} of {0} selected</value>
     </data>
+    <data name="NoFilesAndDirectories" xml:space="preserve">
+        <value>No files or directories found...</value>
+    </data>
+    <data name="None" xml:space="preserve">
+        <value>None</value>
+    </data>
+    <data name="Edited" xml:space="preserve">
+        <value>Edited</value>
+    </data>
+    <data name="Close" xml:space="preserve">
+        <value>Close</value>
+    </data>
+    <data name="ZipFiles" xml:space="preserve">
+        <value>Zip files</value>
+    </data>
+    <data name="Delete" xml:space="preserve">
+        <value>Delete</value>
+    </data>
+    <data name="DeleteTextformat" xml:space="preserve">
+        <value>Are you sure you want to delete {0:N0} {1}</value>
+    </data>
 </root>

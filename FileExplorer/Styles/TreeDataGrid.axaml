@@ -6,7 +6,7 @@
     <StreamGeometry x:Key="TreeDataGridGridSortIconDescendingPath">M1875 1011l-787 787v-1798h-128v1798l-787 -787l-90 90l941 941l941 -941z</StreamGeometry>
     <StreamGeometry x:Key="TreeDataGridGridSortIconAscendingPath">M1965 947l-941 -941l-941 941l90 90l787 -787v1798h128v-1798l787 787z</StreamGeometry>
   </Styles.Resources>
-
+  
   <Style Selector="TreeDataGrid">
     <Setter Property="Template">
       <ControlTemplate>
@@ -39,12 +39,12 @@
       </ControlTemplate>
     </Setter>
   </Style>
-
+  
   <Style Selector="TreeDataGrid /template/ Border#ColumnHeadersPresenterBorder">
     <Setter Property="BorderThickness" Value="0 0 0 1.5" />
     <Setter Property="BorderBrush" Value="{DynamicResource WindowBackground}" />
   </Style>
-
+  
   <Style Selector="TreeDataGridColumnHeader">
     <Setter Property="Background" Value="Transparent"/>
     <Setter Property="MinHeight" Value="25"/>
@@ -103,29 +103,29 @@
       </ControlTemplate>
     </Setter>
   </Style>
-
+  
   <Style Selector="TreeDataGridColumnHeader:pointerover /template/ Border#DataGridBorder">
     <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPointerOver}" />
     <Setter Property="TextBlock.Foreground" Value="{DynamicResource ButtonForegroundPointerOver}" />
   </Style>
-
+  
   <Style Selector="TreeDataGridColumnHeader:pressed /template/ Border#DataGridBorder">
     <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
     <Setter Property="BorderBrush" Value="{DynamicResource ButtonBorderBrushPressed}" />
     <Setter Property="TextBlock.Foreground" Value="{DynamicResource ButtonForegroundPressed}" />
   </Style>
-
+  
   <Style Selector="TreeDataGridColumnHeader[SortDirection=Ascending] /template/ Path#SortIcon">
     <Setter Property="IsVisible" Value="True" />
     <Setter Property="Data" Value="{StaticResource TreeDataGridGridSortIconAscendingPath}" />
   </Style>
-
+  
   <Style Selector="TreeDataGridColumnHeader[SortDirection=Descending] /template/ Path#SortIcon">
     <Setter Property="IsVisible" Value="True" />
     <Setter Property="Data" Value="{StaticResource TreeDataGridGridSortIconDescendingPath}" />
   </Style>
-
+  
   <Style Selector="TreeDataGridExpanderCell">
     <Setter Property="Template">
       <ControlTemplate>
@@ -151,7 +151,7 @@
       </ControlTemplate>
     </Setter>
   </Style>
-
+  
   <Style Selector="TreeDataGridRow">
     <Setter Property="Template">
       <ControlTemplate>
@@ -169,7 +169,7 @@
       </ControlTemplate>
     </Setter>
   </Style>
-
+  
   <Style Selector="TreeDataGridTextCell">
     <Setter Property="Padding" Value="4 2" />
     <Setter Property="Template">
@@ -187,7 +187,7 @@
       </ControlTemplate>
     </Setter>
   </Style>
-
+  
   <Style Selector="TreeDataGridTextCell:editing">
     <Setter Property="Padding" Value="4 2" />
     <Setter Property="Template">
@@ -204,19 +204,19 @@
       </ControlTemplate>
     </Setter>
   </Style>
-
+  
   <Style Selector="TreeDataGridTextCell:editing /template/ TextBox#PART_Edit">
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="MinHeight" Value="25" />
     <Setter Property="Padding" Value="10,3,6,3" />
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
-
+  
   <Style Selector="TreeDataGridTextCell:editing /template/ TextBox#PART_Edit DataValidationErrors">
     <Setter Property="Template" Value="{DynamicResource TooltipDataValidationContentTemplate}" />
     <Setter Property="ErrorTemplate" Value="{DynamicResource TooltipDataValidationErrorTemplate}" />
   </Style>
-
+  
   <Style Selector="TreeDataGridTemplateCell">
     <Setter Property="Template">
       <ControlTemplate>
@@ -231,17 +231,17 @@
       </ControlTemplate>
     </Setter>
   </Style>
-
+  
   <Style Selector="TreeDataGridRow:selected /template/ TreeDataGridCellsPresenter#PART_CellsPresenter">
     <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}"/>
     <Setter Property="ToggleButton.Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
   </Style>
-
+  
   <Style Selector=":is(TreeDataGridCell)">
     <Setter Property="Background" Value="Transparent"/>
     <Setter Property="MinHeight" Value="25"/>
   </Style>
-
+  
   <Style Selector=":is(TreeDataGridCell):selected">
     <Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}"/>
     <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />

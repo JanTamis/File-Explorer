@@ -10,7 +10,13 @@
              x:DataType="viewModels:TabItemViewModel"
              x:Class="FileExplorer.DisplayViews.FileTreeGrid">
 	
-	<TreeDataGrid Name="fileList"></TreeDataGrid>
+	<TreeDataGrid Name="fileList">
+		<TreeDataGrid.Styles>
+			<Style Selector="TreeDataGridRow">
+				
+			</Style>
+		</TreeDataGrid.Styles>
+	</TreeDataGrid>
 	
 	<!-- <ScrollViewer Classes="MiniBar"> -->
 	<!-- 	<ItemsRepeater ItemsSource="{Binding Files}" -->

@@ -1,15 +1,38 @@
-<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
-width="48" height="48"
-viewBox="0 0 48 48"
-style=" fill:#000000;">
-	<linearGradient id="WQEfvoQAcpQgQgyjQQ4Hqa_dINnkNb1FBl4_gr1" x1="24" x2="24" y1="6.708" y2="14.977" gradientUnits="userSpaceOnUse">
-		<stop offset="0" stop-color="#eba600"></stop>
-		<stop offset="1" stop-color="#c28200"></stop>
-	</linearGradient>
-	<path fill="url(#WQEfvoQAcpQgQgyjQQ4Hqa_dINnkNb1FBl4_gr1)" d="M24.414,10.414l-2.536-2.536C21.316,7.316,20.553,7,19.757,7L5,7C3.895,7,3,7.895,3,9l0,30	c0,1.105,0.895,2,2,2l38,0c1.105,0,2-0.895,2-2V13c0-1.105-0.895-2-2-2l-17.172,0C25.298,11,24.789,10.789,24.414,10.414z"></path>
-	<linearGradient id="WQEfvoQAcpQgQgyjQQ4Hqb_dINnkNb1FBl4_gr2" x1="24" x2="24" y1="10.854" y2="40.983" gradientUnits="userSpaceOnUse">
-		<stop offset="0" stop-color="#ffd869"></stop>
-		<stop offset="1" stop-color="#fec52b"></stop>
-	</linearGradient>
-	<path fill="url(#WQEfvoQAcpQgQgyjQQ4Hqb_dINnkNb1FBl4_gr2)" d="M21.586,14.414l3.268-3.268C24.947,11.053,25.074,11,25.207,11H43c1.105,0,2,0.895,2,2v26	c0,1.105-0.895,2-2,2H5c-1.105,0-2-0.895-2-2V15.5C3,15.224,3.224,15,3.5,15h16.672C20.702,15,21.211,14.789,21.586,14.414z"></path>
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="-0.17430435" y1="0.119666666" x2="0.8345" y2="0.79258335" id="gradient_1">
+      <stop offset="0%" stop-color="#EBA600" />
+      <stop offset="91.60966%" stop-color="#C28200" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.3448913" y1="0.45183945" x2="0.9557609" y2="0.61343956" id="gradient_2">
+      <stop offset="0%" stop-color="#E3A917" />
+      <stop offset="46.399994%" stop-color="#D79C1E" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="-0.12780435" y1="0.060827583" x2="0.7601739" y2="0.6819999" id="gradient_3">
+      <stop offset="34%" stop-color="#FFEFB2" />
+      <stop offset="48.5%" stop-color="#FFEDAD" />
+      <stop offset="65.200005%" stop-color="#FFE99F" />
+      <stop offset="82.8%" stop-color="#FEE289" />
+      <stop offset="100%" stop-color="#FED86B" />
+    </linearGradient>
+    <radialGradient gradientUnits="objectBoundingBox" cx="80.07826%" cy="133.27501%" fx="80.07826%" fy="133.27501%" r="1200.3295%" gradientTransform="translate(0.8007826,1.3327501),scale(0.6086956,1),rotate(-88.65737),scale(1,1.1006466),translate(-0.8007826,-1.3327501)" id="gradient_4">
+      <stop offset="19.899998%" stop-color="#FEC832" />
+      <stop offset="60.100002%" stop-color="#FCD667" />
+      <stop offset="68%" stop-color="#FDDA75" />
+      <stop offset="88.6%" stop-color="#FEE496" />
+      <stop offset="100%" stop-color="#FFE8A2" />
+    </radialGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Fonts Folder" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Fonts-Folder" fill="none" stroke="none" />
+    <path d="M44.5 41L3.5 41C2.119 41 1 39.881 1 38.5L1 7.5C1 6.119 2.119 5 3.5 5L15.097 5C16.616 5 18.052 5.69 19.001 6.877L21.5 10L44.5 10C45.881 10 47 11.119 47 12.5L47 38.5C47 39.881 45.881 41 44.5 41L44.5 41Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M1 37.875L1 38.5C1 39.881 2.119 41 3.5 41L44.5 41C45.881 41 47 39.881 47 38.5L47 37.875L1 37.875L1 37.875Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M44.5 11L21.5 11L20.263 11.824C19.114 12.591 17.763 13 16.381 13L3.5 13C2.119 13 1 14.119 1 15.5L1 37.5C1 38.881 2.119 40 3.5 40L44.5 40C45.881 40 47 38.881 47 37.5L47 13.5C47 12.119 45.881 11 44.5 11L44.5 11Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+    <path d="M44.5 40L3.5 40C2.119 40 1 38.881 1 37.5L1 16.5C1 15.119 2.119 14 3.5 14L16.756 14C18.138 14 19.489 13.591 20.639 12.824L21.875 12L44.5 12C45.881 12 47 13.119 47 14.5L47 37.5C47 38.881 45.881 40 44.5 40L44.5 40Z" id="Shape" fill="url(#gradient_4)" stroke="none" />
+  </g>
 </svg>

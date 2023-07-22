@@ -1,13 +1,16 @@
 ﻿using Avalonia.Data.Converters;
 using System.Globalization;
 using System.IO;
+using FileExplorer.Interfaces;
 using FileExplorer.Models;
 using Humanizer;
 
 namespace FileExplorer.Converters;
 
-public sealed class SizeConverter : IValueConverter
+public sealed class SizeConverter : IValueConverter, ISingleton<SizeConverter>
 {
+	public static SizeConverter Instance = new SizeConverter();
+	
 	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
 		switch (value)

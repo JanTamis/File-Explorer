@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.14645001" y1="0.14644995" x2="0.85355" y2="0.85354996" id="gradient_1">
+      <stop offset="0%" stop-color="#33BEF0" />
+      <stop offset="100%" stop-color="#0A85D9" />
+    </linearGradient>
+    <radialGradient gradientUnits="objectBoundingBox" cx="49.989964%" cy="49.99447%" fx="49.989964%" fy="49.99447%" r="55.255302%" gradientTransform="translate(0.49989963,0.4999447),scale(0.90496475,1),scale(1,0.90496916),translate(-0.49989963,-0.4999447)" id="gradient_2">
+      <stop offset="51.6%" stop-color="#000000" />
+      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+    </radialGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Info" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Info" fill="none" stroke="none" />
+    <path d="M44.041 24.122C44.041 35.167 35.086 44.122 24.041 44.122C12.996 44.122 4.041 35.167 4.041 24.122C4.041 13.077 12.996 4.122 24.041 4.122C35.086 4.122 44.041 13.077 44.041 24.122L44.041 24.122Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M22 36L26 36C26.552 36 27 35.552 27 35L27 20C27 19.448 26.552 19 26 19L22 19C21.448 19 21 19.448 21 20L21 35C21 35.552 21.448 36 22 36L22 36Z" id="Shape" fill="#000000" fill-opacity="0.05" stroke="none" />
+    <path d="M22.227 35.5L25.774 35.5C26.175 35.5 26.501 35.175 26.501 34.773L26.501 20.227C26.501 19.826 26.176 19.5 25.774 19.5L22.227 19.5C21.826 19.5 21.5 19.825 21.5 20.227L21.5 34.774C21.5 35.175 21.825 35.5 22.227 35.5L22.227 35.5Z" id="Shape" fill="#000000" fill-opacity="0.07" stroke="none" />
+    <path d="M20.012 15.402C20.012 13.4088 21.7975 11.793 24 11.793C26.2025 11.793 27.988 13.4088 27.988 15.402C27.988 17.3952 26.2025 19.011 24 19.011C21.7975 19.011 20.012 17.3952 20.012 15.402Z" id="Oval" fill="url(#gradient_2)" fill-opacity="0.15" fill-rule="evenodd" stroke="none" />
+    <path d="M24 17.732C25.7 17.732 26.65 16.664 26.65 15.344C26.65 14.024 25.647 13 24 13C22.353 13 21.35 14.024 21.35 15.344C21.35 16.664 22.3 17.732 24 17.732L24 17.732Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M22 20L26 20L26 35L22 35L22 20Z" id="Rectangle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+  </g>
+</svg>

@@ -1,10 +1,12 @@
 ﻿using System.Collections.Concurrent;
+using System.Collections.Frozen;
 using Avalonia.Media;
 using Avalonia.Svg.Skia;
 using System.IO;
 using Avalonia.Threading;
 using Avalonia.Media.Imaging;
 using System.Diagnostics.CodeAnalysis;
+using Avalonia.Controls.Documents;
 using FileExplorer.Core.Extensions;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Models;
@@ -15,7 +17,17 @@ namespace FileExplorer.Helpers;
 [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)]
 public static class ThumbnailProvider
 {
-	private static readonly ConcurrentDictionary<string, IImage> Images = new();
+	private static readonly ConcurrentDictionary<int, IImage> Images = new();
+
+	private static FrozenSet<string> _docs = new[] { ".doc", ".docx", ".docm", ".dotx", ".dotm", ".docb", ".odt" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
+	private static FrozenSet<string> _sheets = new[] { ".xls", ".xlsx", ".xlsm", ".xltx", ".xltm", ".xlsb", ".xlam", ".ods" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
+	private static FrozenSet<string> _slides = new[] { ".ppt", ".pptx", ".pptm", ".potx", ".potm", ".ppam", ".ppsx", ".ppsm", ".sldx", ".sldm" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
+	private static FrozenSet<string> _access = new[] { ".accdb", ".accde", ".accdt", ".accdr", ".mdb", ".mde", ".mda", ".mdt", ".mdw" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
+	private static FrozenSet<string> _xml = new[] { ".xml", ".xsd", ".xsl", ".xslt", ".xps", ".oxps", ".axaml", ".xaml" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
+	private static FrozenSet<string> _fonts = new[] { ".ttf", ".otf", ".woff", ".woff2", ".eot" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
+	private static FrozenSet<string> _jpeg = new[] { ".jpg", ".jpeg", ".jpe", ".jfif" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
+	private static FrozenSet<string> _rawImage = new[] { ".cr2" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
+
 
 	public static async Task<IImage?> GetFileImage(IFileItem? model, IItemProvider provider, int size, Func<bool>? shouldReturnImage = null)
 	{
@@ -68,7 +80,47 @@ public static class ThumbnailProvider
 			}
 			else
 			{
-				var extension = model.Extension?.ToLower();
+				var extension = model.Extension;
+
+				if (_docs.Contains(extension))
+				{
+					return GetImageAsync("Word");
+				}
+
+				if (_sheets.Contains(extension))
+				{
+					return GetImageAsync("Excel");
+				}
+				
+				if (_slides.Contains(extension))
+				{
+					return GetImageAsync("PowerPoint");
+				}
+				
+				if (_fonts.Contains(extension))
+				{
+					return GetImageAsync("Font");
+				}
+				
+				if (_access.Contains(extension))
+				{
+					return GetImageAsync("Access");
+				}
+				
+				if (_xml.Contains(extension))
+				{
+					return GetImageAsync("Xml");
+				}
+				
+				if (_jpeg.Contains(extension))
+				{
+					return GetImageAsync("Jpeg");
+				}
+				
+				if (_rawImage.Contains(extension))
+				{
+					return GetImageAsync("RawImage");
+				}
 
 				if (extension is { Length: > 1 })
 				{
@@ -177,14 +229,16 @@ public static class ThumbnailProvider
 		}, size) ?? Task.FromResult<IImage?>(null));
 	}
 
-	public static async Task<IImage?> GetImageAsync(string? key)
+	public static async Task<IImage?> GetImageAsync(string key)
 	{
 		if (String.IsNullOrEmpty(key))
 		{
 			return null;
 		}
+
+		var hash = String.GetHashCode(key);
 		
-		if (!Images.TryGetValue(key, out var image))
+		if (!Images.TryGetValue(hash, out var image))
 		{
 			var source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/{key}.svg", null);
 
@@ -193,20 +247,22 @@ public static class ThumbnailProvider
 				Source = source,
 			}, DispatcherPriority.Background).GetTask();
 			
-			Images.TryAdd(key, image);
+			Images.TryAdd(hash, image);
 		}
 
 		return image;
 	}
 
-	public static IImage? GetImage(string? key)
+	public static IImage? GetImage(ReadOnlySpan<char> key)
 	{
-		if (String.IsNullOrEmpty(key))
+		if (key.IsEmpty)
 		{
 			return null;
 		}
 
-		if (!Images.TryGetValue(key, out var image))
+		var hash = String.GetHashCode(key);
+
+		if (!Images.TryGetValue(hash, out var image))
 		{
 			var source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/{key}.svg", null);
 
@@ -215,7 +271,7 @@ public static class ThumbnailProvider
 				Source = source,
 			};
 
-			Images.TryAdd(key, image);
+			Images.TryAdd(hash, image);
 		}
 
 		return image;

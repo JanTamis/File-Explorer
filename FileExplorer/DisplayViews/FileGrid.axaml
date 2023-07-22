@@ -10,10 +10,9 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewmodels:TabItemViewModel"
              x:Class="FileExplorer.DisplayViews.FileGrid">
-	<ScrollViewer Classes="MiniBar">
+	<ScrollViewer>
 		<ItemsRepeater ItemsSource="{Binding Files}"
-		               VerticalCacheLength="0"
-		               Margin="10 0 10 5"
+		               Margin="0"
 		               x:Name="fileList">
 			<ItemsRepeater.Layout>
 				<controls:FixedWrapPanel />
@@ -21,63 +20,62 @@
 
 			<ItemsRepeater.ItemTemplate>
 				<DataTemplate DataType="interfaces:IFileItem">
-					<Border CornerRadius="5"
-					        Margin="10"
-					        Padding="0"
-					        ClipToBounds="True"
-					        Background="{DynamicResource MaterialDesignCardBackground}">
-						<ListBoxItem Padding="0"
-						             Margin="0">
-							<StackPanel>
-								<Panel Margin="0"
-								       Height="100">
-									<Panel.DataContext>
-										<MultiBinding Converter="{x:Static converters:PathToImageConverter.Instance}">
-											<Binding Path="$parent[ListBoxItem].DataContext" />
-											<Binding Path="$parent[displayViews:FileGrid].DataContext.Provider" />
+					<ToggleButton Padding="0 5 0 0"
+					             Height="100"
+					             IsChecked="{Binding IsSelected}"
+					             ToolTip.Tip="{Binding ToolTipText}"
+					             Margin="0">
+						<ToggleButton.Styles>
+							<Style Selector="ToggleButton">
+								<Setter Property="CornerRadius" Value="0" />
+							</Style>
+							<Style Selector="ToggleButton:checked">
+								<Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
+							</Style>
+						</ToggleButton.Styles>
+						<StackPanel>
+							<Panel Margin="4 0 0 0">
+								<Panel.DataContext>
+									<MultiBinding Converter="{x:Static converters:PathToImageConverter.Instance}">
+										<Binding Path="$parent[ToggleButton].DataContext" />
+										<Binding Path="$parent[displayViews:FileGrid].DataContext.Provider" />
+									</MultiBinding>
+								</Panel.DataContext>
+
+								<Image Source="{SvgImage /Assets/Icons/Folder.svg}"
+								       Width="75"
+								       Height="75">
+									<Image.IsVisible>
+										<MultiBinding Converter="{x:Static BoolConverters.And}">
+											<Binding Path="!IsSuccessfullyCompleted" />
+											<Binding Path="$parent[ToggleButton].DataContext.IsFolder" />
 										</MultiBinding>
-									</Panel.DataContext>
+									</Image.IsVisible>
+								</Image>
+								<Image Source="{SvgImage /Assets/Icons/File.svg}"
+								       Width="75"
+								       Height="75">
+									<Image.IsVisible>
+										<MultiBinding Converter="{x:Static BoolConverters.And}">
+											<Binding Path="!IsSuccessfullyCompleted" />
+											<Binding Path="!$parent[ToggleButton].DataContext.IsFolder" />
+										</MultiBinding>
+									</Image.IsVisible>
+								</Image>
 
-									<Image Source="{SvgImage /Assets/Icons/Folder.svg}"
-									       Width="75"
-									       Height="75">
-										<Image.IsVisible>
-											<MultiBinding Converter="{x:Static BoolConverters.And}">
-												<Binding Path="!IsSuccessfullyCompleted" />
-												<Binding Path="$parent[ListBoxItem].DataContext.IsFolder" />
-											</MultiBinding>
-										</Image.IsVisible>
-									</Image>
-									<Image Source="{SvgImage /Assets/Icons/File.svg}"
-									       Width="75"
-									       Height="75">
-										<Image.IsVisible>
-											<MultiBinding Converter="{x:Static BoolConverters.And}">
-												<Binding Path="!IsSuccessfullyCompleted" />
-												<Binding Path="!$parent[ListBoxItem].DataContext.IsFolder" />
-											</MultiBinding>
-										</Image.IsVisible>
-									</Image>
-
-									<Image Source="{Binding Result}"
-									       Width="75"
-									       Height="75"
-									       IsVisible="{Binding IsSuccessfullyCompleted}" />
-								</Panel>
-
-								<Border Background="{DynamicResource MaterialDesignTextFieldBoxBackground}"
-								        CornerRadius="0, 0, 5, 5"
-								        Padding="5, 2.5"
-								        Height="40">
-									<TextBlock Text="{Binding Name}"
-									           Foreground="{DynamicResource MaterialDesignBody}"
-									           TextWrapping="WrapWithOverflow"
-									           HorizontalAlignment="Center"
-									           VerticalAlignment="Center" />
-								</Border>
-							</StackPanel>
-						</ListBoxItem>
-					</Border>
+								<Image Source="{Binding Result}"
+								       Width="75"
+								       Height="75"
+								       IsVisible="{Binding IsSuccessfullyCompleted}" />
+							</Panel>
+							<TextBlock Text="{Binding Name}"
+							           Foreground="{DynamicResource MaterialDesignBody}"
+							           Margin="10 0"
+							           TextTrimming="CharacterEllipsis"
+							           HorizontalAlignment="Center"
+							           VerticalAlignment="Center" />
+						</StackPanel>
+					</ToggleButton>
 				</DataTemplate>
 			</ItemsRepeater.ItemTemplate>
 

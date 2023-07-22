@@ -188,5 +188,47 @@ namespace FileExplorer.Resources {
                 return ResourceManager.GetString("FileSelectionFormat", resourceCulture);
             }
         }
+        
+        internal static string NoFilesAndDirectories {
+            get {
+                return ResourceManager.GetString("NoFilesAndDirectories", resourceCulture);
+            }
+        }
+        
+        internal static string None {
+            get {
+                return ResourceManager.GetString("None", resourceCulture);
+            }
+        }
+        
+        internal static string Edited {
+            get {
+                return ResourceManager.GetString("Edited", resourceCulture);
+            }
+        }
+        
+        internal static string Close {
+            get {
+                return ResourceManager.GetString("Close", resourceCulture);
+            }
+        }
+        
+        internal static string ZipFiles {
+            get {
+                return ResourceManager.GetString("ZipFiles", resourceCulture);
+            }
+        }
+        
+        internal static string Delete {
+            get {
+                return ResourceManager.GetString("Delete", resourceCulture);
+            }
+        }
+        
+        internal static string DeleteTextformat {
+            get {
+                return ResourceManager.GetString("DeleteTextformat", resourceCulture);
+            }
+        }
     }
 }

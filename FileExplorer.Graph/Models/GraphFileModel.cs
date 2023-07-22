@@ -22,6 +22,8 @@ namespace FileExplorer.Graph.Models
 			set => item.Name = value;
 		}
 
+		public string ToolTipText => item.Description;
+
 		public long Size => item.Size.GetValueOrDefault();
 
 		public DateTime EditedOn => item.LastModifiedDateTime.GetValueOrDefault().DateTime;

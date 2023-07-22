@@ -2,25 +2,53 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:popup="using:FileExplorer.Popup"
+             xmlns:resource="using:FileExplorer.Resources"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             Width="400" Height="200"
+             DataContext="{Binding $self}"
+             x:DataType="popup:Zip"
              x:Class="FileExplorer.Popup.Zip">
-  <StackPanel>
-	<TextBlock Text="{Binding CurrentFile}"
-			   VerticalAlignment="Center"
-			   Margin="5"
-			   FontSize="15"/>
-	<Panel>
-	  <ProgressBar CornerRadius="10"
-				   Height="25"
-				   ShowProgressText="True"
-				   Margin="5"
-				   Maximum="{Binding Count}"
-				   Value="{Binding CurrentCount}"/>
+	<StackPanel Margin="10">
+		<TextBlock Text="{Binding CurrentFile}"
+		           VerticalAlignment="Center"
+		           Margin="5"
+		           FontSize="15" />
+		<Panel>
+			<ProgressBar CornerRadius="20"
+			             x:DataType="popup:Zip"
+			             Height="25"
+			             ShowProgressText="True"
+			             Margin="5"
+			             Maximum="{Binding FileCount}"
+			             Value="{Binding Progress}" />
 
-	  <Label Content="{Binding Progress}"
-			 HorizontalAlignment="Center"
-			 VerticalAlignment="Center"/>
-	</Panel>
-  </StackPanel>
+			<!-- <Label Content="{Binding Progress}" -->
+			<!--        HorizontalAlignment="Center" -->
+			<!--        VerticalAlignment="Center" /> -->
+		</Panel>
+		<StackPanel Orientation="Horizontal"
+		            HorizontalAlignment="Right"
+		            Margin="0 10 0 0">
+			<Button Content="{resource:Resource Close}"
+			        Command="{Binding Close}"
+			        x:DataType="popup:Zip"
+			        Foreground="{DynamicResource MaterialDesignBody}"
+			        Margin="0 0 5 0"
+			        MinWidth="80"
+			        Cursor="Hand"
+			        Classes="Flat"
+			        HorizontalContentAlignment="Center"
+			        VerticalContentAlignment="Center"
+			        HorizontalAlignment="Stretch" />
+
+			<Button Content="{resource:Resource ZipFiles}"
+			        Command="{Binding ZipFiles}"
+			        x:DataType="popup:Zip"
+			        MinWidth="80"
+			        Cursor="Hand"
+			        HorizontalContentAlignment="Center"
+			        VerticalContentAlignment="Center"
+			        HorizontalAlignment="Stretch" />
+		</StackPanel>
+	</StackPanel>
 </UserControl>

@@ -1,24 +1,21 @@
-﻿using System.IO;
-using Avalonia;
-using Avalonia.Threading;
-using CommunityToolkit.Mvvm.ComponentModel;
-using FileExplorer.Core.Helpers;
-using FileExplorer.DisplayViews;
-using FileExplorer.Interfaces;
-using FileExplorer.Providers;
-using FileExplorer.Models;
-using FileExplorer.Core.Interfaces;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using Avalonia.Media.TextFormatting;
+using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using FileExplorer.Controls;
-using FileExplorer.Core.Models;
 using FileExplorer.Core.Extensions;
+using FileExplorer.Core.Helpers;
+using FileExplorer.Core.Interfaces;
+using FileExplorer.Core.Models;
+using FileExplorer.DisplayViews;
+using FileExplorer.Interfaces;
+using FileExplorer.Models;
+using FileExplorer.Providers;
 using FileExplorer.Resources;
-using ChangeType = FileExplorer.Core.Models.ChangeType;
 using Material.Icons;
 using Material.Icons.Avalonia;
 
@@ -35,6 +32,17 @@ public partial class TabItemViewModel
 	private bool _isUserEntered = true;
 
 	private IFolderUpdateNotificator? _updateNotificator;
+
+	[ObservableProperty]
+	[NotifyPropertyChangedFor(nameof(DisplayControl))]
+	[NotifyPropertyChangedFor(nameof(ShowToolbar))]
+	private ViewTypes? _currentViewMode;
+
+	[ObservableProperty]
+	private SortEnum _currentSortMode = SortEnum.None;
+
+	[ObservableProperty]
+	private bool _sortAcending = true;
 
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(FileCountText))]
@@ -65,11 +73,24 @@ public partial class TabItemViewModel
 	[NotifyPropertyChangedFor(nameof(FileCountText))]
 	private int _fileCount;
 
-	[ObservableProperty]
-	private ViewTypes _currentViewMode = ViewTypes.Tree;
 
-	[ObservableProperty]
-	private IFileViewer _displayControl;
+	public IFileViewer DisplayControl
+	{
+		get
+		{
+			IFileViewer control = CurrentViewMode switch
+			{
+				ViewTypes.Grid => new FileGrid { Provider = Provider, Items = Files, },
+				ViewTypes.List => new FileTreeGrid { Provider = Provider, Items = Files, },
+				_ => new Quickstart(),
+			};
+
+			control.PathChanged += async path => await SetPath(path);
+			control.SelectionChanged += count => SelectionCount = count;
+
+			return control;
+		}
+	}
 
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(PopupVisible))]
@@ -109,7 +130,7 @@ public partial class TabItemViewModel
 
 			using var layout = new TextLayout(textSource, paragraphProperties);
 
-			return Math.Max(layout.Bounds.Width + 16, HasSelection ? PopupControl.Width : 0);
+			return Math.Max(layout.Width + 16, HasSelection ? PopupControl.Width : 0);
 		}
 	}
 
@@ -131,7 +152,7 @@ public partial class TabItemViewModel
 
 			using var layout = new TextLayout(textSource, paragraphProperties);
 
-			return layout.Bounds.Height + 16 + (HasSelection ? PopupControl.Height : 0);
+			return layout.Height + 16 + (HasSelection ? PopupControl.Height : 0);
 		}
 	}
 
@@ -241,7 +262,7 @@ public partial class TabItemViewModel
 			throw new ArgumentOutOfRangeException();
 		});
 
-	public bool SearchFailed => !IsLoading && FileCount == 0;
+	public bool SearchFailed => !IsLoading && FileCount == 0 && CurrentFolder is not null;
 
 	public string? FolderName => CurrentFolder?.Name;
 
@@ -249,15 +270,11 @@ public partial class TabItemViewModel
 
 	public bool PopupVisible => _popupContent is not null;
 
+	public bool ShowToolbar => CurrentViewMode.HasValue;
+
 	public TabItemViewModel()
 	{
 		Files.CountChanged += count => FileCount = count;
-
-		DisplayControl = new FileGrid
-		{
-			Provider = Provider,
-			Items = Files,
-		};
 	}
 
 	public IFileItem? Undo()
@@ -297,7 +314,7 @@ public partial class TabItemViewModel
 	{
 		if (_updateNotificator is not null)
 		{
-			_updateNotificator.Changed -= UpdateFolder;
+			// _updateNotificator.Changed -= UpdateFolder;
 			_updateNotificator.Dispose();
 		}
 		
@@ -309,12 +326,12 @@ public partial class TabItemViewModel
 		SelectionCount = 0;
 		IsLoading = true;
 
-		_updateNotificator = Provider.GetNotificator(CurrentFolder, search, recursive);
+		// _updateNotificator = Provider.GetNotificator(CurrentFolder, search, recursive);
 
-		if (_updateNotificator is not null)
-		{
-			_updateNotificator.Changed += UpdateFolder;
-		}
+		// if (_updateNotificator is not null)
+		// {
+		// 	_updateNotificator.Changed += UpdateFolder;
+		// }
 
 		await await Runner.Run<Task>(async () =>
 		{
@@ -322,35 +339,95 @@ public partial class TabItemViewModel
 
 			if (recursive)
 			{
-				if (Provider is FileSystemProvider)
+				if (CurrentSortMode is SortEnum.None)
 				{
-					await Files.AddRangeAsync(Provider, CurrentFolder, search, TokenSource.Token);
+					if (Provider is FileSystemProvider)
+					{
+						await Files.AddRangeAsync(Provider, CurrentFolder, search, TokenSource.Token);
+					}
+					else
+					{
+						await Files.AddRangeAsync(items, TokenSource.Token);
+					}
 				}
 				else
 				{
-					await Files.AddRangeAsync(items, TokenSource.Token);
+					Comparer<IFileItem> comparer;
+
+					if (SortAcending)
+					{
+						comparer = CurrentSortMode switch
+						{
+							SortEnum.Edited => Comparer<IFileItem>.Create((x, y) => x.EditedOn.CompareTo(y.EditedOn)),
+							SortEnum.Name => Comparer<IFileItem>.Create((x, y) => String.Compare(x.Name, y.Name, StringComparison.CurrentCulture)),
+							SortEnum.Extension => Comparer<IFileItem>.Create((x, y) => String.Compare(x.Extension, y.Extension, StringComparison.CurrentCulture)),
+							SortEnum.Size => Comparer<IFileItem>.Create((x, y) => x.Size.CompareTo(y.Size)),
+						};
+					}
+					else
+					{
+						comparer = CurrentSortMode switch
+						{
+							SortEnum.Edited => Comparer<IFileItem>.Create((x, y) => y.EditedOn.CompareTo(x.EditedOn)),
+							SortEnum.Name => Comparer<IFileItem>.Create((x, y) => String.Compare(y.Name, x.Name, StringComparison.CurrentCulture)),
+							SortEnum.Extension => Comparer<IFileItem>.Create((x, y) => String.Compare(y.Extension, x.Extension, StringComparison.CurrentCulture)),
+							SortEnum.Size => Comparer<IFileItem>.Create((x, y) => y.Size.CompareTo(x.Size)),
+						};
+					}
+
+					await Files.AddRangeAsync(items, comparer, TokenSource.Token);
 				}
 			}
 			else
 			{
-				await Files.AddRangeAsync(items, Comparer<IFileItem>.Create((x, y) =>
+				if (CurrentSortMode is SortEnum.None)
 				{
-					switch (x, y)
+					await Files.AddRangeAsync(items, Comparer<IFileItem>.Create((x, y) =>
 					{
-						case (null, null): return 0;
-						case (null, _): return -1;
-						case (_, null): return 1;
+						switch (x, y)
+						{
+							case (null, null): return 0;
+							case (null, _): return -1;
+							case (_, null): return 1;
+						}
+
+						var result = y.IsFolder.CompareTo(x.IsFolder);
+
+						if (result is 0)
+						{
+							result = String.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
+						}
+
+						return result;
+					}), TokenSource.Token);
+				}
+				else
+				{
+					Comparer<IFileItem> comparer;
+
+					if (SortAcending)
+					{
+						comparer = CurrentSortMode switch
+						{
+							SortEnum.Edited => Comparer<IFileItem>.Create((x, y) => x.EditedOn.CompareTo(y.EditedOn)),
+							SortEnum.Name => Comparer<IFileItem>.Create((x, y) => String.Compare(x.Name, y.Name, StringComparison.CurrentCulture)),
+							SortEnum.Extension => Comparer<IFileItem>.Create((x, y) => String.Compare(x.Extension, y.Extension, StringComparison.CurrentCulture)),
+							SortEnum.Size => Comparer<IFileItem>.Create((x, y) => x.Size.CompareTo(y.Size)),
+						};
+					}
+					else
+					{
+						comparer = CurrentSortMode switch
+						{
+							SortEnum.Edited => Comparer<IFileItem>.Create((x, y) => y.EditedOn.CompareTo(x.EditedOn)),
+							SortEnum.Name => Comparer<IFileItem>.Create((x, y) => String.Compare(y.Name, x.Name, StringComparison.CurrentCulture)),
+							SortEnum.Extension => Comparer<IFileItem>.Create((x, y) => String.Compare(y.Extension, x.Extension, StringComparison.CurrentCulture)),
+							SortEnum.Size => Comparer<IFileItem>.Create((x, y) => y.Size.CompareTo(x.Size)),
+						};
 					}
 
-					var result = y.IsFolder.CompareTo(x.IsFolder);
-
-					if (result is 0)
-					{
-						result = String.Compare(x.Name, y.Name, StringComparison.CurrentCulture);
-					}
-
-					return result;
-				}), TokenSource.Token);
+					await Files.AddRangeAsync(items, comparer, TokenSource.Token);
+				}
 			}
 		});
 
@@ -402,66 +479,6 @@ public partial class TabItemViewModel
 		Files.Clear();
 	}
 
-	partial void OnDisplayControlChanged(IFileViewer value)
-	{
-		value.PathChanged += async path => await SetPath(path);
-		value.SelectionChanged += count =>
-		{
-			SelectionCount = count;
-
-			// if (SelectionCount == 1)
-			// {
-			// 	var item = Files.FirstOrDefault(f => f.IsSelected);
-			//
-			// 	if (!item!.IsFolder && item.GetPath(path => Path.GetExtension(path) is ".jpg" or ".png" or ".bmp" or ".jpeg" or ".tiff"))
-			// 	{
-			// 		PopupControl = new Viewbox()
-			// 		{
-			// 			Width = 150,
-			// 			Height = 150,
-			// 			Margin = new Thickness(5),
-			// 			Child = new Image
-			// 			{
-			// 				Width = 150,
-			// 				Height = 150,
-			// 				Source = new Bitmap(item.GetPath()),
-			// 			},
-			// 		};
-			// 	}
-			// 	else
-			// 	{
-			// 		PopupControl = new Image
-			// 		{
-			// 			Width = 100,
-			// 			Height = 100,
-			// 			Source = await Provider.GetThumbnailAsync(item, 100, default),
-			// 		};
-			// 	}
-			// }
-		};
-	}
-
-	partial void OnCurrentViewModeChanged(ViewTypes value)
-	{
-		DisplayControl = value switch
-		{
-			ViewTypes.Grid => new FileGrid
-			{
-				Provider = Provider,
-				Items = Files,
-			},
-			ViewTypes.Tree => new FileTreeGrid
-			{
-				Provider = Provider,
-				Items = Files,
-			},
-			_ => new FileTreeGrid
-			{
-				Items = Files,
-			},
-		};
-	}
-
 	partial void OnPopupContentChanged(IPopup? value)
 	{
 		if (value is not null)
@@ -479,21 +496,30 @@ public partial class TabItemViewModel
 
 	partial void OnIsLoadingChanged(bool value)
 	{
-		// if (value)
-		// {
-		// 	GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
-		// }
-
 		GC.Collect(GC.MaxGeneration, GCCollectionMode.Optimized, false, true);
+	}
+
+	partial void OnCurrentSortModeChanged(SortEnum value)
+	{
+		UpdateFiles(false, "*");
+	}
+
+	partial void OnSortAcendingChanged(bool value)
+	{
+		UpdateFiles(false, "*");
 	}
 
 	partial void OnCurrentFolderChanged(IFileItem? value)
 	{
 		if (value is null && DisplayControl is not Quickstart)
 		{
-			DisplayControl = new Quickstart();
+			CurrentViewMode = null;
 		}
-
+		else if (!CurrentViewMode.HasValue)
+		{
+			CurrentViewMode = ViewTypes.List;
+		}
+		
 		if (_isUserEntered && (!_undoStack.TryPeek(out var tempPath) || tempPath != CurrentFolder))
 		{
 			_undoStack.Push(CurrentFolder);
@@ -501,96 +527,5 @@ public partial class TabItemViewModel
 		}
 
 		IsSearching = false;
-	}
-
-	private void UpdateFolder(IFolderUpdateNotificator updater, ChangeType type, string path, string? newPath)
-	{
-		if (_updateNotificator?.Equals(updater) != true)
-		{
-			return;
-		}
-
-		switch (type)
-		{
-			case ChangeType.Changed:
-				for (var i = Files.Count - 1; i >= 0; i--)
-				{
-					i = Math.Min(i, Files.Count - 1);
-
-					var file = Files[i];
-
-					if (file?.GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path) == true)
-					{
-						file.UpdateData();
-					}
-				}
-
-				break;
-			case ChangeType.Created:
-				if (_provider is FileSystemProvider)
-				{
-					for (var i = Files.Count - 1; i >= 0; i--)
-					{
-						i = Math.Min(i, Files.Count - 1);
-
-						if (i < 0)
-						{
-							return;
-						}
-
-						var file = Files[i];
-
-						if (file?.GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path) == true)
-						{
-							return;
-						}
-					}
-
-					_files.Add(new FileModel(FileSystemTreeItem.FromPath(path)));
-				}
-
-				break;
-			case ChangeType.Deleted:
-				for (var i = Files.Count - 1; i >= 0; i--)
-				{
-					i = Math.Min(i, Files.Count - 1);
-
-					if (i < 0)
-					{
-						return;
-					}
-
-					var file = Files[i];
-
-					if (file?.GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path) == true)
-					{
-						Files.Remove(file);
-						break;
-					}
-				}
-
-				break;
-			case ChangeType.Renamed:
-				for (var i = _files.Count - 1; i >= 0; i--)
-				{
-					i = Math.Min(i, Files.Count - 1);
-
-					if (i < 0)
-					{
-						return;
-					}
-
-					var file = Files[i];
-
-					if (file?.GetPath((currentPath, toFind) => currentPath.Equals(toFind, StringComparison.CurrentCulture), path) == true)
-					{
-						file.Name = System.IO.Path.GetFileName(newPath);
-					}
-				}
-
-				break;
-			default:
-				throw new ArgumentOutOfRangeException(nameof(type), type, null);
-		}
 	}
 }

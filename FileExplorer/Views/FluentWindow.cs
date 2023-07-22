@@ -18,7 +18,7 @@ public partial class FluentWindow : Window, IStyleable, INotifyPropertyChanged
 	{
 		ExtendClientAreaToDecorationsHint = true;
 		ExtendClientAreaTitleBarHeightHint = -1;
-		base.ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.NoChrome;
+		base.ExtendClientAreaChromeHints = ExtendClientAreaChromeHints.NoChrome | ExtendClientAreaChromeHints.OSXThickTitleBar;
 
 		this.GetObservable(WindowStateProperty)
 			.Subscribe(x =>
@@ -39,24 +39,24 @@ public partial class FluentWindow : Window, IStyleable, INotifyPropertyChanged
 		// WindowStateProperty.Changed.AddClassHandler<FluentWindow>((x, e) => x.HandleWindowStateChanged((WindowState)e.NewValue!));
 	}
 
-	protected override void HandleWindowStateChanged(WindowState state)
-	{
-		if (OperatingSystem.IsMacOS())
-		{
-			if (state is WindowState.FullScreen)
-			{
-				TitleBarMargin = default;
-			}
-			else
-			{
-				TitleBarMargin = new Thickness(70, 0, 0, 0);
-			}
-
-			OnPropertyChanged(nameof(TitleBarMargin));
-		}
-		
-		base.HandleWindowStateChanged(state);
-	}
+	// protected override void HandleWindowStateChanged(WindowState state)
+	// {
+	// 	if (OperatingSystem.IsMacOS())
+	// 	{
+	// 		if (state is WindowState.FullScreen)
+	// 		{
+	// 			TitleBarMargin = default;
+	// 		}
+	// 		else
+	// 		{
+	// 			TitleBarMargin = new Thickness(70, 0, 0, 0);
+	// 		}
+	//
+	// 		OnPropertyChanged(nameof(TitleBarMargin));
+	// 	}
+	// 	
+	// 	base.HandleWindowStateChanged(state);
+	// }
 
 	protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
 	{
