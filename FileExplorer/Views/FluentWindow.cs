@@ -4,13 +4,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Platform;
-using Avalonia.Styling;
 
 namespace FileExplorer.Views;
 
-public partial class FluentWindow : Window, IStyleable, INotifyPropertyChanged
+public partial class FluentWindow : Window, INotifyPropertyChanged
 {
-	Type IStyleable.StyleKey => typeof(Window);
+	protected override Type StyleKeyOverride => typeof(Window);
 
 	public Thickness TitleBarMargin { get; set; }
 

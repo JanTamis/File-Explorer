@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
@@ -13,43 +12,52 @@ namespace FileExplorer.DisplayViews;
 
 public sealed partial class FileGrid : UserControl, ISelectableControl, IFileViewer
 {
-	private int anchorIndex = 0;
+	private int _anchorIndex = 0;
 
-	private bool isShiftPressed = false;
-	private bool isCtrlPressed = false;
+	private bool _isShiftPressed;
+	private bool _isCtrlPressed;
 
-	new event PropertyChangedEventHandler? PropertyChanged = delegate { };
+	private new event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
 	public event Action<IFileItem> PathChanged = delegate { };
 	public event Action<int> SelectionChanged = delegate { };
 
-	private ObservableRangeCollection<IFileItem> _items;
+	private ObservableRangeCollection<IFileItem>? _items;
 
 	public void SelectAll()
 	{
-		foreach (var item in Items)
+		if (Items is not null)
 		{
-			item.IsSelected = true;
+			foreach (var item in Items)
+			{
+				item.IsSelected = true;
+			}
 		}
 	}
 
 	public void SelectNone()
 	{
-		foreach (var item in Items)
+		if (Items is not null)
 		{
-			item.IsSelected = false;
+			foreach (var item in Items)
+			{
+				item.IsSelected = false;
+			}
 		}
 	}
 
 	public void SelectInvert()
 	{
-		foreach (var item in Items)
+		if (Items is not null)
 		{
-			item.IsSelected ^= true;
+			foreach (var item in Items)
+			{
+				item.IsSelected ^= true;
+			}
 		}
 	}
 
-	public ObservableRangeCollection<IFileItem> Items
+	public ObservableRangeCollection<IFileItem>? Items
 	{
 		get => _items;
 		set
@@ -70,7 +78,7 @@ public sealed partial class FileGrid : UserControl, ISelectableControl, IFileVie
 
 		DoubleTappedEvent.Raised.Subscribe(e =>
 		{
-			if (e.Item1 is ToggleButton { DataContext: IFileItem model })
+			if (e.Item1 is ToggleButton { DataContext: IFileItem model, })
 			{
 				PathChanged(model);
 			}
@@ -80,8 +88,8 @@ public sealed partial class FileGrid : UserControl, ISelectableControl, IFileVie
 		{
 			if (e.Item2 is KeyEventArgs args)
 			{
-				isShiftPressed = args.KeyModifiers.HasFlag(KeyModifiers.Shift);
-				isCtrlPressed = args.KeyModifiers.HasFlag(KeyModifiers.Control);
+				_isShiftPressed = args.KeyModifiers.HasFlag(KeyModifiers.Shift);
+				_isCtrlPressed = args.KeyModifiers.HasFlag(KeyModifiers.Control);
 			}
 		});
 
@@ -89,8 +97,8 @@ public sealed partial class FileGrid : UserControl, ISelectableControl, IFileVie
 		{
 			if (e.Item2 is KeyEventArgs args)
 			{
-				isShiftPressed = args.KeyModifiers.HasFlag(KeyModifiers.Shift);
-				isCtrlPressed = args.KeyModifiers.HasFlag(KeyModifiers.Control);
+				_isShiftPressed = args.KeyModifiers.HasFlag(KeyModifiers.Shift);
+				_isCtrlPressed = args.KeyModifiers.HasFlag(KeyModifiers.Control);
 			}
 		});
 
@@ -98,6 +106,11 @@ public sealed partial class FileGrid : UserControl, ISelectableControl, IFileVie
 		fileList.ElementClearing += Grid_ElementClearing;
 
 		fileList.KeyDown += Grid_KeyDown;
+	}
+	public FileGrid(IItemProvider provider, ObservableRangeCollection<IFileItem>? items) : this()
+	{
+		Provider = provider;
+		Items = items;
 	}
 
 	private void Grid_KeyDown(object? sender, KeyEventArgs e)
@@ -124,23 +137,23 @@ public sealed partial class FileGrid : UserControl, ISelectableControl, IFileVie
 
 	private async void Item_PointerPressed(object? sender, RoutedEventArgs e)
 	{
-		if (sender is ToggleButton { DataContext: IFileItem model } item)
+		if (sender is ToggleButton { DataContext: IFileItem model, } item)
 		{
 			var index = Items.IndexOf(model);
 
-			anchorIndex = IFileViewer.UpdateSelection(
+			_anchorIndex = IFileViewer.UpdateSelection(
 				this,
-				anchorIndex,
+				_anchorIndex,
 				index,
 				true,
-				isShiftPressed,
-				isCtrlPressed);
+				_isShiftPressed,
+				_isCtrlPressed);
 		}
 	}
 
 	private void Grid_ElementPrepared(object? sender, ItemsRepeaterElementPreparedEventArgs e)
 	{
-		if (e.Element is ToggleButton { DataContext: IFileItem model } item)
+		if (e.Element is ToggleButton { DataContext: IFileItem model, } item)
 		{
 			item.DoubleTapped += Item_DoubleTapped;
 			item.Click += Item_PointerPressed;
@@ -151,7 +164,7 @@ public sealed partial class FileGrid : UserControl, ISelectableControl, IFileVie
 
 	private void Item_DoubleTapped(object? sender, RoutedEventArgs e)
 	{
-		if (sender is ToggleButton { DataContext: IFileItem model })
+		if (sender is ToggleButton { DataContext: IFileItem model, })
 		{
 			PathChanged(model);
 		}

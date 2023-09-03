@@ -11,6 +11,7 @@ using FileExplorer.Providers;
 using Avalonia.Controls.ApplicationLifetimes;
 using Material.Icons;
 using Avalonia.Controls;
+using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 using FileExplorer.Resources;
 
@@ -39,6 +40,7 @@ public partial class MainWindowViewModel
 	{
 		get
 		{
+			yield return new SideBarModel(null, ResourceDefault.Dashboard, ThumbnailProvider.GetImage("Dashboard"));
 			yield return new SideBarModel(Environment.SpecialFolder.Desktop, ResourceDefault.Desktop, ThumbnailProvider.GetImage("Desktop"));
 			yield return new SideBarModel(Environment.SpecialFolder.MyDocuments, ResourceDefault.Documents, ThumbnailProvider.GetImage("MyDocuments"));
 			yield return new SideBarModel(Environment.SpecialFolder.MyMusic, ResourceDefault.Music, ThumbnailProvider.GetImage("MyMusic"));
@@ -50,12 +52,7 @@ public partial class MainWindowViewModel
 	public SideBarModel? CurrentFolder
 	{
 		get => null;
-		set
-		{
-			var path = Environment.GetFolderPath(value.Folder);
-
-			SetPath(FileSystemTreeItem.FromPath(path));
-		}
+		set => SetPath(FileSystemTreeItem.FromPath(value.Folder));
 	}
 
 	public ObservableRangeCollection<TabItemViewModel> Tabs { get; } = new();
@@ -64,13 +61,13 @@ public partial class MainWindowViewModel
 	{
 		get
 		{
-			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
+			if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: var window, })
 			{
-				return window.WindowState switch
+				return window?.WindowState switch
 				{
 					WindowState.Maximized => MaterialIconKind.WindowRestore,
 					WindowState.Normal => MaterialIconKind.Maximize,
-					_ => MaterialIconKind.Maximize,
+					_ => MaterialIconKind.Maximize
 				};
 			}
 
@@ -116,7 +113,7 @@ public partial class MainWindowViewModel
 			WindowMargin = new Thickness(75, 0, 0, 0);
 		}
 
-		if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
+		if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window, })
 		{
 			Window.WindowStateProperty.Changed.Subscribe(delegate
 			{
@@ -138,14 +135,16 @@ public partial class MainWindowViewModel
 			});
 		}
 
-		IEnumerable<Environment.SpecialFolder> KnownFolders()
-		{
-			yield return Environment.SpecialFolder.Desktop;
-			yield return Environment.SpecialFolder.MyDocuments;
-			yield return Environment.SpecialFolder.MyMusic;
-			yield return Environment.SpecialFolder.MyPictures;
-			yield return Environment.SpecialFolder.MyVideos;
-		}
+		// return;
+		//
+		// IEnumerable<Environment.SpecialFolder> KnownFolders()
+		// {
+		// 	yield return Environment.SpecialFolder.Desktop;
+		// 	yield return Environment.SpecialFolder.MyDocuments;
+		// 	yield return Environment.SpecialFolder.MyMusic;
+		// 	yield return Environment.SpecialFolder.MyPictures;
+		// 	yield return Environment.SpecialFolder.MyVideos;
+		// }
 	}
 
 	private void Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -165,7 +164,7 @@ public partial class MainWindowViewModel
 
 	public async Task GoUp()
 	{
-		if (CurrentTab.CurrentFolder is { IsRoot: false })
+		if (CurrentTab.CurrentFolder is { IsRoot: false, })
 		{
 			CurrentTab.SetPath(await CurrentTab.Provider.GetParentAsync(CurrentTab.CurrentFolder, default));
 		}
@@ -173,7 +172,7 @@ public partial class MainWindowViewModel
 
 	public async ValueTask StartSearch()
 	{
-		if (CurrentTab.Search is { Length: > 0 })
+		if (CurrentTab.Search is { Length: > 0, })
 		{
 			CurrentTab.IsSearching = true;
 
@@ -210,6 +209,10 @@ public partial class MainWindowViewModel
 
 			await CurrentTab.SetPath(new FileModel(path));
 		}
+		else
+		{
+			CurrentTab.SetPath(null);
+		}
 	}
 
 	public async void Refresh()
@@ -219,7 +222,7 @@ public partial class MainWindowViewModel
 
 	public void SelectAll()
 	{
-		foreach (var file in CurrentTab.Files)
+		foreach (var file in CurrentTab.Files ?? Enumerable.Empty<IFileItem>())
 		{
 			file.IsSelected = true;
 		}
@@ -230,7 +233,7 @@ public partial class MainWindowViewModel
 
 	public void SelectNone()
 	{
-		foreach (var file in CurrentTab.Files)
+		foreach (var file in CurrentTab.Files ?? Enumerable.Empty<IFileItem>())
 		{
 			file.IsSelected = false;
 		}
@@ -241,7 +244,7 @@ public partial class MainWindowViewModel
 
 	public void SelectInvert()
 	{
-		foreach (var file in CurrentTab.Files)
+		foreach (var file in CurrentTab.Files ?? Enumerable.Empty<IFileItem>())
 		{
 			file.IsSelected ^= true;
 		}
@@ -252,7 +255,7 @@ public partial class MainWindowViewModel
 
 	public void ShowSettings()
 	{
-		if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+		if (CurrentTab.PopupContent is { HasToBeCanceled: false, } or null)
 		{
 			CurrentTab.PopupContent = new Settings();
 		}
@@ -260,7 +263,7 @@ public partial class MainWindowViewModel
 
 	public void Rename()
 	{
-		if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+		if (CurrentTab.PopupContent is { HasToBeCanceled: false, } or null)
 		{
 			// var fileIndex = CurrentTab.Files.IndexOf(CurrentTab.Files.FirstOrDefault(x => x.IsSelected));
 			//
@@ -300,11 +303,11 @@ public partial class MainWindowViewModel
 
 	public void CopyTo()
 	{
-		if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null && Tabs.Count(x => !String.IsNullOrEmpty(x.CurrentFolder.Name)) > 1)
+		if (CurrentTab.PopupContent is { HasToBeCanceled: false, } or null && Tabs.Count(x => !String.IsNullOrEmpty(x.CurrentFolder.Name)) > 1)
 		{
 			var selector = new TabSelector
 			{
-				Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab && !String.IsNullOrEmpty(x.CurrentFolder.Name))),
+				Tabs = new ObservableRangeCollection<TabItemViewModel>(Tabs.Where(x => x != CurrentTab && !String.IsNullOrEmpty(x.CurrentFolder.Name)))
 			};
 
 			selector.TabSelectionChanged += _ => { selector.Close(); };
@@ -320,14 +323,14 @@ public partial class MainWindowViewModel
 
 	public void ShowProperties()
 	{
-		if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+		if (CurrentTab.PopupContent is { HasToBeCanceled: false, } or null)
 		{
 			var model = CurrentTab.Files.FirstOrDefault(x => x.IsSelected) ?? CurrentTab.CurrentFolder;
 
 			var properties = new Properties
 			{
 				Provider = CurrentTab.Provider,
-				Model = model,
+				Model = model
 			};
 
 			CurrentTab.PopupContent = properties;
@@ -338,14 +341,14 @@ public partial class MainWindowViewModel
 	{
 		var provider = new GraphItemProvider(async (code, url, token) =>
 		{
-			if (CurrentTab.PopupContent is { HasToBeCanceled: false } or null)
+			if (CurrentTab.PopupContent is { HasToBeCanceled: false, } or null)
 			{
 				await Dispatcher.UIThread.InvokeAsync(() =>
 				{
 					var login = new OneDriveLogin
 					{
 						Code = code,
-						RedirectUri = url,
+						RedirectUri = url
 					};
 
 					CurrentTab.PopupContent = login;
@@ -355,7 +358,7 @@ public partial class MainWindowViewModel
 
 		CurrentTab.Provider = provider;
 
-		await _currentTab.SetPath(await provider.GetRootAsync());
+		await CurrentTab.SetPath(await provider.GetRootAsync());
 
 		CurrentTab.PopupContent = null;
 	}
@@ -370,7 +373,7 @@ public partial class MainWindowViewModel
 
 	public void Minimize()
 	{
-		if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
+		if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window, })
 		{
 			window.WindowState = WindowState.Minimized;
 		}
@@ -378,7 +381,7 @@ public partial class MainWindowViewModel
 
 	public void Toggle()
 	{
-		if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window })
+		if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window, })
 		{
 			window.WindowState = window.WindowState switch
 			{

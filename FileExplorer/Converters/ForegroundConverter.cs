@@ -8,19 +8,27 @@ public sealed class ForegroundConverter : IValueConverter
 {
 	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
-		if (value is SolidColorBrush brush)
+		return value switch
 		{
-			var color = brush.Color;
-			var y = 0.2126 * color.R + 0.7152 * color.G + 0.0722 * color.B;
-
-			return y > 127 ? Brushes.Black : Brushes.White;
-		}
-
-		return Brushes.Black;
+			SolidColorBrush { Color: var brushColor, } => GetForeground(brushColor),
+			Color color                                => GetForeground(color),
+			_                                          => Brushes.Black
+		};
 	}
 
 	public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
 		return String.Empty;
+	}
+
+	private static IImmutableSolidColorBrush GetForeground(Color color)
+	{
+		var y = 0.2126 * color.R + 
+		        0.7152 * color.G + 
+		        0.0722 * color.B;
+
+		return y > 127
+			? Brushes.Black
+			: Brushes.White;
 	}
 }

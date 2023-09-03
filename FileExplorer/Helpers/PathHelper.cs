@@ -1,8 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Text;
-using FileExplorer.Models;
-
 namespace FileExplorer.Helpers;
 
 public static class PathHelper

@@ -1,31 +1,24 @@
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
-using System.IO.Enumeration;
 using System.Runtime.CompilerServices;
 using Avalonia.Media;
 using Avalonia.Threading;
-using DialogHostAvalonia;
-using FileExplorer.Core.Extensions;
 using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
-using FileExplorer.Models;
-using Microsoft.Identity.Client;
 
 namespace FileExplorer.Popup;
 
 public sealed partial class Properties : UserControl, IPopup, INotifyPropertyChanged
 {
-	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
+	public new event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
 	private string _path;
 
 	private long _size = 0;
 
-	private IFileItem _model;
+	private readonly IFileItem _model;
 
 	public bool HasShadow => false;
 	public bool HasToBeCanceled => true;
@@ -158,13 +151,13 @@ public sealed partial class Properties : UserControl, IPopup, INotifyPropertyCha
 		Close();
 	}
 
-	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
+	private void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string? name = null)
 	{
 		property = value;
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 	}
 
-	public void OnPropertyChanged(string name)
+	public void OnPropertyChanged(string? name)
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 	}

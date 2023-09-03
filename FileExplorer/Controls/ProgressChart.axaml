@@ -1,0 +1,16 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:FileExplorer.Controls">
+	<Design.PreviewWith>
+		<controls:ProgressChart />
+	</Design.PreviewWith>
+
+	<Style Selector="controls|ProgressChart">
+		<!-- Set Defaults -->
+		<Setter Property="Template">
+			<ControlTemplate>
+				<TextBlock Text="Templated Control" />
+			</ControlTemplate>
+		</Setter>
+	</Style>
+</Styles>

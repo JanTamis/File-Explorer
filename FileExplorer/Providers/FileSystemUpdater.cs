@@ -14,10 +14,10 @@ public class FileSystemUpdater : IFolderUpdateNotificator
 	{
 		_watcher = new FileSystemWatcher(folder, filter)
 		{
-			IncludeSubdirectories = recursive,
+			IncludeSubdirectories = recursive
 		};
-
-		_watcher.NotifyFilter = NotifyFilters.Size;
+		
+		_watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName | NotifyFilters.DirectoryName;
 
 		_watcher.Changed += OnChanged;
 		_watcher.Created += OnCreated;

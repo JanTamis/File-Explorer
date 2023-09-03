@@ -25,7 +25,7 @@ public sealed class ExtensionConverter : IValueConverter
 						return "File";
 					})
 				: "System folder",
-			_ => String.Empty,
+			_ => String.Empty
 		};
 	}
 

@@ -13,7 +13,7 @@ public sealed class WindowStateToIconConverter : IValueConverter
 		{
 			WindowState.Maximized => MaterialIconKind.FullscreenExit,
 			WindowState.FullScreen => MaterialIconKind.FullscreenExit,
-			_ => MaterialIconKind.Fullscreen,
+			_ => MaterialIconKind.Fullscreen
 		};
 	}
 

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.95470744" y1="0.045292407" x2="0.0088249445" y2="0.9912068" id="gradient_1">
+      <stop offset="0%" stop-color="#75DAFF" />
+      <stop offset="100%" stop-color="#1EA2E4" />
+    </linearGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="USB Memory Stick" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="USB-Memory-Stick" fill="none" stroke="none" />
+    <path d="M35.287 22.613L25.388 12.714L31.949 6.153C32.73 5.372 33.996 5.372 34.777 6.153L41.848 13.224C42.629 14.005 42.629 15.271 41.848 16.052L35.287 22.613L35.287 22.613Z" id="Shape" fill="#CCCCCC" stroke="none" />
+    <path d="M32.269 13.609L30.855 12.195C30.66 12 30.66 11.683 30.855 11.488L32.269 10.074C32.464 9.879 32.781 9.879 32.976 10.074L34.39 11.488C34.585 11.683 34.585 12 34.39 12.195L32.976 13.609C32.781 13.805 32.465 13.805 32.269 13.609L32.269 13.609Z" id="Shape" fill="#666666" stroke="none" />
+    <path d="M35.805 17.145L34.391 15.731C34.196 15.536 34.196 15.219 34.391 15.024L35.805 13.61C36 13.415 36.317 13.415 36.512 13.61L37.926 15.024C38.121 15.219 38.121 15.536 37.926 15.731L36.512 17.145C36.317 17.34 36 17.34 35.805 17.145L35.805 17.145Z" id="Shape" fill="#666666" stroke="none" />
+    <path d="M8.495 39.505L8.495 39.505C4.59 35.6 4.59 29.268 8.495 25.363L22.581 11.277C23.003 10.855 23.686 10.855 24.108 11.277L36.723 23.892C37.145 24.314 37.145 24.997 36.723 25.419L22.638 39.505C18.732 43.41 12.401 43.41 8.495 39.505L8.495 39.505Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+  </g>
+</svg>

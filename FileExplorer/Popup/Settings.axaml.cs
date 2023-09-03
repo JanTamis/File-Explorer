@@ -15,10 +15,10 @@ public sealed partial class Settings : UserControl, IPopup
 
 	public bool IsDarkMode
 	{
-		get => Application.Current?.Styles is [MaterialTheme { BaseTheme: BaseThemeMode.Dark }, ..];
+		get => Application.Current?.Styles is [MaterialTheme { BaseTheme: BaseThemeMode.Dark, }, ..,];
 		set
 		{
-			if (Application.Current?.Styles is [MaterialTheme theme, ..])
+			if (Application.Current?.Styles is [MaterialTheme theme, ..,])
 			{
 				theme.BaseTheme = value
 					? BaseThemeMode.Dark
@@ -27,13 +27,13 @@ public sealed partial class Settings : UserControl, IPopup
 				Application.Current.Resources["WindowBackground"] = theme.BaseTheme switch
 				{
 					BaseThemeMode.Light => new SolidColorBrush(Color.Parse("#efeff5")),
-					BaseThemeMode.Dark => new SolidColorBrush(Color.Parse("#333337")),
+					BaseThemeMode.Dark => new SolidColorBrush(Color.Parse("#333337"))
 				};
 
 				Application.Current.Resources["WindowBorder"] = theme.BaseTheme switch
 				{
 					BaseThemeMode.Light => new SolidColorBrush(Color.Parse("#bfbfbf")),
-					BaseThemeMode.Dark => new SolidColorBrush(Color.Parse("#1a212e")),
+					BaseThemeMode.Dark => new SolidColorBrush(Color.Parse("#1a212e"))
 				};
 			}
 		}

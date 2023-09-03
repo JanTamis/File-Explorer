@@ -7,13 +7,14 @@ namespace FileExplorer.Converters;
 
 public class UIIconConverter : IValueConverter, ISingleton<UIIconConverter>
 {
-	public static readonly UIIconConverter Instance = new();	
+	public static UIIconConverter Instance { get; } = new();
+	
 	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
-		var path = $"avares://FileExplorer/Assets/UIIcons/{value}.svg";
-		var source = SvgSource.Load<SvgSource>(path, null);
-
-		return new SvgImage { Source = source };
+		return new SvgImage
+		{
+			Source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/UIIcons/{value}.svg", null),
+		};
 	}
 
 	public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

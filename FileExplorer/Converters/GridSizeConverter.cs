@@ -6,7 +6,7 @@ namespace FileExplorer.Converters;
 
 public sealed class GridSizeConverter : IValueConverter, ISingleton<GridSizeConverter>
 {
-	public static readonly GridSizeConverter Instance = new();
+	public static GridSizeConverter Instance { get; } = new();
 
 	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{

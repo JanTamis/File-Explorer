@@ -2,24 +2,16 @@
 
 namespace FileExplorer.Models;
 
-[INotifyPropertyChanged]
-public sealed partial class ExtensionModel : IComparable<ExtensionModel>
+public sealed partial class ExtensionModel(string extension, long totalSize) : ObservableObject, IComparable<ExtensionModel>
 {
 	[ObservableProperty]
-	private long _totalSize;
+	private long _totalSize = totalSize;
 
 	[ObservableProperty]
-	private long _totalFiles;
+	private long _totalFiles = 1;
 
 	[ObservableProperty]
-	private string _extension;
-
-	public ExtensionModel(string extension, long totalSize)
-	{
-		_totalSize = totalSize;
-		_extension = extension;
-		_totalFiles = 1;
-	}
+	private string _extension = extension;
 
 	public override string ToString()
 	{
@@ -36,6 +28,21 @@ public sealed class ExtensionModelComparer : IComparer<ExtensionModel>
 {
 	public int Compare(ExtensionModel? x, ExtensionModel? y)
 	{
+		if (x is null && y is null)
+		{
+			return 0;
+		}
+
+		if (x is null)
+		{
+			return 1;
+		}
+
+		if (y is null)
+		{
+			return -1;
+		}
+		
 		return y.TotalSize.CompareTo(x.TotalSize);
 	}
 }

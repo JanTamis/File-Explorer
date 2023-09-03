@@ -12,7 +12,7 @@ public sealed class FileIndexModel
 	{
 		IgnoreInaccessible = true,
 		AttributesToSkip = FileAttributes.Temporary,
-		RecurseSubdirectories = true,
+		RecurseSubdirectories = true
 	};
 
 	private Task<long> _taskSize;
@@ -75,7 +75,7 @@ public sealed class FileIndexModel
 	{
 		get
 		{
-			if (_taskSize is null or { IsCompleted: false } && Size is 0)
+			if (_taskSize is null or { IsCompleted: false, } && Size is 0)
 			{
 				return _taskSize ??= Task.Run(() => Size = sizeQuery.Sum());
 			}

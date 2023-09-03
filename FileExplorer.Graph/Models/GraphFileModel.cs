@@ -1,5 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using FileExplorer.Core.Interfaces;
+﻿using FileExplorer.Core.Interfaces;
 using Microsoft.Graph;
 
 namespace FileExplorer.Graph.Models
@@ -14,7 +13,11 @@ namespace FileExplorer.Graph.Models
 
 		public bool IsRoot => false;
 
-		public string Extension => IsFolder ? Path.GetExtension(Name) : String.Empty;
+		public string Extension
+		{
+			get => IsFolder ? Path.GetExtension(Name) : String.Empty;
+			set => throw new NotSupportedException();
+		}
 
 		public string Name
 		{

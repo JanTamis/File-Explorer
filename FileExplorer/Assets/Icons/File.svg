@@ -1,4 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
-width="240" height="240"
-viewBox="0 0 48 48"
-style=" fill:#000000;"><path fill="#50e6ff" d="M39,16v25c0,1.105-0.895,2-2,2H11c-1.105,0-2-0.895-2-2V7c0-1.105,0.895-2,2-2h17L39,16z"></path><linearGradient id="F8F33TU9HxDNWNbQYRyY3a_XWoSyGbnshH2_gr1" x1="28.529" x2="33.6" y1="15.472" y2="10.4" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3079d6"></stop><stop offset="1" stop-color="#297cd2"></stop></linearGradient><path fill="url(#F8F33TU9HxDNWNbQYRyY3a_XWoSyGbnshH2_gr1)" d="M28,5v9c0,1.105,0.895,2,2,2h9L28,5z"></path></svg>
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.048090935" y1="0.952" x2="0.5090909" y2="0.49090907" id="gradient_1">
+      <stop offset="0%" stop-color="#3079D6" />
+      <stop offset="100%" stop-color="#297CD2" />
+    </linearGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" clip-rule="evenodd" fill-rule="evenodd" />
+    </clipPath>
+  </defs>
+  <g id="File" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="File" fill="none" stroke="none" />
+    <path d="M39 16L39 41C39 42.105 38.105 43 37 43L11 43C9.895 43 9 42.105 9 41L9 7C9 5.895 9.895 5 11 5L28 5L39 16L39 16Z" id="Shape" fill="#35C1F1" stroke="none" />
+    <path d="M28 5L28 14C28 15.105 28.895 16 30 16L39 16L28 5L28 5Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+  </g>
+</svg>

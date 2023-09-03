@@ -13,9 +13,10 @@ public sealed class IsHiddenConverter : IValueConverter
 		{
 			var attributes = item.GetPath(path => File.GetAttributes(path.ToString()));
 
-			return attributes.HasFlag(FileAttributes.Hidden)
-				? 0.75
-				: 1;
+			if (attributes.HasFlag(FileAttributes.Hidden))
+			{
+				return 0.75;
+			}
 		}
 
 		return 1;

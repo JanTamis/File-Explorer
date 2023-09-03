@@ -9,7 +9,7 @@ namespace FileExplorer.Popup;
 
 public sealed partial class OneDriveLogin : UserControl, IPopup, INotifyPropertyChanged
 {
-	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
+	public new event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
 	public bool HasShadow => true;
 	public bool HasToBeCanceled => true;
@@ -34,13 +34,13 @@ public sealed partial class OneDriveLogin : UserControl, IPopup, INotifyProperty
 
 	public OneDriveLogin()
 	{
-		AvaloniaXamlLoader.Load(this);
+		InitializeComponent();
 		DataContext = this;
 	}
 
 	public void Close()
 	{
-		OnClose();
+		OnClose?.Invoke();
 	}
 
 	public void CopyCode()
@@ -48,7 +48,7 @@ public sealed partial class OneDriveLogin : UserControl, IPopup, INotifyProperty
 		// Application.Current.Clipboard.SetTextAsync(Code);
 	}
 
-	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
+	private void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string? name = null)
 	{
 		property = value;
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

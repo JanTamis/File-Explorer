@@ -6,13 +6,8 @@
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              xmlns:ripple="clr-namespace:Material.Ripple;assembly=Material.Ripple"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
-             xmlns:naming="clr-namespace:Material.Styles.Resources.Naming;assembly=Material.Styles"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="FileExplorer.App">
-	<Application.DataTemplates>
-		<local:ViewLocator />
-	</Application.DataTemplates>
-
 	<Application.Resources>
 		<ResourceDictionary>
 			<!-- fields are filled in code behind -->
@@ -40,17 +35,14 @@
 		<themes:MaterialTheme BaseTheme="Dark" PrimaryColor="DeepPurple" SecondaryColor="DeepPurple" />
 		<avalonia:MaterialIconStyles />
 
-		<!-- <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Simple.xaml" /> -->
 		<StyleInclude Source="avares://DialogHost.Avalonia/Styles.xaml" />
 		<StyleInclude Source="avares://FileExplorer/Styles/TreeDataGrid.axaml" />
-		<!-- <StyleInclude Source="avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml" /> -->
-		<!-- <StyleInclude Source="avares://Material.WindowStyle/WindowStyleInclude.axaml" /> -->
 
 		<Style Selector="MenuItem">
 			<Setter Property="Height" Value="30" />
 		</Style>
 
-		<Style Selector="TextBox">
+		<Style Selector="TextBox.Clear">
 			<Setter Property="Background" Value="Transparent" />
 			<Setter Property="VerticalContentAlignment" Value="Center" />
 			<Setter Property="BorderThickness" Value="0" />
@@ -190,9 +182,9 @@
 			<Setter Property="Cursor" Value="Arrow" />
 		</Style>
 
-		<Style Selector="TextBlock">
-			<Setter Property="VerticalAlignment" Value="Center" />
-		</Style>
+		<!-- <Style Selector="TextBlock"> -->
+		<!-- 	<Setter Property="VerticalAlignment" Value="Center" /> -->
+		<!-- </Style> -->
 
 		<Style Selector="ComboBox">
 			<Setter Property="Background" Value="Transparent" />
@@ -283,7 +275,7 @@
 						       IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
 						       MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
 						       VerticalOffset="0"
-						       Margin="0"
+						       Margin="10"
 						       WindowManagerAddShadowHint="False"
 						       PlacementTarget="{Binding ElementName=templateRoot}"
 						       IsLightDismissEnabled="True"

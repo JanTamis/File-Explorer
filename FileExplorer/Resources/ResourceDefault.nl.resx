@@ -81,7 +81,7 @@
         <value>Videos</value>
     </data>
     <data name="FileSelectionFormat" xml:space="preserve">
-        <value>{1} van {0} geselecteerd</value>
+        <value>{1:N0} van {0:N0} geselecteerd</value>
     </data>
     <data name="NoFilesAndDirectories" xml:space="preserve">
         <value>Geen bestanden of mappen gevonden...</value>
@@ -103,5 +103,14 @@
     </data>
     <data name="DeleteTextformat" xml:space="preserve">
         <value>Weet je zeker dat je {0:N0} {1} wil verwijderen</value>
+    </data>
+    <data name="FileName" xml:space="preserve">
+        <value>Bestandsnaam</value>
+    </data>
+    <data name="Dashboard" xml:space="preserve">
+        <value>Dashboard</value>
+    </data>
+    <data name="Drives" xml:space="preserve">
+        <value>Schijven</value>
     </data>
 </root>

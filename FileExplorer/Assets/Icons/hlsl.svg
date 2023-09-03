@@ -1,43 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="0.5290003" y1="10.472" x2="5.6" y2="5.3999996" id="gradient_1">
-      <stop offset="0%" stop-color="#3079D6" />
-      <stop offset="100%" stop-color="#297CD2" />
-    </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="23.605652" y1="-14.552417" x2="-9.8070965" y2="26.9955" id="gradient_2">
+    <linearGradient gradientUnits="objectBoundingBox" x1="1.0153801" y1="-0.23787999" x2="-0.35470402" y2="2.61112" id="gradient_1">
       <stop offset="0%" stop-color="#002B82" />
       <stop offset="18.6%" stop-color="#003E99" />
       <stop offset="57.5%" stop-color="#0070D3" />
       <stop offset="58.399998%" stop-color="#0071D4" />
     </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="-3.360582" y1="6.2416673" x2="6.476166" y2="21.936832" id="gradient_3">
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.2525633" y1="0.36953247" x2="0.77758485" y2="1.0459025" id="gradient_2">
       <stop offset="0%" stop-color="#007AD9" />
       <stop offset="100%" stop-color="#2AA4F4" />
     </linearGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="4.847403" y1="-1.5633333" x2="8.301903" y2="18.027916" id="gradient_4">
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.38098046" y1="0.040000007" x2="0.6001764" y2="1.0577272" id="gradient_3">
       <stop offset="0%" stop-color="#A3FFFF" />
       <stop offset="22.300001%" stop-color="#9DFBFF" />
       <stop offset="52.999996%" stop-color="#8BF1FF" />
       <stop offset="88.5%" stop-color="#6EE0FF" />
       <stop offset="100%" stop-color="#63DAFF" />
     </linearGradient>
-    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
-    <clipPath id="mask_1">
-      <use xlink:href="#path_1" />
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" clip-rule="evenodd" fill-rule="evenodd" />
     </clipPath>
   </defs>
-  <g id="File-Icon-2">
-    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
-    <path d="M39 16L39 41C39 42.105 38.105 43 37 43L11 43C9.895 43 9 42.105 9 41L9 7C9 5.895 9.895 5 11 5L28 5L39 16L39 16Z" id="Shape" fill="#50E6FF" stroke="none" />
-    <path d="M28 5L28 14C28 15.105 28.895 16 30 16L39 16L28 5L28 5Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
-  </g>
-  <g id="svg" transform="translate(10 14.5)">
-    <g id="Impossible-Shapes-Icon">
-      <path d="M0 0L28 0L28 28L0 28L0 0L0 0Z" id="Background" fill="#FFFFFF" fill-opacity="0" fill-rule="evenodd" stroke="none" />
-      <path d="M17.4154 11.3645C17.3069 11.1848 17.1179 11.0839 16.8992 11.0833C16.6892 11.0898 16.4978 11.2088 16.4004 11.3948L13.5392 16.9966L15.827 21L1.33817 21L1.22501 21.2042C1.16084 21.3267 1.14334 21.4608 1.16667 21.5833C1.18417 21.7 1.24251 21.805 1.32417 21.8867L4.93501 25.4975C5.04584 25.6083 5.19167 25.6667 5.34334 25.6667L24.9375 25.6667C25.0717 25.6667 25.2 25.62 25.2992 25.5383C25.3925 25.4683 25.4625 25.3692 25.4975 25.2467L25.5442 24.8162L17.4154 11.3645L17.4154 11.3645L17.4154 11.3645Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
-      <path d="M26.7522 20.5018L16.5025 2.62501C16.45 2.5375 16.38 2.4675 16.2925 2.415C16.205 2.3625 16.1 2.33334 15.995 2.33334L15.6806 2.33334L8.09259 17.5099L13.9259 17.5L16.9167 11.6667L25.2992 25.5383C25.3925 25.4683 25.4625 25.3692 25.4975 25.2467L26.8047 20.9568C26.8187 20.9113 26.8263 20.8647 26.8281 20.8174C26.8322 20.7089 26.8047 20.5993 26.7522 20.5018L26.7522 20.5018L26.7522 20.5018Z" id="Shape#1" fill="url(#gradient_3)" stroke="none" />
-      <path d="M16.9167 21.5833L1.16667 21.5833C1.14334 21.4608 1.16084 21.3267 1.22501 21.2042L11.0658 2.64251C11.165 2.45 11.3633 2.33334 11.5792 2.33334L15.995 2.33334C16.1 2.33334 16.205 2.3625 16.2925 2.415L9.03701 16.9266L14.2333 16.9167L16.9167 21.5833L16.9167 21.5833L16.9167 21.5833Z" id="Shape#2" fill="url(#gradient_4)" stroke="none" />
-    </g>
+  <g id="Impossible Shapes" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Impossible-Shapes" fill="none" stroke="none" />
+    <path d="M29.855 19.482C29.669 19.174 29.345 19.001 28.97 19C28.61 19.011 28.282 19.215 28.115 19.534L23.21 29.137L27.132 36L2.294 36L2.1 36.35C1.99 36.56 1.96 36.79 2 37C2.03 37.2 2.13 37.38 2.27 37.52L8.46 43.71C8.65 43.9 8.9 44 9.16 44L42.75 44C42.98 44 43.2 43.92 43.37 43.78C43.53 43.66 43.65 43.49 43.71 43.28L43.79 42.542L29.855 19.482L29.855 19.482Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M45.861 35.146L28.29 4.5C28.2 4.35 28.08 4.23 27.93 4.14C27.78 4.05 27.6 4 27.42 4L26.881 4L13.873 30.017L23.873 30L29 20L43.37 43.78C43.53 43.66 43.65 43.49 43.71 43.28L45.951 35.926C45.975 35.848 45.988 35.768 45.991 35.687C45.998 35.501 45.951 35.313 45.861 35.146L45.861 35.146Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M29 37L2 37C1.96 36.79 1.99 36.56 2.1 36.35L18.97 4.53C19.14 4.2 19.48 4 19.85 4L27.42 4C27.6 4 27.78 4.05 27.93 4.14L15.492 29.017L24.4 29L29 37L29 37Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
   </g>
 </svg>

@@ -14,11 +14,8 @@ public sealed class DynamicList<T> : IList<T>, IList
 	public T[] _items; // Do not rename (binary serialization)
 	internal int _size; // Do not rename (binary serialization)
 	private int _version; // Do not rename (binary serialization)
-	private int _length;
 
-#pragma warning disable CA1825 // avoid the extra generic instantiation for Array.Empty<T>()
-	private static readonly T[] s_emptyArray = new T[1];
-#pragma warning restore CA1825
+	private static readonly T[] s_emptyArray = Array.Empty<T>();
 
 	// Constructs a List. The list is initially empty and has a capacity
 	// of zero. Upon adding the first element to the list the capacity is
@@ -847,7 +844,7 @@ public sealed class DynamicList<T> : IList<T>, IList
 
 	public void Sort(Comparison<T> comparison)
 	{
-
+		_items.AsSpan(0, Count).Sort(comparison);
 		_version++;
 	}
 
@@ -924,7 +921,7 @@ public sealed class DynamicList<T> : IList<T>, IList
 		{
 			var localList = _list;
 
-			if (_version == localList._version && ((uint)_index < (uint)localList._size))
+			if (_version == localList._version && (uint)_index < (uint)localList._size)
 			{
 				_current = localList._items[_index];
 				_index++;

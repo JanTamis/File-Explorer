@@ -6,7 +6,7 @@ public interface IFileItem
 	bool IsFolder { get; }
 	bool IsRoot { get; }
 
-	string Extension { get; }
+	string Extension { get; set; }
 	string Name { get; set; }
 	
 	string ToolTipText { get; }

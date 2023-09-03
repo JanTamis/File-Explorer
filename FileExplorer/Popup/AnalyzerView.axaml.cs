@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
-using Avalonia.Markup.Xaml;
 using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Models;
@@ -23,8 +22,8 @@ public sealed partial class AnalyzerView : UserControl, IPopup
 			{
 				Columns =
 				{
-					new HierarchicalExpanderColumn<FileIndexModel>(new TextColumn<FileIndexModel,string>(ResourceDefault.Name, x => x.Name, GridLength.Auto), x => Enumerable.Empty<FileIndexModel>(), x => false),
-				},
+					new HierarchicalExpanderColumn<FileIndexModel>(new TextColumn<FileIndexModel, string>(ResourceDefault.Name, x => x.Name, GridLength.Auto), x => Enumerable.Empty<FileIndexModel>(), x => false)
+				}
 			};
 			RootDataGrid.Source = source;
 		}
@@ -39,14 +38,13 @@ public sealed partial class AnalyzerView : UserControl, IPopup
 
 	public AnalyzerView()
 	{
-		DataContext = this;
 		InitializeComponent();
 
+		DataContext = this;
 		Root = new ObservableRangeCollection<FileIndexModel>();
 	}
 
 	public void Close()
 	{
-
 	}
 }

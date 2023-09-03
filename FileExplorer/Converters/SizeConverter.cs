@@ -9,13 +9,13 @@ namespace FileExplorer.Converters;
 
 public sealed class SizeConverter : IValueConverter, ISingleton<SizeConverter>
 {
-	public static SizeConverter Instance = new SizeConverter();
+	public static SizeConverter Instance { get; } = new();
 	
-	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
 		switch (value)
 		{
-			case FileModel { Size: < 0 }:
+			case FileModel { Size: < 0, }:
 				return String.Empty;
 				
 			case FileModel model:

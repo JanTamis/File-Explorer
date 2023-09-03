@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" clip-rule="evenodd" fill-rule="evenodd" />
+    </clipPath>
+  </defs>
+  <g id="Albums" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Albums" fill="none" stroke="none" />
+    <path d="M37 30L11 30C9.895 30 9 29.105 9 28L9 8C9 6.895 9.895 6 11 6L37 6C38.105 6 39 6.895 39 8L39 28C39 29.105 38.105 30 37 30L37 30Z" id="Shape" fill="#50E6FF" stroke="none" />
+    <path d="M9 11L39 11L39 13L9 13L9 11Z" id="Rectangle" fill="#000000" fill-opacity="0.05" fill-rule="evenodd" stroke="none" />
+    <path d="M9 11.5L39 11.5L39 13L9 13L9 11.5Z" id="Rectangle" fill="#000000" fill-opacity="0.05" fill-rule="evenodd" stroke="none" />
+    <path d="M39 36L9 36C7.895 36 7 35.105 7 34L7 14C7 12.895 7.895 12 9 12L39 12C40.105 12 41 12.895 41 14L41 34C41 35.105 40.105 36 39 36L39 36Z" id="Shape" fill="#199BE2" stroke="none" />
+    <path d="M7 18L41 18L41 20L7 20L7 18Z" id="Rectangle" fill="#000000" fill-opacity="0.05" fill-rule="evenodd" stroke="none" />
+    <path d="M7 18.5L41 18.5L41 20L7 20L7 18.5Z" id="Rectangle" fill="#000000" fill-opacity="0.05" fill-rule="evenodd" stroke="none" />
+    <path d="M41 43L7 43C5.895 43 5 42.105 5 41L5 21C5 19.895 5.895 19 7 19L41 19C42.105 19 43 19.895 43 21L43 41C43 42.105 42.105 43 41 43L41 43Z" id="Shape" fill="#0D62AB" stroke="none" />
+  </g>
+</svg>

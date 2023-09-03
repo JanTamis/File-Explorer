@@ -16,7 +16,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	{
 		IgnoreInaccessible = true,
 		RecurseSubdirectories = false,
-		AttributesToSkip = FileAttributes.System | FileAttributes.Hidden,
+		AttributesToSkip = FileAttributes.System | FileAttributes.Hidden
 	};
 
 	public IEnumerable<FileSystemTreeItem> Children
@@ -44,7 +44,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 			{
 				var enumerable = new FileSystemEnumerable<byte>(path, (ref FileSystemEntry _) => 0, Options)
 				{
-					ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
+					ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory
 				};
 
 				return enumerable.Any();
@@ -95,7 +95,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	{
 		var parent = this;
 
-		while (parent is { Parent: not null })
+		while (parent is { Parent: not null, })
 		{
 			parent = parent.Parent;
 		}
@@ -150,7 +150,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		{
 			IgnoreInaccessible = Options.IgnoreInaccessible,
 			AttributesToSkip = Options.AttributesToSkip,
-			RecurseSubdirectories = true,
+			RecurseSubdirectories = true
 		};
 
 		if (Directory.Exists(Path))
@@ -244,7 +244,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		return new FileSystemTreeItemEnumerable(new DelegateFileSystemEnumerator<FileSystemTreeItem>(path, Options)
 		{
 			Find = (ref FileSystemEntry entry) => entry.IsDirectory || include(entry.FileName),
-			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
+			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this)
 		});
 	}
 
@@ -264,7 +264,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 
 		return new FileSystemTreeItemEnumerable(new DelegateFileSystemEnumerator<FileSystemTreeItem>(path, Options)
 		{
-			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this),
+			Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this)
 		});
 	}
 
@@ -382,18 +382,11 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		}
 	}
 
-	public class FileSystemTreeItemEnumerable : IEnumerable<FileSystemTreeItem>
+	public sealed class FileSystemTreeItemEnumerable(DelegateFileSystemEnumerator<FileSystemTreeItem> enumerator) : IEnumerable<FileSystemTreeItem>
 	{
-		private readonly DelegateFileSystemEnumerator<FileSystemTreeItem> _enumerator;
-
-		public FileSystemTreeItemEnumerable(DelegateFileSystemEnumerator<FileSystemTreeItem> enumerator)
-		{
-			_enumerator = enumerator;
-		}
-
 		public IEnumerator<FileSystemTreeItem> GetEnumerator()
 		{
-			return _enumerator;
+			return enumerator;
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()

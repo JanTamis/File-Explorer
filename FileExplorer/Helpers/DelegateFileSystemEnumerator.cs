@@ -3,15 +3,10 @@ using System.IO.Enumeration;
 
 namespace FileExplorer.Helpers;
 
-public sealed class DelegateFileSystemEnumerator<TResult> : FileSystemEnumerator<TResult>
+public sealed class DelegateFileSystemEnumerator<TResult>(string directory, EnumerationOptions options) : FileSystemEnumerator<TResult>(directory, options)
 {
-	public FileSystemEnumerable<TResult>.FindTransform? Transformation { get; set; }
-	public FileSystemEnumerable<TResult>.FindPredicate? Find { get; set; }
-
-	public DelegateFileSystemEnumerator(string directory,  EnumerationOptions options) : base(directory, options)
-	{
-      
-	}
+	public FileSystemEnumerable<TResult>.FindTransform? Transformation { get; init; }
+	public FileSystemEnumerable<TResult>.FindPredicate? Find { get; init; }
 
 	protected override TResult TransformEntry(ref FileSystemEntry entry)
 	{

@@ -1,20 +1,18 @@
 using Avalonia.Media;
-using Humanizer;
 
 namespace FileExplorer.Models;
 
-public sealed class SideBarModel
+public sealed class SideBarModel(string? folder, string name, IImage? icon)
 {
-	public Environment.SpecialFolder Folder { get; init; }
+	public string? Folder { get; } = folder;
 
-	public string Name { get; init; }
-	
-	public IImage? Icon { get; init; }
+	public string Name { get; init; } = name;
+
+	public IImage? Icon { get; init; } = icon;
 
 	public SideBarModel(Environment.SpecialFolder folder, string name, IImage? icon)
+		: this(Environment.GetFolderPath(folder), name, icon)
 	{
-		Folder = folder;
-		Name = name;
-		Icon = icon;
+		
 	}
 }

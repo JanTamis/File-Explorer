@@ -13,7 +13,7 @@ public static class FileSearcher
 		{ ">=", (x, y) => x.CompareTo(y) is 1 or 0 },
 		{ "=", (x, y) => x.Equals(y) },
 		{ "!=", (x, y) => !x.Equals(y) },
-		{ "!", (x, y) => !x.Equals(y) },
+		{ "!", (x, y) => !x.Equals(y) }
 	};
 
 	public static bool IsValid(FileSystemEntry systemEntry, IEnumerable<(Categories, (Func<IComparable, IComparable, bool>, IComparable))> query)
@@ -235,17 +235,17 @@ public static class FileSearcher
 
 		switch (b)
 		{
-			case [0x00, 0x00, 0xFE, 0xFF, ..]:
+			case [0x00, 0x00, 0xFE, 0xFF, ..,]:
 			// UTF-32, little-endian
-			case [0xFF, 0xFE, 0x00, 0x00, ..]:
+			case [0xFF, 0xFE, 0x00, 0x00, ..,]:
 			// UTF-16, big-endian
-			case [0xFE, 0xFF, ..]:
+			case [0xFE, 0xFF, ..,]:
 			// UTF-16, little-endian
-			case [0xFF, 0xFE, ..]:
+			case [0xFF, 0xFE, ..,]:
 			// UTF-8
-			case [0xEF, 0xBB, 0xBF, ..]:
+			case [0xEF, 0xBB, 0xBF, ..,]:
 			// UTF-7
-			case [0x2B, 0x2F, 0x76]:
+			case [0x2B, 0x2F, 0x76,]:
 				return true; // UTF-32, big-endian 
 		}
 

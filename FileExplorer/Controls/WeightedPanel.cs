@@ -8,7 +8,7 @@ namespace FileExplorer.Controls;
 // https://wpf.2000things.com/2014/10/09/1176-custom-panel-part-viii/
 public sealed class WeightedPanel : Panel
 {
-	public static AttachedProperty<double> WeightProperty = AvaloniaProperty.RegisterAttached<WeightedPanel, Control, double>("Weight", 0.0);
+	public static readonly AttachedProperty<double> WeightProperty = AvaloniaProperty.RegisterAttached<WeightedPanel, Control, double>("Weight", 0.0);
 
 	static WeightedPanel()
 	{
@@ -29,27 +29,24 @@ public sealed class WeightedPanel : Panel
 	/// </summary>
 	public static double GetWeight(AvaloniaObject element)
 	{
-		if (element is ContentPresenter { Content: ExtensionModel model })
+		return element switch
 		{
-			return model.TotalSize;
-		}
-		else if (element is ContentPresenter { Content: FileIndexModel indexModel })
-		{
-			if (indexModel.IsFolder)
-			{
-				return indexModel.TaskSize.Result;
-			}
-			return 0;
-		}
-
-		return element.GetValue(WeightProperty);
+			ContentPresenter { Content: ExtensionModel model, }                          => model.TotalSize,
+			ContentPresenter { Content: FileIndexModel { IsFolder: true, } indexModel, } => indexModel.TaskSize.Result,
+			ContentPresenter { Content: FileIndexModel, }                                => 0,
+			_                                                                            => element.GetValue(WeightProperty)
+		};
 	}
 
 	protected override Size MeasureOverride(Size availableSize)
 	{
 		foreach (var child in ChildrenTreemapOrder(GetChildren(), availableSize))
+		{
 			if (!Double.IsNaN(child.Rectangle.Width) && !Double.IsNaN(child.Rectangle.Height))
-				child.Element.Measure(child.Rectangle.Size);
+			{
+				child.Element?.Measure(child.Rectangle.Size);
+			}
+		}
 
 		return availableSize;
 	}
@@ -57,8 +54,12 @@ public sealed class WeightedPanel : Panel
 	protected override Size ArrangeOverride(Size finalSize)
 	{
 		foreach (var child in ChildrenTreemapOrder(GetChildren(), finalSize))
+		{
 			if (!Double.IsNaN(child.Rectangle.Width) && !Double.IsNaN(child.Rectangle.Height))
-				child.Element.Arrange(child.Rectangle);
+			{
+				child.Element?.Arrange(child.Rectangle);
+			}
+		}
 
 		return finalSize;
 	}
@@ -66,8 +67,11 @@ public sealed class WeightedPanel : Panel
 	private double TotalChildWeight()
 	{
 		double weightSum = 0L;
-		foreach (Control elem in Children)
+		
+		foreach (var elem in Children)
+		{
 			weightSum += GetWeight(elem);
+		}
 
 		return weightSum;
 	}
@@ -110,18 +114,26 @@ public sealed class WeightedPanel : Panel
 
 			// Entire height, proportionate width
 			if (leftEdge)
+			{
 				size = new Size(pctArea * (containerSize.Width - left), containerSize.Height - top);
+			}
 
 			// Top edge - Entire width, proportionate height
 			else
+			{
 				size = new Size(containerSize.Width - left, pctArea * (containerSize.Height - top));
+			}
 
-			yield return new ChildAndRect { Element = child, Rectangle = new Rect(new Point(left, top), size) };
+			yield return new ChildAndRect { Element = child, Rectangle = new Rect(new Point(left, top), size), };
 
 			if (leftEdge)
+			{
 				left += size.Width;
+			}
 			else
+			{
 				top += size.Height;
+			}
 		}
 	}
 
@@ -139,6 +151,6 @@ public sealed class WeightedPanel : Panel
 
 public sealed class ChildAndRect
 {
-	public Control Element { get; set; }
+	public Control? Element { get; set; }
 	public Rect Rectangle { get; set; }
 }

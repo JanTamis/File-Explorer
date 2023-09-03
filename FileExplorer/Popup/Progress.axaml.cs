@@ -9,11 +9,11 @@ namespace FileExplorer.Popup;
 
 public partial class Progress : UserControl, IPopup, INotifyPropertyChanged
 {
-	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
+	public new event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
 	private double _progress;
 	private long _speed;
-	private string _estimateTime;
+	private string _estimateTime = String.Empty;
 
 	public bool HasShadow => false;
 	public bool HasToBeCanceled => true;
@@ -42,7 +42,7 @@ public partial class Progress : UserControl, IPopup, INotifyPropertyChanged
 
 	public Progress()
 	{
-		AvaloniaXamlLoader.Load(this);
+		InitializeComponent();
 	}
 
 	public void Close()
@@ -51,13 +51,13 @@ public partial class Progress : UserControl, IPopup, INotifyPropertyChanged
 		OnClose?.Invoke();
 	}
 
-	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
+	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string? name = null)
 	{
 		property = value;
 		OnPropertyChanged(name);
 	}
 
-	public void OnPropertyChanged(string name)
+	public void OnPropertyChanged(string? name)
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 	}

@@ -12,7 +12,10 @@ public static class MetaDataHelper
 			return ImageMetadataReader.ReadMetadata(path)
 				.Where(w => !w.IsEmpty);
 		}
-		catch (Exception) { }
+		catch (Exception)
+		{
+			// ignored
+		}
 
 		return Enumerable.Empty<Directory>();
 	}

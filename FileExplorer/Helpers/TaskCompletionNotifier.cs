@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-using Avalonia;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace FileExplorer.Helpers;
 
@@ -41,7 +39,7 @@ public sealed partial class TaskCompletionNotifier<TResult> : ObservableObject
 			var scheduler = SynchronizationContext.Current is null
 				? TaskScheduler.Current
 				: TaskScheduler.FromCurrentSynchronizationContext();
-
+			
 			task.ContinueWith(t =>
 			{
 				OnPropertyChanged(nameof(IsCompleted));

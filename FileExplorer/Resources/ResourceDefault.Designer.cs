@@ -230,5 +230,23 @@ namespace FileExplorer.Resources {
                 return ResourceManager.GetString("DeleteTextformat", resourceCulture);
             }
         }
+        
+        internal static string FileName {
+            get {
+                return ResourceManager.GetString("FileName", resourceCulture);
+            }
+        }
+        
+        internal static string Dashboard {
+            get {
+                return ResourceManager.GetString("Dashboard", resourceCulture);
+            }
+        }
+        
+        internal static string Drives {
+            get {
+                return ResourceManager.GetString("Drives", resourceCulture);
+            }
+        }
     }
 }

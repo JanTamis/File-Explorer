@@ -1,17 +1,9 @@
 ﻿using FileExplorer.Core.Interfaces;
-using FileExplorer.Interfaces;
 
 namespace FileExplorer.Helpers;
 
-public class AsyncComparer<T> : IAsyncComparer<T>
+public class AsyncComparer<T>(AsyncComparison<T> comparison) : IAsyncComparer<T>
 {
-	readonly AsyncComparison<T> comparison;
-
-	public AsyncComparer(AsyncComparison<T> comparison)
-	{
-		this.comparison = comparison;
-	}
-
 	public ValueTask<int> CompareAsync(T x, T y)
 	{
 		return comparison(x, y);

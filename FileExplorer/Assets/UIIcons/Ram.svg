@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.026113637" y1="0.02759999" x2="0.9037727" y2="0.97225004" id="gradient_1">
+      <stop offset="0%" stop-color="#21AD64" />
+      <stop offset="100%" stop-color="#088242" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="-0.022022728" y1="-1.48175" x2="0.84645456" y2="1.6246252" id="gradient_2">
+      <stop offset="0%" stop-color="#4C4C4C" />
+      <stop offset="100%" stop-color="#343434" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.5" y1="-0.2420001" x2="0.5" y2="0.84375" id="gradient_3">
+      <stop offset="0%" stop-color="#4C4C4C" />
+      <stop offset="100%" stop-color="#343434" />
+    </linearGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Memory Slot" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Memory-Slot" fill="none" stroke="none" />
+    <path d="M42 11L6 11C3.8 11 2 12.8 2 15L2 31L46 31L46 15C46 12.8 44.2 11 42 11L42 11Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M2 31L2 35C2 37.2 3.8 39 6 39L23 39L23 34C23 33.4 23.4 33 24 33C24.6 33 25 33.4 25 34L25 39L42 39C44.2 39 46 37.2 46 35L46 31L2 31L2 31Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M8 33L9 33L9 39L7 39L7 34C7 33.448 7.448 33 8 33L8 33Z" id="Shape" fill="#EDBE00" stroke="none" />
+    <path d="M9 33L11 33L11 39L9 39L9 33Z" id="Rectangle" fill="#E3A600" fill-rule="evenodd" stroke="none" />
+    <path d="M13 33L15 33L15 39L13 39L13 33Z" id="Rectangle" fill="#E3A600" fill-rule="evenodd" stroke="none" />
+    <path d="M17 33L19 33L19 39L17 39L17 33Z" id="Rectangle" fill="#E3A600" fill-rule="evenodd" stroke="none" />
+    <path d="M21 33L22 33C22.552 33 23 33.448 23 34L23 39L21 39L21 33L21 33Z" id="Shape" fill="#E3A600" stroke="none" />
+    <path d="M26 33L27 33L27 39L25 39L25 34C25 33.448 25.448 33 26 33L26 33Z" id="Shape" fill="#E3A600" stroke="none" />
+    <path d="M29 33L31 33L31 39L29 39L29 33Z" id="Rectangle" fill="#E3A600" fill-rule="evenodd" stroke="none" />
+    <path d="M33 33L35 33L35 39L33 39L33 33Z" id="Rectangle" fill="#E3A600" fill-rule="evenodd" stroke="none" />
+    <path d="M37 33L39 33L39 39L37 39L37 33Z" id="Rectangle" fill="#E3A600" fill-rule="evenodd" stroke="none" />
+    <path d="M11 33L13 33L13 39L11 39L11 33Z" id="Rectangle" fill="#EDBE00" fill-rule="evenodd" stroke="none" />
+    <path d="M15 33L17 33L17 39L15 39L15 33Z" id="Rectangle" fill="#EDBE00" fill-rule="evenodd" stroke="none" />
+    <path d="M19 33L21 33L21 39L19 39L19 33Z" id="Rectangle" fill="#EDBE00" fill-rule="evenodd" stroke="none" />
+    <path d="M27 33L29 33L29 39L27 39L27 33Z" id="Rectangle" fill="#EDBE00" fill-rule="evenodd" stroke="none" />
+    <path d="M31 33L33 33L33 39L31 39L31 33Z" id="Rectangle" fill="#EDBE00" fill-rule="evenodd" stroke="none" />
+    <path d="M35 33L37 33L37 39L35 39L35 33Z" id="Rectangle" fill="#EDBE00" fill-rule="evenodd" stroke="none" />
+    <path d="M39 33L40 33C40.552 33 41 33.448 41 34L41 39L39 39L39 33L39 33Z" id="Shape" fill="#EDBE00" stroke="none" />
+    <path d="M21 27C19.897 27 19 26.103 19 25L19 19C19 17.897 19.897 17 21 17L27 17C28.103 17 29 17.897 29 19L29 25C29 26.103 28.103 27 27 27L21 27L21 27Z" id="Shape" fill="#000000" fill-opacity="0.05" stroke="none" />
+    <path d="M21 26.5C20.173 26.5 19.5 25.827 19.5 25L19.5 19C19.5 18.173 20.173 17.5 21 17.5L27 17.5C27.827 17.5 28.5 18.173 28.5 19L28.5 25C28.5 25.827 27.827 26.5 27 26.5L21 26.5L21 26.5Z" id="Shape" fill="#000000" fill-opacity="0.07" stroke="none" />
+    <path d="M21 18L27 18C27.552 18 28 18.448 28 19L28 25C28 25.552 27.552 26 27 26L21 26C20.448 26 20 25.552 20 25L20 19C20 18.448 20.448 18 21 18L21 18Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+    <path d="M33 27C31.897 27 31 26.103 31 25L31 19C31 17.897 31.897 17 33 17L39 17C40.103 17 41 17.897 41 19L41 25C41 26.103 40.103 27 39 27L33 27L33 27Z" id="Shape" fill="#000000" fill-opacity="0.05" stroke="none" />
+    <path d="M33 26.5C32.173 26.5 31.5 25.827 31.5 25L31.5 19C31.5 18.173 32.173 17.5 33 17.5L39 17.5C39.827 17.5 40.5 18.173 40.5 19L40.5 25C40.5 25.827 39.827 26.5 39 26.5L33 26.5L33 26.5Z" id="Shape" fill="#000000" fill-opacity="0.07" stroke="none" />
+    <path d="M33 18L39 18C39.552 18 40 18.448 40 19L40 25C40 25.552 39.552 26 39 26L33 26C32.448 26 32 25.552 32 25L32 19C32 18.448 32.448 18 33 18L33 18Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+    <path d="M9 27C7.897 27 7 26.103 7 25L7 19C7 17.897 7.897 17 9 17L15 17C16.103 17 17 17.897 17 19L17 25C17 26.103 16.103 27 15 27L9 27L9 27Z" id="Shape" fill="#000000" fill-opacity="0.05" stroke="none" />
+    <path d="M9 26.5C8.173 26.5 7.5 25.827 7.5 25L7.5 19C7.5 18.173 8.173 17.5 9 17.5L15 17.5C15.827 17.5 16.5 18.173 16.5 19L16.5 25C16.5 25.827 15.827 26.5 15 26.5L9 26.5L9 26.5Z" id="Shape" fill="#000000" fill-opacity="0.07" stroke="none" />
+    <path d="M9 18L15 18C15.552 18 16 18.448 16 19L16 25C16 25.552 15.552 26 15 26L9 26C8.448 26 8 25.552 8 25L8 19C8 18.448 8.448 18 9 18L9 18Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+  </g>
+</svg>

@@ -1,10 +1,7 @@
 using Avalonia.Controls;
-using Avalonia.Controls.Generators;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 using System.Runtime;
-using Avalonia;
 using CommunityToolkit.Mvvm.Input;
 using FileExplorer.Models;
 using FileExplorer.ViewModels;
@@ -89,13 +86,13 @@ public sealed partial class MainWindow : FluentWindow
 
 	private void TreeItemGenerated(object? sender, ContainerPreparedEventArgs e)
 	{
-		if (e.Container is TreeViewItem { DataContext: FolderModel folderModel } treeItem)
+		if (e.Container is TreeViewItem { DataContext: FolderModel folderModel, } treeItem)
 		{
 			treeItem.ContainerPrepared += TreeItemGenerated;
 
 			if (folderModel.HasItems || folderModel.TreeItem is null)
 			{
-				treeItem.ItemsSource = new[] { new FolderModel(new FileSystemTreeItem("Loading...", false)) };
+				treeItem.ItemsSource = new[] { new FolderModel(new FileSystemTreeItem("Loading...", false)), };
 			}
 		}
 	}
@@ -110,7 +107,7 @@ public sealed partial class MainWindow : FluentWindow
 
 	private void OnTabCloseClick(object sender, RoutedEventArgs e)
 	{
-		if (DataContext is MainWindowViewModel { Tabs.Count: > 0 } model && sender is Button { DataContext: TabItemViewModel tab })
+		if (DataContext is MainWindowViewModel { Tabs.Count: > 0, } model && sender is Button { DataContext: TabItemViewModel tab, })
 		{
 			tab.CancelUpdateFiles();
 			model.Tabs.Remove(tab);
@@ -122,7 +119,7 @@ public sealed partial class MainWindow : FluentWindow
 
 	private void ItemContainerGenerator_Materialized1(object? sender, ContainerPreparedEventArgs e)
 	{
-		if (e.Container is MenuItem { DataContext: FolderModel folder, ContextMenu: not null } item && DataContext is MainWindowViewModel model)
+		if (e.Container is MenuItem { DataContext: FolderModel folder, ContextMenu: not null, } item && DataContext is MainWindowViewModel model)
 		{
 			item.Command = new RelayCommand(() => { model.CurrentTab.CurrentFolder = new FileModel(folder.TreeItem); });
 
@@ -140,7 +137,7 @@ public sealed partial class MainWindow : FluentWindow
 	{
 		if (DataContext is MainWindowViewModel model)
 		{
-			if (e.Container is ListBoxItem { DataContext: FileModel fileModel } item)
+			if (e.Container is ListBoxItem { DataContext: FileModel fileModel, } item)
 			{
 				item.DoubleTapped += async delegate { await model.SetPath(fileModel.TreeItem); };
 			}
@@ -166,7 +163,7 @@ public sealed partial class MainWindow : FluentWindow
 
 	private async void Tree_SelectionChanged(object? sender, SelectionChangedEventArgs e)
 	{
-		if (DataContext is MainWindowViewModel model && e.AddedItems is [FolderModel { TreeItem: not null } folderModel, ..])
+		if (DataContext is MainWindowViewModel model && e.AddedItems is [FolderModel { TreeItem: not null, } folderModel, ..,])
 		{
 			await model.SetPath(folderModel.TreeItem);
 		}

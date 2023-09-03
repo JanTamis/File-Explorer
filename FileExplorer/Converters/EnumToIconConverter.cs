@@ -8,7 +8,7 @@ namespace FileExplorer.Converters;
 
 public sealed class EnumToIconConverter : IValueConverter, ISingleton<EnumToIconConverter>
 {
-	public static readonly EnumToIconConverter Instance = new();
+	public static EnumToIconConverter Instance { get; } = new();
 	
 	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
@@ -21,7 +21,7 @@ public sealed class EnumToIconConverter : IValueConverter, ISingleton<EnumToIcon
 
 				return new SvgImage
 				{
-					Source = source,
+					Source = source
 				};
 			}
 			catch (FileNotFoundException) { }			

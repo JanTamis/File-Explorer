@@ -1,33 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
-	<defs>
-		<linearGradient x1="0.048090935" y1="0.952" x2="0.5090909" y2="0.49090907" id="gradient_1">
-			<stop offset="0" stop-color="#3079D6" />
-			<stop offset="1" stop-color="#297CD2" />
-		</linearGradient>
-		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
-		<path d="M0 0L25 0L25 25L0 25L0 0Z" id="path_2" />
-		<clipPath id="mask_1">
-			<use xlink:href="#path_1" />
-		</clipPath>
-		<clipPath id="mask_2">
-			<use xlink:href="#path_2" />
-		</clipPath>
-	</defs>
-	<g id="icons8_file">
-		<path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
-		<g clip-path="url(#mask_1)">
-			<path d="M30 11L30 36C30 37.105 29.105 38 28 38L2 38C0.895001 38 0 37.105 0 36L0 2C0 0.895 0.895001 0 2 0L19 0L30 11L30 11Z" transform="translate(9 5)" id="Shape" fill="#50E6FF" fill-rule="evenodd" stroke="none" />
-			<path d="M0 0L0 9C0 10.105 0.895 11 2 11L11 11L0 0L0 0Z" transform="translate(28 5)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
-		</g>
-	</g>
-	<g id="icons8_musical_notes" transform="translate(11.4878235 16.714249)">
-		<path d="M0 0L25 0L25 25L0 25L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
-		<g clip-path="url(#mask_2)">
-			<path d="M3.125 0C1.39896 0 0 1.39896 0 3.125C0 4.85104 1.39896 6.25 3.125 6.25C4.85104 6.25 6.25 4.85104 6.25 3.125C6.25 1.39896 4.85104 0 3.125 0L3.125 0Z" transform="translate(14.5833435 15.104141)" id="Shape" fill="#ED3675" fill-rule="evenodd" stroke="none" />
-			<path d="M3.125 0C1.39896 0 0 1.39896 0 3.125C0 4.85104 1.39896 6.25 3.125 6.25C4.85104 6.25 6.25 4.85104 6.25 3.125C6.25 1.39896 4.85104 0 3.125 0L3.125 0Z" transform="translate(2.0833435 16.145828)" id="Shape" fill="#ED3675" fill-rule="evenodd" stroke="none" />
-			<path d="M10.4167 0L0 2.26406L0 6.95156L10.4167 4.6875L10.4167 0Z" transform="translate(8.3333435 3.3276062)" id="Polygon" fill="#CC1B4E" fill-rule="evenodd" stroke="none" />
-			<path d="M13.3203 0.0241749L0.820313 2.74084C0.341667 2.84553 0 3.26897 0 3.75907L0 16.6669L2.08333 16.6669L2.08333 5.20855L12.5 2.94449L12.5 15.6252L14.5833 15.6252L14.5833 1.0424C14.5833 0.377821 13.9698 -0.116971 13.3203 0.0241749L13.3203 0.0241749Z" transform="translate(6.25 2.6039581)" id="Shape" fill="#ED3675" fill-rule="evenodd" stroke="none" />
-		</g>
-	</g>
+  <defs>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" clip-rule="evenodd" fill-rule="evenodd" />
+    </clipPath>
+  </defs>
+  <g id="Musical Notes" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Musical-Notes" fill="none" stroke="none" />
+    <path d="M34 29C30.686 29 28 31.686 28 35C28 38.314 30.686 41 34 41C37.314 41 40 38.314 40 35C40 31.686 37.314 29 34 29L34 29Z" id="Shape" fill="#ED3675" stroke="none" />
+    <path d="M10 31C6.686 31 4 33.686 4 37C4 40.314 6.686 43 10 43C13.314 43 16 40.314 16 37C16 33.686 13.314 31 10 31L10 31Z" id="Shape" fill="#ED3675" stroke="none" />
+    <path d="M36 6.389L16 10.736L16 19.736L36 15.389L36 6.389Z" id="Polygon" fill="#CC1B4E" fill-rule="evenodd" stroke="none" />
+    <path d="M37.575 5.046L13.575 10.262C12.656 10.463 12 11.276 12 12.217L12 37L16 37L16 15L36 10.653L36 35L40 35L40 7.001C40 5.725 38.822 4.775 37.575 5.046L37.575 5.046Z" id="Shape" fill="#ED3675" stroke="none" />
+  </g>
 </svg>

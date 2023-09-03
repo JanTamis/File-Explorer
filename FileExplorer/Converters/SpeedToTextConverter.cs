@@ -7,7 +7,7 @@ namespace FileExplorer.Converters;
 
 public class SpeedToTextConverter : IValueConverter, ISingleton<SpeedToTextConverter>
 {
-	public static SpeedToTextConverter Instance = new();
+	public static SpeedToTextConverter Instance { get; } = new();
 
 	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{

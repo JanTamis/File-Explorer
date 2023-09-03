@@ -1,5 +1,5 @@
+using System.IO;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Interfaces;
@@ -23,21 +23,26 @@ public sealed partial class Quickstart : UserControl, IFileViewer
 		}
 	}
 
-	private IEnumerable<FileModel> Drives
-	{
-		get
-		{
-			//return MainWindowViewModel.Tree.Children
-			//	.Select(s => new FileModel(s));
+	private IEnumerable<DriveModel> Drives =>
+		DriveInfo
+			.GetDrives()
+			.Where(w => w is { IsReady: true, })
+			.Select(s =>
+			{
+				if (OperatingSystem.IsWindows())
+				{
+					return new DriveModel(s.RootDirectory.FullName, s.VolumeLabel, s.TotalSize, s.TotalSize - s.AvailableFreeSpace, s.DriveType);
+				}
 
-			return Enumerable.Empty<FileModel>();
+				var index = s.VolumeLabel.LastIndexOf('/');
 
-			//return DriveInfo
-			//	.GetDrives()
-			//	.Where(x => x.IsReady)
-			//	.Select(x => new FileModel(x.Name, true));
-		}
-	}
+				if (index < 1 && s.VolumeLabel.Length is 1)
+				{
+					return new DriveModel(s.RootDirectory.FullName, s.VolumeLabel, s.TotalSize, s.TotalSize - s.AvailableFreeSpace, s.DriveType);
+				}
+
+				return new DriveModel(s.RootDirectory.FullName, s.VolumeLabel[(index + 1)..],  s.TotalSize, s.TotalSize - s.AvailableFreeSpace, s.DriveType);
+			});
 
 	private int DriveCount => Drives.Count();
 	private int FileCount => RecentFiles.Count();
@@ -49,12 +54,7 @@ public sealed partial class Quickstart : UserControl, IFileViewer
 		DataContext = this;
 	}
 
-	private void InitializeComponent()
-	{
-		AvaloniaXamlLoader.Load(this);
-	}
-
-	public ObservableRangeCollection<IFileItem> Items { get; set; }
+	public ObservableRangeCollection<IFileItem>? Items { get; set; }
 	public ValueTask<int> ItemCount => ValueTask.FromResult(0);
 
 	public event Action<IFileItem>? PathChanged;

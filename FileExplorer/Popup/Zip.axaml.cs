@@ -4,96 +4,204 @@ using System.Runtime.CompilerServices;
 using Avalonia.Controls;
 using DialogHostAvalonia;
 using FileExplorer.Core.Interfaces;
-using SharpCompress.Archives;
+using FileExplorer.Helpers;
 using SharpCompress.Common;
 using SharpCompress.Writers;
+using SharpCompress.Writers.GZip;
+using SharpCompress.Writers.Tar;
+using SharpCompress.Writers.Zip;
+using CompressionLevel = SharpCompress.Compressors.Deflate.CompressionLevel;
 
 namespace FileExplorer.Popup;
 
-public sealed partial class Zip : UserControl, IPopup
+public sealed partial class Zip : UserControl, IPopup, INotifyPropertyChanged
 {
-  private List<IFileItem> _selectedFiles;
-  private int _progress;
-  
-  public List<IFileItem> SelectedFiles
-  {
-    get => _selectedFiles;
-    set
-    {
-      OnPropertyChanged(ref _selectedFiles, value);
-      OnPropertyChanged(nameof(FileCount));
-    }
-  }
+	private List<IFileItem> _selectedFiles;
+	private long _progress;
+	private string _fileName;
+	private bool _isRunning;
 
-  public IFileItem Folder
-  {
-    get => _folder;
-    set => OnPropertyChanged(ref _folder, value);
-  }
+	private EtaCalculator _etaCalculator;
 
-  public int Progress
-  {
-    get => _progress;
-    set => OnPropertyChanged(ref _progress, value);
-  }
-  
-  public int FileCount => SelectedFiles?.Count ?? 0;
+	private DateTime _startTime;
 
-  public new event PropertyChangedEventHandler? PropertyChanged = delegate { };
+	public List<IFileItem> SelectedFiles
+	{
+		get => _selectedFiles;
+		set
+		{
+			OnPropertyChanged(ref _selectedFiles, value);
 
-  public bool HasShadow => true;
-  public bool HasToBeCanceled => false;
-  public string Title => "Zipping Items...";
+			TotalSize = SelectedFiles.Sum(s =>
+			{
+				using var handle = File.OpenHandle(s.GetPath());
 
-  private CancellationTokenSource? _source;
-  private IFileItem _folder;
+				return RandomAccess.GetLength(handle);
+			});
+			
+			OnPropertyChanged(nameof(TotalSize));
+		}
+	}
 
-  public event Action? OnClose;
+	public IFileItem Folder
+	{
+		get => _folder;
+		set => OnPropertyChanged(ref _folder, value);
+	}
 
-  public Zip()
-  {
-    InitializeComponent();
-  }
+	public long Progress
+	{
+		get => _progress;
+		set => OnPropertyChanged(ref _progress, value);
+	}
 
-  public async Task ZipFiles()
-  {
-    await Task.Run(() =>
-    {
-      using var archive = ArchiveFactory.Create(ArchiveType.Zip);
+	public string FileName
+	{
+		get => _fileName;
+		set => OnPropertyChanged(ref _fileName, value);
+	}
 
-      foreach (var selectedFile in SelectedFiles)
-      {
-        _source?.Token.ThrowIfCancellationRequested();
-        archive.AddEntry(selectedFile.Name, File.OpenRead(selectedFile.GetPath()), true);
+	public bool IsRunning
+	{
+		get => _isRunning;
+		set => OnPropertyChanged(ref _isRunning, value);
+	}
 
-        Progress++;
-      }
+	public TimeSpan EstimatedTime => _etaCalculator?.ETR ?? TimeSpan.Zero;
 
-      archive.SaveTo($"{Folder.GetPath()}/archive.zip", new WriterOptions(CompressionType.Deflate));
-    });
+	public long TotalSize { get; private set; }
 
-    Close();
-  }
+	public new event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
-  public void Close()
-  {
-    _source?.Cancel();
-    OnClose?.Invoke();
+	public bool HasShadow => true;
+	public bool HasToBeCanceled => true;
+	public string Title => "Zipping Items...";
 
-    if (DialogHost.IsDialogOpen(null))
-    {
-	    DialogHost.Close(null);
-    }
-  }
+	private IFileItem _folder;
 
-  private void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
-  {
-    property = value;
-    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-  }
+	public event Action? OnClose;
 
-  public void OnPropertyChanged(string name)
-  {
-    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-  }
+	public Zip()
+	{
+		InitializeComponent();
+	}
+
+	public async Task ZipFiles()
+	{
+		IsRunning = true;
+
+		_startTime = DateTime.Now;
+		_etaCalculator = new EtaCalculator(0, 30);
+
+		await Task.Run(() =>
+		{
+			using var destinationStream = File.Create(Path.Combine(Folder.GetPath(), FileName));
+			var extension = Path.GetExtension(FileName.AsSpan());
+
+			IWriter? writer = null;
+
+			switch (extension)
+			{
+				case ".zip":
+				case ".zipx":
+				case ".cbz":
+					writer = new ZipWriter(destinationStream, new ZipWriterOptions(CompressionType.Deflate)
+					{
+						DeflateCompressionLevel = CompressionLevel.Default,
+						UseZip64 = true
+					});
+					break;
+					case ".tar":
+					case ".taz":
+					case ".tgz":
+					case ".tb2":
+					case ".tbz":
+					case ".tbz2":
+					case ".tz2":
+					case ".tZ":
+					case ".taZ":
+						writer = new TarWriter(destinationStream, new TarWriterOptions(CompressionType.GZip, true));
+						break;
+					case ".gz":
+						writer = new GZipWriter(destinationStream, new GZipWriterOptions());
+						break;
+			}
+
+			if (writer is not null)
+			{
+				ZipFiles(writer);
+			}
+		});
+		
+		Close();
+	}
+
+	public void Close()
+	{
+		OnClose?.Invoke();
+
+		if (DialogHost.IsDialogOpen(null))
+		{
+			DialogHost.Close(null);
+		}
+
+		IsRunning = false;
+	}
+
+	private void ZipFiles(IWriter writer)
+	{
+		Task.Run(async () =>
+		{
+			using var timer = new PeriodicTimer(TimeSpan.FromSeconds(1));
+
+			while (IsRunning && await timer.WaitForNextTickAsync())
+			{
+				OnPropertyChanged(nameof(EstimatedTime));
+			}
+		});
+		
+		foreach (var selectedFile in SelectedFiles)
+		{
+			if (!IsRunning)
+			{
+				break;
+			}
+			
+			var path = selectedFile.GetPath();
+
+			if (File.Exists(path))
+			{
+				using var file = File.OpenRead(path);
+
+				Task.Run(async () =>
+				{
+					using var timer = new PeriodicTimer(TimeSpan.FromMilliseconds(25));
+
+					var previous = 0L;
+
+					while (IsRunning && await timer.WaitForNextTickAsync())
+					{
+						Progress += file.Position - previous;
+						
+						_etaCalculator.Update((double)((decimal)Progress / (decimal)TotalSize));
+						
+						previous = file.Position;
+					}
+				});
+
+				writer.Write(selectedFile.Name, file);
+			}
+		}
+	}
+
+	private void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string? name = null)
+	{
+		property = value;
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+	}
+
+	private void OnPropertyChanged(string? name)
+	{
+		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+	}
 }

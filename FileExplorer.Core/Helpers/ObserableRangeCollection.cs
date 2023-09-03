@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using FileExplorer.Core.Extensions;
 using FileExplorer.Core.Interfaces;
+using ValueTaskSupplement;
 
 namespace FileExplorer.Core.Helpers;
 
@@ -41,7 +42,7 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 	object? IList.this[int index]
 	{
 		get => _data[index];
-		set => _data[index] = (T)value;
+		set => _data[index] = (T) value;
 	}
 
 	public T this[int index]
@@ -389,7 +390,7 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 
 		var isLocked = false;
 
-		var task = provider.EnumerateItemsAsync(folder, pattern, x => bag.Enqueue((T)x), token).ConfigureAwait(false);
+		var task = provider.EnumerateItemsAsync(folder, pattern, x => bag.Enqueue((T) x), token).ConfigureAwait(false);
 		var isDone = false;
 
 		Runner.Run<Task>(async () =>
@@ -464,7 +465,7 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 		{
 			Console.WriteLine(e);
 		}
-		
+
 		return ValueTask.CompletedTask;
 	}
 
@@ -494,7 +495,7 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 		while (lo <= hi)
 		{
 			// i might overflow if lo and hi are both large positive numbers.
-			var i = lo + ((hi - lo) >> 1);
+			var i = lo + (hi - lo >> 1);
 			var c = comparer.Compare(_data[i], value);
 
 			switch (c)
@@ -521,7 +522,7 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 		while (lo <= hi)
 		{
 			// i might overflow if lo and hi are both large positive numbers.
-			var i = lo + ((hi - lo) >> 1);
+			var i = lo + (hi - lo >> 1);
 			var c = await comparer.CompareAsync(_data[i], value);
 
 			switch (c)
@@ -546,20 +547,18 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 		await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
 	}
 
+	public ValueTask Sort(Comparison<T> comparison)
+	{
+		_data.Sort(comparison);
+		return OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+	}
+
 	public IEnumerator<T> GetEnumerator()
 	{
-		for (var i = 0; i < _data.Count; i++)
-		{
-			yield return _data[i];
-		}
+		return _data.GetEnumerator();
 	}
 
-	public void PropertyChanged(string property)
-	{
-		OnPropertyChanged(property);
-	}
-
-	static async ValueTask ParallelQuickSort<TComparer>(IList<T> array, int left, int right, TComparer comparer) where TComparer : IComparer<T>
+	async static ValueTask ParallelQuickSort<TComparer>(IList<T> array, int left, int right, TComparer comparer) where TComparer : IComparer<T>
 	{
 		const int threshold = 250;
 		var i = left;
@@ -589,9 +588,7 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 
 		if (j - left > threshold && right - i > threshold)
 		{
-			await Task.WhenAll(
-				Task.Run(() => ParallelQuickSort(array, left, j, comparer)),
-				Task.Run(() => ParallelQuickSort(array, i, right, comparer)));
+			await ValueTaskEx.WhenAll(ParallelQuickSort(array, left, j, comparer), ParallelQuickSort(array, i, right, comparer));
 		}
 		else
 		{
@@ -606,52 +603,6 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 			}
 		}
 	}
-
-// private static async Task ParallelQuickSortAsync(IList<T> array, int left, int right, IAsyncComparer<T> comparer)
-// {
-//   const int Threshold = 250;
-//   var i = left;
-//   var j = right;
-//   var m = array[(left + right) / 2];
-//
-//   while (i <= j)
-//   {
-//     while (await comparer.CompareAsync(array[i], m) is -1)
-//     {
-//       i++;
-//     }
-//
-//     while (await comparer.CompareAsync(array[j], m) is 1)
-//     {
-//       j--;
-//     }
-//
-//     if (i <= j)
-//     {
-//       (array[i], array[j]) = (array[j], array[i]);
-//
-//       i++;
-//       j--;
-//     }
-//   }
-//
-//   if (j - left > Threshold && right - i > Threshold)
-//   {
-//     await Task.WhenAll(ParallelQuickSortAsync(array, left, j, comparer), ParallelQuickSortAsync(array, i, right, comparer));
-//   }
-//   else
-//   {
-//     if (j > left)
-//     {
-//       await ParallelQuickSortAsync(array, left, j, comparer);
-//     }
-//
-//     if (i < right)
-//     {
-//       await ParallelQuickSortAsync(array, i, right, comparer);
-//     }
-//   }
-// }
 
 	public int IndexOf(T item)
 	{
@@ -703,10 +654,10 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 		return value;
 	}
 
-// public ref T GetPinnableReference()
-// {
-// 	return ref CollectionsMarshal.AsSpan(_data).GetPinnableReference();
-// }
+	// public ref T GetPinnableReference()
+	// {
+	// 	return ref CollectionsMarshal.AsSpan(_data).GetPinnableReference();
+	// }
 
 	IEnumerator IEnumerable.GetEnumerator()
 	{
@@ -725,7 +676,7 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 
 	public int IndexOf(object? value)
 	{
-		return _data.IndexOf((T)value);
+		return _data.IndexOf((T) value);
 	}
 
 	public void Insert(int index, object? value)

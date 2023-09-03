@@ -1,6 +1,6 @@
 namespace FileExplorer.Interfaces;
 
-public interface ISingleton<T>
+public interface ISingleton<out T>
 {
-	static T Instance;
+	abstract static T Instance { get; }
 }

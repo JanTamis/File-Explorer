@@ -10,21 +10,24 @@ namespace FileExplorer.Popup;
 
 public sealed partial class TabSelector : UserControl, IPopup, INotifyPropertyChanged
 {
-	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
+	private ObservableRangeCollection<TabItemViewModel>? _tabs;
+	private TabItemViewModel? _currentTab;
+	
+	public new event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
 	public event Action<TabItemViewModel> TabSelectionChanged = delegate { };
-
-	private ObservableRangeCollection<TabItemViewModel> _tabs;
-	private TabItemViewModel _currentTab;
-
-	public TabItemViewModel CurrentTab
+	
+	public TabItemViewModel? CurrentTab
 	{
 		get => _currentTab;
 		set
 		{
 			_currentTab = value;
 
-			TabSelectionChanged(CurrentTab);
+			if (CurrentTab is not null)
+			{
+				TabSelectionChanged(CurrentTab);
+			}
 		}
 	}
 
@@ -33,7 +36,7 @@ public sealed partial class TabSelector : UserControl, IPopup, INotifyPropertyCh
 
 	public string Title => "Select Tab";
 
-	public ObservableRangeCollection<TabItemViewModel> Tabs
+	public ObservableRangeCollection<TabItemViewModel>? Tabs
 	{
 		get => _tabs;
 		set => OnPropertyChanged(ref _tabs, value);
@@ -57,7 +60,7 @@ public sealed partial class TabSelector : UserControl, IPopup, INotifyPropertyCh
 		OnClose();
 	}
 
-	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
+	private void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string? name = null)
 	{
 		property = value;
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

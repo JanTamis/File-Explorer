@@ -195,7 +195,7 @@ public unsafe partial class WindowsThumbnailProvider
 	{
 		[PreserveSig]
 		HResult GetImage(
-			[In, MarshalAs(UnmanagedType.Struct)] NativeSize size,
+			[In, MarshalAs(UnmanagedType.Struct),] NativeSize size,
 			[In] ThumbnailOptions flags,
 			[Out] out IntPtr phbm);
 	}

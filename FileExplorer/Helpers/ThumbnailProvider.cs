@@ -6,7 +6,8 @@ using System.IO;
 using Avalonia.Threading;
 using Avalonia.Media.Imaging;
 using System.Diagnostics.CodeAnalysis;
-using Avalonia.Controls.Documents;
+using System.Globalization;
+using System.Runtime.CompilerServices;
 using FileExplorer.Core.Extensions;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Models;
@@ -19,17 +20,46 @@ public static class ThumbnailProvider
 {
 	private static readonly ConcurrentDictionary<int, IImage> Images = new();
 
-	private static FrozenSet<string> _docs = new[] { ".doc", ".docx", ".docm", ".dotx", ".dotm", ".docb", ".odt" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
-	private static FrozenSet<string> _sheets = new[] { ".xls", ".xlsx", ".xlsm", ".xltx", ".xltm", ".xlsb", ".xlam", ".ods" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
-	private static FrozenSet<string> _slides = new[] { ".ppt", ".pptx", ".pptm", ".potx", ".potm", ".ppam", ".ppsx", ".ppsm", ".sldx", ".sldm" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
-	private static FrozenSet<string> _access = new[] { ".accdb", ".accde", ".accdt", ".accdr", ".mdb", ".mde", ".mda", ".mdt", ".mdw" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
-	private static FrozenSet<string> _xml = new[] { ".xml", ".xsd", ".xsl", ".xslt", ".xps", ".oxps", ".axaml", ".xaml" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
-	private static FrozenSet<string> _fonts = new[] { ".ttf", ".otf", ".woff", ".woff2", ".eot" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
-	private static FrozenSet<string> _jpeg = new[] { ".jpg", ".jpeg", ".jpe", ".jfif" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
-	private static FrozenSet<string> _rawImage = new[] { ".cr2" }.ToFrozenSet(StringComparer.OrdinalIgnoreCase, true);
+	public static readonly Dictionary<string, FrozenSet<string>> FileTypes = new()
+	{
+		{ "Word", new[] { ".doc", ".docx", ".docm", ".dotx", ".dotm", ".docb", ".odt", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "PowerPoint", new[] { ".ppt", ".pptx", ".pptm", ".potx", ".potm", ".ppam", ".ppsx", ".ppsm", ".sldx", ".sldm", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "Excel", new[] { ".xls", ".xlsx", ".xlsm", ".xltx", ".xltm", ".xlsb", ".xlam", ".ods", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "Access", new[] { ".accdb", ".accde", ".accdt", ".accdr", ".mdb", ".mde", ".mda", ".mdt", ".mdw", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
 
+		{ "Font", new[] { ".ttf", ".otf", ".woff", ".woff2", ".eot", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
 
-	public static async Task<IImage?> GetFileImage(IFileItem? model, IItemProvider provider, int size, Func<bool>? shouldReturnImage = null)
+		{ "Jpeg", new[] { ".jpg", ".jpeg", ".jpe", ".jfif", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "Png", new[] { ".png", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "RawImage", new[] { ".arw", ".cr2", ".cr3", ".dng", ".nef", ".orf", ".raf", ".rw2", ".srw", ".pef", ".3fr", ".mos", ".raw", ".x3f", ".sr2", ".erf", ".fff", ".mfw", ".nrw", ".rwl", ".cap", ".iiq", ".eip", ".kdc", ".fff", ".mef", ".mdc", ".ptx", ".pxn", ".r3d", ".raw", ".rwl", ".rwz", ".srw", ".x3f", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+
+		{ "Archive", new[] { ".zip", ".7z", ".tar", ".gz", ".tgz", ".bz2", ".xz", ".lzma", ".lz", ".lzo", ".z", ".arj", ".cab", ".chm", ".deb", ".lzh", ".rpm", ".udf", ".wim", ".xar", ".zoo", ".war", ".ear", ".sar", ".par", ".tar.gz", ".tar.bz2", ".tar.xz", ".tar.lzma", ".tar.lzo", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+
+		{ "Audio", new[] { ".mp3", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "Video", new[] { ".mp4", ".mov", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+
+		{ "Web", new[] { ".url", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+
+		{ "AdobeIllustrator", new[] { ".ai", ".eps", ".ait", ".aia", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "AdobeDx", new[] { ".xd", ".xdp", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "AdobeAnimate", new[] { ".fla", ".swf", ".jsfl", ".flv", ".xfl", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "AdobeFireworks", new[] { ".fw", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "AdobeInDesign", new[] { ".indd", ".indt", ".idml", ".inx", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "AdobeFramemaker", new[] { ".fm", ".mif", ".fml", ".fmtemplate", ".fmstyles", ".fmindex", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "AdobeAfterEffects", new[] { ".aep", ".aet", ".aepx", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+
+		{ "Xml", new[] { ".xml", ".xsd", ".xsl", ".xslt", ".xps", ".oxps", ".axaml", ".xaml", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "CPlusPlus", new[] { ".cpp", ".h", ".cc", ".cxx", ".h", ".hpp", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "Java", new[] { ".java", ".class", ".jar", ".javadoc", ".javap", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "HTML", new[] { ".html", ".htm", ".shtml", ".shtm", ".xhtml", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "CSS", new[] { ".css", ".scss", ".less", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "JavaScript", new[] { ".js", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+
+		{ "Data", new[] { ".bin", ".dmp", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) },
+		{ "Executable", new[] { ".exe", ".app", }.ToFrozenSet(StringComparer.OrdinalIgnoreCase) }
+	};
+
+	public async static Task<IImage?> GetFileImage(IFileItem? model, IItemProvider provider, int size, Func<bool>? shouldReturnImage = null)
 	{
 		if (model is null || shouldReturnImage is not null && !shouldReturnImage())
 		{
@@ -44,108 +74,63 @@ public static class ThumbnailProvider
 		return await ImageFromData(model, provider, size);
 	}
 
-	private static async Task<IImage?> ImageFromData(IFileItem model, IItemProvider provider, int size)
+	private async static Task<IImage?> ImageFromData(IFileItem model, IItemProvider provider, int size)
 	{
 		return await await Runner.RunSecundairy(() => model?.GetPath((path, imageSize) =>
 		{
 			if (model.IsFolder)
 			{
-				if (OperatingSystem.IsWindows())
+				if (TryGetFromKnownFolder(path, out var result))
 				{
-					foreach (var folder in Enum.GetValues<KnownFolder>())
-					{
-						var folderText = Enum.GetName(folder);
-
-						if (folderText is not null && path.SequenceEqual(KnownFolders.GetPath(folder)))
-						{
-							return GetImageAsync(folderText);
-						}
-					}
+					return result;
 				}
 
-				if (model is FileModel { IsRoot: false })
+				if (TryGetFromDrive(model, out result))
 				{
-					var driveInfo = new DriveInfo(new string(model.Name[0], 1));
-
-					if (driveInfo.IsReady)
-					{
-						return GetImageAsync(Enum.GetName(driveInfo.DriveType));
-					}
+					return result;
 				}
 
-				if (provider.HasItems(model))
-				{
-					return GetImageAsync("FolderFiles");
-				}
+				return provider.HasItems(model)
+					? GetImageAsync("FolderFiles")
+					: GetImageAsync("Folder");
 			}
-			else
+
+			if (model.Extension is { Length: > 1, } extension)
 			{
-				var extension = model.Extension;
-
-				if (_docs.Contains(extension))
+				if (TryGetFromBitmap(model, extension, size, out var result))
 				{
-					return GetImageAsync("Word");
+					return result;
 				}
 
-				if (_sheets.Contains(extension))
+				if (TryGetFromSvg(model, extension, out result))
 				{
-					return GetImageAsync("Excel");
-				}
-				
-				if (_slides.Contains(extension))
-				{
-					return GetImageAsync("PowerPoint");
-				}
-				
-				if (_fonts.Contains(extension))
-				{
-					return GetImageAsync("Font");
-				}
-				
-				if (_access.Contains(extension))
-				{
-					return GetImageAsync("Access");
-				}
-				
-				if (_xml.Contains(extension))
-				{
-					return GetImageAsync("Xml");
-				}
-				
-				if (_jpeg.Contains(extension))
-				{
-					return GetImageAsync("Jpeg");
-				}
-				
-				if (_rawImage.Contains(extension))
-				{
-					return GetImageAsync("RawImage");
+					return result;
 				}
 
-				if (extension is { Length: > 1 })
+				if (TryGetFromKnownExtension(extension, out result))
 				{
-					return GetImageAsync(extension[1..]);
+					return result;
 				}
+
+				return GetFromExtension(extension.AsSpan(1));
 			}
 
-			return model.IsFolder
-				? GetImageAsync("Folder")
-				: GetImageAsync("File"); // Task.FromException<IImage?>(new ArgumentException("No image was found for the item"));
+			return GetImageAsync("File");
 		}, size) ?? Task.FromResult<IImage?>(null)).ConfigureAwait(false);
 	}
 
-	private static async Task<IImage?> ImageFromFileModel(IFileItem model, int size, Func<bool>? shouldReturnImage)
+	private async static Task<IImage?> ImageFromFileModel(IFileItem model, int size, Func<bool>? shouldReturnImage)
 	{
 		return await Runner.RunSecundairy(() => model?.GetPath((path, imageSize) =>
 		{
 			Bitmap? image = null;
 
-			if (shouldReturnImage is null || shouldReturnImage?.Invoke() == true)
+			if (shouldReturnImage is null || shouldReturnImage())
 			{
 				image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly, () => size is < 64 and >= 32);
 			}
 
-			if (image is null && (shouldReturnImage is null || shouldReturnImage?.Invoke() == true))
+			if (image is null && (shouldReturnImage is null || shouldReturnImage()))
 			{
 				image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly, () => true);
 			}
@@ -154,7 +139,7 @@ public static class ThumbnailProvider
 		}, size)).ConfigureAwait(false);
 	}
 
-	public static async Task<IImage?> GetFileImage(FileSystemTreeItem? model, int size, Func<bool>? shouldReturnImage = null)
+	public async static Task<IImage?> GetFileImage(FileSystemTreeItem? model, int size, Func<bool>? shouldReturnImage = null)
 	{
 		if (model is null || shouldReturnImage is not null && !shouldReturnImage())
 		{
@@ -172,7 +157,7 @@ public static class ThumbnailProvider
 					image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.ThumbnailOnly, () => size is < 64 and >= 32);
 				}
 
-				if (image is null && (shouldReturnImage is null || shouldReturnImage?.Invoke() == true))
+				if (image is null && (shouldReturnImage is null || shouldReturnImage()))
 				{
 					image = WindowsThumbnailProvider.GetThumbnail(path, imageSize, imageSize, ThumbnailOptions.IconOnly, () => true);
 				}
@@ -185,72 +170,61 @@ public static class ThumbnailProvider
 		{
 			if (model.IsFolder)
 			{
-				if (OperatingSystem.IsWindows())
+				if (TryGetFromKnownFolder(path, out var result))
 				{
-					foreach (var folder in Enum.GetValues<KnownFolder>())
-					{
-						var folderText = Enum.GetName(folder);
-
-						if (folderText is not null && path.SequenceEqual(KnownFolders.GetPath(folder)))
-						{
-							return GetImageAsync(folderText);
-						}
-					}
+					return result;
 				}
 
-				if (model.Parent is null)
+				if (TryGetFromDrive(model, out result))
 				{
-					var driveInfo = new DriveInfo(new string(model.Value[0], 1));
-
-					if (driveInfo.IsReady)
-					{
-						return GetImageAsync(Enum.GetName(driveInfo.DriveType));
-					}
+					return result;
 				}
 
-				if (model.HasChildren)
-				{
-					return GetImageAsync("FolderFiles");
-				}
+				return model.HasChildren
+					? GetImageAsync("FolderFiles")
+					: GetImageAsync("Folder");
 			}
-			else
+
+			var extension = Path.GetExtension(path);
+
+			if (extension is { Length: > 1, })
 			{
-				var extension = Path.GetExtension(path);
-
-				if (extension is { Length: > 1 })
-				{
-					return GetImageAsync(extension[1..].ToString().ToLower());
-				}
+				return GetFromExtension(extension.Slice(1));
 			}
 
-			return model.IsFolder
-				? GetImageAsync("Folder")
-				: GetImageAsync("File"); // Task.FromException<IImage?>(new ArgumentException("No image was found for the item"));
+			return GetImageAsync("File");
 		}, size) ?? Task.FromResult<IImage?>(null));
 	}
 
-	public static async Task<IImage?> GetImageAsync(string key)
+	public static Task<IImage?> GetImageAsync(ReadOnlySpan<char> key)
 	{
-		if (String.IsNullOrEmpty(key))
+		if (key.IsEmpty)
 		{
-			return null;
+			return Task.FromResult((IImage?) null);
 		}
 
 		var hash = String.GetHashCode(key);
-		
+
 		if (!Images.TryGetValue(hash, out var image))
 		{
-			var source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/{key}.svg", null);
+			var source = new SvgSource();
+			var stream = Avalonia.Platform.AssetLoader.Open(new Uri($"avares://FileExplorer/Assets/Icons/{key}.svg"));
 
-			image = await Dispatcher.UIThread.InvokeAsync(() => new SvgImage
+			source.Load(stream);
+
+			//var source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/{key}.svg", null);
+
+			return Dispatcher.UIThread.InvokeAsync(() => new SvgImage
 			{
-				Source = source,
-			}, DispatcherPriority.Background).GetTask();
-			
-			Images.TryAdd(hash, image);
+				Source = source
+			}, DispatcherPriority.Background).GetTask().ContinueWith((x, keyHash) =>
+			{
+				Images.TryAdd(Unsafe.Unbox<int>(keyHash!), x.Result);
+				return (IImage?) x.Result;
+			}, hash);
 		}
 
-		return image;
+		return Task.FromResult((IImage?) image);
 	}
 
 	public static IImage? GetImage(ReadOnlySpan<char> key)
@@ -268,13 +242,128 @@ public static class ThumbnailProvider
 
 			image = new SvgImage
 			{
-				Source = source,
+				Source = source
 			};
 
 			Images.TryAdd(hash, image);
 		}
 
 		return image;
+	}
+
+	private static bool TryGetFromDrive(IFileItem fileItem, out Task<IImage?> result)
+	{
+		if (fileItem is FileModel { IsRoot: false, })
+		{
+			return TryGetFromDrivePath(new string(fileItem.Name[0], 1), out result);
+		}
+
+		result = Task.FromResult<IImage?>(null);
+		return false;
+	}
+
+	private static bool TryGetFromDrive(FileSystemTreeItem treeItem, out Task<IImage?> result)
+	{
+		if (treeItem is { HasParent: true, })
+		{
+			return TryGetFromDrivePath(new string(treeItem.Value[0], 1), out result);
+		}
+
+		result = Task.FromResult<IImage?>(null);
+		return false;
+	}
+
+	private static bool TryGetFromDrivePath(string path, out Task<IImage?> result)
+	{
+		var driveInfo = new DriveInfo(path);
+
+		if (driveInfo.IsReady)
+		{
+			result = GetImageAsync(Enum.GetName(driveInfo.DriveType));
+			return true;
+		}
+
+		result = Task.FromResult<IImage?>(null);
+		return false;
+	}
+
+	private static bool TryGetFromKnownFolder(ReadOnlySpan<char> path, out Task<IImage?> result)
+	{
+		if (OperatingSystem.IsWindows())
+		{
+			foreach (var folder in Enum.GetValues<KnownFolder>())
+			{
+				var folderText = Enum.GetName(folder);
+
+				if (folderText is not null && path.SequenceEqual(KnownFolders.GetPath(folder)))
+				{
+					result = GetImageAsync(folderText);
+					return true;
+				}
+			}
+		}
+
+		result = Task.FromResult<IImage?>(null);
+		return false;
+	}
+
+	private static bool TryGetFromBitmap(IFileItem fileItem, string extension, int size, out Task<IImage?> result)
+	{
+		if (FileTypes.TryGetValue("Jpeg", out var files) && files.Contains(extension) ||
+		    FileTypes.TryGetValue("Png", out files) && files.Contains(extension))
+		{
+			result = Runner.RunSecundairy(() =>
+			{
+				using var fileStream = new FileStream(fileItem.GetPath(), FileMode.Open, FileAccess.Read, FileShare.Read);
+				return (IImage?) Bitmap.DecodeToWidth(fileStream, size, BitmapInterpolationMode.MediumQuality);
+			});
+
+			return true;
+		}
+
+		result = Task.FromResult<IImage?>(null);
+		return false;
+	}
+
+	private static bool TryGetFromSvg(IFileItem fileItem, ReadOnlySpan<char> extension, out Task<IImage?> result)
+	{
+		if (extension.Equals(".svg", StringComparison.OrdinalIgnoreCase))
+		{
+			var source = SvgSource.Load<SvgSource>(fileItem.GetPath(), null);
+
+			result = Dispatcher.UIThread.InvokeAsync(() => (IImage?) new SvgImage
+			{
+				Source = source
+			}, DispatcherPriority.Background).GetTask();
+
+			return true;
+		}
+
+		result = Task.FromResult<IImage?>(null);
+		return false;
+	}
+
+	private static bool TryGetFromKnownExtension(string extension, out Task<IImage?> result)
+	{
+		foreach (var (fileName, extensions) in FileTypes)
+		{
+			if (extensions.Contains(extension))
+			{
+				result = GetImageAsync(fileName);
+				return true;
+			}
+		}
+
+		result = Task.FromResult<IImage?>(null);
+		return false;
+	}
+
+	private static Task<IImage?> GetFromExtension(ReadOnlySpan<char> extension)
+	{
+		Span<char> extensionSpan = stackalloc char[extension.Length];
+		extensionSpan = extensionSpan.Slice(0, extension.ToLower(extensionSpan, CultureInfo.CurrentCulture));
+
+		return GetImageAsync(extensionSpan);
 	}
 }
 

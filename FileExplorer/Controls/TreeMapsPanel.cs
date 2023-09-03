@@ -46,11 +46,11 @@ public class TreeMapsPanel : Panel
 	/// </summary>
 	public static double GetWeight(AvaloniaObject element)
 	{
-		if (element is ContentPresenter { Content: ExtensionModel model })
+		if (element is ContentPresenter { Content: ExtensionModel model, })
 		{
 			return model.TotalSize;
 		}
-		else if (element is ContentPresenter { Content: FileIndexModel indexModel })
+		else if (element is ContentPresenter { Content: FileIndexModel indexModel, })
 		{
 			if (indexModel.IsFolder)
 			{

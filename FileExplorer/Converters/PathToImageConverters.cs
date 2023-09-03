@@ -11,7 +11,7 @@ namespace FileExplorer.Converters;
 
 public sealed class PathToImageConverter : IValueConverter, IMultiValueConverter, ISingleton<PathToImageConverter>
 {
-	public static readonly PathToImageConverter Instance = new();
+	public static PathToImageConverter Instance { get; } = new();
 
 	public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
 	{
@@ -33,7 +33,7 @@ public sealed class PathToImageConverter : IValueConverter, IMultiValueConverter
 				FileSystemTreeItem treeItem => ThumbnailProvider.GetFileImage(treeItem, size),
 				TabItemViewModel model => ThumbnailProvider.GetFileImage(model.CurrentFolder, model.Provider, size),
 				string path => ThumbnailProvider.GetFileImage(FileSystemTreeItem.FromPath(path), size),
-				_ => null,
+				_ => null
 			};
 
 			if (task is not null)
@@ -52,9 +52,9 @@ public sealed class PathToImageConverter : IValueConverter, IMultiValueConverter
 
 	public object? Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
 	{
-		if (values is [IFileItem item, IItemProvider provider])
+		if (values is [IFileItem item, IItemProvider provider, int size,])
 		{
-			return new TaskCompletionNotifier<IImage?>(provider.GetThumbnailAsync(item, 100, CancellationToken.None));
+			return new TaskCompletionNotifier<IImage?>(provider.GetThumbnailAsync(item, size, CancellationToken.None));
 		}
 
 		return null;

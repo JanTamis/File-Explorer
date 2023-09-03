@@ -7,23 +7,23 @@
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-      <LangVersion>preview</LangVersion>
+        <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-      <LangVersion>preview</LangVersion>
+        <LangVersion>preview</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\FileExplorer.Core\FileExplorer.Core.csproj" />
+        <ProjectReference Include="..\FileExplorer.Core\FileExplorer.Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="AsyncImageLoader.Avalonia" Version="3.0.0-avalonia11-preview2" />
-        <PackageReference Include="Azure.Identity" Version="1.6.1" />
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0-preview.6.22324.4" />
-        <PackageReference Include="Microsoft.Graph" Version="4.37.0" />
-      <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+        <PackageReference Include="AsyncImageLoader.Avalonia" Version="3.2.0"/>
+        <PackageReference Include="Azure.Identity" Version="1.6.1"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0-preview.6.22324.4"/>
+        <PackageReference Include="Microsoft.Graph" Version="4.37.0"/>
+        <PackageReference Include="System.Linq.Async" Version="6.0.1"/>
     </ItemGroup>
 
 </Project>

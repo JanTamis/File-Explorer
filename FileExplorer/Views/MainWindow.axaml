@@ -125,6 +125,7 @@
 
 					<Border Grid.Column="1" IsHitTestVisible="False">
 						<TextBlock Text="FileHub"
+						           VerticalAlignment="Center"
 						           Classes="Headline6"
 						           Margin="100, 0, 0, 0"
 						           HorizontalAlignment="Left" />
@@ -162,6 +163,7 @@
 							<StackPanel Orientation="Horizontal">
 								<TextBox MinWidth="75"
 								         x:Name="searchBar"
+								         Padding="0 5 0 0"
 								         Foreground="{DynamicResource PrimaryHueLightForegroundBrush}"
 								         Text="{Binding CurrentTab.Search}"
 								         Watermark="{resources:Resource Search}" />
@@ -195,7 +197,6 @@
 				</controls:Card.Transitions>
 
 				<ListBox ItemsSource="{Binding Folders}"
-
 				         Margin="0 10 0 0"
 				         SelectedItem="{Binding CurrentFolder}">
 					<ListBox.ItemTemplate>
@@ -207,6 +208,7 @@
 								       Height="35" />
 
 								<TextBlock Text="{Binding Name}"
+								           VerticalAlignment="Center"
 								           FontWeight="Normal"
 								           Foreground="{DynamicResource MaterialDesignBody}" />
 							</StackPanel>
@@ -274,6 +276,7 @@
 										<TextBlock Text="{Binding}"
 										           FontSize="14"
 										           FontWeight="Normal"
+										           VerticalAlignment="Center"
 										           TextTrimming="CharacterEllipsis"
 										           Foreground="{DynamicResource MaterialDesignBody}" />
 									</StackPanel>
@@ -385,20 +388,13 @@
 					               Margin="0"
 					               IsPointerOver="{Binding CurrentTab.PointerOverAmount, Mode=OneWayToSource}"
 					               assist:ShadowAssist.ShadowDepth="CenterDepth2">
-						<controls:Card.Transitions>
-							<Transitions>
-								<DoubleTransition Duration="0:0:0.1"
-								                  Property="Width"
-								                  Easing="CubicEaseInOut" />
-								<DoubleTransition Duration="0:0:0.1"
-								                  Property="Height"
-								                  Easing="CubicEaseInOut" />
-							</Transitions>
-						</controls:Card.Transitions>
-
-						<TextBlock Text="{Binding CurrentTab.FileCountText}"
-						           HorizontalAlignment="Center"
-						           FontSize="16" />
+						<StackPanel>
+							<ContentPresenter Content="{Binding CurrentTab.PopupControl}" />
+							<TextBlock Text="{Binding CurrentTab.FileCountText}"
+							           HorizontalAlignment="Center"
+							           FontSize="16" />
+						</StackPanel>
+						
 					</controls:Card>
 				</StackPanel>
 			</Grid>

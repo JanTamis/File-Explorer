@@ -7,21 +7,25 @@
              xmlns:interfaces="using:FileExplorer.Core.Interfaces"
              xmlns:converters="using:FileExplorer.Converters"
              xmlns:displayViews="clr-namespace:FileExplorer.DisplayViews"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewmodels:TabItemViewModel"
              x:Class="FileExplorer.DisplayViews.FileGrid">
+	<UserControl.Resources>
+		<system:Int32 x:Key="ItemWidth">75</system:Int32>
+	</UserControl.Resources>
 	<ScrollViewer>
 		<ItemsRepeater ItemsSource="{Binding Files}"
 		               Margin="0"
 		               x:Name="fileList">
 			<ItemsRepeater.Layout>
-				<controls:FixedWrapPanel />
+				<controls:FixedWrapPanel ItemWidth="175" />
 			</ItemsRepeater.Layout>
 
 			<ItemsRepeater.ItemTemplate>
 				<DataTemplate DataType="interfaces:IFileItem">
 					<ToggleButton Padding="0 5 0 0"
-					             Height="100"
+					             Height="110"
 					             IsChecked="{Binding IsSelected}"
 					             ToolTip.Tip="{Binding ToolTipText}"
 					             Margin="0">
@@ -31,6 +35,7 @@
 							</Style>
 							<Style Selector="ToggleButton:checked">
 								<Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
+								<Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
 							</Style>
 						</ToggleButton.Styles>
 						<StackPanel>
@@ -39,6 +44,7 @@
 									<MultiBinding Converter="{x:Static converters:PathToImageConverter.Instance}">
 										<Binding Path="$parent[ToggleButton].DataContext" />
 										<Binding Path="$parent[displayViews:FileGrid].DataContext.Provider" />
+										<Binding Source="{StaticResource ItemWidth}" />
 									</MultiBinding>
 								</Panel.DataContext>
 
@@ -69,7 +75,6 @@
 								       IsVisible="{Binding IsSuccessfullyCompleted}" />
 							</Panel>
 							<TextBlock Text="{Binding Name}"
-							           Foreground="{DynamicResource MaterialDesignBody}"
 							           Margin="10 0"
 							           TextTrimming="CharacterEllipsis"
 							           HorizontalAlignment="Center"

@@ -6,17 +6,17 @@ namespace FileExplorer.ViewModels;
 
 public sealed class ViewModelBase : INotifyPropertyChanged
 {
-	public event PropertyChangedEventHandler PropertyChanged = delegate { };
+	public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
 	public async ValueTask OnPropertyChanged([CallerMemberName] string? name = null)
 	{
 		if (Dispatcher.UIThread.CheckAccess())
 		{
-			PropertyChanged(this, new PropertyChangedEventArgs(name));
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 		}
 		else
 		{
-			await Dispatcher.UIThread.InvokeAsync(() => PropertyChanged(this, new PropertyChangedEventArgs(name)));
+			await Dispatcher.UIThread.InvokeAsync(() => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name)));
 		}
 	}
 

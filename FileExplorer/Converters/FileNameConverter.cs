@@ -17,15 +17,13 @@ public sealed class FileNameConverter : IValueConverter
 
 				return String.IsNullOrEmpty(name) ? path : Path.GetFileName(path);
 			}
-			case "":
-				return "Quick Start";
 			case string path:
 				return Path.GetFileName(path).Split('.')[^2];
 			case FileModel model:
 				return model.Name;
 			case FileSystemTreeItem treeItem:
 				return treeItem.Value;
-			case null:
+			case null or "":
 				return "Quick Start";
 			default:
 				return String.Empty;

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0" y1="0.5" x2="1" y2="0.5" id="gradient_1">
+      <stop offset="0%" stop-color="#11408A" />
+      <stop offset="100%" stop-color="#103F8F" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0" y1="0.5" x2="1" y2="0.5" id="gradient_2">
+      <stop offset="0%" stop-color="#1D59B3" />
+      <stop offset="100%" stop-color="#195BBC" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0" y1="0.50000006" x2="1" y2="0.50000006" id="gradient_3">
+      <stop offset="0%" stop-color="#3079D6" />
+      <stop offset="100%" stop-color="#297CD2" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0" y1="0.5" x2="1" y2="0.5" id="gradient_4">
+      <stop offset="0%" stop-color="#42A3F2" />
+      <stop offset="100%" stop-color="#42A4EB" />
+    </linearGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <path d="M22 0L22 0L22 22L0 22L0 0L22 0Z" id="path_2" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" clip-rule="evenodd" fill-rule="evenodd" />
+    </clipPath>
+    <clipPath id="clip_2">
+      <use xlink:href="#path_2" clip-rule="evenodd" fill-rule="evenodd" />
+    </clipPath>
+  </defs>
+  <g id="Database" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Database" fill="none" stroke="none" />
+    <path d="M40 28L8 28C8 28 8 38.271 8 39C8 41.209 15.163 43 24 43C32.837 43 40 41.209 40 39C40 38.271 40 28 40 28L40 28Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M40 18L8 18C8 18 8 28.271 8 29C8 31.209 15.163 33 24 33C32.837 33 40 31.209 40 29C40 28.271 40 18 40 18L40 18Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M40 8L8 8C8 8 8 17.756 8 18.5C8 20.433 15.163 22 24 22C32.837 22 40 20.433 40 18.5C40 17.756 40 8 40 8L40 8Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+    <path d="M8 8C8 6.34315 15.1634 5 24 5C32.8366 5 40 6.34315 40 8C40 9.65685 32.8366 11 24 11C15.1634 11 8 9.65685 8 8Z" id="Oval" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
+    <g id="Musical Notes" clip-path="url(#clip_2)" transform="translate(22 24)">
+      <path d="M22 0L22 0L22 22L0 22L0 0L22 0Z" id="Musical-Notes" fill="none" stroke="none" />
+      <path d="M15.5833 13.2917C14.0644 13.2917 12.8333 14.5228 12.8333 16.0417C12.8333 17.5606 14.0644 18.7917 15.5833 18.7917C17.1023 18.7917 18.3333 17.5606 18.3333 16.0417C18.3333 14.5228 17.1023 13.2917 15.5833 13.2917L15.5833 13.2917Z" id="Shape" fill="#ED3675" stroke="none" />
+      <path d="M4.58333 14.2083C3.06442 14.2083 1.83333 15.4394 1.83333 16.9583C1.83333 18.4773 3.06442 19.7083 4.58333 19.7083C6.10225 19.7083 7.33333 18.4773 7.33333 16.9583C7.33333 15.4394 6.10225 14.2083 4.58333 14.2083L4.58333 14.2083Z" id="Shape" fill="#ED3675" stroke="none" />
+      <path d="M16.5 2.9283L7.33333 4.92067L7.33333 9.04567L16.5 7.0533L16.5 2.9283Z" id="Polygon" fill="#CC1B4E" fill-rule="evenodd" stroke="none" />
+      <path d="M17.2219 2.31274L6.22188 4.70341C5.80067 4.79554 5.5 5.16816 5.5 5.59945L5.5 16.9583L7.33333 16.9583L7.33333 6.87499L16.5 4.88262L16.5 16.0417L18.3333 16.0417L18.3333 3.20879C18.3333 2.62395 17.7934 2.18854 17.2219 2.31274L17.2219 2.31274Z" id="Shape" fill="#ED3675" stroke="none" />
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.31135002" y1="-0.033424854" x2="0.6688" y2="0.97722507" id="gradient_1">
+      <stop offset="0%" stop-color="#7DD8F3" />
+      <stop offset="100%" stop-color="#45B0D0" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.0021152496" y1="0.5" x2="0.9978844" y2="0.5" id="gradient_2">
+      <stop offset="0%" stop-color="#3079D6" />
+      <stop offset="100%" stop-color="#297CD2" />
+    </linearGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="CD" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="CD" fill="none" stroke="none" />
+    <path d="M4 24C4 12.9543 12.9543 4 24 4C35.0457 4 44 12.9543 44 24C44 35.0457 35.0457 44 24 44C12.9543 44 4 35.0457 4 24Z" id="Circle" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+    <path d="M16.2 24.2C16.2 19.8922 19.6922 16.4 24 16.4C28.3078 16.4 31.8 19.8922 31.8 24.2C31.8 28.5078 28.3078 32 24 32C19.6922 32 16.2 28.5078 16.2 24.2Z" id="Circle" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+    <path d="M20.9 24.2C20.9 22.4879 22.2879 21.1 24 21.1C25.7121 21.1 27.1 22.4879 27.1 24.2C27.1 25.9121 25.7121 27.3 24 27.3C22.2879 27.3 20.9 25.9121 20.9 24.2Z" id="Circle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+    <path d="M24 39C23.447 39 23 38.552 23 38C23 37.448 23.447 37 24 37C31.168 37 37 31.168 37 24C37 23.448 37.447 23 38 23C38.553 23 39 23.448 39 24C39 32.271 32.271 39 24 39L24 39Z" id="Shape" fill="#EDEDED" stroke="none" />
+    <path d="M10 26C9.447 26 9 25.552 9 25C9 16.178 16.178 9 25 9C25.553 9 26 9.448 26 10C26 10.552 25.553 11 25 11C17.28 11 11 17.28 11 25C11 25.552 10.553 26 10 26L10 26Z" id="Shape" fill="#EDEDED" stroke="none" />
+  </g>
+</svg>

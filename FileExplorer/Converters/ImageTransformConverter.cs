@@ -10,7 +10,7 @@ public sealed class ImageTransformConverter : IValueConverter
 	{
 		return value is true 
 			? new ScaleTransform(1, -1) 
-			: null;
+			: new ScaleTransform(1, 1);
 	}
 
 	public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

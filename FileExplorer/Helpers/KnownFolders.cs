@@ -21,7 +21,7 @@ public static class KnownFolders
 		"{33E28130-4E1E-4676-835A-98395C3BC3BB}", // Pictures
 		"{4C5C32FF-BB9D-43B0-B5B4-2D72E54EAAA4}", // SavedGames
 		"{7D1D3A04-DEBB-4115-95CF-2F29DA2920DA}", // SavedSearches
-		"{18989B1D-99B5-455B-841C-AB7C74E4DDFC}", // Videos
+		"{18989B1D-99B5-455B-841C-AB7C74E4DDFC}" // Videos
 	};
 
 	/// <summary>

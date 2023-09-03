@@ -4,6 +4,8 @@
     <option name="projectPerEditor">
       <map>
         <entry key="FileExplorer/App.axaml" value="FileExplorer/FileExplorer.csproj" />
+        <entry key="FileExplorer/Controls/ProgressChart.axaml" value="FileExplorer/FileExplorer.csproj" />
+        <entry key="FileExplorer/Controls/Test.axaml" value="FileExplorer/FileExplorer.csproj" />
         <entry key="FileExplorer/DisplayViews/AnalyzerView.axaml" value="FileExplorer/FileExplorer.csproj" />
         <entry key="FileExplorer/DisplayViews/FileDataGrid.axaml" value="FileExplorer/FileExplorer.csproj" />
         <entry key="FileExplorer/DisplayViews/FileGrid.axaml" value="FileExplorer/FileExplorer.csproj" />

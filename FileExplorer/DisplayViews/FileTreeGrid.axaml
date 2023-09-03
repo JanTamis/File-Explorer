@@ -2,87 +2,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:interfaces="using:FileExplorer.Core.Interfaces"
-             xmlns:converters="using:FileExplorer.Converters"
-             xmlns:controls="clr-namespace:FileExplorer.Controls"
              xmlns:viewModels="clr-namespace:FileExplorer.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:DataType="viewModels:TabItemViewModel"
              x:Class="FileExplorer.DisplayViews.FileTreeGrid">
 	
 	<TreeDataGrid Name="fileList">
-		<TreeDataGrid.Styles>
-			<Style Selector="TreeDataGridRow">
-				
-			</Style>
-		</TreeDataGrid.Styles>
+		
 	</TreeDataGrid>
-	
-	<!-- <ScrollViewer Classes="MiniBar"> -->
-	<!-- 	<ItemsRepeater ItemsSource="{Binding Files}" -->
-	<!-- 	               VerticalCacheLength="0" -->
-	<!-- 	               Margin="10 0 10 5" -->
-	<!-- 	               x:Name="fileList"> -->
-	<!-- 		<ItemsRepeater.Layout> -->
-	<!-- 			<controls:FixedWrapPanel /> -->
-	<!-- 		</ItemsRepeater.Layout> -->
-	<!-- 		 -->
-	<!-- 		<ItemsRepeater.ItemTemplate> -->
-	<!-- 			<DataTemplate DataType="interfaces:IFileItem"> -->
-	<!-- 				~1~ <ListBoxItem Background="Transparent" @1@ -->
-	<!-- 				~1~              CornerRadius="20" @1@ -->
-	<!-- 				~1~              Padding="0" @1@ -->
-	<!-- 				~1~              Margin="10"> @1@ -->
-	<!-- 					<Border CornerRadius="5" -->
-	<!-- 					        Background="{DynamicResource MaterialDesignCardBackground}"> -->
-	<!-- 						<StackPanel> -->
-	<!-- 							<Border Background="{DynamicResource MaterialDesignTextFieldBoxBackground}" -->
-	<!-- 							        CornerRadius="0, 0, 5, 5" -->
-	<!-- 							        Padding="5, 2.5" -->
-	<!-- 							        Height="40"> -->
-	<!-- 								<TextBlock Text="{Binding Name}" -->
-	<!-- 								           TextWrapping="WrapWithOverflow" -->
-	<!-- 								           HorizontalAlignment="Center" -->
-	<!-- 								           VerticalAlignment="Center" /> -->
-	<!-- 							</Border> -->
-	<!-- 						</StackPanel> -->
-	<!-- 					</Border> -->
-	<!-- 				~1~ </ListBoxItem> @1@ -->
-	<!-- 			</DataTemplate> -->
-	<!-- 		</ItemsRepeater.ItemTemplate> -->
-	<!-- -->
-	<!-- 		<ItemsRepeater.Styles> -->
-	<!-- 			<Style Selector="ListBoxItem:selected"> -->
-	<!-- 				<Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" /> -->
-	<!-- 			</Style> -->
-	<!-- 		</ItemsRepeater.Styles> -->
-	<!-- -->
-	<!-- 	</ItemsRepeater> -->
-	<!-- </ScrollViewer> -->
-	
-	<!-- <ScrollViewer Classes="MiniBar"> -->
-	<!-- 	<ItemsRepeater ItemsSource="{Binding Files}"> -->
-	<!-- 		<ItemsRepeater.Layout> -->
-	<!-- 			<StackLayout /> -->
-	<!-- 		</ItemsRepeater.Layout> -->
-	<!-- 		 -->
-	<!-- 		<ItemsRepeater.ItemTemplate> -->
-	<!-- 			<DataTemplate DataType="interfaces:IFileItem"> -->
-	<!-- 				<ListBoxItem Background="Transparent" -->
-	<!-- 				             CornerRadius="20" -->
-	<!-- 				             Padding="0" -->
-	<!-- 				             Margin="10"> -->
-	<!-- 					 -->
-	<!-- 				</ListBoxItem> -->
-	<!-- 			</DataTemplate> -->
-	<!-- 		</ItemsRepeater.ItemTemplate> -->
-	<!-- -->
-	<!-- 		<ItemsRepeater.Styles> -->
-	<!-- 			<Style Selector="ListBoxItem:selected"> -->
-	<!-- 				<Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" /> -->
-	<!-- 			</Style> -->
-	<!-- 		</ItemsRepeater.Styles> -->
-	<!-- -->
-	<!-- 	</ItemsRepeater> -->
-	<!-- </ScrollViewer> -->
 </UserControl>

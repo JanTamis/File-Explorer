@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Tracing;
 using System.Globalization;
 using Avalonia.Media;
 using FileExplorer.Core.Interfaces;
@@ -10,10 +9,8 @@ using FileExplorer.Models;
 using Microsoft.Extensions.Caching.Memory;
 using System.IO;
 using System.IO.Enumeration;
-using System.Runtime.Versioning;
 using System.Text;
 using System.Text.RegularExpressions;
-using Avalonia.Svg;
 using Avalonia.Svg.Skia;
 using DialogHostAvalonia;
 using FileExplorer.Core.Extensions;
@@ -30,67 +27,27 @@ namespace FileExplorer.Providers;
 
 public sealed class FileSystemProvider : IItemProvider
 {
-	private readonly MemoryCache? _imageCache;
+	// private readonly MemoryCache? _imageCache = new(new MemoryCacheOptions
+	// {
+	// 	ExpirationScanFrequency = TimeSpan.FromMinutes(1)
+	// });
 
-	private IFileItem[]? _clipboard;
+	private IEnumerable<IFileItem> _clipboard = Enumerable.Empty<IFileItem>();
 
-	private static readonly CompositeFormat _deleteFormat = CompositeFormat.Parse(ResourceDefault.DeleteTextformat);
-
-	public FileSystemProvider()
-	{
-		_imageCache = new MemoryCache(new MemoryCacheOptions
-		{
-			ExpirationScanFrequency = TimeSpan.FromMinutes(1),
-		});
-	}
+	private static readonly CompositeFormat DeleteFormat = CompositeFormat.Parse(ResourceDefault.DeleteTextformat);
 
 	public IAsyncEnumerable<IFileItem> GetItemsAsync(IFileItem folder, string filter, bool recursive, CancellationToken token)
 	{
-		if (folder is FileModel model)
-		{
-			IEnumerable<FileSystemTreeItem> enumerable;
-
-			if (filter is "*" or "*.*")
-			{
-				enumerable = recursive
-					? model.TreeItem.EnumerateChildrenRecursive()
-					: model.TreeItem.EnumerateChildren();
-			}
-			else
-			{
-				enumerable = recursive
-					? model.TreeItem.EnumerateChildrenRecursive(name => FileSystemName.MatchesSimpleExpression(filter, name) || Regex.IsMatch(name, filter))
-					: model.TreeItem.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name) || Regex.IsMatch(name, filter));
-			}
-
-			return enumerable
-				.Select(s => new FileModel(s))
-				.ToAsyncEnumerable();
-		}
-
-		return AsyncEnumerable.Empty<IFileItem>();
+		return GetItems(folder, filter, recursive, token)
+			.ToAsyncEnumerable();
 	}
 
 	public IEnumerable<IFileItem> GetItems(IFileItem folder, string filter, bool recursive, CancellationToken token)
 	{
 		if (folder is FileModel model)
 		{
-			IEnumerable<FileSystemTreeItem> enumerable;
-
-			if (filter is "*" or "*.*")
-			{
-				enumerable = recursive
-					? model.TreeItem.EnumerateChildrenRecursive()
-					: model.TreeItem.EnumerateChildren();
-			}
-			else
-			{
-				enumerable = recursive
-					? model.TreeItem.EnumerateChildrenRecursive(name => FileSystemName.MatchesSimpleExpression(filter, name)) // || Regex.IsMatch(name, filter))
-					: model.TreeItem.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name)); // || Regex.IsMatch(name, filter));
-			}
-
-			return enumerable.Select(s => new FileModel(s));
+			return GetEnumerable(model.TreeItem, filter, recursive)
+				.Select(s => new FileModel(s));
 		}
 
 		return Enumerable.Empty<IFileItem>();
@@ -98,12 +55,12 @@ public sealed class FileSystemProvider : IItemProvider
 
 	public bool HasItems(IFileItem folder)
 	{
-		return folder is FileModel { TreeItem.HasChildren: true };
+		return folder is FileModel { TreeItem.HasChildren: true, };
 	}
 
 	public ValueTask<IEnumerable<IPathSegment>> GetPathAsync(IFileItem folder)
 	{
-		if (folder is FileModel { TreeItem: not null } file)
+		if (folder is FileModel { TreeItem: not null, } file)
 		{
 			return ValueTask.FromResult(file.TreeItem
 				.EnumerateToRoot()
@@ -117,12 +74,9 @@ public sealed class FileSystemProvider : IItemProvider
 
 	public ValueTask<IFileItem?> GetParentAsync(IFileItem folder, CancellationToken token)
 	{
-		if (folder is FileModel { TreeItem.Parent: not null } file)
-		{
-			return new ValueTask<IFileItem?>(new FileModel(file.TreeItem.Parent));
-		}
-
-		return new ValueTask<IFileItem?>(null as IFileItem);
+		return folder is FileModel { TreeItem.Parent: not null, } file
+			? new ValueTask<IFileItem?>(new FileModel(file.TreeItem.Parent))
+			: new ValueTask<IFileItem?>(null as IFileItem);
 	}
 
 	public async Task<IImage?> GetThumbnailAsync(IFileItem? item, int size, CancellationToken token)
@@ -157,16 +111,9 @@ public sealed class FileSystemProvider : IItemProvider
 			var bag = new ConcurrentQueue<Task>();
 			bag.Enqueue(Run(bag, model.TreeItem, pattern, action, token));
 
-			try
+			while (bag.TryDequeue(out var task))
 			{
-				while (bag.TryDequeue(out var task))
-				{
-					await task;
-				}
-			}
-			catch (Exception)
-			{
-
+				await task;
 			}
 		}
 
@@ -179,7 +126,7 @@ public sealed class FileSystemProvider : IItemProvider
 				using var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(folder.GetPath(), FileSystemTreeItem.Options)
 				{
 					Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, folder),
-					Find = (ref FileSystemEntry entry) => entry.IsDirectory || FileSystemName.MatchesSimpleExpression(pattern, entry.FileName),
+					Find = (ref FileSystemEntry entry) => entry.IsDirectory || FileSystemName.MatchesSimpleExpression(pattern, entry.FileName) || IsCategory(entry.FileName, pattern)
 				};
 
 				while (enumerable.MoveNext() && !token.IsCancellationRequested)
@@ -190,7 +137,7 @@ public sealed class FileSystemProvider : IItemProvider
 					{
 						bag.Enqueue(Run(bag, item, pattern, action, token));
 
-						if (FileSystemName.MatchesSimpleExpression(pattern, item.Value))
+						if (FileSystemName.MatchesSimpleExpression(pattern, item.Value) || IsCategory(item.Value, pattern))
 						{
 							action(new FileModel(item));
 						}
@@ -220,7 +167,6 @@ public sealed class FileSystemProvider : IItemProvider
 			}
 			catch (Exception)
 			{
-
 			}
 		}
 
@@ -235,7 +181,7 @@ public sealed class FileSystemProvider : IItemProvider
 				using var enumerable = new DelegateFileSystemEnumerator<FileSystemTreeItem>(folder.GetPath(), FileSystemTreeItem.Options)
 				{
 					Transformation = (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, folder),
-					Find = (ref FileSystemEntry entry) => entry.IsDirectory || FileSystemName.MatchesSimpleExpression(pattern, entry.FileName),
+					Find = (ref FileSystemEntry entry) => entry.IsDirectory || FileSystemName.MatchesSimpleExpression(pattern, entry.FileName)
 				};
 
 				while (enumerable.MoveNext() && !token.IsCancellationRequested)
@@ -301,19 +247,19 @@ public sealed class FileSystemProvider : IItemProvider
 	{
 		_clipboard = model.Files
 			.Where(w => w.IsSelected)
-			.ToArray();
+			.ToList();
 	}
 
 	private void Copy(MenuItemActionModel model)
 	{
 		_clipboard = model.Files
 			.Where(w => w.IsSelected)
-			.ToArray();
+			.ToList();
 	}
 
 	private void Paste(MenuItemActionModel model)
 	{
-		if (_clipboard is null or { Length: 0 })
+		if (_clipboard?.Any() == true)
 		{
 			return;
 		}
@@ -322,7 +268,7 @@ public sealed class FileSystemProvider : IItemProvider
 
 		progress.Loaded += async delegate
 		{
-			var maxLength = (double)_clipboard
+			var maxLength = (double) _clipboard
 				.Select(s => new FileInfo(s.GetPath()).Length)
 				.Sum();
 
@@ -338,7 +284,7 @@ public sealed class FileSystemProvider : IItemProvider
 
 				while (await timer.WaitForNextTickAsync() && !isDone)
 				{
-					progress.Speed = (length - previousLength) * (long)(1000d / interval);
+					progress.Speed = (length - previousLength) * (long) (1000d / interval);
 					progress.EstimateTime = $"Estimated time: {EstimateTime(Stopwatch.GetElapsedTime(startTime), progress.Process):hh\\:mm\\:ss}";
 
 					previousLength = length;
@@ -400,13 +346,13 @@ public sealed class FileSystemProvider : IItemProvider
 
 			var choice = new Choice
 			{
-				Message = String.Format(CultureInfo.CurrentCulture, _deleteFormat, selectedCount, itemText),
+				Message = String.Format(CultureInfo.CurrentCulture, DeleteFormat, selectedCount, itemText),
 				CloseText = ResourceDefault.Close,
 				SubmitText = ResourceDefault.Delete,
 				Image = new SvgImage
 				{
-					Source = SvgSource.Load<SvgSource>("avares://FileExplorer/Assets/UIIcons/Question.svg", null),
-				},
+					Source = SvgSource.Load<SvgSource>("avares://FileExplorer/Assets/UIIcons/Question.svg", null)
+				}
 			};
 
 			choice.OnSubmit += delegate
@@ -448,7 +394,7 @@ public sealed class FileSystemProvider : IItemProvider
 
 		var folderQuery = new FileSystemEnumerable<FileIndexModel>(path, (ref FileSystemEntry x) => new FileIndexModel(FileSystemTreeItem.FromPath(x.ToFullPath())), options)
 		{
-			ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory,
+			ShouldIncludePredicate = (ref FileSystemEntry x) => x.IsDirectory
 		};
 
 		analyzer.Initialized += delegate
@@ -506,16 +452,56 @@ public sealed class FileSystemProvider : IItemProvider
 		model.Popup = new Properties
 		{
 			Provider = this,
-			Model = model.CurrentFolder,
+			Model = model.CurrentFolder
 		};
 	}
 
-	private void Zip(MenuItemActionModel model)
+	private void Zip(MenuItemActionModel? model)
 	{
-		model.Popup = new Zip
+		if (model?.Files is not null)
 		{
-			SelectedFiles =  model.Files.Where(w => w.IsSelected).ToList(),
-			Folder = model.CurrentFolder,
-		};
+			model.Popup = new Zip
+			{
+				SelectedFiles = model.Files.Where(w => w.IsSelected).ToList(),
+				Folder = model.CurrentFolder
+			};
+		}
+	}
+
+	private static bool IsCategory(ReadOnlySpan<char> name, string filter)
+	{
+		var extension = Path.GetExtension(name).ToString();
+
+		if (filter.Contains("[Images]", StringComparison.CurrentCultureIgnoreCase) &&
+		    (ThumbnailProvider.FileTypes.TryGetValue("Jpeg", out var files) && files.Contains(extension) ||
+		     ThumbnailProvider.FileTypes.TryGetValue("Png", out files) && files.Contains(extension) ||
+		     ThumbnailProvider.FileTypes.TryGetValue("RawImage", out files) && files.Contains(extension)))
+		{
+			return true;
+		}
+
+		foreach (var (groupName, extensions) in ThumbnailProvider.FileTypes)
+		{
+			if (filter.Contains($"[{groupName}]", StringComparison.CurrentCultureIgnoreCase) && extensions.Contains(extension))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private IEnumerable<FileSystemTreeItem> GetEnumerable(FileSystemTreeItem item, string filter, bool recursive)
+	{
+		if (filter is "*" or "*.*")
+		{
+			return recursive
+				? item.EnumerateChildrenRecursive()
+				: item.EnumerateChildren();
+		}
+
+		return recursive
+			? item.EnumerateChildrenRecursive(name => FileSystemName.MatchesSimpleExpression(filter, name) || IsCategory(name, filter)) // || Regex.IsMatch(name, filter))
+			: item.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name) || IsCategory(name, filter)); // || Regex.IsMatch(name, filter));
 	}
 }

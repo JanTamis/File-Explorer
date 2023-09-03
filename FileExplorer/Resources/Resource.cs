@@ -1,5 +1,4 @@
 using Avalonia.Markup.Xaml;
-using FileExplorer.Resources;
 
 namespace FileExplorer.Resources;
 

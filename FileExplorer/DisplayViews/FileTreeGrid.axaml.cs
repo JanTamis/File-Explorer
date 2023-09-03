@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Data;
 using System.Globalization;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -9,13 +10,20 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
 using Avalonia.Data.Converters;
+using Avalonia.Data.Core;
+using Avalonia.Data.Core.Plugins;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
+using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings;
+using Avalonia.Media;
 using Avalonia.Svg.Skia;
+using Avalonia.Threading;
 using FileExplorer.Converters;
 using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
+using FileExplorer.Helpers;
 using FileExplorer.Interfaces;
 using FileExplorer.Resources;
 using Humanizer;
@@ -28,30 +36,19 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 
 	private const int ImageSize = 30;
 
-	private static PropertyInfo? isSelectedProperty = typeof(TreeDataGridRow).GetProperty(nameof(TreeDataGridRow.IsSelected));
+	private static readonly PropertyInfo? IsSelectedProperty = typeof(TreeDataGridRow).GetProperty(nameof(TreeDataGridRow.IsSelected));
 
 	public IItemProvider? Provider { get; set; }
 
 	private ObservableRangeCollection<IFileItem> _items;
 
-	// public ObservableRangeCollection<IFileItem> Items
-	// {
-	// 	get => _items;
-	// 	set
-	// 	{
-	// 		OnPropertyChanged(ref _items, value);
-	//
-	// 		fileList.ItemsSource = value;
-	// 	}
-	// }
-
-	public ObservableRangeCollection<IFileItem> Items
+	public ObservableRangeCollection<IFileItem>? Items
 	{
 		get
 		{
-			if (fileList is { Source: HierarchicalTreeDataGridSource<IFileItem> source })
+			if (fileList is { Source.Items: ObservableRangeCollection<IFileItem> items, })
 			{
-				return source.Items as ObservableRangeCollection<IFileItem>;
+				return items;
 			}
 
 			return default;
@@ -60,27 +57,32 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 		{
 			var folder = new SvgImage
 			{
-				Source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/Folder.svg", null),
+				Source = SvgSource.Load<SvgSource>("avares://FileExplorer/Assets/Icons/Folder.svg", null)
 			};
 			var file = new SvgImage
 			{
-				Source = SvgSource.Load<SvgSource>($"avares://FileExplorer/Assets/Icons/File.svg", null),
+				Source = SvgSource.Load<SvgSource>("avares://FileExplorer/Assets/Icons/File.svg", null)
 			};
+
+			var resultBinding = new CompiledBindingPathBuilder()
+				.Property(new ClrPropertyInfo(nameof(TaskCompletionNotifier<IImage?>.Result), null, null, typeof(IImage)),
+					(reference, info) => new TaskCompletionNotifierAccessor<IImage?, IImage?>(reference, x => x.Result))
+				.Build();
+
+			var isSuccessfullyCompletedBinding = new CompiledBindingPathBuilder()
+				.Property(new ClrPropertyInfo(nameof(TaskCompletionNotifier<IImage?>.IsSuccessfullyCompleted), null, null, typeof(bool)),
+					(reference, info) => new TaskCompletionNotifierAccessor<IImage?, bool>(reference, x => x.IsSuccessfullyCompleted))
+				.Build();
+
+			var isNotSuccessfullyCompletedBinding = new CompiledBindingPathBuilder()
+				.Property(new ClrPropertyInfo(nameof(TaskCompletionNotifier<IImage?>.IsSuccessfullyCompleted), null, null, typeof(bool)),
+					(reference, info) => new TaskCompletionNotifierAccessor<IImage?, bool>(reference, x => !x.IsSuccessfullyCompleted))
+				.Build();
 
 			var source = new FlatTreeDataGridSource<IFileItem>(value)
 			{
 				Columns =
 				{
-					// new TemplateColumn<IFileItem>("", new FuncDataTemplate<IFileItem>((x, _) =>
-					// 	new CheckBox()
-					// 	{
-					// 		[!CheckBox.IsCheckedProperty] = new Binding("IsSelected", BindingMode.TwoWay)
-					// 	}), GridLength.Auto, new ColumnOptions<IFileItem>
-					// 	{
-					// 		CompareAscending = (x, y) => String.Compare(x?.Name, y?.Name, StringComparison.CurrentCulture),
-					// 		CompareDescending = (x, y) => String.Compare(y?.Name, x?.Name, StringComparison.CurrentCulture),
-					// 	}),
-					// new HierarchicalExpanderColumn<IFileItem>(
 					new TemplateColumn<IFileItem>(null, new FuncDataTemplate<IFileItem>((x, _) =>
 						new StackPanel
 						{
@@ -91,10 +93,15 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 								new Panel
 								{
 									Margin = new Thickness(5, 0, 0, 0),
-									[!DataContextProperty] = new Binding
+									[!DataContextProperty] = new MultiBinding
 									{
-										ConverterParameter = Provider,
-										Converter = PathToImageConverter.Instance,
+										Bindings =
+										{
+											new Binding("$parent[1].DataContext"),
+											new Binding { Source = Provider, },
+											new Binding { Source = ImageSize, }
+										},
+										Converter = PathToImageConverter.Instance
 									},
 
 									Children =
@@ -103,8 +110,8 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 										{
 											Width = ImageSize,
 											Height = ImageSize,
-											[!IsVisibleProperty] = new Binding("IsSuccessfullyCompleted"),
-											[!Image.SourceProperty] = new Binding("Result"),
+											[!IsVisibleProperty] = new CompiledBindingExtension(isSuccessfullyCompletedBinding),
+											[!Image.SourceProperty] = new CompiledBindingExtension(resultBinding)
 										},
 
 										new Image
@@ -115,12 +122,12 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 											{
 												Bindings =
 												{
-													new Binding("!IsSuccessfullyCompleted"),
-													new Binding("$parent[1].DataContext.IsFolder"),
+													new CompiledBindingExtension(isNotSuccessfullyCompletedBinding),
+													new Binding("$parent[1].DataContext.IsFolder")
 												},
-												Converter = BoolConverters.And,
+												Converter = BoolConverters.And
 											},
-											Source = folder,
+											Source = folder
 										},
 										new Image
 										{
@@ -130,16 +137,16 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 											{
 												Bindings =
 												{
-													new Binding("!IsSuccessfullyCompleted"),
-													new Binding("!$parent[1].DataContext.IsFolder"),
+													new CompiledBindingExtension(isNotSuccessfullyCompletedBinding),
+													new Binding("!$parent[1].DataContext.IsFolder")
 												},
-												Converter = BoolConverters.And,
+												Converter = BoolConverters.And
 											},
-											Source = file,
-										},
-									},
-								},
-							},
+											Source = file
+										}
+									}
+								}
+							}
 						}), null, GridLength.Auto, new TemplateColumnOptions<IFileItem>
 					{
 						CanUserResizeColumn = false,
@@ -164,7 +171,7 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 							}
 							
 							return result;
-						},
+						}
 					}),
 					// x => Provider?.GetItems(x, "*", false, default).OrderByDescending(o => o.IsFolder).ThenBy(t => t.Name) ?? Enumerable.Empty<IFileItem>(),
 					// x => x is { IsFolder: true } && Provider?.HasItems(x) is true),
@@ -172,27 +179,27 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 					{
 						CompareAscending = (x, y) => String.Compare(x!.Name, y!.Name),
 						CompareDescending = (x, y) => String.Compare(y!.Name, x!.Name),
-						CanUserSortColumn = false,
+						CanUserSortColumn = false
 					}),
 					new TextColumn<IFileItem, string>(ResourceDefault.EditDate, item => item.EditedOn.Humanize(false, DateTime.Now, CultureInfo.CurrentCulture), GridLength.Auto, new TextColumnOptions<IFileItem>()
 					{
 						CompareAscending = (x, y) => DateTime.Compare(x!.EditedOn, y!.EditedOn),
 						CompareDescending = (x, y) => DateTime.Compare(y!.EditedOn, x!.EditedOn),
-						CanUserSortColumn = false,
+						CanUserSortColumn = false
 					}),
 					new TextColumn<IFileItem, string>(ResourceDefault.Extension, item => item.Extension, GridLength.Auto, new TextColumnOptions<IFileItem>
 					{
 						CompareAscending = (x, y) => String.Compare(x?.Extension, y?.Extension),
 						CompareDescending = (x, y) => String.Compare(y?.Extension, x?.Extension),
-						CanUserSortColumn = false,
+						CanUserSortColumn = false
 					}),
 					new TextColumn<IFileItem, string>(ResourceDefault.Size, item => item.IsFolder ? null : item.Size.Bytes().ToString(), GridLength.Auto, new TextColumnOptions<IFileItem>
 					{
 						CompareAscending = (x, y) => x!.Size.CompareTo(y!.Size),
 						CompareDescending = (x, y) => y!.Size.CompareTo(x!.Size),
-						CanUserSortColumn = false,
-					}),
-				},
+						CanUserSortColumn = false
+					})
+				}
 			};
 
 			fileList.Source = source;
@@ -201,7 +208,7 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 
 			TreeDataGridRow.IsSelectedProperty.Changed.Subscribe(args =>
 			{
-				if (args.Sender is TreeDataGridRow { DataContext: IFileItem item })
+				if (args.Sender is TreeDataGridRow { DataContext: IFileItem item, })
 				{
 					item.IsSelected = args.NewValue.Value;
 				}
@@ -227,7 +234,7 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 
 			DoubleTappedEvent.AddClassHandler<TreeDataGridRow>((sender, _) =>
 			{
-				if (sender is { DataContext: IFileItem item } && item != previousModel)
+				if (sender is { DataContext: IFileItem item, } && item != previousModel)
 				{
 					PathChanged(item);
 
@@ -279,6 +286,11 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 
 		fileList.KeyDown += Grid_KeyDown;
 	}
+	public FileTreeGrid(IItemProvider? provider, ObservableRangeCollection<IFileItem>? items) : this()
+	{
+		Provider = provider;
+		Items = items;
+	}
 
 	protected override void OnInitialized()
 	{
@@ -293,9 +305,9 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 
 			fileList.RowPrepared += (sender, args) =>
 			{
-				if (args.Row is { DataContext: IFileItem item })
+				if (args.Row is { DataContext: IFileItem item, })
 				{
-					isSelectedProperty?.SetValue(args.Row, item.IsSelected);
+					IsSelectedProperty?.SetValue(args.Row, item.IsSelected);
 				}
 
 				args.Row[!TreeDataGridRow.IsSelectedProperty] = new Binding("DataContext.IsSelected", BindingMode.OneWayToSource);
@@ -320,7 +332,7 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 
 	private void Item_DoubleTapped(object? sender, RoutedEventArgs e)
 	{
-		if (sender is ListBoxItem { DataContext: IFileItem model })
+		if (sender is ListBoxItem { DataContext: IFileItem model, })
 		{
 			PathChanged(model);
 		}
@@ -331,4 +343,93 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 		field = value;
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 	}
+}
+
+public sealed class TaskCompletionNotifierAccessor<T, TResult> : IPropertyAccessor
+{
+	private readonly TaskCompletionNotifier<T> _notifier;
+	private readonly Func<TaskCompletionNotifier<T>, TResult> _getter;
+	
+	public TaskCompletionNotifierAccessor(WeakReference<object> target, Func<TaskCompletionNotifier<T>, TResult> getter)
+	{
+		if (target.TryGetTarget(out var temp) && temp is TaskCompletionNotifier<T> completionNotifier)
+		{
+			_notifier = completionNotifier;
+		}
+		else
+		{
+			throw new ArgumentException("Target is not a TaskCompletionNotifier<T>");
+		}
+		
+		_getter = getter;
+	}
+	
+	public void Dispose()
+	{
+		
+	}
+	
+	public bool SetValue(object? value, BindingPriority priority)
+	{
+		return false;
+	}
+	
+	public void Subscribe(Action<object?> listener)
+	{
+		listener(_getter(_notifier));
+		_notifier.Task.ContinueWith(x => listener(_getter(_notifier)), TaskContinuationOptions.ExecuteSynchronously);
+	}
+	
+	public void Unsubscribe()
+	{
+		
+	}
+
+	public Type? PropertyType => typeof(TResult);
+
+	public object? Value => _getter(_notifier);
+}
+
+public sealed class SelectorAccessor<T, TResult> : IPropertyAccessor
+{
+	private readonly T _item;
+	private readonly Func<T, TResult> _getter;
+
+	public SelectorAccessor(WeakReference<object> target, Func<T, TResult> getter)
+	{
+		if (target.TryGetTarget(out var temp) && temp is T completionNotifier)
+		{
+			_item = completionNotifier;
+		}
+		else
+		{
+			throw new ArgumentException("Target is not a TaskCompletionNotifier<T>");
+		}
+
+		_getter = getter;
+	}
+
+	public void Dispose()
+	{
+
+	}
+
+	public bool SetValue(object? value, BindingPriority priority)
+	{
+		return false;
+	}
+
+	public void Subscribe(Action<object?> listener)
+	{
+		listener(_getter(_item));
+	}
+
+	public void Unsubscribe()
+	{
+
+	}
+
+	public Type? PropertyType => typeof(TResult);
+
+	public object? Value => _getter(_item);
 }

@@ -1,10 +1,6 @@
 ﻿using Humanizer;
-using System.Collections.Concurrent;
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Enumeration;
-using System.Runtime.CompilerServices;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 using CommunityToolkit.HighPerformance.Helpers;
@@ -13,10 +9,9 @@ using FileExplorer.Resources;
 
 namespace FileExplorer.Models;
 
-[INotifyPropertyChanged]
-public sealed partial class FileModel : IFileItem
+public sealed partial class FileModel(FileSystemTreeItem item) : ObservableObject, IFileItem
 {
-	public FileSystemTreeItem TreeItem { get; }
+	public FileSystemTreeItem TreeItem { get; } = item;
 
 	private string? _name;
 	private string? _extension;
@@ -29,7 +24,6 @@ public sealed partial class FileModel : IFileItem
 	
 	[ObservableProperty]
 	private bool _isSelected;
-
 
 	public string? ExtensionName { get; set; }
 
@@ -50,9 +44,13 @@ public sealed partial class FileModel : IFileItem
 		}
 	}
 
-	public string Extension => _extension ??= !IsFolder
-		? System.IO.Path.GetExtension(TreeItem.Value)
-		: String.Empty;
+	public string Extension
+	{
+		get => _extension ??= !IsFolder
+			? System.IO.Path.GetExtension(TreeItem.Value)
+			: String.Empty;
+		set => SetProperty(ref _extension, value);
+	}
 
 	public string ToolTipText
 	{
@@ -79,7 +77,7 @@ public sealed partial class FileModel : IFileItem
 	{
 		get
 		{
-			if (_size == -1 && !IsFolder && new FileInfo(Path) is { Exists: true } info)
+			if (_size == -1 && !IsFolder && new FileInfo(Path) is { Exists: true, } info)
 			{
 				_size = info.Length;
 			}
@@ -93,7 +91,7 @@ public sealed partial class FileModel : IFileItem
 			{
 				RecurseSubdirectories = true,
 				IgnoreInaccessible = true,
-				AttributesToSkip = FileSystemTreeItem.Options.AttributesToSkip,
+				AttributesToSkip = FileSystemTreeItem.Options.AttributesToSkip
 			}).Sum()
 		: Size;
 
@@ -109,16 +107,16 @@ public sealed partial class FileModel : IFileItem
 		{
 			result = file.Size;
 		}
-		else if (path[^1] == PathHelper.DirectorySeparator && new DriveInfo(new String(path[0], 1)) is { IsReady: true } info)
+		else if (path[^1] == PathHelper.DirectorySeparator && new DriveInfo(new String(path[0], 1)) is { IsReady: true, } info)
 		{
 			result = info.TotalSize - info.TotalFreeSpace;
 		}
 		else if (file.IsFolder)
 		{
 			var query = new FileSystemEnumerable<long>(path, (ref FileSystemEntry entry) => entry.Length,
-				new EnumerationOptions { RecurseSubdirectories = true })
+				new EnumerationOptions { RecurseSubdirectories = true, })
 				{
-					ShouldIncludePredicate = (ref FileSystemEntry y) => !y.IsDirectory,
+					ShouldIncludePredicate = (ref FileSystemEntry y) => !y.IsDirectory
 				};
 
 			result = query.Sum();
@@ -140,11 +138,6 @@ public sealed partial class FileModel : IFileItem
 
 			return _editedOn;
 		}
-	}
-
-	public FileModel(FileSystemTreeItem item)
-	{
-		TreeItem = item;
 	}
 
 	public void UpdateData()

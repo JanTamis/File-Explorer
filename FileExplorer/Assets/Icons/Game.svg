@@ -1,81 +1,60 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient x1="0.048090935" y1="0.952" x2="0.5090909" y2="0.49090907" id="gradient_1">
-      <stop offset="0" stop-color="#3079D6" />
-      <stop offset="1" stop-color="#297CD2" />
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.085088804" y1="0.06073332" x2="0.90299785" y2="0.9543668" id="gradient_1">
+      <stop offset="0%" stop-color="#8795A1" />
+      <stop offset="100%" stop-color="#6D7882" />
     </linearGradient>
-    <linearGradient x1="0.085088804" y1="0.06073332" x2="0.90299785" y2="0.9543668" id="gradient_2">
-      <stop offset="0" stop-color="#8795A1" />
-      <stop offset="1" stop-color="#6D7882" />
-    </linearGradient>
-    <radialGradient gradientUnits="objectBoundingBox" cx="50%" cy="50%" fx="50%" fy="50%" r="50.000008%" gradientTransform="translate(0.5,0.5),scale(0.9999998,1),translate(-0.5,-0.5)" id="gradient_3">
+    <radialGradient gradientUnits="objectBoundingBox" cx="50%" cy="50%" fx="50%" fy="50%" r="50.000008%" gradientTransform="translate(0.5,0.5),scale(0.9999998,1),translate(-0.5,-0.5)" id="gradient_2">
       <stop offset="0%" stop-color="#000000" />
       <stop offset="100%" stop-color="#000000" stop-opacity="0" />
     </radialGradient>
-    <radialGradient gradientUnits="objectBoundingBox" cx="50%" cy="50.000023%" fx="50%" fy="50.000023%" r="50%" gradientTransform="translate(0.5,0.50000024),translate(-0.5,-0.50000024)" id="gradient_4">
+    <radialGradient gradientUnits="objectBoundingBox" cx="50%" cy="50.000023%" fx="50%" fy="50.000023%" r="50%" gradientTransform="translate(0.5,0.50000024),scale(1,0.9999997),translate(-0.5,-0.50000024)" id="gradient_3">
       <stop offset="0%" stop-color="#000000" />
       <stop offset="100%" stop-color="#000000" stop-opacity="0" />
     </radialGradient>
-    <radialGradient gradientUnits="objectBoundingBox" cx="50%" cy="50%" fx="50%" fy="50%" r="50.000015%" gradientTransform="translate(0.5,0.5),scale(0.9999997,1),translate(-0.5,-0.5)" id="gradient_5">
+    <radialGradient gradientUnits="objectBoundingBox" cx="50%" cy="50%" fx="50%" fy="50%" r="50%" gradientTransform="translate(0.5,0.5),translate(-0.5,-0.5)" id="gradient_4">
       <stop offset="0%" stop-color="#000000" />
       <stop offset="100%" stop-color="#000000" stop-opacity="0" />
     </radialGradient>
-    <radialGradient gradientUnits="objectBoundingBox" cx="50%" cy="50%" fx="50%" fy="50%" r="50%" gradientTransform="translate(0.5,0.5),translate(-0.5,-0.5)" id="gradient_6">
-      <stop offset="0%" stop-color="#000000" />
-      <stop offset="100%" stop-color="#000000" stop-opacity="0" />
-    </radialGradient>
-    <radialGradient gradientUnits="objectBoundingBox" cx="16.625023%" cy="14.575005%" fx="16.625023%" fy="14.575005%" r="98.90008%" gradientTransform="translate(0.16625023,0.14575005),scale(0.9999995,1),translate(-0.16625023,-0.14575005)" id="gradient_7">
+    <radialGradient gradientUnits="objectBoundingBox" cx="16.625023%" cy="14.575005%" fx="16.625023%" fy="14.575005%" r="98.90003%" gradientTransform="translate(0.16625023,0.14575005),translate(-0.16625023,-0.14575005)" id="gradient_5">
       <stop offset="0%" stop-color="#46C3F0" />
       <stop offset="100%" stop-color="#15A2EB" />
     </radialGradient>
-    <radialGradient gradientUnits="objectBoundingBox" cx="14.400005%" cy="15.049982%" fx="14.400005%" fy="15.049982%" r="99.600075%" gradientTransform="translate(0.14400005,0.15049982),scale(0.9999995,1),translate(-0.14400005,-0.15049982)" id="gradient_8">
+    <radialGradient gradientUnits="objectBoundingBox" cx="14.400005%" cy="15.049982%" fx="14.400005%" fy="15.049982%" r="99.60002%" gradientTransform="translate(0.14400005,0.15049982),scale(1,0.9999995),translate(-0.14400005,-0.15049982)" id="gradient_6">
       <stop offset="0%" stop-color="#FEE100" />
       <stop offset="100%" stop-color="#F7A511" />
     </radialGradient>
-    <radialGradient gradientUnits="objectBoundingBox" cx="14.424992%" cy="15.050006%" fx="14.424992%" fy="15.050006%" r="99.60005%" gradientTransform="translate(0.14424992,0.15050006),scale(0.99999976,1),translate(-0.14424992,-0.15050006)" id="gradient_9">
+    <radialGradient gradientUnits="objectBoundingBox" cx="14.424992%" cy="15.050006%" fx="14.424992%" fy="15.050006%" r="99.60003%" gradientTransform="translate(0.14424992,0.15050006),translate(-0.14424992,-0.15050006)" id="gradient_7">
       <stop offset="0%" stop-color="#FF80A9" />
       <stop offset="100%" stop-color="#FF3B78" />
     </radialGradient>
-    <radialGradient gradientUnits="objectBoundingBox" cx="17.50002%" cy="12.599993%" fx="17.50002%" fy="12.599993%" r="101.20005%" gradientTransform="translate(0.17500019,0.12599993),scale(0.9999995,1),translate(-0.17500019,-0.12599993)" id="gradient_10">
+    <radialGradient gradientUnits="objectBoundingBox" cx="17.50002%" cy="12.599993%" fx="17.50002%" fy="12.599993%" r="4103.881%" gradientTransform="translate(0.17500019,0.12599993),rotate(-145.9134),scale(1,1.0342643),translate(-0.17500019,-0.12599993)" id="gradient_8">
       <stop offset="0%" stop-color="#1AD674" />
       <stop offset="48.5%" stop-color="#13C266" />
       <stop offset="100%" stop-color="#0AA854" />
     </radialGradient>
-    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="path_1" />
-    <path d="M0 0L25 0L25 25L0 25L0 0Z" id="path_2" />
-    <clipPath id="mask_1">
-      <use xlink:href="#path_1" />
-    </clipPath>
-    <clipPath id="mask_2">
-      <use xlink:href="#path_2" />
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" clip-rule="evenodd" fill-rule="evenodd" />
     </clipPath>
   </defs>
-  <g id="icons8_file_2">
-    <path d="M0 0L48 0L48 48L0 48L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
-    <g clip-path="url(#mask_1)">
-      <path d="M30 11L30 36C30 37.105 29.105 38 28 38L2 38C0.895001 38 0 37.105 0 36L0 2C0 0.895 0.895001 0 2 0L19 0L30 11L30 11Z" transform="translate(9 5)" id="Shape" fill="#50E6FF" fill-rule="evenodd" stroke="none" />
-      <path d="M0 0L0 9C0 10.105 0.895 11 2 11L11 11L0 0L0 0Z" transform="translate(28 5)" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
-    </g>
-  </g>
-  <g id="icons8_game_controller" transform="translate(10.901978 17.645508)">
-    <path d="M0 0L25 0L25 25L0 25L0 0Z" id="Background" fill="none" fill-rule="evenodd" stroke="none" />
-    <g clip-path="url(#mask_2)">
-      <path d="M0 1.04167L3.64583 2.08333L3.64583 0.520833C3.64583 0.233333 3.4125 0 3.125 0L0.520833 0C0.233334 0 0 0.233333 0 0.520833L0 1.04167L0 1.04167Z" transform="translate(17.1875 3.6458435)" id="Shape" fill="#0076D7" fill-rule="evenodd" stroke="none" />
-      <path d="M3.64583 1.04167L0 2.08333L0 0.520833C0 0.233333 0.233333 0 0.520833 0L3.125 0C3.4125 0 3.64583 0.233333 3.64583 0.520833L3.64583 1.04167L3.64583 1.04167Z" transform="translate(4.166687 3.6458435)" id="Shape" fill="#0076D7" fill-rule="evenodd" stroke="none" />
-      <path d="M23.1141 2.9026C22.9948 2.06875 22.3891 1.39063 21.5724 1.18333C19.751 0.720833 16.2323 0 11.9792 0C7.72552 0 4.20729 0.720833 2.38594 1.18333C1.56927 1.39063 0.964062 2.06875 0.844271 2.9026C0.542187 5.01198 0 9.05885 0 10.9375C0 13.5266 2.09844 15.625 4.6875 15.625C6.91771 15.625 8.78073 14.0661 9.25469 11.9792L14.7031 11.9792C15.1776 14.0661 17.0401 15.625 19.2703 15.625C21.8594 15.625 23.9578 13.5266 23.9578 10.9375C23.9583 9.05885 23.4161 5.01146 23.1141 2.9026L23.1141 2.9026Z" transform="translate(0.520813 4.1666565)" id="Shape" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
-      <path d="M0 1.5625C0 0.699555 0.699555 0 1.5625 0C2.42544 0 3.125 0.699555 3.125 1.5625C3.125 2.42544 2.42544 3.125 1.5625 3.125C0.699555 3.125 0 2.42544 0 1.5625Z" transform="translate(17.708313 7.2916565)" id="Circle" fill="url(#gradient_3)" fill-rule="evenodd" stroke="none" />
-      <path d="M0 1.5625C0 0.699555 0.699555 0 1.5625 0C2.42544 0 3.125 0.699555 3.125 1.5625C3.125 2.42544 2.42544 3.125 1.5625 3.125C0.699555 3.125 0 2.42544 0 1.5625Z" transform="translate(17.708313 11.4583435)" id="Circle" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
-      <path d="M0 1.5625C0 0.699555 0.699555 0 1.5625 0C2.42545 0 3.125 0.699555 3.125 1.5625C3.125 2.42544 2.42545 3.125 1.5625 3.125C0.699555 3.125 0 2.42544 0 1.5625Z" transform="translate(15.625 9.375)" id="Circle" fill="url(#gradient_5)" fill-rule="evenodd" stroke="none" />
-      <path d="M0 1.5625C0 0.699555 0.699555 0 1.5625 0C2.42544 0 3.125 0.699555 3.125 1.5625C3.125 2.42544 2.42544 3.125 1.5625 3.125C0.699555 3.125 0 2.42544 0 1.5625Z" transform="translate(19.791687 9.375)" id="Circle" fill="url(#gradient_6)" fill-rule="evenodd" stroke="none" />
-      <path d="M0 1.04167C0 0.46637 0.46637 0 1.04167 0C1.61696 0 2.08333 0.46637 2.08333 1.04167C2.08333 1.61696 1.61696 2.08333 1.04167 2.08333C0.46637 2.08333 0 1.61696 0 1.04167Z" transform="translate(20.3125 9.8958435)" id="Circle" fill="url(#gradient_7)" fill-rule="evenodd" stroke="none" />
-      <path d="M0 1.04167C0 0.46637 0.46637 0 1.04167 0C1.61696 0 2.08333 0.46637 2.08333 1.04167C2.08333 1.61696 1.61696 2.08333 1.04167 2.08333C0.46637 2.08333 0 1.61696 0 1.04167Z" transform="translate(16.145813 9.8958435)" id="Circle" fill="url(#gradient_8)" fill-rule="evenodd" stroke="none" />
-      <path d="M0 1.04167C0 0.46637 0.46637 0 1.04167 0C1.61696 0 2.08333 0.46637 2.08333 1.04167C2.08333 1.61696 1.61696 2.08333 1.04167 2.08333C0.46637 2.08333 0 1.61696 0 1.04167Z" transform="translate(18.229187 7.8125)" id="Circle" fill="url(#gradient_9)" fill-rule="evenodd" stroke="none" />
-      <path d="M0 1.04167C0 0.46637 0.46637 0 1.04167 0C1.61696 0 2.08333 0.46637 2.08333 1.04167C2.08333 1.61696 1.61696 2.08333 1.04167 2.08333C0.46637 2.08333 0 1.61696 0 1.04167Z" transform="translate(18.229187 11.9791565)" id="Circle" fill="url(#gradient_10)" fill-rule="evenodd" stroke="none" />
-      <path d="M5.72917 2.08333L4.6875 2.08333L4.6875 1.04167C4.6875 0.466146 4.22135 0 3.64583 0L3.125 0C2.54948 0 2.08333 0.466146 2.08333 1.04167L2.08333 2.08333L1.04167 2.08333C0.466146 2.08333 0 2.54948 0 3.125L0 3.64583C0 4.22135 0.466146 4.6875 1.04167 4.6875L2.08333 4.6875L2.08333 5.72917C2.08333 6.30469 2.54948 6.77083 3.125 6.77083L3.64583 6.77083C4.22135 6.77083 4.6875 6.30469 4.6875 5.72917L4.6875 4.6875L5.72917 4.6875C6.30469 4.6875 6.77083 4.22135 6.77083 3.64583L6.77083 3.125C6.77083 2.54948 6.30469 2.08333 5.72917 2.08333L5.72917 2.08333Z" transform="translate(3.125 7.8125)" id="Shape" fill="#000000" fill-opacity="0.05" fill-rule="evenodd" stroke="none" />
-      <path d="M5.46875 2.08333L4.16667 2.08333L4.16667 0.78125C4.16667 0.35 3.81667 0 3.38542 0L2.86458 0C2.43333 0 2.08333 0.35 2.08333 0.78125L2.08333 2.08333L0.78125 2.08333C0.35 2.08333 0 2.43333 0 2.86458L0 3.38542C0 3.81667 0.35 4.16667 0.78125 4.16667L2.08333 4.16667L2.08333 5.46875C2.08333 5.9 2.43333 6.25 2.86458 6.25L3.38542 6.25C3.81667 6.25 4.16667 5.9 4.16667 5.46875L4.16667 4.16667L5.46875 4.16667C5.9 4.16667 6.25 3.81667 6.25 3.38542L6.25 2.86458C6.25 2.43333 5.9 2.08333 5.46875 2.08333L5.46875 2.08333Z" transform="translate(3.385437 8.0729065)" id="Shape" fill="#000000" fill-opacity="0.07" fill-rule="evenodd" stroke="none" />
-      <path d="M0.520833 0L1.04167 0C1.32917 0 1.5625 0.233333 1.5625 0.520833L1.5625 5.20833C1.5625 5.49583 1.32917 5.72917 1.04167 5.72917L0.520833 5.72917C0.233333 5.72917 0 5.49583 0 5.20833L0 0.520833C0 0.233333 0.233333 0 0.520833 0L0.520833 0Z" transform="translate(5.729187 8.3333435)" id="Shape" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
-      <path d="M5.72917 0.520833L5.72917 1.04167C5.72917 1.32917 5.49583 1.5625 5.20833 1.5625L0.520833 1.5625C0.233333 1.5625 0 1.32917 0 1.04167L0 0.520833C0 0.233333 0.233333 0 0.520833 0L5.20833 0C5.49583 0 5.72917 0.233333 5.72917 0.520833L5.72917 0.520833Z" transform="translate(3.645813 10.4166565)" id="Shape" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
-    </g>
+  <g id="Game Controller" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Game-Controller" fill="none" stroke="none" />
+    <path d="M33 9L40 11L40 8C40 7.448 39.552 7 39 7L34 7C33.448 7 33 7.448 33 8L33 9L33 9Z" id="Shape" fill="#0076D7" stroke="none" />
+    <path d="M15 9L8 11L8 8C8 7.448 8.448 7 9 7L14 7C14.552 7 15 7.448 15 8L15 9L15 9Z" id="Shape" fill="#0076D7" stroke="none" />
+    <path d="M45.379 13.573C45.15 11.972 43.987 10.67 42.419 10.272C38.922 9.384 32.166 8 24 8C15.833 8 9.078 9.384 5.581 10.272C4.013 10.67 2.851 11.972 2.621 13.573C2.041 17.623 1 25.393 1 29C1 33.971 5.029 38 10 38C14.282 38 17.859 35.007 18.769 31L29.23 31C30.141 35.007 33.717 38 37.999 38C42.97 38 46.999 33.971 46.999 29C47 25.393 45.959 17.622 45.379 13.573L45.379 13.573Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M34 17C34 15.3431 35.3431 14 37 14C38.6569 14 40 15.3431 40 17C40 18.6569 38.6569 20 37 20C35.3431 20 34 18.6569 34 17Z" id="Circle" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+    <path d="M34 25C34 23.3431 35.3431 22 37 22C38.6569 22 40 23.3431 40 25C40 26.6569 38.6569 28 37 28C35.3431 28 34 26.6569 34 25Z" id="Circle" fill="url(#gradient_3)" fill-rule="evenodd" stroke="none" />
+    <path d="M30 21C30 19.3431 31.3431 18 33 18C34.6569 18 36 19.3431 36 21C36 22.6569 34.6569 24 33 24C31.3431 24 30 22.6569 30 21Z" id="Circle" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
+    <path d="M38 21C38 19.3431 39.3431 18 41 18C42.6569 18 44 19.3431 44 21C44 22.6569 42.6569 24 41 24C39.3431 24 38 22.6569 38 21Z" id="Circle" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
+    <path d="M39 21C39 19.8954 39.8954 19 41 19C42.1046 19 43 19.8954 43 21C43 22.1046 42.1046 23 41 23C39.8954 23 39 22.1046 39 21Z" id="Circle" fill="url(#gradient_5)" fill-rule="evenodd" stroke="none" />
+    <path d="M31 21C31 19.8954 31.8954 19 33 19C34.1046 19 35 19.8954 35 21C35 22.1046 34.1046 23 33 23C31.8954 23 31 22.1046 31 21Z" id="Circle" fill="url(#gradient_6)" fill-rule="evenodd" stroke="none" />
+    <path d="M35 17C35 15.8954 35.8954 15 37 15C38.1046 15 39 15.8954 39 17C39 18.1046 38.1046 19 37 19C35.8954 19 35 18.1046 35 17Z" id="Circle" fill="url(#gradient_7)" fill-rule="evenodd" stroke="none" />
+    <path d="M35 25C35 23.8954 35.8954 23 37 23C38.1046 23 39 23.8954 39 25C39 26.1046 38.1046 27 37 27C35.8954 27 35 26.1046 35 25Z" id="Circle" fill="url(#gradient_8)" fill-rule="evenodd" stroke="none" />
+    <path d="M17 19L15 19L15 17C15 15.895 14.105 15 13 15L12 15C10.895 15 10 15.895 10 17L10 19L8 19C6.895 19 6 19.895 6 21L6 22C6 23.105 6.895 24 8 24L10 24L10 26C10 27.105 10.895 28 12 28L13 28C14.105 28 15 27.105 15 26L15 24L17 24C18.105 24 19 23.105 19 22L19 21C19 19.895 18.105 19 17 19L17 19Z" id="Shape" fill="#000000" fill-opacity="0.05" stroke="none" />
+    <path d="M17 19.5L14.5 19.5L14.5 17C14.5 16.172 13.828 15.5 13 15.5L12 15.5C11.172 15.5 10.5 16.172 10.5 17L10.5 19.5L8 19.5C7.172 19.5 6.5 20.172 6.5 21L6.5 22C6.5 22.828 7.172 23.5 8 23.5L10.5 23.5L10.5 26C10.5 26.828 11.172 27.5 12 27.5L13 27.5C13.828 27.5 14.5 26.828 14.5 26L14.5 23.5L17 23.5C17.828 23.5 18.5 22.828 18.5 22L18.5 21C18.5 20.172 17.828 19.5 17 19.5L17 19.5Z" id="Shape" fill="#000000" fill-opacity="0.07" stroke="none" />
+    <path d="M12 16L13 16C13.552 16 14 16.448 14 17L14 26C14 26.552 13.552 27 13 27L12 27C11.448 27 11 26.552 11 26L11 17C11 16.448 11.448 16 12 16L12 16Z" id="Shape" fill="#FFFFFF" stroke="none" />
+    <path d="M18 21L18 22C18 22.552 17.552 23 17 23L8 23C7.448 23 7 22.552 7 22L7 21C7 20.448 7.448 20 8 20L17 20C17.552 20 18 20.448 18 21L18 21Z" id="Shape" fill="#FFFFFF" stroke="none" />
   </g>
 </svg>

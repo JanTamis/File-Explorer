@@ -2,24 +2,32 @@
 
 namespace FileExplorer.Models;
 
-public readonly struct FileModelComparer : IComparer<IFileItem>
+public readonly struct FileModelComparer(SortEnum sortMember) : IComparer<IFileItem>
 {
-	private readonly SortEnum sortMember;
-
-	public FileModelComparer(SortEnum sortMember)
+	public int Compare(IFileItem? x, IFileItem? y)
 	{
-		this.sortMember = sortMember;
-	}
+		if (x is null && y is null)
+		{
+			return 0;
+		}
 
-	public int Compare(IFileItem x, IFileItem y)
-	{
+		if (x is null)
+		{
+			return -1;
+		}
+
+		if (y is null)
+		{
+			return 1;
+		}
+		
 		var result = sortMember switch
 		{
 			SortEnum.Name => String.Compare(x.Name, y.Name, StringComparison.CurrentCulture),
-			// SortEnum.Edited => y.EditedOn.CompareTo(x.EditedOn),
+			SortEnum.Edited => y.EditedOn.CompareTo(x.EditedOn),
 			SortEnum.Size => x.Size.CompareTo(y.Size),
 			SortEnum.Extension => String.Compare(x.Extension, y.Extension, StringComparison.CurrentCulture),
-			_ => 0,
+			_ => 0
 		};
 
 		if (sortMember is SortEnum.None)

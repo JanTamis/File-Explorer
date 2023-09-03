@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.49999997" y1="-0.015048407" x2="0.49999997" y2="1.0331969" id="gradient_1">
+      <stop offset="0%" stop-color="#D43A02" />
+      <stop offset="100%" stop-color="#B9360C" />
+    </linearGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Home Page" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Home-Page" fill="none" stroke="none" />
+    <path d="M40 17L34 13L34 7L40 7L40 17Z" id="Polygon" fill="#CCCCCC" fill-rule="evenodd" stroke="none" />
+    <path d="M42 39L6 39L6 41C6 42.105 6.895 43 8 43L40 43C41.105 43 42 42.105 42 41L42 39L42 39Z" id="Shape" fill="#999999" stroke="none" />
+    <path d="M42 39L6 39L6 20L24 3L42 20L42 39L42 39Z" id="Shape" fill="#CCCCCC" stroke="none" />
+    <path d="M19 25L29 25C29.552 25 30 25.448 30 26L30 43L18 43L18 26C18 25.448 18.448 25 19 25L19 25Z" id="Shape" fill="#DE490D" stroke="none" />
+    <path d="M40 7L34 7L34 6C34 5.448 34.448 5 35 5L39 5C39.552 5 40 5.448 40 6L40 7L40 7Z" id="Shape" fill="#999999" stroke="none" />
+    <path d="M24 4C23.526 4 23.052 4.168 22.674 4.503L17.315 9.314L6 20L6 25.39L24 9.428L42 25.39L42 20L30.685 9.314L25.326 4.503C24.948 4.168 24.474 4 24 4L24 4Z" id="Shape" fill="#000000" fill-opacity="0.05" stroke="none" />
+    <path d="M24 3C23.526 3 23.052 3.167 22.674 3.5L17.315 8.284L6 18.909L6 24.268L24 8.397L42 24.268L42 18.909L30.685 8.284L25.326 3.5C24.948 3.167 24.474 3 24 3L24 3Z" id="Shape" fill="#000000" fill-opacity="0.07" stroke="none" />
+    <path d="M44.495 19.507L25.326 2.503C24.948 2.168 24.474 2 24 2C23.526 2 23.052 2.168 22.674 2.503L3.505 19.507C3.085 19.881 3.056 20.527 3.441 20.937L5.077 22.682C5.446 23.076 6.061 23.106 6.467 22.749L24 7.428L41.533 22.75C41.938 23.106 42.554 23.077 42.923 22.683L44.559 20.938C44.944 20.527 44.915 19.881 44.495 19.507L44.495 19.507Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+  </g>
+</svg>

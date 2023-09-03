@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using FileExplorer.Core.Helpers;
@@ -9,11 +8,11 @@ namespace FileExplorer.Popup;
 
 public sealed partial class Rename : UserControl, IPopup, INotifyPropertyChanged
 {
-	public new event PropertyChangedEventHandler PropertyChanged = delegate { };
+	public new event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
-	public IFileItem File => Files?[Index];
+	public IFileItem? File => Files?[Index];
 
-	public ObservableRangeCollection<IFileItem> Files { get; set; }
+	public ObservableRangeCollection<IFileItem?> Files { get; set; }
 	public int Index { get; set; }
 
 	public bool HasShadow => false;
@@ -25,7 +24,7 @@ public sealed partial class Rename : UserControl, IPopup, INotifyPropertyChanged
 
 	public Rename()
 	{
-		AvaloniaXamlLoader.Load(this);
+		InitializeComponent();
 
 		DataContext = this;
 	}
@@ -56,13 +55,13 @@ public sealed partial class Rename : UserControl, IPopup, INotifyPropertyChanged
 		OnPropertyChanged(nameof(Title));
 	}
 
-	protected void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string name = null)
+	private void OnPropertyChanged<T>(ref T property, T value, [CallerMemberName] string? name = null)
 	{
 		property = value;
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 	}
 
-	public void OnPropertyChanged(string name)
+	public void OnPropertyChanged(string? name)
 	{
 		PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 	}
