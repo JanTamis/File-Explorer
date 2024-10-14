@@ -18,11 +18,11 @@ public sealed class PathToImageConverter : IValueConverter, IMultiValueConverter
 		switch (value)
 		{
 			case Task<IImage?> imageTask:
-				return new TaskCompletionNotifier<IImage?>(imageTask);
+				return new ImageTaskCompletionNotifier(imageTask);
 			case IFileItem item when parameter is IItemProvider provider:
-				return new TaskCompletionNotifier<IImage?>(provider.GetThumbnailAsync(item, 100, CancellationToken.None));
+				return new ImageTaskCompletionNotifier(provider.GetThumbnailAsync(item, 100, CancellationToken.None));
 			case FileModel item:
-				return new TaskCompletionNotifier<IImage?>(ThumbnailProvider.GetFileImage(item.TreeItem, 100));
+				return new ImageTaskCompletionNotifier(ThumbnailProvider.GetFileImage(item.TreeItem, 100));
 		}
 
 		if (parameter is int size)
@@ -38,7 +38,7 @@ public sealed class PathToImageConverter : IValueConverter, IMultiValueConverter
 
 			if (task is not null)
 			{
-				return new TaskCompletionNotifier<IImage?>(task);
+				return new ImageTaskCompletionNotifier(task);
 			}
 		}
 
@@ -54,7 +54,7 @@ public sealed class PathToImageConverter : IValueConverter, IMultiValueConverter
 	{
 		if (values is [IFileItem item, IItemProvider provider, int size,])
 		{
-			return new TaskCompletionNotifier<IImage?>(provider.GetThumbnailAsync(item, size, CancellationToken.None));
+			return new ImageTaskCompletionNotifier(provider.GetThumbnailAsync(item, size, CancellationToken.None));
 		}
 
 		return null;

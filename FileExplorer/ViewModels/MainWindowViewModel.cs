@@ -1,3 +1,4 @@
+using System.IO;
 using Avalonia.Controls.Notifications;
 using Avalonia.Threading;
 using FileExplorer.Popup;
@@ -17,8 +18,7 @@ using FileExplorer.Resources;
 
 namespace FileExplorer.ViewModels;
 
-[ObservableObject]
-public partial class MainWindowViewModel
+public sealed partial class MainWindowViewModel : ObservableObject
 {
 	public readonly WindowNotificationManager notificationManager;
 
@@ -46,6 +46,11 @@ public partial class MainWindowViewModel
 			yield return new SideBarModel(Environment.SpecialFolder.MyMusic, ResourceDefault.Music, ThumbnailProvider.GetImage("MyMusic"));
 			yield return new SideBarModel(Environment.SpecialFolder.MyPictures, ResourceDefault.Pictures, ThumbnailProvider.GetImage("MyPictures"));
 			yield return new SideBarModel(Environment.SpecialFolder.MyVideos, ResourceDefault.Videos, ThumbnailProvider.GetImage("MyVideos"));
+
+			foreach (var drive in DriveInfo.GetDrives())
+			{
+				yield return new SideBarModel(drive.RootDirectory.FullName, drive.Name, null);
+			}
 		}
 	}
 
@@ -84,8 +89,9 @@ public partial class MainWindowViewModel
 	{
 		get
 		{
-			yield return ViewTypes.Grid;
 			yield return ViewTypes.List;
+			yield return ViewTypes.Grid;
+			yield return ViewTypes.Gallery;
 		}
 	}
 
@@ -154,7 +160,7 @@ public partial class MainWindowViewModel
 
 	public void AddTab()
 	{
-		var tab = new TabItemViewModel();
+		var tab = App.Container.Resolve<TabItemViewModel>().Value;
 
 		Tabs.Add(tab);
 		CurrentTab = tab;
@@ -222,7 +228,7 @@ public partial class MainWindowViewModel
 
 	public void SelectAll()
 	{
-		foreach (var file in CurrentTab.Files ?? Enumerable.Empty<IFileItem>())
+		foreach (var file in CurrentTab.Files)
 		{
 			file.IsSelected = true;
 		}
@@ -233,7 +239,7 @@ public partial class MainWindowViewModel
 
 	public void SelectNone()
 	{
-		foreach (var file in CurrentTab.Files ?? Enumerable.Empty<IFileItem>())
+		foreach (var file in CurrentTab.Files)
 		{
 			file.IsSelected = false;
 		}
@@ -361,35 +367,6 @@ public partial class MainWindowViewModel
 		await CurrentTab.SetPath(await provider.GetRootAsync());
 
 		CurrentTab.PopupContent = null;
-	}
-
-	public void Close()
-	{
-		if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-		{
-			desktop.Shutdown();
-		}
-	}
-
-	public void Minimize()
-	{
-		if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window, })
-		{
-			window.WindowState = WindowState.Minimized;
-		}
-	}
-
-	public void Toggle()
-	{
-		if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } window, })
-		{
-			window.WindowState = window.WindowState switch
-			{
-				WindowState.Normal => WindowState.Maximized,
-				WindowState.Maximized => WindowState.Normal,
-				_ => window.WindowState
-			};
-		}
 	}
 
 	public void ToggleSidebar()

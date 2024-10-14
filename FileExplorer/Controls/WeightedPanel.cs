@@ -97,7 +97,7 @@ public sealed class WeightedPanel : Panel
 		bool leftEdge;
 
 		// Sort by weight
-		var childrenByWeight = elems.OrderByDescending(o => GetWeight(o as AvaloniaObject));
+		var childrenByWeight = elems.OrderByDescending(GetWeight);
 
 		// Allocate space for each child, one at a time.
 		// Moving left to right, top to bottom

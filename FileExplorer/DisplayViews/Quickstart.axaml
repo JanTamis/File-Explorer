@@ -43,7 +43,7 @@
 								            VerticalAlignment="Center">
 									<Image Source="{Binding DriveType, Converter={x:Static converters:UIIconConverter.Instance}}" />
 									<TextBlock Text="{Binding Name}"
-									           Foreground="{DynamicResource MaterialDesignBody}"
+									           Foreground="{DynamicResource MaterialBodyBrush}"
 									           Margin="5 0 0 0"
 									           VerticalAlignment="Center"/>
 								</StackPanel>
@@ -51,7 +51,7 @@
 								<ProgressBar Value="{Binding Size}"
 								             Height="10"
 								             assists:TransitionAssist.DisableTransitions="True"
-								             Foreground="{DynamicResource PrimaryHueMidBrush}"
+								             Foreground="{DynamicResource MaterialPrimaryMidBrush}"
 								             Maximum="{Binding TotalSize}" />
 							</StackPanel>
 						</Button>

@@ -475,6 +475,9 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 		_data.Capacity = 0;
 
 		await OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+
+
+		CountChanged(Count);
 	}
 
 	public void Trim()
@@ -633,6 +636,8 @@ public sealed class ObservableRangeCollection<T> : INotifyCollectionChanged, ILi
 		//_data.Capacity = 0;
 
 		OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+
+		CountChanged(Count);
 	}
 
 	public bool Contains(T item)

@@ -34,8 +34,8 @@
 								<Setter Property="CornerRadius" Value="0" />
 							</Style>
 							<Style Selector="ToggleButton:checked">
-								<Setter Property="Background" Value="{DynamicResource PrimaryHueMidBrush}" />
-								<Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
+								<Setter Property="Background" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+								<Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidForegroundBrush}" />
 							</Style>
 						</ToggleButton.Styles>
 						<StackPanel>
@@ -74,16 +74,21 @@
 								       Height="75"
 								       IsVisible="{Binding IsSuccessfullyCompleted}" />
 							</Panel>
-							<TextBlock Text="{Binding Name}"
-							           Margin="10 0"
+							<TextBlock Margin="10 0"
 							           TextTrimming="CharacterEllipsis"
 							           HorizontalAlignment="Center"
-							           VerticalAlignment="Center" />
+							           VerticalAlignment="Center" >
+								<TextBlock.Text>
+									<MultiBinding Converter="{x:Static converters:StringConcatConverter.Instance}">
+										<Binding Path="Name"/>
+										<!-- <Binding Path="Extension" /> -->
+									</MultiBinding>
+								</TextBlock.Text>
+							</TextBlock>
 						</StackPanel>
 					</ToggleButton>
 				</DataTemplate>
 			</ItemsRepeater.ItemTemplate>
-
 		</ItemsRepeater>
 	</ScrollViewer>
 </UserControl>

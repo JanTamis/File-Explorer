@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.25524998" y1="-0.17244445" x2="0.7298889" y2="1.1315833" id="gradient_1">
+      <stop offset="0%" stop-color="#2AA4F4" />
+      <stop offset="100%" stop-color="#007AD9" />
+    </linearGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" clip-rule="evenodd" fill-rule="evenodd" />
+    </clipPath>
+  </defs>
+  <g id="Typescript" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Typescript" fill="none" stroke="none" />
+    <path d="M6 6L42 6L42 42L6 42L6 6Z" id="Rectangle" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+    <path d="M27.49 22L14.227 22L14.227 25.264L18.984 25.264L18.984 40L22.753 40L22.753 25.264L27.49 25.264L27.49 22Z" id="Polygon" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+    <path d="M39.194 26.084C39.194 26.084 37.407 24.892 35.387 24.892C33.367 24.892 32.64 25.852 32.64 26.878C32.64 29.526 40.021 29.261 40.021 34.59C40.021 42.799 28.767 39.158 28.767 39.158L28.767 35.22C28.767 35.22 30.919 36.842 33.5 36.842C36.081 36.842 35.983 35.154 35.983 34.922C35.983 32.473 28.668 32.473 28.668 27.044C28.668 19.663 39.326 22.575 39.326 22.575L39.194 26.084L39.194 26.084Z" id="Shape" fill="#FFFFFF" stroke="none" />
+  </g>
+</svg>

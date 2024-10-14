@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.36256248" y1="-0.16574949" x2="0.65909374" y2="1.0514423" id="gradient_1">
+      <stop offset="0%" stop-color="#FFCF54" />
+      <stop offset="26.1%" stop-color="#FDCB4D" />
+      <stop offset="63.9%" stop-color="#F7C13A" />
+      <stop offset="100%" stop-color="#F0B421" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0" y1="0.49950218" x2="1" y2="0.49950218" id="gradient_2">
+      <stop offset="0%" stop-color="#F0B421" stop-opacity="0" />
+      <stop offset="51.2%" stop-color="#E9AB12" stop-opacity="0.5137255" />
+      <stop offset="100%" stop-color="#E09F00" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0" y1="0.5002527" x2="0.75249994" y2="0.5002527" id="gradient_3">
+      <stop offset="0%" stop-color="#F0B421" stop-opacity="0" />
+      <stop offset="51.2%" stop-color="#E9AB12" stop-opacity="0.5137255" />
+      <stop offset="100%" stop-color="#E09F00" />
+    </linearGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" clip-rule="evenodd" fill-rule="evenodd" />
+    </clipPath>
+  </defs>
+  <g id="Puppet" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Puppet" fill="none" stroke="none" />
+    <path d="M10 8.383L12 8.383L12 37.596L10 37.596L10 8.383Z" id="Rectangle" fill="#D3D1D1" fill-rule="evenodd" stroke="none" />
+    <path d="M32 15L34 15L34 38L32 38L32 15Z" id="Rectangle" fill="#D3D1D1" fill-rule="evenodd" stroke="none" />
+    <path d="M21 10L23 10L23 30L21 30L21 10Z" id="Rectangle" fill="#D3D1D1" fill-rule="evenodd" stroke="none" />
+    <path d="M38 2L34 4L32 4L22 4L13.5 4C12.672 4 12 4.672 12 5.5C12 6.328 12.672 7 13.5 7L11.5 7C10.672 7 10 7.672 10 8.5C10 9.328 10.672 10 11.5 10L20.191 10L15.314 12.095C14.553 12.422 14.201 13.304 14.528 14.065C14.855 14.826 15.737 15.178 16.498 14.851L23.136 12L32.171 12L29.54 14.631C28.836 15.335 28.664 16.47 29.246 17.278C29.988 18.308 31.434 18.394 32.293 17.535L36.866 13.1C37.591 12.397 38 11.43 38 10.42L38 10L42 8L38 2L38 2Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M30 16C30 15.4477 30.4477 15 31 15C31.5523 15 32 15.4477 32 16C32 16.5523 31.5523 17 31 17C30.4477 17 30 16.5523 30 16Z" id="Circle" fill="#FFDE87" fill-rule="evenodd" stroke="none" />
+    <path d="M22.303 8.995L20.181 10L12 10L22.303 8.995Z" id="Polygon" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+    <path d="M13.5 7L22 7L12.085 5.021C12.034 5.172 12 5.332 12 5.5C12 6.328 12.672 7 13.5 7L13.5 7Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+    <path d="M19 32C19 30.3431 20.3431 29 22 29C23.6569 29 25 30.3431 25 32C25 33.6569 23.6569 35 22 35C20.3431 35 19 33.6569 19 32Z" id="Circle" fill="#586169" fill-rule="evenodd" stroke="none" />
+    <path d="M16.5 42C16.231 42 15.964 41.928 15.729 41.786L10.729 38.786C10.018 38.36 9.788 37.438 10.214 36.728C10.64 36.018 11.564 35.787 12.272 36.213L16.68 38.858L29.526 34.577C30.007 34.416 30.54 34.511 30.938 34.829L35.938 38.829C36.584 39.347 36.689 40.29 36.171 40.937C35.654 41.583 34.712 41.69 34.063 41.17L29.701 37.68L16.975 41.922C16.819 41.975 16.659 42 16.5 42L16.5 42Z" id="Shape" fill="#586169" stroke="none" />
+    <path d="M27.679 44.815L26.006 35.954L20.245 37.766L21.644 45.185C21.732 45.658 22.145 46 22.626 46L26.696 46C27.323 46 27.795 45.43 27.679 44.815L27.679 44.815Z" id="Shape" fill="#586169" stroke="none" />
+  </g>
+</svg>

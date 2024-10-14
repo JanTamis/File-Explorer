@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Media;
 using FileExplorer.Core.Models;
+using FileExplorer.Interfaces;
 
 namespace FileExplorer.Core.Interfaces;
 
@@ -17,7 +18,7 @@ public interface IItemProvider
 
 	Task<IImage?> GetThumbnailAsync(IFileItem? item, int size, CancellationToken token);
 
-	IEnumerable<MenuItemModel> GetMenuItems(IFileItem item) => Enumerable.Empty<MenuItemModel>();
+	IEnumerable<IMenuModel> GetMenuItems(IFileItem? item) => Enumerable.Empty<IMenuModel>();
 
 	IFolderUpdateNotificator? GetNotificator(IFileItem folder, string filter, bool recursive);
 

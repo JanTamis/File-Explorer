@@ -65,17 +65,17 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 			};
 
 			var resultBinding = new CompiledBindingPathBuilder()
-				.Property(new ClrPropertyInfo(nameof(TaskCompletionNotifier<IImage?>.Result), null, null, typeof(IImage)),
+				.Property(new ClrPropertyInfo(nameof(ImageTaskCompletionNotifier.Result), null, null, typeof(IImage)),
 					(reference, info) => new TaskCompletionNotifierAccessor<IImage?, IImage?>(reference, x => x.Result))
 				.Build();
 
 			var isSuccessfullyCompletedBinding = new CompiledBindingPathBuilder()
-				.Property(new ClrPropertyInfo(nameof(TaskCompletionNotifier<IImage?>.IsSuccessfullyCompleted), null, null, typeof(bool)),
+				.Property(new ClrPropertyInfo(nameof(ImageTaskCompletionNotifier.IsSuccessfullyCompleted), null, null, typeof(bool)),
 					(reference, info) => new TaskCompletionNotifierAccessor<IImage?, bool>(reference, x => x.IsSuccessfullyCompleted))
 				.Build();
 
 			var isNotSuccessfullyCompletedBinding = new CompiledBindingPathBuilder()
-				.Property(new ClrPropertyInfo(nameof(TaskCompletionNotifier<IImage?>.IsSuccessfullyCompleted), null, null, typeof(bool)),
+				.Property(new ClrPropertyInfo(nameof(ImageTaskCompletionNotifier.IsSuccessfullyCompleted), null, null, typeof(bool)),
 					(reference, info) => new TaskCompletionNotifierAccessor<IImage?, bool>(reference, x => !x.IsSuccessfullyCompleted))
 				.Build();
 
@@ -103,7 +103,7 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 										},
 										Converter = PathToImageConverter.Instance
 									},
-
+									
 									Children =
 									{
 										new Image
@@ -113,7 +113,7 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 											[!IsVisibleProperty] = new CompiledBindingExtension(isSuccessfullyCompletedBinding),
 											[!Image.SourceProperty] = new CompiledBindingExtension(resultBinding)
 										},
-
+									
 										new Image
 										{
 											Width = ImageSize,
@@ -153,7 +153,7 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 						CompareAscending = (x, y) =>
 						{
 							var result = x.IsFolder.CompareTo(y.IsFolder);
-
+					
 							if (result is 0)
 							{
 								result = String.CompareOrdinal(x!.Name, y!.Name);
@@ -164,7 +164,7 @@ public sealed partial class FileTreeGrid : UserControl, IFileViewer
 						CompareDescending = (x, y) =>
 						{
 							var result = y.IsFolder.CompareTo(x.IsFolder);
-
+					
 							if (result is 0)
 							{
 								result = String.CompareOrdinal(y!.Name, x!.Name);

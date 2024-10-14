@@ -1,10 +1,9 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="using:FileExplorer"
              xmlns:converters="using:FileExplorer.Converters"
              xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
              xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-             xmlns:ripple="clr-namespace:Material.Ripple;assembly=Material.Ripple"
+             xmlns:treegrid="using:Avalonia.Controls.Primitives"
              xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles"
              xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:Class="FileExplorer.App">
@@ -32,6 +31,8 @@
 	</Application.Resources>
 
 	<Application.Styles>
+		<SimpleTheme />
+		<!-- <StyleInclude Source="avares://AvaloniaEdit/Themes/Simple/AvaloniaEdit.xaml" /> -->
 		<themes:MaterialTheme BaseTheme="Dark" PrimaryColor="DeepPurple" SecondaryColor="DeepPurple" />
 		<avalonia:MaterialIconStyles />
 
@@ -40,6 +41,10 @@
 
 		<Style Selector="MenuItem">
 			<Setter Property="Height" Value="30" />
+		</Style>
+		
+		<Style Selector="treegrid|TreeDataGridRow">
+			<Setter Property="Height" Value="40" />
 		</Style>
 
 		<Style Selector="TextBox.Clear">
@@ -171,7 +176,7 @@
 		<!-- </Style> -->
 
 		<Style Selector="TitleBar">
-			<Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+			<Setter Property="Foreground" Value="{DynamicResource MaterialBodyBrush}" />
 		</Style>
 
 		<!-- <Style Selector="ComboBoxItem:pointerover"> -->
@@ -254,7 +259,7 @@
 											      HorizontalAlignment="Right"
 											      VerticalAlignment="Center"
 											      Data="M7,10L12,15L17,10H7Z"
-											      Fill="{DynamicResource MaterialDesignTextBoxBorder}" />
+											      Fill="{DynamicResource MaterialTextBoxBorderBrush}" />
 										</Border>
 									</Grid>
 									<controls:MaterialUnderline Classes="MirrorY"
@@ -327,10 +332,10 @@
 			<Setter Property="VerticalContentAlignment" Value="Center" />
 			<Setter Property="Background" Value="Transparent" />
 			<Setter Property="BorderBrush" Value="Transparent" />
-			<Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidBrush}" />
+			<Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidBrush}" />
 			<Setter Property="Padding" Value="16 6" />
 			<Setter Property="assists:ShadowAssist.ShadowDepth" Value="Depth0" />
-			<Setter Property="assists:ButtonAssist.HoverColor" Value="{DynamicResource MaterialDesignBody}" />
+			<Setter Property="assists:ButtonAssist.HoverColor" Value="{DynamicResource MaterialBodyBrush}" />
 			<Setter Property="assists:ButtonAssist.ClickFeedbackColor" Value="{Binding $self.Foreground}" />
 		</Style>
 
@@ -343,12 +348,12 @@
 		<!-- </Style> -->
 
 		<Style Selector="TreeDataGridRow">
-			<Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDivider}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource MaterialDividerBrush}" />
 			<Setter Property="BorderThickness" Value="0 0 0 1" />
 		</Style>
 
 		<Style Selector="TreeDataGridRow:selected">
-			<Setter Property="BorderBrush" Value="{DynamicResource PrimaryHueDarkBrush}" />
+			<Setter Property="BorderBrush" Value="{DynamicResource MaterialPrimaryDarkBrush}" />
 			<Setter Property="BorderThickness" Value="0 0 0 1" />
 		</Style>
 
@@ -367,7 +372,7 @@
 							              HorizontalScrollBarVisibility="Hidden"
 							              VerticalScrollBarVisibility="Disabled">
 								<Border x:Name="ColumnHeadersPresenterBorder"
-								        BorderBrush="{DynamicResource MaterialDesignDivider}">
+								        BorderBrush="{DynamicResource MaterialDividerBrush}">
 									<TreeDataGridColumnHeadersPresenter Name="PART_ColumnHeadersPresenter"
 									                                    ElementFactory="{TemplateBinding ElementFactory}"
 									                                    Items="{TemplateBinding Columns}" />
@@ -402,7 +407,7 @@
 						           Height="20">
 							<Panel DockPanel.Dock="Right"
 							       TabIndex="2">
-								<Rectangle Fill="{DynamicResource MaterialDesignDivider}"
+								<Rectangle Fill="{DynamicResource MaterialDividerBrush}"
 								           HorizontalAlignment="Right"
 								           Width="1" />
 

@@ -5,7 +5,7 @@ namespace FileExplorer.Helpers;
 /// <summary>
 /// Watches a task and raises property-changed notifications when the task completes.
 /// </summary>
-public sealed partial class TaskCompletionNotifier<TResult> : ObservableObject
+public partial class TaskCompletionNotifier<TResult> : ObservableObject
 {
 	// Gets the task being watched. This property never changes and is never <c>null</c>.
 	public Task<TResult> Task { get; }

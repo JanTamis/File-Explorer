@@ -67,8 +67,10 @@
 		<TextBlock Grid.Row="5"
 		           Grid.Column="0"
 		           VerticalAlignment="Center"
-		           Margin="0 0 10 0"
-		           Text="Size:" />
+		           Margin="0 0 10 0">
+			<Run Text="{resources:Resource Size}" />
+			<Run Text=":" />
+		</TextBlock>
 
 		<TextBlock Grid.Row="5"
 		           VerticalAlignment="Center"
@@ -103,7 +105,7 @@
 		            HorizontalAlignment="Right"
 		            Orientation="Horizontal">
 			<Button Content="{resources:Resource Cancel}"
-			        Foreground="{DynamicResource MaterialDesignBody}"
+			        Foreground="{DynamicResource MaterialBodyBrush}"
 			        HorizontalContentAlignment="Center"
 			        Classes="Flat"
 			        Cursor="Hand"

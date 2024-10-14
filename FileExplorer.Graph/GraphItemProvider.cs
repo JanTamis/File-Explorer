@@ -23,7 +23,7 @@ public sealed class GraphItemProvider : IItemProvider
 			SizeLimit = 536_870_912,
 		});
 
-		var scopes = new[] { "User.Read", "Files.ReadWrite.All", "Files.Read", "Files.Read.All", "profile" };
+		string[] scopes = ["User.Read", "Files.ReadWrite.All", "Files.Read", "Files.Read.All", "profile"];
 
 		// Multi-tenant apps can use "common",
 		// single-tenant apps must use the tenant ID from the Azure portal

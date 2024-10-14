@@ -30,6 +30,7 @@ namespace FileExplorer.Graph.Models
 		public long Size => item.Size.GetValueOrDefault();
 
 		public DateTime EditedOn => item.LastModifiedDateTime.GetValueOrDefault().DateTime;
+		public DateTime CreatedOn => item.CreatedDateTime.GetValueOrDefault().DateTime;
 
 		public bool IsVisible { get; set; }
 
@@ -56,6 +57,11 @@ namespace FileExplorer.Graph.Models
 		public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
 		{
 			return action(Name, parameter);
+		}
+		
+		public Stream GetStream()
+		{
+			return item.Content;
 		}
 
 		public bool Equals(IFileItem? other)

@@ -113,4 +113,82 @@
     <data name="Drives" xml:space="preserve">
         <value>Schijven</value>
     </data>
+    <data name="File" xml:space="preserve">
+        <value>bestand</value>
+    </data>
+    <data name="Folder" xml:space="preserve">
+        <value>map</value>
+    </data>
+    <data name="Dimensions" xml:space="preserve">
+        <value>Afmeting</value>
+    </data>
+    <data name="DataPrecision" xml:space="preserve">
+        <value>Precisie</value>
+    </data>
+    <data name="Aperture" xml:space="preserve">
+        <value>Diafragma</value>
+    </data>
+    <data name="FStop" xml:space="preserve">
+        <value>f-getal</value>
+    </data>
+    <data name="Make" xml:space="preserve">
+        <value>Merk</value>
+    </data>
+    <data name="Model" xml:space="preserve">
+        <value>Model</value>
+    </data>
+    <data name="ShutterSpeed" xml:space="preserve">
+        <value>Belichtingstijd</value>
+    </data>
+    <data name="Resolution" xml:space="preserve">
+        <value>Resolutie</value>
+    </data>
+    <data name="ISOSpeed" xml:space="preserve">
+        <value>ISO-snelheid</value>
+    </data>
+    <data name="Duration" xml:space="preserve">
+        <value>Duur</value>
+    </data>
+    <data name="Information" xml:space="preserve">
+        <value>Informatie</value>
+    </data>
+    <data name="MimeType" xml:space="preserve">
+        <value>Mime</value>
+    </data>
+    <data name="HasAlpha" xml:space="preserve">
+        <value>Bevat Alfa</value>
+    </data>
+    <data name="Yes" xml:space="preserve">
+        <value>Ja</value>
+    </data>
+    <data name="No" xml:space="preserve">
+        <value>Nee</value>
+    </data>
+    <data name="IsAnimation" xml:space="preserve">
+        <value>Is geanimeerd</value>
+    </data>
+    <data name="Files" xml:space="preserve">
+        <value>bestanden</value>
+    </data>
+    <data name="Folders" xml:space="preserve">
+        <value>mappen</value>
+    </data>
+    <data name="SampleRate" xml:space="preserve">
+        <value>Samplefrequency</value>
+    </data>
+    <data name="BitsPerSample" xml:space="preserve">
+        <value>Bits per sample</value>
+    </data>
+    <data name="ElapsedTime" xml:space="preserve">
+        <value>Verlopen tijd:</value>
+    </data>
+    <data name="RemainingTime" xml:space="preserve">
+        <value>Resterende tijd:</value>
+    </data>
+    <data name="TotalSize" xml:space="preserve">
+        <value>Totale groote:</value>
+    </data>
+    <data name="Speed" xml:space="preserve">
+        <value>Snelheid:</value>
+    </data>
 </root>

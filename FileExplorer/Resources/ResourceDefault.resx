@@ -120,4 +120,82 @@
     <data name="Drives" xml:space="preserve">
         <value>Drives</value>
     </data>
+    <data name="File" xml:space="preserve">
+        <value>file</value>
+    </data>
+    <data name="Folder" xml:space="preserve">
+        <value>folder</value>
+    </data>
+    <data name="Dimensions" xml:space="preserve">
+        <value>Dimensions</value>
+    </data>
+    <data name="DataPrecision" xml:space="preserve">
+        <value>Precision</value>
+    </data>
+    <data name="Aperture" xml:space="preserve">
+        <value>Aperture</value>
+    </data>
+    <data name="FStop" xml:space="preserve">
+        <value>F-stop</value>
+    </data>
+    <data name="Make" xml:space="preserve">
+        <value>Make</value>
+    </data>
+    <data name="Model" xml:space="preserve">
+        <value>Model</value>
+    </data>
+    <data name="ShutterSpeed" xml:space="preserve">
+        <value>Shutter speed</value>
+    </data>
+    <data name="Resolution" xml:space="preserve">
+        <value>Resolution</value>
+    </data>
+    <data name="ISOSpeed" xml:space="preserve">
+        <value>ISO-speed</value>
+    </data>
+    <data name="Duration" xml:space="preserve">
+        <value>Duration</value>
+    </data>
+    <data name="Information" xml:space="preserve">
+        <value>Information</value>
+    </data>
+    <data name="MimeType" xml:space="preserve">
+        <value>Mime</value>
+    </data>
+    <data name="HasAlpha" xml:space="preserve">
+        <value>Has alpha</value>
+    </data>
+    <data name="Yes" xml:space="preserve">
+        <value>Yes</value>
+    </data>
+    <data name="No" xml:space="preserve">
+        <value>No</value>
+    </data>
+    <data name="IsAnimation" xml:space="preserve">
+        <value>Is animation</value>
+    </data>
+    <data name="Files" xml:space="preserve">
+        <value>files</value>
+    </data>
+    <data name="Folders" xml:space="preserve">
+        <value>folders</value>
+    </data>
+    <data name="SampleRate" xml:space="preserve">
+        <value>Sample rate</value>
+    </data>
+    <data name="BitsPerSample" xml:space="preserve">
+        <value>Bits per sample</value>
+    </data>
+    <data name="ElapsedTime" xml:space="preserve">
+        <value>Elapsed time:</value>
+    </data>
+    <data name="RemainingTime" xml:space="preserve">
+        <value>Remaining time:</value>
+    </data>
+    <data name="TotalSize" xml:space="preserve">
+        <value>Total size:</value>
+    </data>
+    <data name="Speed" xml:space="preserve">
+        <value>Speed</value>
+    </data>
 </root>

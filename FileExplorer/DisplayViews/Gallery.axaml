@@ -1,0 +1,158 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:displayViews="clr-namespace:FileExplorer.DisplayViews"
+             xmlns:converters="clr-namespace:FileExplorer.Converters"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:resources="using:FileExplorer.Resources"
+             xmlns:interfaces="clr-namespace:FileExplorer.Core.Interfaces;assembly=FileExplorer.Core"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="displayViews:Gallery"
+             x:Class="FileExplorer.DisplayViews.Gallery">
+	<UserControl.Resources>
+		<system:Int32 x:Key="ItemWidth">75</system:Int32>
+	</UserControl.Resources>
+
+	<Grid RowDefinitions="* Auto">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*" />
+			<ColumnDefinition Width="Auto" 
+			                  MinWidth="200" 
+			                  MaxWidth="500"/>
+		</Grid.ColumnDefinitions>
+		
+		<ContentControl Content="{Binding SelectionControl^}" 
+		                Margin="0 0 3 0"/>
+		
+		<ScrollViewer Margin="0 0 3 0"
+		              Grid.Row="1" 
+		              Grid.Column="0"
+		              HorizontalScrollBarVisibility="Auto"
+		              VerticalScrollBarVisibility="Hidden">
+			<ItemsRepeater ItemsSource="{Binding Items}"
+			               HorizontalCacheLength="0"
+			               Margin="0"
+			               x:Name="fileList">
+				<ItemsRepeater.Layout>
+					<StackLayout Orientation="Horizontal" />
+				</ItemsRepeater.Layout>
+
+				<ItemsRepeater.ItemTemplate>
+					<DataTemplate DataType="interfaces:IFileItem">
+						<ToggleButton Padding="10"
+						              IsChecked="{Binding IsSelected}"
+						              ToolTip.Tip="{Binding ToolTipText}"
+						              Margin="0">
+							<ToggleButton.Styles>
+								<Style Selector="ToggleButton">
+									<Setter Property="CornerRadius" Value="0" />
+								</Style>
+								<Style Selector="ToggleButton:checked">
+									<Setter Property="Background" Value="{DynamicResource MaterialPrimaryMidBrush}" />
+									<Setter Property="Foreground" Value="{DynamicResource MaterialPrimaryMidForegroundBrush}" />
+								</Style>
+							</ToggleButton.Styles>
+							<StackPanel>
+								<Panel Margin="4 0 0 0">
+									<Panel.DataContext>
+										<MultiBinding Converter="{x:Static converters:PathToImageConverter.Instance}">
+											<Binding Path="$parent[ToggleButton].DataContext" />
+											<Binding Path="$parent[displayViews:Gallery].DataContext.Provider" />
+											<Binding Source="{StaticResource ItemWidth}" />
+										</MultiBinding>
+									</Panel.DataContext>
+
+									<Image Source="{SvgImage /Assets/Icons/Folder.svg}"
+									       Width="75"
+									       Height="75">
+										<Image.IsVisible>
+											<MultiBinding Converter="{x:Static BoolConverters.And}">
+												<Binding Path="!IsSuccessfullyCompleted" />
+												<Binding Path="$parent[ToggleButton].DataContext.IsFolder" />
+											</MultiBinding>
+										</Image.IsVisible>
+									</Image>
+									<Image Source="{SvgImage /Assets/Icons/File.svg}"
+									       Width="75"
+									       Height="75">
+										<Image.IsVisible>
+											<MultiBinding Converter="{x:Static BoolConverters.And}">
+												<Binding Path="!IsSuccessfullyCompleted" />
+												<Binding Path="!$parent[ToggleButton].DataContext.IsFolder" />
+											</MultiBinding>
+										</Image.IsVisible>
+									</Image>
+
+									<Image Source="{Binding Result}"
+									       Width="75"
+									       Height="75"
+									       IsVisible="{Binding IsSuccessfullyCompleted}" />
+								</Panel>
+							</StackPanel>
+						</ToggleButton>
+					</DataTemplate>
+				</ItemsRepeater.ItemTemplate>
+			</ItemsRepeater>
+		</ScrollViewer>
+
+
+		<GridSplitter Grid.Column="0"
+		              Grid.Row="0"
+		              Grid.RowSpan="2"
+		              Width="3"
+		              HorizontalAlignment="Right" />
+		
+		<Grid Grid.Column="1"
+		      Grid.Row="0"
+		      Grid.RowSpan="2"
+		      RowDefinitions="Auto Auto *">
+			<Grid RowDefinitions="Auto, Auto"
+			      Margin="10"
+			      ColumnDefinitions="Auto, *">
+				<ContentControl Content="{Binding SelectionControlSmall^}"
+				                Grid.Column="0"
+				                Grid.Row="0"
+				                Grid.RowSpan="2"
+				                Margin="0, 0, 10, 0"
+				                VerticalAlignment="Top"
+				                Width="50"
+				                Height="50"/>
+				
+				<TextBlock Grid.Column="1" 
+				           VerticalAlignment="Center"
+				           Grid.Row="0"
+				           Theme="{DynamicResource Subtitle1TextBlock}"
+				           FontWeight="Medium"
+				           TextWrapping="Wrap"
+				           Text="{Binding Title}"/>
+				
+				<TextBlock Grid.Column="1"
+				           Grid.Row="1"
+				           VerticalAlignment="Center"
+				           TextWrapping="Wrap"
+				           Theme="{DynamicResource Subtitle2TextBlock}"
+				           FontWeight="Normal"
+				           Opacity="0.75"
+				           Text="{Binding SubTitle}" />
+			</Grid>
+			
+			<TextBlock Grid.Row="1"
+			           Text="{resources:Resource Information}"
+			           IsVisible="{Binding Title, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+			           Margin="10 0 0 0"
+			           FontSize="16"
+			           FontWeight="Bold" />
+
+			<TreeDataGrid Name="propertyList"
+			              ShowColumnHeaders="False"
+			              Grid.Row="2">
+				<TreeDataGrid.Styles>
+					<Style Selector="TreeDataGridRow">
+						<Setter Property="Height" Value="30" />
+					</Style>
+				</TreeDataGrid.Styles>
+			</TreeDataGrid>
+		</Grid>
+	</Grid>
+</UserControl>

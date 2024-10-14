@@ -8,10 +8,16 @@ using System.IO.Enumeration;
 
 namespace FileExplorer.Models;
 
-public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, IEquatable<FileSystemTreeItem>
+/// <summary>
+/// Represents a node in a file system tree.
+/// </summary>
+public sealed class FileSystemTreeItem(ReadOnlySpan<char> name, bool isFolder, FileSystemTreeItem? parent = null) : ITreeItem<string, FileSystemTreeItem>, IEquatable<FileSystemTreeItem>
 {
 	private string? _path;
 
+	/// <summary>
+	/// Enumeration options for traversing the file system.
+	/// </summary>
 	public static readonly EnumerationOptions Options = new()
 	{
 		IgnoreInaccessible = true,
@@ -19,12 +25,15 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		AttributesToSkip = FileAttributes.System | FileAttributes.Hidden
 	};
 
+	/// <summary>
+	/// Gets the children of the current node.
+	/// </summary>
 	public IEnumerable<FileSystemTreeItem> Children
 	{
 		get
 		{
 			var path = GetPath();
-			
+
 			if (IsFolder && Directory.Exists(path))
 			{
 				return new FileSystemEnumerable<FileSystemTreeItem>(path, (ref FileSystemEntry x) => new FileSystemTreeItem(x.FileName, x.IsDirectory, this), Options);
@@ -34,12 +43,15 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		}
 	}
 
+	/// <summary>
+	/// Checks if the current node has any subfolders.
+	/// </summary>
 	public bool HasFolders
 	{
 		get
 		{
 			var path = GetPath();
-			
+
 			if (IsFolder && Directory.Exists(path))
 			{
 				var enumerable = new FileSystemEnumerable<byte>(path, (ref FileSystemEntry _) => 0, Options)
@@ -54,16 +66,34 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		}
 	}
 
-	public bool IsFolder { get; }
+	/// <summary>
+	/// Indicates whether the current node is a folder.
+	/// </summary>
+	public bool IsFolder { get; } = isFolder;
 
-	public FileSystemTreeItem? Parent { get; set; }
+	/// <summary>
+	/// The parent of the current node.
+	/// </summary>
+	public FileSystemTreeItem? Parent { get; set; } = parent;
 
-	public string Value { get; set; }
+	/// <summary>
+	/// The value of the current node.
+	/// </summary>
+	public string Value { get; set; } = name.ToString();
 
+	/// <summary>
+	/// Checks if the current node has a parent.
+	/// </summary>
 	public bool HasParent => Parent is not null;
 
+	/// <summary>
+	/// The path of the current node.
+	/// </summary>
 	public string Path => _path ??= GetPath();
 
+	/// <summary>
+	/// Checks if the current node has any children.
+	/// </summary>
 	public bool HasChildren
 	{
 		get
@@ -79,18 +109,10 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		}
 	}
 
-	public FileSystemTreeItem(ReadOnlySpan<char> name, bool isFolder, FileSystemTreeItem? parent = null)
-	{
-		IsFolder = isFolder;
-		Parent = parent;
-
-		Value = name.ToString();
-	}
-
 	/// <summary>
-	/// Get the root of the tree
+	/// Gets the root of the tree.
 	/// </summary>
-	/// <returns>the root of the tree</returns>
+	/// <returns>The root of the tree.</returns>
 	public FileSystemTreeItem GetRoot()
 	{
 		var parent = this;
@@ -104,9 +126,9 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	}
 
 	/// <summary>
-	/// Enumerate all the tree items from the current item to the root of the tree
+	/// Enumerates all the tree items from the current item to the root of the tree.
 	/// </summary>
-	/// <returns></returns>
+	/// <returns>An IEnumerable of FileSystemTreeItem from the current item to the root of the tree.</returns>
 	public IEnumerable<FileSystemTreeItem> EnumerateToRoot()
 	{
 		var item = this;
@@ -122,9 +144,9 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 	}
 
 	/// <summary>
-	/// Enumerates the values from the current value to the root of the tree
+	/// Enumerates the values from the current value to the root of the tree.
 	/// </summary>
-	/// <returns>all the values from the current value to the root of the tree</returns>
+	/// <returns>An IEnumerable of string from the current value to the root of the tree.</returns>
 	public IEnumerable<string> EnumerateValuesToRoot()
 	{
 		var item = this;
@@ -139,11 +161,10 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		yield return item.Value;
 	}
 
-
 	/// <summary>
-	/// Get the amount of children recursively
+	/// Gets the amount of children recursively.
 	/// </summary>
-	/// <returns>the amount of children recursively</returns>
+	/// <returns>The amount of children recursively.</returns>
 	public int GetChildrenCount()
 	{
 		var options = new EnumerationOptions
@@ -162,6 +183,10 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		return 0;
 	}
 
+	/// <summary>
+	/// Enumerates the children of the current node recursively.
+	/// </summary>
+	/// <returns>An IEnumerable of FileSystemTreeItem representing the children of the current node.</returns>
 	public IEnumerable<FileSystemTreeItem> EnumerateChildrenRecursive()
 	{
 		if (!IsFolder)
@@ -181,6 +206,10 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		return enumerable.SelectMany(s => s.EnumerateChildrenRecursive().Prepend(s));
 	}
 
+	/// <summary>
+	/// Enumerates the children of the current node recursively asynchronously.
+	/// </summary>
+	/// <returns>An IAsyncEnumerable of FileSystemTreeItem array representing the children of the current node.</returns>
 	public async IAsyncEnumerable<FileSystemTreeItem[]> EnumerateChildrenRecursiveAsync()
 	{
 		if (!IsFolder)
@@ -197,7 +226,7 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 
 		var task = Task.Factory.StartNew(x =>
 		{
-			if (x is FileSystemTreeItem item)
+			if (x is FileSystemTreeItem)
 			{
 				var enumerable = new FileSystemEnumerable<FileSystemTreeItem>(path, (ref FileSystemEntry entry) => new FileSystemTreeItem(entry.FileName, entry.IsDirectory, this));
 
@@ -218,6 +247,10 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		}
 	}
 
+	/// <summary>
+	/// Enumerates the children of the current node recursively based on a condition.
+	/// </summary>
+	/// <returns>An IEnumerable of FileSystemTreeItem representing the children of the current node.</returns>
 	public IEnumerable<FileSystemTreeItem> EnumerateChildrenRecursive(ReadOnlySpanFunc<char, bool> include)
 	{
 		return EnumerateChildren(include)
@@ -227,6 +260,10 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 			.Where(w => !w.IsFolder || include(w.Value));
 	}
 
+	/// <summary>
+	/// Enumerates the children of the current node based on a condition.
+	/// </summary>
+	/// <returns>An IEnumerable of FileSystemTreeItem representing the children of the current node.</returns>
 	public IEnumerable<FileSystemTreeItem> EnumerateChildren(ReadOnlySpanFunc<char, bool> include)
 	{
 		if (!IsFolder)
@@ -248,6 +285,10 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		});
 	}
 
+	/// <summary>
+	/// Enumerates the children of the current node.
+	/// </summary>
+	/// <returns>An IEnumerable of FileSystemTreeItem representing the children of the current node.</returns>
 	public IEnumerable<FileSystemTreeItem> EnumerateChildren()
 	{
 		if (!IsFolder)
@@ -268,6 +309,10 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		});
 	}
 
+	/// <summary>
+	/// Gets the path of the current node.
+	/// </summary>
+	/// <returns>The path of the current node.</returns>
 	public string GetPath()
 	{
 		var count = GetPathLength();
@@ -275,6 +320,10 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		return String.Create(count, this, BuildPath);
 	}
 
+	/// <summary>
+	/// Gets the path of the current node based on a condition.
+	/// </summary>
+	/// <returns>The path of the current node.</returns>
 	public T GetPath<T>(ReadOnlySpanFunc<char, T> action)
 	{
 		if (_path is not null)
@@ -288,6 +337,10 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		return action(buffer);
 	}
 
+	/// <summary>
+	/// Gets the path of the current node based on a condition and a parameter.
+	/// </summary>
+	/// <returns>The path of the current node.</returns>
 	public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
 	{
 		if (_path is not null)
@@ -301,26 +354,46 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		return action(buffer, parameter);
 	}
 
+	/// <summary>
+	/// Returns a string that represents the current object.
+	/// </summary>
+	/// <returns>A string that represents the current object.</returns>
 	public override string ToString()
 	{
 		return Value;
 	}
 
+	/// <summary>
+	/// Determines whether the specified object is equal to the current object.
+	/// </summary>
+	/// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
 	public override bool Equals(object? obj)
 	{
 		return obj is FileSystemTreeItem item && Equals(item);
 	}
 
+	/// <summary>
+	/// Determines whether the specified FileSystemTreeItem is equal to the current FileSystemTreeItem.
+	/// </summary>
+	/// <returns>true if the specified FileSystemTreeItem is equal to the current FileSystemTreeItem; otherwise, false.</returns>
 	public bool Equals(FileSystemTreeItem? other)
 	{
 		return String.Equals(Path, other?.Path);
 	}
 
+	/// <summary>
+	/// Serves as the default hash function.
+	/// </summary>
+	/// <returns>A hash code for the current object.</returns>
 	public override int GetHashCode()
 	{
 		return Path.GetHashCode();
 	}
 
+	/// <summary>
+	/// Creates a FileSystemTreeItem from a path.
+	/// </summary>
+	/// <returns>A FileSystemTreeItem that represents the path.</returns>
 	public static FileSystemTreeItem? FromPath([NotNullIfNotNull(nameof(path))] string? path)
 	{
 		if (path is null)
@@ -343,6 +416,10 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		return result;
 	}
 
+	/// <summary>
+	/// Gets the length of the path of the current node.
+	/// </summary>
+	/// <returns>The length of the path of the current node.</returns>
 	private int GetPathLength()
 	{
 		var item = this;
@@ -363,6 +440,9 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		return count;
 	}
 
+	/// <summary>
+	/// Builds the path of the current node.
+	/// </summary>
 	private static void BuildPath(Span<char> buffer, FileSystemTreeItem item)
 	{
 		item.Value.CopyTo(buffer.Slice(buffer.Length - item.Value.Length));
@@ -382,13 +462,24 @@ public sealed class FileSystemTreeItem : ITreeItem<string, FileSystemTreeItem>, 
 		}
 	}
 
+	/// <summary>
+	/// Represents an enumerable of FileSystemTreeItem.
+	/// </summary>
 	public sealed class FileSystemTreeItemEnumerable(DelegateFileSystemEnumerator<FileSystemTreeItem> enumerator) : IEnumerable<FileSystemTreeItem>
 	{
+		/// <summary>
+		/// Returns an enumerator that iterates through the collection.
+		/// </summary>
+		/// <returns>An enumerator that can be used to iterate through the collection.</returns>
 		public IEnumerator<FileSystemTreeItem> GetEnumerator()
 		{
 			return enumerator;
 		}
 
+		/// <summary>
+		/// Returns an enumerator that iterates through a collection.
+		/// </summary>
+		/// <returns>An IEnumerator object that can be used to iterate through the collection.</returns>
 		IEnumerator IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();

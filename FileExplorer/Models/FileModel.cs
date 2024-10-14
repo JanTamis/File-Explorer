@@ -1,4 +1,5 @@
-﻿using Humanizer;
+﻿using System.Globalization;
+using Humanizer;
 using System.IO;
 using System.IO.Enumeration;
 using FileExplorer.Core.Interfaces;
@@ -11,7 +12,7 @@ namespace FileExplorer.Models;
 
 public sealed partial class FileModel(FileSystemTreeItem item) : ObservableObject, IFileItem
 {
-	public FileSystemTreeItem TreeItem { get; } = item;
+	public FileSystemTreeItem TreeItem => item;
 
 	private string? _name;
 	private string? _extension;
@@ -140,6 +141,10 @@ public sealed partial class FileModel(FileSystemTreeItem item) : ObservableObjec
 		}
 	}
 
+	public DateTime CreatedOn => IsFolder
+		? Directory.GetCreationTime(Path)
+		: File.GetCreationTime(Path);
+
 	public void UpdateData()
 	{
 		_size = -1;
@@ -147,7 +152,6 @@ public sealed partial class FileModel(FileSystemTreeItem item) : ObservableObjec
 
 		OnPropertyChanged(nameof(Size));
 		OnPropertyChanged(nameof(EditedOn));
-
 	}
 
 	public string GetPath()
@@ -163,6 +167,11 @@ public sealed partial class FileModel(FileSystemTreeItem item) : ObservableObjec
 	public T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter)
 	{
 		return TreeItem.GetPath(action, parameter);
+	}
+	
+	public Stream GetStream()
+	{
+		return File.Open(GetPath(), FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite);
 	}
 
 	public override int GetHashCode()

@@ -19,11 +19,11 @@
                     x:CompileBindings="True"
                     x:Name="mainWindow"
                     Icon="/Assets/Icon.ico"
-                    Foreground="{DynamicResource MaterialDesignBody}"
+                    Foreground="{DynamicResource MaterialBodyBrush}"
                     MinWidth="800"
                     MinHeight="600"
                     Width="1000"
-                    Background="{DynamicResource MaterialDesignPaper}"
+                    Background="{DynamicResource MaterialPaperBrush}"
                     Height="800"
                     CornerRadius="20"
                     BorderThickness="0"
@@ -68,7 +68,7 @@
 						        Classes="Flat"
 						        Command="{Binding ToggleSidebar}">
 							<icons:MaterialIcon Kind="HamburgerMenu"
-							                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}"
+							                    Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}"
 							                    Width="25"
 							                    Height="25" />
 						</Button>
@@ -79,7 +79,7 @@
 							<icons:MaterialIcon Kind="ArrowBack"
 							                    Height="25"
 							                    Width="25"
-							                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" />
+							                    Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}" />
 						</Button>
 						<Button Classes="Flat"
 						        Command="{Binding Redo}"
@@ -87,7 +87,7 @@
 							<icons:MaterialIcon Kind="ArrowForward"
 							                    Height="25"
 							                    Width="25"
-							                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" />
+							                    Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}" />
 						</Button>
 
 						<Button Classes="Flat"
@@ -96,7 +96,7 @@
 							<icons:MaterialIcon Kind="ArrowUp"
 							                    Height="25"
 							                    Width="25"
-							                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" />
+							                    Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}" />
 						</Button>
 
 						<Panel>
@@ -107,7 +107,7 @@
 								<icons:MaterialIcon Kind="Refresh"
 								                    Height="25"
 								                    Width="25"
-								                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" />
+								                    Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}" />
 							</Button>
 
 							<Button Classes="Flat"
@@ -117,7 +117,7 @@
 								<icons:MaterialIcon Kind="SquareOutline"
 								                    Height="25"
 								                    Width="25"
-								                    Foreground="{DynamicResource PrimaryHueMidForegroundBrush}" />
+								                    Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}" />
 							</Button>
 						</Panel>
 					</StackPanel>
@@ -147,14 +147,14 @@
 						<Button Classes="Icon"
 						        Command="{Binding ShowSettings}"
 						        Padding="0"
-						        Foreground="{DynamicResource PrimaryHueMidForegroundBrush}">
+						        Foreground="{DynamicResource MaterialPrimaryMidForegroundBrush}">
 							<icons:MaterialIcon Kind="Gear"
 							                    Width="25"
 							                    Height="25" />
 						</Button>
 
-						<Border Background="{DynamicResource PrimaryHueLightBrush}"
-						        BorderBrush="{DynamicResource PrimaryHueDarkBrush}"
+						<Border Background="{DynamicResource MaterialPrimaryLightBrush}"
+						        BorderBrush="{DynamicResource MaterialPrimaryDarkBrush}"
 						        BorderThickness="0.5"
 						        Margin="5 0 0 0"
 						        Padding="5, 0, 0, 0"
@@ -164,7 +164,7 @@
 								<TextBox MinWidth="75"
 								         x:Name="searchBar"
 								         Padding="0 5 0 0"
-								         Foreground="{DynamicResource PrimaryHueLightForegroundBrush}"
+								         Foreground="{DynamicResource MaterialPrimaryLightForegroundBrush}"
 								         Text="{Binding CurrentTab.Search}"
 								         Watermark="{resources:Resource Search}" />
 								<Button Classes="Icon"
@@ -172,7 +172,7 @@
 								        Padding="0"
 								        Width="25"
 								        Height="25"
-								        Foreground="{DynamicResource PrimaryHueLightForegroundBrush}">
+								        Foreground="{DynamicResource MaterialPrimaryLightForegroundBrush}">
 									<icons:MaterialIcon Kind="Search"
 									                    Width="20"
 									                    Height="20" />
@@ -210,7 +210,7 @@
 								<TextBlock Text="{Binding Name}"
 								           VerticalAlignment="Center"
 								           FontWeight="Normal"
-								           Foreground="{DynamicResource MaterialDesignBody}" />
+								           Foreground="{DynamicResource MaterialBodyBrush}" />
 							</StackPanel>
 						</DataTemplate>
 					</ListBox.ItemTemplate>
@@ -247,7 +247,7 @@
 												      Background="{TemplateBinding Background}"
 												      HorizontalAlignment="Stretch"
 												      VerticalAlignment="Stretch">
-													<ripple:RippleEffect RippleFill="{DynamicResource PrimaryHueMidBrush}"
+													<ripple:RippleEffect RippleFill="{DynamicResource MaterialPrimaryMidBrush}"
 													                     Height="40"
 													                     Padding="5, 0">
 														<ContentPresenter Name="headerContent"
@@ -278,7 +278,7 @@
 										           FontWeight="Normal"
 										           VerticalAlignment="Center"
 										           TextTrimming="CharacterEllipsis"
-										           Foreground="{DynamicResource MaterialDesignBody}" />
+										           Foreground="{DynamicResource MaterialBodyBrush}" />
 									</StackPanel>
 
 								</DataTemplate>
@@ -288,7 +288,7 @@
 						<StackPanel Orientation="Horizontal"
 						            Grid.Column="1">
 
-							<Border BorderBrush="{DynamicResource MaterialDesignDivider}"
+							<Border BorderBrush="{DynamicResource MaterialDividerBrush}"
 							        IsVisible="{Binding CurrentTab.ShowToolbar}"
 							        Width="2"
 							        VerticalAlignment="Stretch"
@@ -319,7 +319,7 @@
 								</Panel>
 							</ToggleButton>
 
-							<Border BorderBrush="{DynamicResource MaterialDesignDivider}"
+							<Border BorderBrush="{DynamicResource MaterialDividerBrush}"
 							        IsVisible="{Binding CurrentTab.ShowToolbar}"
 							        Width="2"
 							        VerticalAlignment="Stretch"
@@ -386,11 +386,13 @@
 					               VerticalAlignment="Bottom"
 					               Padding="8 10"
 					               Margin="0"
+					               Background="{DynamicResource MaterialPrimaryLightBrush}"
 					               IsPointerOver="{Binding CurrentTab.PointerOverAmount, Mode=OneWayToSource}"
 					               assist:ShadowAssist.ShadowDepth="CenterDepth2">
 						<StackPanel>
 							<ContentPresenter Content="{Binding CurrentTab.PopupControl}" />
 							<TextBlock Text="{Binding CurrentTab.FileCountText}"
+							           Foreground="{DynamicResource MaterialPrimaryLightForegroundBrush}"
 							           HorizontalAlignment="Center"
 							           FontSize="16" />
 						</StackPanel>

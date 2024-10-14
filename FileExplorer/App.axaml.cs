@@ -14,7 +14,7 @@ namespace FileExplorer;
 public sealed partial class App : Application
 {
 	public static MainWindowViewModel? MainViewModel { get; set; }
-	public static Container Container { get; } = new Container();
+	public static Container Container { get; } = new();
 
 	public override void Initialize()
 	{

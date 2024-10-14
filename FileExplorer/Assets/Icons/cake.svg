@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.5000001" y1="-0.018700004" x2="0.5000001" y2="0.7135" id="gradient_1">
+      <stop offset="0.2%" stop-color="#F44F78" />
+      <stop offset="39.699997%" stop-color="#E4305D" />
+      <stop offset="76.3%" stop-color="#D81B4A" />
+      <stop offset="100%" stop-color="#D41343" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.07500005" y1="0.07500005" x2="0.54859996" y2="0.5486001" id="gradient_2">
+      <stop offset="0%" stop-color="#FAA0BD" />
+      <stop offset="100%" stop-color="#FA67A6" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.875" y1="0.125" x2="0.40049982" y2="0.5995002" id="gradient_3">
+      <stop offset="0%" stop-color="#FAA0BD" />
+      <stop offset="100%" stop-color="#FA67A6" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.5000001" y1="-0.1437" x2="0.5000001" y2="0.49479997" id="gradient_4">
+      <stop offset="0%" stop-color="#FAA0BD" />
+      <stop offset="100%" stop-color="#FA67A6" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="-0.01736112" y1="0.5" x2="1.0260556" y2="0.5" id="gradient_5">
+      <stop offset="0%" stop-color="#FAF8E5" />
+      <stop offset="100%" stop-color="#FAEEAC" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="-0.01736112" y1="0.5" x2="1.0260556" y2="0.5" id="gradient_6">
+      <stop offset="0%" stop-color="#D4943B" />
+      <stop offset="100%" stop-color="#C2620E" />
+      <stop offset="100%" stop-color="#C2620E" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="-0.01736112" y1="0.5" x2="1.0260556" y2="0.5" id="gradient_7">
+      <stop offset="0%" stop-color="#A34F27" />
+      <stop offset="58.7%" stop-color="#8B3817" />
+      <stop offset="100%" stop-color="#802D10" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="-0.01736112" y1="0.5" x2="1.0260556" y2="0.5" id="gradient_8">
+      <stop offset="0.2%" stop-color="#F44F78" />
+      <stop offset="39.699997%" stop-color="#E4305D" />
+      <stop offset="76.3%" stop-color="#D81B4A" />
+      <stop offset="100%" stop-color="#D41343" />
+    </linearGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" clip-rule="evenodd" fill-rule="evenodd" />
+    </clipPath>
+  </defs>
+  <g id="Cake" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Cake" fill="none" stroke="none" />
+    <path d="M19 15C19 12.2386 21.2386 10 24 10C26.7614 10 29 12.2386 29 15C29 17.7614 26.7614 20 24 20C21.2386 20 19 17.7614 19 15Z" id="Circle" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+    <path d="M11 19C11 16.2386 13.2386 14 16 14C18.7614 14 21 16.2386 21 19C21 21.7614 18.7614 24 16 24C13.2386 24 11 21.7614 11 19Z" id="Circle" fill="url(#gradient_2)" fill-rule="evenodd" stroke="none" />
+    <path d="M27 19C27 16.2386 29.2386 14 32 14C34.7614 14 37 16.2386 37 19C37 21.7614 34.7614 24 32 24C29.2386 24 27 21.7614 27 19Z" id="Circle" fill="url(#gradient_3)" fill-rule="evenodd" stroke="none" />
+    <path d="M19 20C19 17.2386 21.2386 15 24 15C26.7614 15 29 17.2386 29 20C29 22.7614 26.7614 25 24 25C21.2386 25 19 22.7614 19 20Z" id="Circle" fill="url(#gradient_4)" fill-rule="evenodd" stroke="none" />
+    <path d="M6 23L42 23L42 39L6 39L6 23Z" id="Rectangle" fill="url(#gradient_5)" fill-rule="evenodd" stroke="none" />
+    <path d="M42 39C42 41.21 40.21 43 38 43L8 43C6.9 43 6 42.1 6 41L6 39L42 39L42 39Z" id="Shape" fill="url(#gradient_6)" stroke="none" />
+    <path d="M42 23L6 23L6 21C6 19.9 6.9 19 8 19L38 19C40.21 19 42 20.79 42 23L42 23Z" id="Shape" fill="url(#gradient_7)" stroke="none" />
+    <path d="M6 26L6 34L11 34L11 35C11 36.105 11.895 37 13 37C14.105 37 15 36.105 15 35L15 34L29 34L29 35C29 35.552 29.448 36 30 36C30.552 36 31 35.552 31 35L31 34C31 33.448 31.448 33 32 33C32.552 33 33 33.448 33 34L33 35.5C33 36.328 33.672 37 34.5 37C35.328 37 36 36.328 36 35.5L36 34L42 34L42 26L6 26L6 26Z" id="Shape" fill="url(#gradient_8)" stroke="none" />
+  </g>
+</svg>

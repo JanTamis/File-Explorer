@@ -107,6 +107,7 @@ public sealed partial class FileGrid : UserControl, ISelectableControl, IFileVie
 
 		fileList.KeyDown += Grid_KeyDown;
 	}
+	
 	public FileGrid(IItemProvider provider, ObservableRangeCollection<IFileItem>? items) : this()
 	{
 		Provider = provider;
@@ -135,7 +136,7 @@ public sealed partial class FileGrid : UserControl, ISelectableControl, IFileVie
 		}
 	}
 
-	private async void Item_PointerPressed(object? sender, RoutedEventArgs e)
+	private void Item_PointerPressed(object? sender, RoutedEventArgs e)
 	{
 		if (sender is ToggleButton { DataContext: IFileItem model, } item)
 		{
@@ -145,9 +146,12 @@ public sealed partial class FileGrid : UserControl, ISelectableControl, IFileVie
 				this,
 				_anchorIndex,
 				index,
+				out var amount,
 				true,
 				_isShiftPressed,
 				_isCtrlPressed);
+			
+			SelectionChanged?.Invoke(amount);
 		}
 	}
 

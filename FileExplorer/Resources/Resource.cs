@@ -2,17 +2,10 @@ using Avalonia.Markup.Xaml;
 
 namespace FileExplorer.Resources;
 
-public class Resource : MarkupExtension
+public class Resource(string name) : MarkupExtension
 {
-	public string? Name { get; init; }
-
-	public Resource(string? name)
-	{
-		Name = name;
-	}
-
 	public override object ProvideValue(IServiceProvider serviceProvider)
 	{
-		return ResourceDefault.ResourceManager.GetString(Name) ?? String.Empty;
+		return ResourceDefault.ResourceManager.GetString(name) ?? String.Empty;
 	}
 }

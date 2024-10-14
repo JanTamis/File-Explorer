@@ -1,10 +1,7 @@
 ﻿using System.Globalization;
 using System.IO;
 using System.Text;
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
-using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using FileExplorer.Core.Extensions;
@@ -16,22 +13,19 @@ using FileExplorer.Interfaces;
 using FileExplorer.Models;
 using FileExplorer.Providers;
 using FileExplorer.Resources;
-using Material.Icons;
-using Material.Icons.Avalonia;
+using FileExplorer.Services;
 
 namespace FileExplorer.ViewModels;
 
-public partial class TabItemViewModel : ObservableObject
+public sealed partial class TabItemViewModel : ObservableObject
 {
 	private static readonly CompositeFormat FileSelectedFormat = CompositeFormat.Parse(ResourceDefault.FileSelectionFormat);
 
-	private readonly Stack<IFileItem?> _undoStack = new();
-	private readonly Stack<IFileItem?> _redoStack = new();
-
 	public CancellationTokenSource? TokenSource;
 
-	private bool _isUserEntered = true;
 	private bool _isRecursive;
+
+	private readonly FileOperationService _fileOperationService;
 
 	private IFolderUpdateNotificator? _updateNotificator;
 
@@ -61,7 +55,7 @@ public partial class TabItemViewModel : ObservableObject
 
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(SearchFailed))]
-	private ObservableRangeCollection<IFileItem>? _files = new();
+	private ObservableRangeCollection<IFileItem> _files = new();
 
 	[ObservableProperty]
 	[NotifyPropertyChangedFor(nameof(SearchFailed))]
@@ -81,9 +75,10 @@ public partial class TabItemViewModel : ObservableObject
 		{
 			IFileViewer control = CurrentViewMode switch
 			{
-				ViewTypes.Grid => new FileGrid(Provider, Files),
-				ViewTypes.List => new FileTreeGrid(Provider, Files),
-				_              => new Quickstart()
+				ViewTypes.Grid    => new FileGrid(Provider, Files),
+				ViewTypes.List    => new FileTreeGrid(Provider, Files),
+				ViewTypes.Gallery => new Gallery(Provider, Files),
+				_ => new Quickstart()
 			};
 
 			control.PathChanged += async path => await SetPath(path);
@@ -131,58 +126,16 @@ public partial class TabItemViewModel : ObservableObject
 
 	public IEnumerable<Control> MenuItems => Provider
 		.GetMenuItems(CurrentFolder)
-		.Select<MenuItemModel, Control>(s =>
+		.Select<IMenuModel, Control>(s =>
 		{
-			switch (s.Type)
+			var parameters = new MenuItemActionModel
 			{
-				case MenuItemType.Button:
-					var button = new Button
-					{
-						[!TemplatedControl.ForegroundProperty] = new DynamicResourceExtension("MaterialDesignBody"),
-						Classes = { "Icon", },
-						Content = new MaterialIcon
-						{
-							Width = 25,
-							Height = 25,
-							[!TemplatedControl.ForegroundProperty] = new DynamicResourceExtension("PrimaryHueMidForegroundBrush"),
-							Kind = Enum.Parse<MaterialIconKind>(s.Icon)
-						}
-					};
+				CurrentFolder = CurrentFolder,
+				Files = Files,
+				Popup = x => PopupContent = x,
+			};
 
-					if (s.Action is not null)
-					{
-						button.Click += delegate
-						{
-							var model = new MenuItemActionModel
-							{
-								CurrentFolder = CurrentFolder,
-								Files = Files,
-							};
-
-							s.Action(model);
-
-							if (model.Popup is not null)
-							{
-								PopupContent = model.Popup;
-							}
-						};
-					}
-
-					return button;
-				case MenuItemType.Separator:
-					return new Border
-					{
-						Width = 4,
-						Margin = new Thickness(4, 0),
-						Classes = { "Separator", }
-					};
-				case MenuItemType.Dropdown:
-					break;
-				default:
-					throw new ArgumentOutOfRangeException();
-			}
-
-			throw new ArgumentOutOfRangeException();
+			return s.GetControl(parameters);
 		});
 
 	public bool SearchFailed => !IsLoading && FileCount == 0 && CurrentFolder is not null;
@@ -198,28 +151,18 @@ public partial class TabItemViewModel : ObservableObject
 	public TabItemViewModel()
 	{
 		Files.CountChanged += count => FileCount = count;
+
+		_fileOperationService = new FileOperationService();
 	}
 
 	public IFileItem? Undo()
 	{
-		if (_undoStack.TryPop(out var path))
-		{
-			_isUserEntered = false;
-			_redoStack.Push(CurrentFolder);
-		}
-
-		return path;
+		return _fileOperationService.Undo(CurrentFolder);
 	}
 
 	public IFileItem? Redo()
 	{
-		if (_redoStack.TryPop(out var path))
-		{
-			_isUserEntered = false;
-			_undoStack.Push(CurrentFolder);
-		}
-
-		return path;
+		return _fileOperationService.Redo(CurrentFolder);
 	}
 
 	public void CancelUpdateFiles()
@@ -256,7 +199,7 @@ public partial class TabItemViewModel : ObservableObject
 			_updateNotificator.Changed += UpdateFolder;
 		}
 
-		await await Runner.Run<Task>(async () =>
+		await await Runner.Run(() =>
 		{
 			var items = Provider.GetItemsAsync(CurrentFolder!, search, recursive, TokenSource.Token);
 
@@ -264,86 +207,16 @@ public partial class TabItemViewModel : ObservableObject
 			{
 				if (Provider is FileSystemProvider)
 				{
-					await Files.AddRangeAsync(Provider, CurrentFolder, search, TokenSource.Token);
+					return Files.AddRangeAsync(Provider, CurrentFolder, search, TokenSource.Token);
 				}
-				else
-				{
-					await Files.AddRangeAsync(items, TokenSource.Token);
-				}
+
+				return Files.AddRangeAsync(items, TokenSource.Token);
 			}
-			else
-			{
-				await Files.AddRangeAsync(items, GetComparer(), TokenSource.Token);
-			}
+
+			return Files.AddRangeAsync(items, GetComparer(), TokenSource.Token);
 		});
 
 		IsLoading = false;
-	}
-
-	private void UpdateFolder(IFolderUpdateNotificator notificator, ChangeType changeType, string oldPath, string? newPath)
-	{
-		if (IsLoading || Files is null)
-		{
-			return;
-		}
-
-		var fileFromOldPathEnumerable = Files
-			.Where(w => w.GetPath((currentItem, item) => currentItem.SequenceEqual(item), oldPath));
-
-		switch (changeType)
-		{
-			case ChangeType.Changed:
-
-				foreach (var file in fileFromOldPathEnumerable)
-				{
-					Dispatcher.UIThread.Invoke(file.UpdateData);
-					break;
-				}
-
-				break;
-
-			case ChangeType.Created:
-				if (_isRecursive)
-				{
-				}
-				else if (CurrentFolder is FileModel file)
-				{
-					var comparer = GetComparer();
-					var model = new FileModel(new FileSystemTreeItem(Path.GetFileName(oldPath.AsSpan()), new DirectoryInfo(oldPath).Exists, file.TreeItem));
-					var index = Files.BinarySearch(model, comparer);
-
-					if (index < 0)
-					{
-						Files.Insert(~index, model);
-					}
-				}
-
-				break;
-
-			case ChangeType.Deleted:
-				for (var i = Files.Count - 1; i >= 0; i--)
-				{
-					if (Files[i].GetPath((currentItem, item) => currentItem.SequenceEqual(item), oldPath))
-					{
-						Files.RemoveAt(i);
-					}
-				}
-
-				break;
-
-			case ChangeType.Renamed:
-				foreach (var file in fileFromOldPathEnumerable)
-				{
-					file.Name = Path.GetFileNameWithoutExtension(newPath)!;
-					file.Extension = Path.GetExtension(newPath)!;
-					Dispatcher.UIThread.Invoke(file.UpdateData);
-					break;
-				}
-
-				break;
-			default:
-				throw new ArgumentOutOfRangeException(nameof(changeType), changeType, null);
-		}
 	}
 
 	public async ValueTask SetPath(IFileItem? path)
@@ -443,14 +316,94 @@ public partial class TabItemViewModel : ObservableObject
 			CurrentViewMode = ViewTypes.List;
 		}
 
-		if (_isUserEntered && (!_undoStack.TryPeek(out var tempPath) || tempPath != CurrentFolder))
-		{
-			_undoStack.Push(CurrentFolder);
-			_redoStack.Clear();
-		}
+		_fileOperationService.UpdateUndoRedoStack(CurrentFolder);
 
 		IsSearching = false;
 	}
+
+	private void UpdateFolder(IFolderUpdateNotificator notificator, ChangeType changeType, string oldPath, string? newPath)
+	{
+		if (IsLoading)
+		{
+			return;
+		}
+
+		var fileFromOldPathEnumerable = Files
+			.Where(w => w.GetPath((currentItem, item) => currentItem.SequenceEqual(item), oldPath));
+
+		switch (changeType)
+		{
+			case ChangeType.Changed:
+				HandleChangedFiles();
+				break;
+
+			case ChangeType.Created:
+				HandleCreatedFiles();
+				break;
+
+			case ChangeType.Deleted:
+				HandleDeletedFiles();
+				break;
+
+			case ChangeType.Renamed:
+				HandleRenamedFiles();
+				break;
+			default:
+				throw new ArgumentOutOfRangeException(nameof(changeType), changeType, null);
+		}
+
+		return;
+
+		void HandleDeletedFiles()
+		{
+			for (var i = Files.Count - 1; i >= 0; i--)
+			{
+				if (Files[i].GetPath((currentItem, item) => currentItem.SequenceEqual(item), oldPath))
+				{
+					Files.RemoveAt(i);
+				}
+			}
+		}
+
+		void HandleCreatedFiles()
+		{
+			if (_isRecursive)
+			{
+			}
+			else if (CurrentFolder is FileModel file)
+			{
+				var comparer = GetComparer();
+				var model = new FileModel(new FileSystemTreeItem(Path.GetFileName(oldPath.AsSpan()), new DirectoryInfo(oldPath).Exists, file.TreeItem));
+				var index = Files.BinarySearch(model, comparer);
+
+				if (index < 0)
+				{
+					Files.Insert(~index, model);
+				}
+			}
+		}
+
+		void HandleRenamedFiles()
+		{
+			foreach (var file in fileFromOldPathEnumerable)
+			{
+				file.Name = Path.GetFileNameWithoutExtension(newPath)!;
+				file.Extension = Path.GetExtension(newPath)!;
+				Dispatcher.UIThread.Invoke(file.UpdateData);
+				break;
+			}
+		}
+
+		void HandleChangedFiles()
+		{
+			foreach (var file in fileFromOldPathEnumerable)
+			{
+				Dispatcher.UIThread.Invoke(file.UpdateData);
+				break;
+			}
+		}
+	}
+
 
 	private Comparer<IFileItem> GetComparer()
 	{

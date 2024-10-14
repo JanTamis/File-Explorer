@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.5" y1="0" x2="0.5" y2="1" id="gradient_1">
+      <stop offset="0%" stop-color="#F45560" />
+      <stop offset="100%" stop-color="#CF1928" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.5" y1="0" x2="0.5" y2="1" id="gradient_2">
+      <stop offset="0%" stop-color="#787E85" />
+      <stop offset="50%" stop-color="#9CA5AD" />
+      <stop offset="100%" stop-color="#787E85" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.5000001" y1="0" x2="0.5000001" y2="1" id="gradient_3">
+      <stop offset="12.9%" stop-color="#41474A" />
+      <stop offset="69.8%" stop-color="#323538" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.49999997" y1="0" x2="0.49999997" y2="1" id="gradient_4">
+      <stop offset="0%" stop-color="#889097" />
+      <stop offset="100%" stop-color="#4C5963" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.39600003" y1="0.010833323" x2="0.604" y2="0.9891668" id="gradient_5">
+      <stop offset="0%" stop-color="#F45560" />
+      <stop offset="100%" stop-color="#CF1928" />
+    </linearGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" clip-rule="evenodd" fill-rule="evenodd" />
+    </clipPath>
+  </defs>
+  <g id="Joystick" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Joystick" fill="none" stroke="none" />
+    <path d="M15 33L12 33C11.45 33 11 32.55 11 32L11 29C11 28.45 11.45 28 12 28L15 28C15.55 28 16 28.45 16 29L16 32C16 32.55 15.55 33 15 33L15 33Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M23 14L27 14L27 28L23 28L23 14L23 14Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M19 32C19 28.686 21.686 26 25 26C28.314 26 31 28.686 31 32L19 32L19 32Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+    <path d="M40 42L8 42C6.35 42 5 40.65 5 39L5 33C5 31.35 6.35 30 8 30L40 30C41.65 30 43 31.35 43 33L43 39C43 40.65 41.65 42 40 42L40 42Z" id="Shape" fill="url(#gradient_4)" stroke="none" />
+    <path d="M25 5C21.686 5 19 7.686 19 11C19 14.314 21.686 17 25 17C28.314 17 31 14.314 31 11C31 7.686 28.314 5 25 5L25 5Z" id="Shape" fill="url(#gradient_5)" stroke="none" />
+  </g>
+</svg>

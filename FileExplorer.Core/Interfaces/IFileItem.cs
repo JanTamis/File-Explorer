@@ -14,6 +14,7 @@ public interface IFileItem
 	long Size { get; }
 
 	DateTime EditedOn { get; }
+	DateTime CreatedOn { get; }
 
 	bool IsVisible { get; set; }
 
@@ -22,6 +23,8 @@ public interface IFileItem
 	string GetPath();
 	T GetPath<T>(ReadOnlySpanFunc<char, T> action);
 	T GetPath<T, TParameter>(ReadOnlySpanFunc<char, TParameter, T> action, TParameter parameter);
+	
+	Stream GetStream();
 }
 
 public delegate T ReadOnlySpanFunc<TSpan, out T>(ReadOnlySpan<TSpan> data);

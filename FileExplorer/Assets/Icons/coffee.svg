@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.5066874" y1="0.5" x2="0.96175003" y2="0.5" id="gradient_1">
+      <stop offset="0%" stop-color="#CF1928" />
+      <stop offset="100%" stop-color="#F45560" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.5" y1="0.06599426" x2="0.5" y2="1.3065033" id="gradient_2">
+      <stop offset="16.2%" stop-color="#F45560" />
+      <stop offset="100%" stop-color="#CF1928" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.41926664" y1="0.0113333315" x2="0.66986674" y2="0.7792667" id="gradient_3">
+      <stop offset="0%" stop-color="#F45560" />
+      <stop offset="89.700005%" stop-color="#CF1928" />
+    </linearGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" clip-rule="evenodd" fill-rule="evenodd" />
+    </clipPath>
+  </defs>
+  <g id="Coffee" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Coffee" fill="none" stroke="none" />
+    <path d="M30 32.326L30 15L43 15C44.654 15 46 16.346 46 18L46 23.983C46 26.204 44.509 28.181 42.373 28.791L30 32.326L30 32.326ZM32 17L32 29.674L41.824 26.867C43.105 26.501 44 25.315 44 23.983L44 18C44 17.449 43.552 17 43 17L32 17L32 17Z" id="Shape" fill="url(#gradient_1)" fill-rule="evenodd" stroke="none" />
+    <path d="M8.904 41L39.096 41C41.39 41 43.39 39.439 43.947 37.213L44 37L4 37L4.053 37.213C4.61 39.439 6.61 41 8.904 41L8.904 41Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M34 37L14 37C14 37 9 22 9 17C9 14.75 9 8 9 8C9 7.448 9.448 7 10 7L38 7C38.552 7 39 7.448 39 8C39 8 39 14.75 39 17C39 22 34 37 34 37L34 37Z" id="Shape" fill="url(#gradient_3)" stroke="none" />
+  </g>
+</svg>

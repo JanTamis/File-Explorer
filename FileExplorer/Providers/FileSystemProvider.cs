@@ -6,18 +6,21 @@ using Avalonia.Media;
 using FileExplorer.Core.Interfaces;
 using FileExplorer.Helpers;
 using FileExplorer.Models;
-using Microsoft.Extensions.Caching.Memory;
 using System.IO;
 using System.IO.Enumeration;
+using System.Numerics;
 using System.Text;
-using System.Text.RegularExpressions;
 using Avalonia.Svg.Skia;
 using DialogHostAvalonia;
 using FileExplorer.Core.Extensions;
 using FileExplorer.Core.Models;
 using FileExplorer.DisplayViews;
+using FileExplorer.Interfaces;
 using FileExplorer.Popup;
+using FileExplorer.Providers.FileSystemMenuItems;
 using FileExplorer.Resources;
+using Humanizer;
+using Humanizer.Localisation;
 using Material.Icons;
 using Directory = System.IO.Directory;
 using File = System.IO.File;
@@ -74,9 +77,12 @@ public sealed class FileSystemProvider : IItemProvider
 
 	public ValueTask<IFileItem?> GetParentAsync(IFileItem folder, CancellationToken token)
 	{
-		return folder is FileModel { TreeItem.Parent: not null, } file
-			? new ValueTask<IFileItem?>(new FileModel(file.TreeItem.Parent))
-			: new ValueTask<IFileItem?>(null as IFileItem);
+		if (folder is FileModel { TreeItem.Parent: { } parent })
+		{
+			return new ValueTask<IFileItem?>(new FileModel(parent));
+		}
+
+		return new ValueTask<IFileItem?>(null as IFileItem);
 	}
 
 	public async Task<IImage?> GetThumbnailAsync(IFileItem? item, int size, CancellationToken token)
@@ -113,7 +119,13 @@ public sealed class FileSystemProvider : IItemProvider
 
 			while (bag.TryDequeue(out var task))
 			{
-				await task;
+				try
+				{
+					await task;
+				}
+				catch (Exception e)
+				{
+				}
 			}
 		}
 
@@ -210,22 +222,22 @@ public sealed class FileSystemProvider : IItemProvider
 		}
 	}
 
-	public IEnumerable<MenuItemModel> GetMenuItems(IFileItem? item)
+	public IEnumerable<IMenuModel> GetMenuItems(IFileItem? item)
 	{
 		if (item is null)
 		{
 			yield break;
 		}
 
-		yield return new MenuItemModel(MenuItemType.Button, nameof(MaterialIconKind.Scissors), Cut);
-		yield return new MenuItemModel(MenuItemType.Button, nameof(MaterialIconKind.ContentCopy), Copy);
-		yield return new MenuItemModel(MenuItemType.Button, nameof(MaterialIconKind.ContentPaste), Paste);
-		yield return new MenuItemModel(MenuItemType.Button, nameof(MaterialIconKind.TrashCanOutline), Remove);
-		yield return new MenuItemModel(MenuItemType.Separator);
-		yield return new MenuItemModel(MenuItemType.Button, nameof(MaterialIconKind.InformationOutline), Properties);
-		yield return new MenuItemModel(MenuItemType.Button, nameof(MaterialIconKind.FolderZipOutline), Zip);
-		yield return new MenuItemModel(MenuItemType.Separator);
-		// yield return new MenuItemModel(MenuItemType.Button, nameof(MaterialIconKind.Analytics), Analyze);
+		yield return new ButtonMenuItemModel(MaterialIconKind.Scissors, Cut);
+		yield return new ButtonMenuItemModel(MaterialIconKind.ContentCopy, Copy);
+		yield return new ButtonMenuItemModel(MaterialIconKind.ContentPaste, Paste);
+		yield return new ButtonMenuItemModel(MaterialIconKind.TrashCanOutline, Remove);
+		yield return new SeparatorMenuItemModel();
+		yield return new ButtonMenuItemModel(MaterialIconKind.InformationOutline, Properties);
+		yield return new ButtonMenuItemModel(MaterialIconKind.FolderZipOutline, Zip);
+		yield return new SeparatorMenuItemModel();
+		// yield return new ButtonMenuItemModel(MaterialIconKind.Analytics, Analyze);
 	}
 
 	public IFolderUpdateNotificator? GetNotificator([NotNullIfNotNull(nameof(folder))] IFileItem? folder, string filter, bool recursive)
@@ -236,11 +248,6 @@ public sealed class FileSystemProvider : IItemProvider
 		}
 
 		return new FileSystemUpdater(folder.GetPath(), filter, recursive);
-	}
-
-	public static TimeSpan EstimateTime(TimeSpan elapsedTime, double progress)
-	{
-		return Math.ReciprocalEstimate(progress) * elapsedTime - elapsedTime;
 	}
 
 	private void Cut(MenuItemActionModel model)
@@ -259,7 +266,7 @@ public sealed class FileSystemProvider : IItemProvider
 
 	private void Paste(MenuItemActionModel model)
 	{
-		if (_clipboard?.Any() == true)
+		if (!_clipboard.Any())
 		{
 			return;
 		}
@@ -275,7 +282,8 @@ public sealed class FileSystemProvider : IItemProvider
 			var length = 0L;
 			var previousLength = 0L;
 			var isDone = false;
-			var startTime = Stopwatch.GetTimestamp();
+
+			var etaCalculator = new EtaCalculator(1, TimeSpan.FromSeconds(30));
 
 			Task.Run(async () =>
 			{
@@ -285,7 +293,7 @@ public sealed class FileSystemProvider : IItemProvider
 				while (await timer.WaitForNextTickAsync() && !isDone)
 				{
 					progress.Speed = (length - previousLength) * (long) (1000d / interval);
-					progress.EstimateTime = $"Estimated time: {EstimateTime(Stopwatch.GetElapsedTime(startTime), progress.Process):hh\\:mm\\:ss}";
+					progress.EstimateTime = $"{etaCalculator.ETR.Humanize(3, minUnit: TimeUnit.Second)}";
 
 					previousLength = length;
 				}
@@ -319,6 +327,7 @@ public sealed class FileSystemProvider : IItemProvider
 						currentFileLengthCount = streamPosition;
 
 						progress.Process = length / maxLength;
+						etaCalculator.Update(progress.Process);
 					}
 				});
 
@@ -331,7 +340,7 @@ public sealed class FileSystemProvider : IItemProvider
 			isDone = true;
 		};
 
-		model.Popup = progress;
+		model.Popup(progress);
 	}
 
 	private void Remove(MenuItemActionModel model)
@@ -340,9 +349,7 @@ public sealed class FileSystemProvider : IItemProvider
 
 		if (selectedCount > 0)
 		{
-			var itemText = selectedCount > 1
-				? ResourceDefault.Items
-				: ResourceDefault.Item;
+			var itemText = GetItemText(selectedCount);
 
 			var choice = new Choice
 			{
@@ -380,7 +387,7 @@ public sealed class FileSystemProvider : IItemProvider
 				}
 			};
 
-			model.Popup = choice;
+			model.Popup(choice);
 		}
 	}
 
@@ -444,27 +451,29 @@ public sealed class FileSystemProvider : IItemProvider
 
 		// analyzer.OnClose += tokenSource.Cancel;
 
-		model.Popup = analyzer;
+		model.Popup(analyzer);
 	}
 
 	private void Properties(MenuItemActionModel model)
 	{
-		model.Popup = new Properties
+		model.Popup(new Properties
 		{
 			Provider = this,
 			Model = model.CurrentFolder
-		};
+		});
 	}
 
 	private void Zip(MenuItemActionModel? model)
 	{
 		if (model?.Files is not null)
 		{
-			model.Popup = new Zip
+			model.Popup(new Zip
 			{
-				SelectedFiles = model.Files.Where(w => w.IsSelected).ToList(),
+				SelectedFiles = model.Files
+					.Where(w => w is { IsSelected: true, IsFolder: false })
+					.ToList(),
 				Folder = model.CurrentFolder
-			};
+			});
 		}
 	}
 
@@ -503,5 +512,12 @@ public sealed class FileSystemProvider : IItemProvider
 		return recursive
 			? item.EnumerateChildrenRecursive(name => FileSystemName.MatchesSimpleExpression(filter, name) || IsCategory(name, filter)) // || Regex.IsMatch(name, filter))
 			: item.EnumerateChildren(name => FileSystemName.MatchesSimpleExpression(filter, name) || IsCategory(name, filter)); // || Regex.IsMatch(name, filter));
+	}
+
+	private string GetItemText<T>(T itemCount) where T : IBinaryInteger<T>
+	{
+		return itemCount > T.One
+			? ResourceDefault.Items
+			: ResourceDefault.Item;
 	}
 }

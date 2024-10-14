@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Avalonia.Controls;
 using FileExplorer.Core.Helpers;
 using FileExplorer.Core.Interfaces;
@@ -14,25 +15,19 @@ public interface IFileViewer
 	void SelectAll();
 	void SelectNone();
 	void SelectInvert();
-	
-	public static int UpdateSelection(IFileViewer viewer, int anchorIndex, int index, bool select = true, bool rangeModifier = false, bool toggleModifier = false)
+
+	public static int UpdateSelection(IFileViewer viewer, int anchorIndex, int index, out int amount, bool select = true, bool rangeModifier = false, bool toggleModifier = false)
 	{
-		if (viewer.Items is null)
-		{
-			return anchorIndex;
-		}
+		amount = 0;
 		
-		var files = viewer.Items;
-		var count = files.Count;
-
-		if (index < 0 || index >= count)
+		if (viewer.Items is null || index < 0 || index >= viewer.Items.Count)
 		{
 			return anchorIndex;
 		}
 
-		var mode = SelectionMode.Multiple;
-		var multi = mode.HasFlag(SelectionMode.Multiple);
-		var toggle = toggleModifier || mode.HasFlag(SelectionMode.Toggle);
+		var files = viewer.Items;
+		var multi = SelectionMode.Multiple.HasFlag(SelectionMode.Multiple);
+		var toggle = toggleModifier || SelectionMode.Multiple.HasFlag(SelectionMode.Toggle);
 		var range = multi && rangeModifier;
 
 		if (!select)
@@ -41,47 +36,57 @@ public interface IFileViewer
 		}
 		else if (range)
 		{
-			for (var i = 0; i < count; i++)
-			{
-				files[i].IsSelected = false;
-			}
-
-			if (index > anchorIndex)
-			{
-				for (var i = anchorIndex; i <= index; i++)
-				{
-					files[i].IsSelected = true;
-				}
-			}
-			else
-			{
-				for (var i = index; i <= anchorIndex; i++)
-				{
-					files[i].IsSelected = true;
-				}
-			}
+			amount = SelectRange(files, anchorIndex, index);
 		}
 		else if (multi && toggle)
 		{
-			var file = files[index];
-
-			file.IsSelected ^= true;
+			files[index].IsSelected ^= true;
+			amount = files[index].IsSelected ? 1 : 0;
 		}
 		else
 		{
-			for (var i = 0; i < count; i++)
-			{
-				files[i].IsSelected = false;
-			}
-
-			files[index].IsSelected = true;
+			amount = SelectSingle(files, index);
 		}
 
-		if (!range)
+		return range ? anchorIndex : index;
+	}
+
+	private static int SelectRange(ObservableRangeCollection<IFileItem> files, int anchorIndex, int index)
+	{
+		ClearSelection(files);
+
+		var count = 0;
+
+		var start = Math.Min(anchorIndex, index);
+		var end = Math.Max(anchorIndex, index);
+
+		for (var i = start; i <= end; i++)
 		{
-			anchorIndex = index;
+			files[i].IsSelected = true;
+			count++;
 		}
+		
+		return count;
+	}
 
-		return anchorIndex;
+	private static int SelectSingle(ObservableRangeCollection<IFileItem> files, int index)
+	{
+		ClearSelection(files);
+		files[index].IsSelected = true;
+
+		return 1;
+	}
+
+	private static void ClearSelection(ObservableRangeCollection<IFileItem> files)
+	{
+		for (var i = 0; i < files.Count; i++)
+		{
+			var file = files[i];
+			
+			if (file.IsSelected)
+			{
+				file.IsSelected = false;
+			}
+		}
 	}
 }

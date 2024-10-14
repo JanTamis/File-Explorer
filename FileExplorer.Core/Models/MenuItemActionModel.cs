@@ -7,5 +7,5 @@ public class MenuItemActionModel
 {
 	public ObservableRangeCollection<IFileItem> Files { get; init; }
 	public IFileItem CurrentFolder { get; init; }
-	public IPopup? Popup { get; set; }
+	public Action<IPopup?> Popup { get; init; }
 }

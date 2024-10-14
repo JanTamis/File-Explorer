@@ -1,12 +1,18 @@
 ﻿using FileExplorer.Popup;
+using FileExplorer.Services;
+using FileExplorer.ViewModels;
 using StrongInject;
 
 namespace FileExplorer.Injection;
 
 [Register<Properties>]
-[Register<Settings>]
-public sealed partial class Container :
+[Register<Settings>(Scope.SingleInstance)]
+[Register<TabItemViewModel>]
+[Register<FileOperationService>]
+public partial class Container :
 	IContainer<Properties>,
-	IContainer<Settings>
+	IContainer<Settings>,
+	IContainer<TabItemViewModel>,
+	IContainer<FileOperationService>
 {
 }

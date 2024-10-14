@@ -17,10 +17,10 @@ public class EtaCalculator
 	/// <param name="maximumDuration">
 	/// Determines how many seconds of data will be used to calculate the ETA.
 	/// </param>
-	public EtaCalculator(int minimumData, double maximumDuration)
+	public EtaCalculator(int minimumData, TimeSpan maximumDuration)
 	{
 		_minimumData = minimumData;
-		_maximumTicks = (long) (maximumDuration * Stopwatch.Frequency);
+		_maximumTicks = (long) (maximumDuration.TotalSeconds * Stopwatch.Frequency);
 		_queue = new Queue<ProgressItem>(minimumData * 2);
 		_timer = Stopwatch.StartNew();
 	}
@@ -30,23 +30,22 @@ public class EtaCalculator
 	private readonly Stopwatch _timer;
 	private readonly Queue<ProgressItem> _queue;
 
-	private ProgressItem current;
-	private ProgressItem oldest;
+	private ProgressItem _current;
+	private ProgressItem _oldest;
 
 	public void Reset()
 	{
 		_queue.Clear();
-
-		_timer.Reset();
-		_timer.Start();
+		_timer.Restart();
 	}
 
 	private void ClearExpired()
 	{
 		var expired = _timer.ElapsedTicks - _maximumTicks;
+		
 		while (_queue.Count > _minimumData && _queue.Peek().Key < expired)
 		{
-			oldest = _queue.Dequeue();
+			_oldest = _queue.Dequeue();
 		}
 	}
 
@@ -57,7 +56,7 @@ public class EtaCalculator
 	public void Update(double progress)
 	{
 		// If progress hasn't changed, ignore:
-		if (Math.Abs(current.Value - progress) < Double.Epsilon)
+		if (Math.Abs(_current.Value - progress) < Double.Epsilon)
 		{
 			return;
 		}
@@ -67,13 +66,13 @@ public class EtaCalculator
 
 		// Queue this item:
 		var currentTicks = _timer.ElapsedTicks;
-		current = new ProgressItem(currentTicks, progress);
-		_queue.Enqueue(current);
+		_current = new ProgressItem(currentTicks, progress);
+		_queue.Enqueue(_current);
 
 		// See if its the first item:
 		if (_queue.Count == 1)
 		{
-			oldest = current;
+			_oldest = _current;
 		}
 	}
 
@@ -85,8 +84,8 @@ public class EtaCalculator
 		{
 			// Create local copies of the oldest & current,
 			// so that another thread can update them without locking:
-			var (oldestKey, oldestValue) = oldest;
-			var (currentKey, currentValue) = current;
+			var (oldestKey, oldestValue) = _oldest;
+			var (currentKey, currentValue) = _current;
 
 			// Make sure we have enough items:
 			if (_queue.Count < _minimumData || Math.Abs(oldestValue - currentValue) < Double.Epsilon)
@@ -110,5 +109,5 @@ public class EtaCalculator
 	/// </summary>
 	public bool ETAIsAvailable =>
 		// Make sure we have enough items:
-		_queue.Count >= _minimumData && Math.Abs(oldest.Value - current.Value) > Single.Epsilon;
+		_queue.Count >= _minimumData && Math.Abs(_oldest.Value - _current.Value) > Single.Epsilon;
 }

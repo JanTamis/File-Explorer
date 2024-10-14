@@ -10,7 +10,7 @@
 	            >
 		<TabControl.Styles>
 			<Style Selector="TabItem:selected">
-				<Setter Property="TextBlock.Foreground" Value="{DynamicResource MaterialDesignBody}" />
+				<Setter Property="TextBlock.Foreground" Value="{DynamicResource MaterialBodyBrush}" />
 			</Style>
 			<Style Selector="TabItem">
 				<Setter Property="Theme" Value="{StaticResource MaterialBottomNavigationTabItem}" />

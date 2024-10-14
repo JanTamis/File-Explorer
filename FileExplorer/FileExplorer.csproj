@@ -4,7 +4,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <Platforms>AnyCPU;x64</Platforms>
-        <LangVersion>11</LangVersion>
+        <LangVersion>default</LangVersion>
         <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
         <TrimMode>full</TrimMode>
         <EnablePreviewFeatures>true</EnablePreviewFeatures>
@@ -17,15 +17,6 @@
         <SignAssembly>true</SignAssembly>
         <DelaySign>false</DelaySign>
         <PlatformTarget>x64</PlatformTarget>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(IsWindows)'=='true'">
-        <DefineConstants>Windows</DefineConstants>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(IsOSX)'=='true'">
-        <DefineConstants>macOS</DefineConstants>
-    </PropertyGroup>
-    <PropertyGroup Condition="'$(IsLinux)'=='true'">
-        <DefineConstants>Linux</DefineConstants>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -84,30 +75,79 @@
         <Resource Include="Assets\UIIcons\FileExplorer.svg" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.0.4" />
-        <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.0.0" />
-        <PackageReference Include="Avalonia.Desktop" Version="11.0.4" />
-        <PackageReference Include="Avalonia.Diagnostics" Version="11.0.4" />
-        <PackageReference Include="Avalonia.Svg.Skia" Version="11.0.0" />
-        <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.1" />
-        <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="11.0.0" />
-        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
-        <PackageReference Include="DialogHost.Avalonia" Version="0.7.6" />
+        <PackageReference Include="Avalonia" Version="11.0.6" />
+        <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.0.6" />
+        <PackageReference Include="Avalonia.Controls.ItemsRepeater" Version="11.0.6" />
+        <PackageReference Include="Avalonia.Controls.Skia" Version="11.0.0.10" />
+        <PackageReference Include="Avalonia.Desktop" Version="11.0.6" />
+        <PackageReference Include="Avalonia.Diagnostics" Version="11.0.6" />
+        <PackageReference Include="Avalonia.Svg.Skia" Version="11.0.0.10" />
+        <PackageReference Include="Avalonia.Themes.Simple" Version="11.0.6" />
+        <PackageReference Include="AvaloniaEdit.TextMate" Version="11.0.6" />
+        <PackageReference Include="CommunityToolkit.HighPerformance" Version="8.2.2" />
+        <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="11.0.2" />
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+        <PackageReference Include="DialogHost.Avalonia" Version="0.7.7" />
         <PackageReference Include="DiscUtils.FileSystems" Version="0.16.13" />
         <PackageReference Include="Humanizer" Version="2.14.1" />
         <PackageReference Include="HyperText.Avalonia" Version="11.0.0-rc1" />
-        <PackageReference Include="Material.Avalonia" Version="3.0.0-avalonia11-preview6.17-nightly" />
-        <PackageReference Include="Material.Icons.Avalonia" Version="2.0.1" />
+        <PackageReference Include="Material.Avalonia" Version="3.2.1.66-nightly" />
+        <PackageReference Include="Material.Icons.Avalonia" Version="2.1.0" />
         <PackageReference Include="Material.WindowStyle" Version="0.11.0.24-alpha" />
-        <PackageReference Include="MemoryPack" Version="1.9.16" />
+        <PackageReference Include="MemoryPack" Version="1.10.0" />
         <PackageReference Include="MetadataExtractor" Version="2.8.1" />
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0-preview.7.23375.6" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0-preview.7.23375.6" />
-        <PackageReference Include="SharpCompress" Version="0.33.0" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+        <PackageReference Include="SharpCompress" Version="0.35.0" />
         <PackageReference Include="StrongInject" Version="1.4.5-CI-20220524-023137" />
-        <PackageReference Include="Svg.Skia" Version="1.0.0" />
+        <PackageReference Include="Svg.Skia" Version="1.0.0.10" />
+        <PackageReference Include="Svg.SourceGenerator.Skia" Version="1.0.0.10" />
         <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+        <PackageReference Include="TextMateSharp.Grammars" Version="1.0.56" />
         <PackageReference Include="ValueTaskSupplement" Version="1.1.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <AdditionalFiles Include="Assets\Icons\File.svg" ClassName="FilePicture"/>
+        <AdditionalFiles Include="Assets\Icons\Folder.svg" ClassName="FolderPicture"/>
+        <AdditionalFiles Include="Assets\Icons\FolderFiles.svg" ClassName="FolderFilesPicture"/>
+        
+        <AdditionalFiles Include="Assets\Icons\Word.svg" ClassName="WordPicture" />
+        <AdditionalFiles Include="Assets\Icons\PowerPoint.svg" ClassName="PowerPointPicture"/>
+        <AdditionalFiles Include="Assets\Icons\Excel.svg" ClassName="ExcelPicture"/>
+        <AdditionalFiles Include="Assets\Icons\Access.svg" ClassName="AccessPicture"/>
+        
+        <AdditionalFiles Include="Assets\Icons\Font.svg" ClassName="FontPicture"/>
+
+        <AdditionalFiles Include="Assets\Icons\Jpeg.svg" ClassName="JpegPicture"/>
+        <AdditionalFiles Include="Assets\Icons\Png.svg" ClassName="PngPicture"/>
+        <AdditionalFiles Include="Assets\Icons\RawImage.svg" ClassName="RawImagePicture"/>
+
+        <AdditionalFiles Include="Assets\Icons\Archive.svg" ClassName="ArchivePicture"/>
+
+        <AdditionalFiles Include="Assets\Icons\Audio.svg" ClassName="AudioPicture"/>
+        <AdditionalFiles Include="Assets\Icons\Video.svg" ClassName="VideoPicture"/>
+
+        <AdditionalFiles Include="Assets\Icons\Web.svg" ClassName="WebPicture"/>
+
+        <AdditionalFiles Include="Assets\Icons\AdobeIllustrator.svg" ClassName="AdobeIllustratorPicture"/>
+        <AdditionalFiles Include="Assets\Icons\AdobeXd.svg" ClassName="AdobeXdPicture"/>
+        <AdditionalFiles Include="Assets\Icons\AdobeAnimate.svg" ClassName="AdobeAnimatePicture"/>
+        <AdditionalFiles Include="Assets\Icons\AdobeFireworks.svg" ClassName="AdobeFireworksPicture"/>
+        <AdditionalFiles Include="Assets\Icons\AdobeInDesign.svg" ClassName="AdobeInDesignPicture"/>
+        <AdditionalFiles Include="Assets\Icons\AdobeFramemaker.svg" ClassName="AdobeFramemakerPicture"/>
+        <AdditionalFiles Include="Assets\Icons\AdobeAfterEffects.svg" ClassName="AdobeAfterEffectsPicture"/>
+
+        <AdditionalFiles Include="Assets\Icons\Android.svg" ClassName="AndroidPicture"/>
+
+        <AdditionalFiles Include="Assets\Icons\Xml.svg" ClassName="XmlPicture"/>
+        <AdditionalFiles Include="Assets\Icons\CPlusPlus.svg" ClassName="CPlusPlusPicture"/>
+        <AdditionalFiles Include="Assets\Icons\Java.svg" ClassName="JavaPicture"/>
+        <AdditionalFiles Include="Assets\Icons\HTML.svg" ClassName="HTMLPicture"/>
+        <AdditionalFiles Include="Assets\Icons\CSS.svg" ClassName="CSSPicture"/>
+        <AdditionalFiles Include="Assets\Icons\JavaScript.svg" ClassName="JavaScriptPicture"/>
+
+        <AdditionalFiles Include="Assets\Icons\Data.svg" ClassName="DataPicture"/>
+        <AdditionalFiles Include="Assets\Icons\Executable.svg" ClassName="ExecutablePicture"/>
     </ItemGroup>
     <ItemGroup>
         <AvaloniaResource Update="Assets\avalonia-logo.ico">

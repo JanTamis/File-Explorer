@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:converters="using:FileExplorer.Converters"
+             xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              DataContext="{Binding $self}"
              x:Class="FileExplorer.Popup.Progress">
@@ -11,14 +12,17 @@
 		           HorizontalAlignment="Center"
 		           Margin="0 0 0 5"/>
 		<ProgressBar Value="{Binding Process}"
+		             assists:TransitionAssist.DisableTransitions="True"
+		             Foreground="{DynamicResource MaterialPrimaryMidBrush}"
+		             ShowProgressText="True"
 		             Margin="0 0 0 5"
-		             Height="15"
+		             Height="25"
 		             Maximum="1" />
 
 
 		<Grid ColumnDefinitions="*, *">
-			<TextBlock Grid.Column="0" Text="{Binding EstimateTime}" HorizontalAlignment="Left" />
-			<TextBlock Grid.Column="1" Text="{Binding Speed, Converter={x:Static converters:SpeedToTextConverter.Instance}}" HorizontalAlignment="Right" />
+			<TextBlock Grid.Column="0" FontSize="16" Text="{Binding EstimateTime}" HorizontalAlignment="Left" />
+			<TextBlock Grid.Column="1" FontSize="16" Text="{Binding Speed, Converter={x:Static converters:SpeedToTextConverter.Instance}}" HorizontalAlignment="Right" />
 		</Grid>
 	</StackPanel>
 </UserControl>

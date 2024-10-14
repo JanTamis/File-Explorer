@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.048090935" y1="0.9519999" x2="0.5090909" y2="0.4909091" id="gradient_1">
+      <stop offset="0%" stop-color="#3079D6" />
+      <stop offset="100%" stop-color="#297CD2" />
+    </linearGradient>
+    <linearGradient gradientUnits="objectBoundingBox" x1="0.5" y1="0.034208298" x2="0.5" y2="1.0276923" id="gradient_2">
+      <stop offset="0%" stop-color="#DEDEDE" />
+      <stop offset="100%" stop-color="#D6D6D6" />
+    </linearGradient>
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="path_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#path_1" clip-rule="evenodd" fill-rule="evenodd" />
+    </clipPath>
+  </defs>
+  <g id="Edit Text File" clip-path="url(#clip_1)">
+    <path d="M48 0L48 0L48 48L0 48L0 0L48 0Z" id="Edit-Text-File" fill="none" stroke="none" />
+    <path d="M39 16L39 41C39 42.105 38.105 43 37 43L11 43C9.895 43 9 42.105 9 41L9 7C9 5.895 9.895 5 11 5L28 5L39 16L39 16Z" id="Shape" fill="#50E6FF" stroke="none" />
+    <path d="M32.5 21L15.5 21C15.224 21 15 20.776 15 20.5L15 19.5C15 19.224 15.224 19 15.5 19L32.5 19C32.776 19 33 19.224 33 19.5L33 20.5C33 20.776 32.776 21 32.5 21L32.5 21Z" id="Shape" fill="#057093" stroke="none" />
+    <path d="M30.5 25L15.5 25C15.224 25 15 24.776 15 24.5L15 23.5C15 23.224 15.224 23 15.5 23L30.5 23C30.776 23 31 23.224 31 23.5L31 24.5C31 24.776 30.776 25 30.5 25L30.5 25Z" id="Shape" fill="#057093" stroke="none" />
+    <path d="M32.5 29L15.5 29C15.224 29 15 28.776 15 28.5L15 27.5C15 27.224 15.224 27 15.5 27L32.5 27C32.776 27 33 27.224 33 27.5L33 28.5C33 28.776 32.776 29 32.5 29L32.5 29Z" id="Shape" fill="#057093" stroke="none" />
+    <path d="M30.5 33L15.5 33C15.224 33 15 32.776 15 32.5L15 31.5C15 31.224 15.224 31 15.5 31L30.5 31C30.776 31 31 31.224 31 31.5L31 32.5C31 32.776 30.776 33 30.5 33L30.5 33Z" id="Shape" fill="#057093" stroke="none" />
+    <path d="M28 5L28 14C28 15.105 28.895 16 30 16L39 16L28 5L28 5Z" id="Shape" fill="url(#gradient_1)" stroke="none" />
+    <path d="M39 19.602L23.101 35.504L21.868 40.4C21.757 40.842 22.158 41.243 22.6 41.132L27.497 39.899L39 28.394L39 19.602L39 19.602Z" id="Shape" fill="#000000" fill-opacity="0.05" stroke="none" />
+    <path d="M39 20.309L23.941 35.371L23.394 36.388L23.394 36.388L23.393 36.388L22.529 39.822C22.43 40.214 22.785 40.568 23.177 40.47L26.623 39.602L26.623 39.602L26.623 39.602L27.629 39.059L39 27.663L39 20.309L39 20.309Z" id="Shape" fill="#000000" fill-opacity="0.07" stroke="none" />
+    <path d="M42.781 22.141L40.859 20.22C40.567 19.927 40.091 19.927 39.798 20.22L38.894 21.125L41.875 24.106L42.78 23.202C43.073 22.908 43.073 22.434 42.781 22.141" id="Shape" fill="#C94F60" stroke="none" />
+    <path d="M24.003 36.016L23 40L26.985 38.997L27.403 35.541L24.003 36.016L24.003 36.016Z" id="Shape" fill="#F0F0F0" stroke="none" />
+    <path d="M39.333 26.648L26.985 38.996L24.004 36.015L36.352 23.667L39.333 26.648L39.333 26.648Z" id="Shape" fill="#EDBE00" stroke="none" />
+    <path d="M36.349 23.667L38.892 21.123L41.875 24.104L39.332 26.648L36.349 23.667L36.349 23.667Z" id="Shape" fill="url(#gradient_2)" stroke="none" />
+    <path d="M23.508 37.985L23 40L25.014 39.492L23.508 37.985L23.508 37.985Z" id="Shape" fill="#787878" stroke="none" />
+  </g>
+</svg>

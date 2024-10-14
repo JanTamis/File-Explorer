@@ -248,5 +248,161 @@ namespace FileExplorer.Resources {
                 return ResourceManager.GetString("Drives", resourceCulture);
             }
         }
+        
+        internal static string File {
+            get {
+                return ResourceManager.GetString("File", resourceCulture);
+            }
+        }
+        
+        internal static string Folder {
+            get {
+                return ResourceManager.GetString("Folder", resourceCulture);
+            }
+        }
+        
+        internal static string Dimensions {
+            get {
+                return ResourceManager.GetString("Dimensions", resourceCulture);
+            }
+        }
+        
+        internal static string DataPrecision {
+            get {
+                return ResourceManager.GetString("DataPrecision", resourceCulture);
+            }
+        }
+        
+        internal static string Aperture {
+            get {
+                return ResourceManager.GetString("Aperture", resourceCulture);
+            }
+        }
+        
+        internal static string FStop {
+            get {
+                return ResourceManager.GetString("FStop", resourceCulture);
+            }
+        }
+        
+        internal static string Make {
+            get {
+                return ResourceManager.GetString("Make", resourceCulture);
+            }
+        }
+        
+        internal static string Model {
+            get {
+                return ResourceManager.GetString("Model", resourceCulture);
+            }
+        }
+        
+        internal static string ShutterSpeed {
+            get {
+                return ResourceManager.GetString("ShutterSpeed", resourceCulture);
+            }
+        }
+        
+        internal static string Resolution {
+            get {
+                return ResourceManager.GetString("Resolution", resourceCulture);
+            }
+        }
+        
+        internal static string ISOSpeed {
+            get {
+                return ResourceManager.GetString("ISOSpeed", resourceCulture);
+            }
+        }
+        
+        internal static string Duration {
+            get {
+                return ResourceManager.GetString("Duration", resourceCulture);
+            }
+        }
+        
+        internal static string Information {
+            get {
+                return ResourceManager.GetString("Information", resourceCulture);
+            }
+        }
+        
+        internal static string MimeType {
+            get {
+                return ResourceManager.GetString("MimeType", resourceCulture);
+            }
+        }
+        
+        internal static string HasAlpha {
+            get {
+                return ResourceManager.GetString("HasAlpha", resourceCulture);
+            }
+        }
+        
+        internal static string Yes {
+            get {
+                return ResourceManager.GetString("Yes", resourceCulture);
+            }
+        }
+        
+        internal static string No {
+            get {
+                return ResourceManager.GetString("No", resourceCulture);
+            }
+        }
+        
+        internal static string IsAnimation {
+            get {
+                return ResourceManager.GetString("IsAnimation", resourceCulture);
+            }
+        }
+        
+        internal static string Files {
+            get {
+                return ResourceManager.GetString("Files", resourceCulture);
+            }
+        }
+        
+        internal static string Folders {
+            get {
+                return ResourceManager.GetString("Folders", resourceCulture);
+            }
+        }
+        
+        internal static string SampleRate {
+            get {
+                return ResourceManager.GetString("SampleRate", resourceCulture);
+            }
+        }
+        
+        internal static string BitsPerSample {
+            get {
+                return ResourceManager.GetString("BitsPerSample", resourceCulture);
+            }
+        }
+        
+        internal static string ElapsedTime {
+            get {
+                return ResourceManager.GetString("ElapsedTime", resourceCulture);
+            }
+        }
+        
+        internal static string RemainingTime {
+            get {
+                return ResourceManager.GetString("RemainingTime", resourceCulture);
+            }
+        }
+        
+        internal static string TotalSize {
+            get {
+                return ResourceManager.GetString("TotalSize", resourceCulture);
+            }
+        }
+        
+        internal static string Speed {
+            get {
+                return ResourceManager.GetString("Speed", resourceCulture);
+            }
+        }
     }
 }
